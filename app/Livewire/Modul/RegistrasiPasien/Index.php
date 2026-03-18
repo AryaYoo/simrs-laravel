@@ -15,6 +15,7 @@ class Index extends Component
     public string $search = '';
     public string $dari = '';
     public string $sampai = '';
+    public int $perPage = 20;
 
     public function mount()
     {
@@ -25,6 +26,7 @@ class Index extends Component
     public function updatedSearch()  { $this->resetPage(); }
     public function updatedDari()    { $this->resetPage(); }
     public function updatedSampai()  { $this->resetPage(); }
+    public function updatedPerPage() { $this->resetPage(); }
 
     public function render()
     {
@@ -43,7 +45,7 @@ class Index extends Component
             })
             ->orderBy('tgl_registrasi', 'desc')
             ->orderBy('jam_reg', 'desc')
-            ->paginate(15);
+            ->paginate($this->perPage);
 
         return view('livewire.modul.registrasi-pasien.index', [
             'regPeriksas' => $regPeriksas,
