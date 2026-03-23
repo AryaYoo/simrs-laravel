@@ -34,6 +34,14 @@
                 <span class="text-xs text-neutral-400">s/d</span>
                 <flux:input type="date" wire:model.live="sampai" class="w-40" />
             </div>
+            <div class="flex items-center gap-2 border-l border-neutral-200 dark:border-neutral-700 pl-3 ml-1">
+                <span class="text-xs font-medium text-neutral-500">Limit:</span>
+                <flux:select wire:model.live="perPage" class="!w-24">
+                    <flux:select.option value="20">20</flux:select.option>
+                    <flux:select.option value="50">50</flux:select.option>
+                    <flux:select.option value="100">100</flux:select.option>
+                </flux:select>
+            </div>
         </div>
 
         <flux:table :paginate="$regPeriksas">
