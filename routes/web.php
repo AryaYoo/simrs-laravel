@@ -31,8 +31,28 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/registrasi-pasien/new', \App\Livewire\Modul\RegistrasiPasien\NewPatient::class)->name('modul.registrasi-pasien.new');
     Route::get('modul/registrasi-pasien/{no_rawat}', \App\Livewire\Modul\RegistrasiPasien\Show::class)->name('modul.registrasi-pasien.show')->where('no_rawat', '.*');
 
+    Route::get('modul/rawat-inap', \App\Livewire\Modul\RawatInap\Index::class)->name('modul.rawat-inap.index');
+    Route::get('modul/rawat-inap/{no_rawat}', \App\Livewire\Modul\RawatInap\Show::class)->name('modul.rawat-inap.show')->where('no_rawat', '.*');
+
+    Route::get('modul/rawat-jalan', \App\Livewire\Modul\RawatJalan\Index::class)->name('modul.rawat-jalan.index');
+    Route::get('modul/rawat-jalan/{no_rawat}', \App\Livewire\Modul\RawatJalan\Show::class)->name('modul.rawat-jalan.show')->where('no_rawat', '.*');
+
     Route::get('modul/pasien', \App\Livewire\Modul\Pasien\Index::class)->name('modul.pasien.index');
     Route::get('modul/pasien/{no_rkm_medis}', \App\Livewire\Modul\Pasien\Show::class)->name('modul.pasien.show')->where('no_rkm_medis', '.*');
+
+    Route::view('master-data', 'master-data.index')->name('master-data.index');
+    Route::get('master-data/penjamin', \App\Livewire\MasterData\Penjamin\Index::class)->name('master-data.penjamin.index');
+    Route::get('master-data/kabupaten', \App\Livewire\MasterData\Kabupaten\Index::class)->name('master-data.kabupaten.index');
+    Route::get('master-data/kecamatan', \App\Livewire\MasterData\Kecamatan\Index::class)->name('master-data.kecamatan.index');
+    Route::get('master-data/kelurahan', \App\Livewire\MasterData\Kelurahan\Index::class)->name('master-data.kelurahan.index');
+    Route::get('master-data/perusahaan-pasien', \App\Livewire\MasterData\PerusahaanPasien\Index::class)->name('master-data.perusahaan-pasien.index');
+    Route::get('master-data/suku-bangsa', \App\Livewire\MasterData\SukuBangsa\Index::class)->name('master-data.suku-bangsa.index');
+    Route::get('master-data/bahasa-pasien', \App\Livewire\MasterData\BahasaPasien\Index::class)->name('master-data.bahasa-pasien.index');
+    Route::get('master-data/cacat-fisik', \App\Livewire\MasterData\CacatFisik\Index::class)->name('master-data.cacat-fisik.index');
+    Route::get('master-data/provinsi', \App\Livewire\MasterData\Provinsi\Index::class)->name('master-data.provinsi.index');
+    Route::get('master-data/dokter', \App\Livewire\MasterData\Dokter\Index::class)->name('master-data.dokter.index');
+    Route::get('master-data/poliklinik', \App\Livewire\MasterData\Poliklinik\Index::class)->name('master-data.poliklinik.index');
+    Route::get('master-data/perujuk', \App\Livewire\MasterData\Perujuk\Index::class)->name('master-data.perujuk.index');
 });
 
 require __DIR__ . '/settings.php';

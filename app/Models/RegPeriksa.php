@@ -22,12 +22,13 @@ class RegPeriksa extends Model
         'kd_pj',
         'p_jawab',
         'almt_pj',
-        'hubungan_pj',
+        'hubunganpj',
         'biaya_reg',
         'stts_daftar',
         'stts',
         'stts_poli',
         'status_bayar',
+        'status_lanjut',
     ];
 
     public function dokter()
@@ -43,5 +44,20 @@ class RegPeriksa extends Model
     public function penjab()
     {
         return $this->belongsTo(Penjab::class, 'kd_pj', 'kd_pj');
+    }
+
+    public function kamarInap()
+    {
+        return $this->hasOne(KamarInap::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function permintaanRanap()
+    {
+        return $this->hasOne(PermintaanRanap::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function poliklinik()
+    {
+        return $this->belongsTo(Poliklinik::class, 'kd_poli', 'kd_poli');
     }
 }

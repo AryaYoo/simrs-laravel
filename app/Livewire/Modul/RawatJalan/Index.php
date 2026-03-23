@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Livewire\Modul\RegistrasiPasien;
+namespace App\Livewire\Modul\RawatJalan;
 
 use App\Models\RegPeriksa;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('layouts.app', ['title' => 'Daftar Pasien'])]
+#[Layout('layouts.app', ['title' => 'Daftar Rawat Jalan'])]
 class Index extends Component
 {
     use WithPagination;
@@ -33,7 +33,8 @@ class Index extends Component
         $searchTerm = '%' . $this->search . '%';
 
         $regPeriksas = RegPeriksa::query()
-            ->with(['dokter', 'pasien', 'penjab'])
+            ->with(['pasien', 'penjab', 'dokter', 'poliklinik'])
+            ->where('status_lanjut', 'Ralan')
             ->when($this->dari,    fn($q) => $q->whereDate('tgl_registrasi', '>=', $this->dari))
             ->when($this->sampai,  fn($q) => $q->whereDate('tgl_registrasi', '<=', $this->sampai))
             ->where(function ($query) use ($searchTerm) {
@@ -47,7 +48,7 @@ class Index extends Component
             ->orderBy('jam_reg', 'desc')
             ->paginate($this->perPage);
 
-        return view('livewire.modul.registrasi-pasien.index', [
+        return view('livewire.modul.rawat-jalan.index', [
             'regPeriksas' => $regPeriksas,
         ]);
     }

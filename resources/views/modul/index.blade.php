@@ -3,10 +3,8 @@
     $modules = [
         ['title' => 'Registrasi','icon' => 'users', 'route' => route('modul.registrasi-pasien.index')],
         ['title' => 'Pasien','icon' => 'identification', 'route' => route('modul.pasien.index')],
-        ['title' => 'IGD','icon' => 'truck', 'route' => '#'],
-        ['title' => 'Laboratorium','icon' => 'beaker', 'route' => '#'],
-        ['title' => 'Radiologi','icon' => 'film', 'route' => '#'],
-        ['title' => 'Rawat Inap','icon' => 'home', 'route' => '#']
+        ['title' => 'Rawat Inap','icon' => 'home', 'route' => route('modul.rawat-inap.index')],
+        ['title' => 'Rawat Jalan','icon' => 'calendar-days', 'route' => route('modul.rawat-jalan.index')]
     ];
     @endphp
 

@@ -65,6 +65,12 @@
                         <flux:icon name="users" class="w-4 h-4 flex-shrink-0" />
                         <span>{{ __('Users') }}</span>
                     </a>
+                    <a href="{{ route('master-data.index') }}" wire:navigate
+                        class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium mb-0.5 transition-colors {{ request()->routeIs('master-data*') ? 'bg-white/20' : 'hover:bg-white/10' }}"
+                        style="color: white; text-decoration: none;">
+                        <flux:icon name="circle-stack" class="w-4 h-4 flex-shrink-0" />
+                        <span>{{ __('Master Data') }}</span>
+                    </a>
                 @endif
             </nav>
 

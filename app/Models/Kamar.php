@@ -4,21 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Penjab extends Model
+class Kamar extends Model
 {
-    protected $table = 'penjab';
-    protected $primaryKey = 'kd_pj';
+    protected $table = 'kamar';
+    protected $primaryKey = 'kd_kamar';
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
-        'kd_pj',
-        'png_jawab',
-        'nama_perusahaan',
-        'alamat_asuransi',
-        'no_telp',
-        'attn',
+        'kd_kamar',
+        'kd_bangsal',
+        'trf_kamar',
         'status',
+        'kelas',
+        'statusdata',
     ];
 }

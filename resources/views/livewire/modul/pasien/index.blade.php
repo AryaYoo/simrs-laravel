@@ -29,7 +29,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <span class="text-xs font-medium text-neutral-500">Limit:</span>
-                <flux:select wire:model.live="perPage" variant="filled" class="!w-24">
+                <flux:select wire:model.live="perPage" class="!w-24">
                     <flux:select.option value="20">20</flux:select.option>
                     <flux:select.option value="50">50</flux:select.option>
                     <flux:select.option value="100">100</flux:select.option>
