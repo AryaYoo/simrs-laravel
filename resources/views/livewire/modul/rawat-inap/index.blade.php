@@ -57,7 +57,7 @@
                         <flux:table.cell>{{ $reg->penjab->png_jawab ?? '-' }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->permintaanRanap->kd_kamar ?? '-' }}</flux:table.cell>
                         <flux:table.cell>
-                            <div class="flex justify-center">
+                            <div class="flex justify-center text-center">
                                 <flux:button icon="document-text" size="xs" :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))" target="_blank" variant="ghost" />
                             </div>
                         </flux:table.cell>

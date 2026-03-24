@@ -14,7 +14,7 @@
         searchQuery: '',
         sortMode: 'default',
         menus: [
-            { label: 'Riwayat Pasien', url: '#' },
+            { label: 'Riwayat Pasien', url: '{{ route('modul.rawat-inap.sub-rawat-inap.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}', target: '_blank' },
             { label: 'Input Resep', url: '#' },
             { label: 'Copy Resep', url: '#' },
             { label: 'Permintaan Stok Pasien', url: '#' },
@@ -288,7 +288,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" x-show="filteredMenus.length > 0">
                         <template x-for="item in filteredMenus" :key="item.label">
-                            <a :href="item.url" class="group flex items-center gap-3 p-3 rounded-xl border border-neutral-200 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 hover:border-[#6A7E3F] dark:hover:border-[#6A7E3F] hover:bg-[#6A7E3F]/5 dark:hover:bg-[#6A7E3F]/10 transition-all cursor-pointer shadow-sm">
+                            <a :href="item.url" :target="item.target || '_self'" class="group flex items-center gap-3 p-3 rounded-xl border border-neutral-200 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 hover:border-[#6A7E3F] dark:hover:border-[#6A7E3F] hover:bg-[#6A7E3F]/5 dark:hover:bg-[#6A7E3F]/10 transition-all cursor-pointer shadow-sm">
                                 <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 group-hover:bg-[#6A7E3F]/10 dark:group-hover:bg-[#6A7E3F]/30 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] transition-colors flex-shrink-0">
                                     <flux:icon name="document-text" class="w-4 h-4" />
                                 </div>
