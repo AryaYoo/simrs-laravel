@@ -34,13 +34,14 @@
 
         <flux:table :paginate="$regPeriksas">
             <flux:table.columns>
-                <flux:table.column>{{ __('Nomor Rawat') }}</flux:table.column>
-                <flux:table.column>{{ __('Nomor Rekam Medis') }}</flux:table.column>
+                <flux:table.column>{{ __('No. Rawat') }}</flux:table.column>
+                <flux:table.column>{{ __('No. RM') }}</flux:table.column>
                 <flux:table.column>{{ __('Nama Pasien') }}</flux:table.column>
                 <flux:table.column>{{ __('Alamat Pasien') }}</flux:table.column>
                 <flux:table.column>{{ __('Penanggung Jawab') }}</flux:table.column>
                 <flux:table.column>{{ __('Jenis Bayar') }}</flux:table.column>
                 <flux:table.column>{{ __('Kamar') }}</flux:table.column>
+                <flux:table.column align="center">{{ __('Perawatan/Tindakan') }}</flux:table.column>
                 <flux:table.column>{{ __('Action') }}</flux:table.column>
             </flux:table.columns>
 
@@ -56,12 +57,19 @@
                         <flux:table.cell>{{ $reg->penjab->png_jawab ?? '-' }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->permintaanRanap->kd_kamar ?? '-' }}</flux:table.cell>
                         <flux:table.cell>
-                            <flux:button icon="eye" size="xs" :href="route('modul.rawat-inap.show', str_replace('/', '-', $reg->no_rawat))" wire:navigate variant="ghost" />
+                            <div class="flex justify-center">
+                                <flux:button icon="document-text" size="xs" :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))" wire:navigate variant="ghost" />
+                            </div>
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            <div class="flex justify-center">
+                                <flux:button icon="eye" size="xs" :href="route('modul.rawat-inap.show', str_replace('/', '-', $reg->no_rawat))" wire:navigate variant="ghost" />
+                            </div>
                         </flux:table.cell>
                     </flux:table.row>
                 @empty
                     <flux:table.row>
-                        <flux:table.cell colspan="8">
+                        <flux:table.cell colspan="9">
                             <div class="flex flex-col items-center justify-center py-12 text-neutral-400 dark:text-neutral-500">
                                 <flux:icon name="calendar" class="w-12 h-12 mb-3 opacity-40" />
                                 <p class="text-sm font-medium">Tidak ada pasien rawat inap di periode ini</p>
