@@ -38,7 +38,7 @@
                 id="masterdata-search"
                 class="block w-full pl-9 pr-3 py-2.5 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
                        bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
-                       placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+                       placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#6A7E3F]/30 focus:border-[#6A7E3F] transition-colors"
                 placeholder="Pencarian master data..."
             />
         </div>
@@ -52,19 +52,18 @@
                class="masterdata-card group flex flex-col items-center justify-center gap-2 p-4
                       rounded-xl border border-neutral-200 dark:border-neutral-700
                       bg-white dark:bg-neutral-800
-                      hover:border-indigo-300 hover:bg-indigo-50
-                      dark:hover:border-indigo-500 dark:hover:bg-indigo-950/30
+                      hover:border-[#6A7E3F] hover:bg-[#6A7E3F]/5
+                      dark:hover:border-[#6A7E3F] dark:hover:bg-[#6A7E3F]/10
                       transition-all duration-150 cursor-pointer"
             >
-                <div class="w-11 h-11 rounded-lg flex items-center justify-center
+                <div class="masterdata-icon-bg w-11 h-11 rounded-lg flex items-center justify-center
                             bg-neutral-100 dark:bg-neutral-700
-                            group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50
                             transition-colors">
                     <flux:icon name="{{ $item['icon'] }}"
-                               class="w-5 h-5 text-neutral-500 dark:text-neutral-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                               class="masterdata-icon w-5 h-5 text-neutral-500 dark:text-neutral-300 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4]"
                                variant="outline" />
                 </div>
-                <span class="text-xs font-medium text-center leading-tight text-neutral-600 dark:text-neutral-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-300">
+                <span class="masterdata-title text-xs font-medium text-center leading-tight text-neutral-600 dark:text-neutral-300 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4]">
                     {{ $item['title'] }}
                 </span>
             </a>

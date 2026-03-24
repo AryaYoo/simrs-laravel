@@ -2,26 +2,27 @@
 
 namespace App\Livewire\Modul\RawatInap;
 
+use App\Models\PemeriksaanRanap;
 use App\Models\RegPeriksa;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('layouts.app', ['title' => 'Perawatan/Tindakan Pasien Rawat Inap'])]
+#[Layout('layouts.app', ['title' => 'Perawatan/Tindakan Pasien Rawat Inap', 'hideSidebar' => true])]
 class PerawatanTindakan extends Component
 {
     public string $no_rawat;
     public $regPeriksa;
-    public string $activeTab = 'penanganan_dokter';
+    public string $activeTab = 'pemeriksaan';
 
-    public function mount(string $no_rawat)
+    public function mount(string $no_rawat): void
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
         $this->regPeriksa = RegPeriksa::with([
-            'pasien', 
-            'penjab', 
+            'pasien',
+            'penjab',
             'dokter',
-            'kamarInap.kamar', 
-            'permintaanRanap.kamar'
+            'kamarInap.kamar',
+            'permintaanRanap.kamar',
         ])
         ->where('no_rawat', $this->no_rawat)
         ->firstOrFail();
@@ -33,8 +34,15 @@ class PerawatanTindakan extends Component
             ->where('no_rawat', $this->no_rawat)
             ->get();
 
+        $pemeriksaanRanap = PemeriksaanRanap::with(['regPeriksa.pasien', 'pegawai'])
+            ->where('no_rawat', $this->no_rawat)
+            ->orderBy('tgl_perawatan', 'desc')
+            ->orderBy('jam_rawat', 'desc')
+            ->get();
+
         return view('livewire.modul.rawat-inap.perawatan-tindakan', [
-            'rawatInapDrpr' => $rawatInapDrpr,
+            'rawatInapDrpr'    => $rawatInapDrpr,
+            'pemeriksaanRanap' => $pemeriksaanRanap,
         ]);
     }
 }

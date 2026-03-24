@@ -60,7 +60,7 @@
             <flux:table.rows>
                 @forelse ($regPeriksas as $reg)
                     @php $isBpjs = str_contains(strtoupper($reg->penjab->png_jawab ?? ''), 'BPJS'); @endphp
-                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-indigo-50/50 dark:bg-indigo-900/10' : ''">
+                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-[#4C5C2D]/5 dark:bg-[#4C5C2D]/10' : ''">
                         <flux:table.cell>{{ $reg->no_reg }}</flux:table.cell>
                         <flux:table.cell class="font-medium">{{ $reg->no_rawat }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->tgl_registrasi }}</flux:table.cell>

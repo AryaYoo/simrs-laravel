@@ -20,11 +20,11 @@
 
     {{-- Patient Identity Hero --}}
     <div class="rounded-2xl overflow-hidden shadow-sm border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
-        <div class="h-2 w-full" style="background: linear-gradient(90deg, #1B9C85 0%, #15B5A0 100%);"></div>
+        <div class="h-2 w-full" style="background: linear-gradient(90deg, #4C5C2D 0%, #6A7E3F 100%);"></div>
         <div class="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5">
             {{-- Avatar --}}
             <div class="flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white"
-                 style="background: linear-gradient(135deg, #1B9C85, #15B5A0);">
+                 style="background: linear-gradient(135deg, #4C5C2D, #6A7E3F);">
                 {{ strtoupper(substr($regPeriksa->pasien->nm_pasien ?? 'P', 0, 1)) }}
             </div>
             {{-- Info utama --}}
@@ -71,8 +71,8 @@
         {{-- Informasi Registrasi --}}
         <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background-color: rgba(27,156,133,0.1);">
-                    <flux:icon name="clipboard-document-list" class="w-4 h-4" style="color: #1B9C85;" />
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background-color: rgba(76,92,45,0.1);">
+                    <flux:icon name="clipboard-document-list" class="w-4 h-4" style="color: #4C5C2D;" />
                 </div>
                 <h2 class="font-semibold text-sm text-neutral-700 dark:text-neutral-200">Informasi Registrasi</h2>
             </div>
@@ -95,8 +95,8 @@
         {{-- Informasi Pembayaran --}}
         <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background-color: rgba(27,156,133,0.1);">
-                    <flux:icon name="banknotes" class="w-4 h-4" style="color: #1B9C85;" />
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background-color: rgba(76,92,45,0.1);">
+                    <flux:icon name="banknotes" class="w-4 h-4" style="color: #4C5C2D;" />
                 </div>
                 <h2 class="font-semibold text-sm text-neutral-700 dark:text-neutral-200">Pembayaran</h2>
             </div>
@@ -119,8 +119,8 @@
         {{-- Status --}}
         <div class="rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm overflow-hidden lg:col-span-2">
             <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background-color: rgba(27,156,133,0.1);">
-                    <flux:icon name="chart-bar" class="w-4 h-4" style="color: #1B9C85;" />
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background-color: rgba(76,92,45,0.1);">
+                    <flux:icon name="chart-bar" class="w-4 h-4" style="color: #4C5C2D;" />
                 </div>
                 <h2 class="font-semibold text-sm text-neutral-700 dark:text-neutral-200">Status</h2>
             </div>

@@ -26,7 +26,7 @@
             {{-- Personal Identity Card --}}
             <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
-                    <flux:icon name="identification" class="w-5 h-5 text-indigo-500" />
+                    <flux:icon name="identification" class="w-5 h-5 text-[#4C5C2D]" />
                     <h2 class="font-semibold text-neutral-800 dark:text-neutral-100 text-[15px]">Informasi Identitas</h2>
                 </div>
                 <div class="p-5">
@@ -50,7 +50,7 @@
             {{-- Address and Contact Card --}}
             <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
-                    <flux:icon name="map-pin" class="w-5 h-5 text-indigo-500" />
+                    <flux:icon name="map-pin" class="w-5 h-5 text-[#4C5C2D]" />
                     <h2 class="font-semibold text-neutral-800 dark:text-neutral-100 text-[15px]">Alamat & Kontak</h2>
                 </div>
                 <div class="p-5">
@@ -67,7 +67,7 @@
             {{-- Responsible Person / Penanggung Jawab --}}
             <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
-                    <flux:icon name="users" class="w-5 h-5 text-indigo-500" />
+                    <flux:icon name="users" class="w-5 h-5 text-[#4C5C2D]" />
                     <h2 class="font-semibold text-neutral-800 dark:text-neutral-100 text-[15px]">Data Penanggung Jawab</h2>
                 </div>
                 <div class="p-5">
@@ -91,7 +91,7 @@
             {{-- Insurance / Payment Status --}}
             <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
-                    <flux:icon name="credit-card" class="w-5 h-5 text-indigo-500" />
+                    <flux:icon name="credit-card" class="w-5 h-5 text-[#4C5C2D]" />
                     <h2 class="font-semibold text-neutral-800 dark:text-neutral-100 text-[15px]">Asuransi & Pelayanan</h2>
                 </div>
                 <div class="p-5">
@@ -107,7 +107,7 @@
             {{-- Additional Details --}}
             <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
-                    <flux:icon name="clipboard-document-list" class="w-5 h-5 text-indigo-500" />
+                    <flux:icon name="clipboard-document-list" class="w-5 h-5 text-[#4C5C2D]" />
                     <h2 class="font-semibold text-neutral-800 dark:text-neutral-100 text-[15px]">Informasi Tambahan</h2>
                 </div>
                 <div class="p-5">

@@ -48,7 +48,7 @@
             <flux:table.rows>
                 @forelse ($regPeriksas as $reg)
                     @php $isBpjs = str_contains(strtoupper($reg->penjab->png_jawab ?? ''), 'BPJS'); @endphp
-                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-indigo-50/50 dark:bg-indigo-900/10' : ''">
+                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-[#4C5C2D]/5 dark:bg-[#4C5C2D]/10' : ''">
                         <flux:table.cell class="font-medium tracking-tight">{{ $reg->no_rawat }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->no_rkm_medis }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->pasien->nm_pasien ?? '-' }}</flux:table.cell>
@@ -58,12 +58,12 @@
                         <flux:table.cell>{{ $reg->permintaanRanap->kd_kamar ?? '-' }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex justify-center">
-                                <flux:button icon="document-text" size="xs" :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))" wire:navigate variant="ghost" />
+                                <flux:button icon="document-text" size="xs" :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))" target="_blank" variant="ghost" />
                             </div>
                         </flux:table.cell>
                         <flux:table.cell>
                             <div class="flex justify-center">
-                                <flux:button icon="eye" size="xs" :href="route('modul.rawat-inap.show', str_replace('/', '-', $reg->no_rawat))" wire:navigate variant="ghost" />
+                                <flux:button icon="eye" size="xs" :href="route('modul.rawat-inap.show', str_replace('/', '-', $reg->no_rawat))" target="_blank" variant="ghost" />
                             </div>
                         </flux:table.cell>
                     </flux:table.row>

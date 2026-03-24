@@ -13,7 +13,7 @@
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
                     <flux:button type="submit" class="w-full text-white border-none shadow-md font-bold"
-                        style="background-color: #1B9C85; box-shadow: 0 4px 6px -1px rgba(27, 156, 133, 0.1);">
+                        style="background-color: #4C5C2D; box-shadow: 0 4px 6px -1px rgba(76, 92, 45, 0.1);">
                         {{ __('Save') }}</flux:button>
                 </div>
 

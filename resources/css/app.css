@@ -23,15 +23,16 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    /* LaraLite Color Palette */
+    /* LaraLite Color Palette - Olive Theme */
     --color-brand-indigo: #4C4C6D;
     --color-brand-indigo-hover: #3B3B56;
     --color-brand-indigo-light: rgba(76, 76, 109, 0.08);
-    --color-brand-teal: #1B9C85;
-    --color-brand-teal-hover: #158A74;
-    --color-brand-teal-active: #107062;
-    --color-brand-teal-light: rgba(27, 156, 133, 0.12);
-    --color-brand-mint: #E8F6EF;
+    --color-brand-olive: #6A7E3F;
+    --color-brand-teal: #4C5C2D;
+    --color-brand-teal-hover: #3d4b24;
+    --color-brand-teal-active: #2e381b;
+    --color-brand-teal-light: rgba(76, 92, 45, 0.12);
+    --color-brand-mint: #FBF6F6;
     --color-brand-yellow: #FFE194;
 
     --color-accent: var(--color-brand-teal);
@@ -89,15 +90,18 @@ select[data-flux-control] {
 input[data-flux-control]:hover,
 textarea[data-flux-control]:hover,
 select[data-flux-control]:hover {
-    border-color: rgba(27, 156, 133, 0.4) !important;
+    border-color: rgba(76, 92, 45, 0.4) !important;
 }
 
+input:focus,
+textarea:focus,
+select:focus,
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
     outline: none !important;
-    border-color: #1B9C85 !important;
-    box-shadow: 0 0 0 3px rgba(27, 156, 133, 0.15) !important;
+    border-color: #4C5C2D !important;
+    box-shadow: 0 0 0 3px rgba(76, 92, 45, 0.15) !important;
 }
 
 /* ── Sidebar active state ─────────────────────────────── */
@@ -121,18 +125,18 @@ select:focus[data-flux-control] {
 }
 
 .laralite-sidebar-item.active {
-    background-color: rgba(27, 156, 133, 0.25);
+    background-color: rgba(76, 92, 45, 0.25);
     color: #ffffff;
     font-weight: 600;
-    box-shadow: inset 2px 0 0 0 #1B9C85;
+    box-shadow: inset 2px 0 0 0 #4C5C2D;
 }
 
 .laralite-sidebar-item:active {
-    background-color: rgba(27, 156, 133, 0.35);
+    background-color: rgba(76, 92, 45, 0.35);
     transform: scale(0.98);
 }
 
-/* ── Primary Button (Teal CTA) ────────────────────────── */
+/* ── Primary Button (Olive CTA) ────────────────────────── */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -142,27 +146,27 @@ select:focus[data-flux-control] {
     font-size: 0.875rem;
     font-weight: 600;
     color: #ffffff;
-    background-color: #1B9C85;
+    background-color: #4C5C2D;
     border: none;
     cursor: pointer;
     transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-    box-shadow: 0 1px 3px rgba(27, 156, 133, 0.3), 0 1px 2px rgba(27, 156, 133, 0.2);
+    box-shadow: 0 1px 3px rgba(76, 92, 45, 0.3), 0 1px 2px rgba(76, 92, 45, 0.2);
     letter-spacing: 0.01em;
 }
 
 .btn-primary:hover {
-    background-color: #158A74;
-    box-shadow: 0 4px 12px rgba(27, 156, 133, 0.35);
+    background-color: #3d4b24;
+    box-shadow: 0 4px 12px rgba(76, 92, 45, 0.35);
 }
 
 .btn-primary:active {
-    background-color: #107062;
+    background-color: #2e381b;
     transform: scale(0.98);
-    box-shadow: 0 1px 3px rgba(27, 156, 133, 0.2);
+    box-shadow: 0 1px 3px rgba(76, 92, 45, 0.2);
 }
 
 .btn-primary:focus-visible {
-    outline: 2px solid #1B9C85;
+    outline: 2px solid #4C5C2D;
     outline-offset: 2px;
 }
 
@@ -211,24 +215,24 @@ select:focus[data-flux-control] {
 
 /* ── Link ─────────────────────────────────────────────── */
 .brand-link {
-    color: #1B9C85;
+    color: #4C5C2D;
     font-weight: 600;
     text-decoration: none;
     transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 
 .brand-link:hover {
-    color: #158A74;
+    color: #3d4b24;
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 /* == Override Flux Sidebar Active State == */
 [data-flux-sidebar-item][data-current],
 [data-flux-sidebar-item][data-current='true'] {
-    background-color: rgba(27, 156, 133, 0.2) !important;
+    background-color: rgba(76, 92, 45, 0.2) !important;
     color: #ffffff !important;
     border-color: transparent !important;
-    box-shadow: inset 3px 0 0 0 #1B9C85 !important;
+    box-shadow: inset 3px 0 0 0 #4C5C2D !important;
     font-weight: 600 !important;
 }
 
@@ -238,5 +242,20 @@ select:focus[data-flux-control] {
 }
 
 [data-flux-sidebar-item][data-current]:hover {
-    background-color: rgba(27, 156, 133, 0.28) !important;
+    background-color: rgba(76, 92, 45, 0.28) !important;
+}
+
+/* == Master Data & Module Card Hover Overrides == */
+.masterdata-card:hover, .module-card:hover {
+    border-color: #6A7E3F !important;
+    background-color: rgba(106, 126, 63, 0.05) !important;
+}
+.masterdata-card:hover .masterdata-icon-bg, .module-card:hover .module-icon-bg {
+    background-color: rgba(106, 126, 63, 0.15) !important;
+}
+.masterdata-card:hover .masterdata-icon, .module-card:hover .module-icon {
+    color: #4C5C2D !important;
+}
+.masterdata-card:hover .masterdata-title, .module-card:hover .module-title {
+    color: #4C5C2D !important;
 }
