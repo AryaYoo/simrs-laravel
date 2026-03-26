@@ -20,7 +20,7 @@
     </div>
 
     {{-- Professional Patient Info Card --}}
-    <div class="max-w-3xl" x-data="{ minimized: false }">
+    <div class="max-w-3xl" x-data="{ minimized: false, isFloating: false }" @scroll.window="isFloating = window.scrollY > 200">
         <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden relative">
             {{-- Accent Line --}}
             <div class="absolute top-0 left-0 w-1.5 h-full bg-[#4C5C2D] dark:bg-[#8CC7C4]"></div>
@@ -111,6 +111,36 @@
             {{-- Minimized Summary Bar --}}
             <div x-show="minimized" x-transition class="px-6 sm:px-7 py-3 pl-8">
                 <p class="text-xs text-neutral-400 italic">Detail data diri disembunyikan. Klik ikon di kanan untuk menampilkan.</p>
+            </div>
+        </div>
+
+        {{-- Floating Patient Info Card (Bottom Right) --}}
+        <div x-show="isFloating" style="display: none;"
+            x-transition:enter="transition ease-out duration-300 transform" 
+            x-transition:enter-start="opacity-0 translate-y-8 scale-95" 
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100" 
+            x-transition:leave="transition ease-in duration-200 transform" 
+            x-transition:leave-start="opacity-100 translate-y-0 scale-100" 
+            x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+            class="fixed bottom-6 right-6 z-50 w-72 sm:w-80 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-xl rounded-2xl border border-neutral-200/80 dark:border-neutral-700/80 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] overflow-hidden cursor-pointer hover:border-[#4C5C2D]/50 dark:hover:border-[#8CC7C4]/50 transition-colors group"
+            @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+            title="Kembali ke atas">
+            
+            {{-- Accent Line --}}
+            <div class="absolute top-0 left-0 w-1.5 h-full bg-[#4C5C2D] dark:bg-[#8CC7C4]"></div>
+            
+            <div class="flex items-center justify-between p-3.5 pl-5">
+                <div class="flex flex-col gap-0.5">
+                    <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate max-w-[180px] sm:max-w-[210px]">{{ $regPeriksa->pasien->nm_pasien }}</h2>
+                    <div class="flex flex-wrap items-center gap-2 mt-1">
+                        <span class="inline-flex items-center rounded bg-neutral-100 dark:bg-neutral-700 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 dark:text-neutral-300">
+                            RM: {{ $regPeriksa->no_rkm_medis }}
+                        </span>
+                    </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700/50 flex items-center justify-center shrink-0 group-hover:bg-[#4C5C2D] group-hover:text-white dark:group-hover:bg-[#8CC7C4] dark:group-hover:text-neutral-900 transition-colors">
+                    <flux:icon name="arrow-up" class="w-4 h-4 text-neutral-500 group-hover:text-white dark:group-hover:text-neutral-900" />
+                </div>
             </div>
         </div>
     </div>
@@ -218,9 +248,118 @@
                 @endif
 
             @elseif($activeTab === 'soapie')
-                <div class="text-neutral-500 py-8 text-center text-sm border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl">
-                    Konten Riwayat Soapie
-                </div>
+                @if($riwayatSoapie->isEmpty())
+                    <div class="flex flex-col items-center justify-center py-16 text-neutral-400 dark:text-neutral-600">
+                        <flux:icon name="inbox" class="w-12 h-12 mb-3 opacity-50" />
+                        <p class="text-sm font-medium">Tidak ada data S.O.A.P.I.E</p>
+                    </div>
+                @else
+                    <div class="flex flex-col gap-4">
+                        @php
+                            $totalSoapie = 0;
+                            foreach($riwayatSoapie as $group) {
+                                $totalSoapie += $group->count();
+                            }
+                        @endphp
+                        <p class="text-xs text-neutral-400 text-right">Total: {{ $totalSoapie }} catatan dari {{ $riwayatSoapie->count() }} kunjungan</p>
+
+                        @foreach($riwayatSoapie as $noRawatKey => $soapies)
+                            @php
+                                $firstSoapie = $soapies->first();
+                            @endphp
+                            <div class="rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm bg-white dark:bg-neutral-800">
+                                {{-- Outer Card Header: No Rawat & Tgl Registrasi --}}
+                                <div class="sticky top-0 z-10 backdrop-blur-md rounded-t-xl flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-neutral-50/90 dark:bg-neutral-800/90 border-b border-neutral-200 dark:border-neutral-700">
+                                    <div class="flex flex-wrap items-center gap-4">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-[10px] font-semibold text-neutral-400 uppercase">No. Rawat:</span>
+                                            <span class="font-mono text-sm font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">
+                                                {{ $noRawatKey }}
+                                            </span>
+                                            @if($noRawatKey === $no_rawat)
+                                                <span class="ml-1 inline-flex items-center rounded bg-[#4C5C2D]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#4C5C2D] dark:text-[#8CC7C4]">Saat ini</span>
+                                            @endif
+                                        </div>
+                                        <span class="text-neutral-300 dark:text-neutral-600">|</span>
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-[10px] font-semibold text-neutral-400 uppercase">Tgl. Registrasi:</span>
+                                            <span class="text-sm text-neutral-700 dark:text-neutral-300 font-medium">
+                                                {{ \Carbon\Carbon::parse($firstSoapie->regPeriksa->tgl_registrasi ?? '')->translatedFormat('d F Y') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="inline-flex items-center rounded-full bg-neutral-100 dark:bg-neutral-700 px-2.5 py-0.5 text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+                                            {{ $soapies->count() }} Observasi
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Inner Observasi List --}}
+                                <div class="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-700">
+                                    @foreach($soapies as $soapie)
+                                        <div class="flex flex-col hover:bg-neutral-50/30 dark:hover:bg-neutral-700/10 transition-colors">
+                                            {{-- Inner Header: Tanggal, Jam, Dokter, Status --}}
+                                            <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-2.5 bg-neutral-100 dark:bg-neutral-800/80 border-b border-neutral-200 dark:border-neutral-700">
+                                                <div class="flex items-center gap-1.5">
+                                                    <flux:icon name="clock" class="w-4 h-4 text-neutral-400" />
+                                                    <span class="text-xs text-neutral-600 dark:text-neutral-300 font-medium">
+                                                        {{ \Carbon\Carbon::parse($soapie->tgl_perawatan)->translatedFormat('d M Y') }}
+                                                        <span class="font-bold ml-1 text-neutral-800 dark:text-neutral-100">{{ \Carbon\Carbon::parse($soapie->jam_rawat)->format('H:i') }}</span>
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <flux:icon name="user" class="w-3.5 h-3.5 text-neutral-400" />
+                                                        <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-200">
+                                                            {{ $soapie->pegawai->nama ?? $soapie->nip ?? '-' }}
+                                                        </span>
+                                                    </div>
+                                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $soapie->regPeriksa->stts === 'Sudah' ? 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400' }}">
+                                                        {{ $soapie->regPeriksa->stts ?? '-' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {{-- SOAPIE Fields Grid - 2 Rows, 3 Columns --}}
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-neutral-200/60 dark:divide-neutral-700/60">
+                                                @php
+                                                    $fields = [
+                                                        ['label' => 'S — Subjek',     'icon' => 'chat-bubble-left',         'value' => $soapie->keluhan,      'color' => 'text-blue-600 dark:text-blue-400',       'bg' => 'bg-blue-100 dark:bg-blue-900/30'],
+                                                        ['label' => 'O — Objek',      'icon' => 'clipboard-document-check', 'value' => $soapie->pemeriksaan,  'color' => 'text-emerald-600 dark:text-emerald-400', 'bg' => 'bg-emerald-100 dark:bg-emerald-900/30'],
+                                                        ['label' => 'A — Asesmen',    'icon' => 'beaker',                   'value' => $soapie->penilaian,    'color' => 'text-purple-600 dark:text-purple-400',   'bg' => 'bg-purple-100 dark:bg-purple-900/30'],
+                                                        ['label' => 'P — Plan',       'icon' => 'document-text',            'value' => $soapie->rtl,          'color' => 'text-amber-600 dark:text-amber-400',     'bg' => 'bg-amber-100 dark:bg-amber-900/30'],
+                                                        ['label' => 'I — Inst/Impl',  'icon' => 'arrow-path',               'value' => $soapie->instruksi,    'color' => 'text-cyan-600 dark:text-cyan-400',       'bg' => 'bg-cyan-100 dark:bg-cyan-900/30'],
+                                                        ['label' => 'E — Evaluasi',   'icon' => 'check-circle',             'value' => $soapie->evaluasi,     'color' => 'text-rose-600 dark:text-rose-400',       'bg' => 'bg-rose-100 dark:bg-rose-900/30'],
+                                                    ];
+                                                @endphp
+
+                                                @foreach($fields as $index => $field)
+                                                    <div class="p-5 flex flex-col gap-2 {{ $index >= 3 ? 'md:border-t md:border-neutral-200/60 md:dark:border-neutral-700/60' : '' }}">
+                                                        <div class="flex items-center gap-2">
+                                                            <div class="p-1.5 rounded-md {{ $field['bg'] }} {{ $field['color'] }}">
+                                                                <flux:icon :name="$field['icon']" class="w-4 h-4" />
+                                                            </div>
+                                                            <span class="text-xs font-bold uppercase tracking-wide {{ $field['color'] }}">
+                                                                {{ $field['label'] }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="pl-8">
+                                                            <p class="text-[15px] font-medium text-neutral-600 dark:text-neutral-300 leading-relaxed whitespace-pre-line min-h-[1.5rem]">
+                                                                {{ $field['value'] ?: '-' }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
             @elseif($activeTab === 'perawatan')
                 <div class="text-neutral-500 py-8 text-center text-sm border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl">
                     Konten Riwayat Perawatan
