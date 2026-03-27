@@ -433,11 +433,11 @@
                                                 </button>
                                                 {{-- Children list --}}
                                                 <div x-show="isSubMenuOpen(group.label + '_' + item.label)" x-transition
-                                                    class="mt-1.5 ml-1 pl-2 border-l-2 border-[#4C5C2D]/20 dark:border-[#8CC7C4]/20 space-y-1">
-                                                    <template x-for="child in item.children" :key="child.label">
+                                                    class="mt-1 overflow-hidden rounded-lg border border-neutral-100 dark:border-neutral-700/50 bg-neutral-50 dark:bg-neutral-800/40">
+                                                    <template x-for="(child, idx) in item.children" :key="child.label">
                                                         <a :href="child.url" :target="child.target || '_self'"
-                                                            class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs text-neutral-600 dark:text-neutral-400 hover:bg-[#4C5C2D]/5 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-colors">
-                                                            <div class="w-1 h-1 rounded-full bg-current opacity-50 flex-shrink-0"></div>
+                                                            class="flex items-center gap-2.5 px-3 py-2 text-xs text-neutral-600 dark:text-neutral-400 hover:bg-[#4C5C2D]/8 hover:text-[#4C5C2D] dark:hover:bg-[#4C5C2D]/15 dark:hover:text-[#8CC7C4] transition-colors border-b border-neutral-100 dark:border-neutral-700/30 last:border-b-0">
+                                                            <span class="flex-shrink-0 w-4 h-4 rounded text-[10px] font-bold tabular-nums flex items-center justify-center bg-neutral-200/70 dark:bg-neutral-700/70 text-neutral-500 dark:text-neutral-400" x-text="idx + 1"></span>
                                                             <span x-text="child.label" class="leading-snug"></span>
                                                         </a>
                                                     </template>
