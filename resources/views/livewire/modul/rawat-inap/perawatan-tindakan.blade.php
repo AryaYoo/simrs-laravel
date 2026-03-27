@@ -12,125 +12,268 @@
 
         menuModalOpen: false,
         searchQuery: '',
-        sortMode: 'default',
-        menus: [
-            { label: 'Riwayat Pasien', url: '{{ route('modul.rawat-inap.sub-rawat-inap.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}', target: '_blank' },
-            { label: 'Input Resep', url: '#' },
-            { label: 'Copy Resep', url: '#' },
-            { label: 'Permintaan Stok Pasien', url: '#' },
-            { label: 'Permintaan Resep Pulang', url: '#' },
-            { label: 'Input Obat & BHP', url: '#' },
-            { label: 'Data Obat & BHP', url: '#' },
-            { label: 'Berkas Digital', url: '#' },
-            { label: 'Permintaan Lab', url: '#' },
-            { label: 'Permintaan Rad', url: '#' },
-            { label: 'Konsultasi Medik', url: '#' },
-            { label: 'Jadwal Operasi', url: '#' },
-            { label: 'Surat Kontrol', url: '#' },
-            { label: 'Rujuk Keluar', url: '#' },
-            { label: 'Diagnosa', url: '#' },
-            { label: 'Resume Pasien', url: '#' },
-            { label: 'Awal Keperawatan Umum', url: '#' },
-            { label: 'Awal Keperawatan Kandungan', url: '#' },
-            { label: 'Awal Keperawatan Neonatus', url: '#' },
-            { label: 'Awal Keperawatan Bayi/Anak', url: '#' },
-            { label: 'Awal Fisioterapi', url: '#' },
-            { label: 'Awal Medis Umum', url: '#' },
-            { label: 'Awal Medis Kandungan', url: '#' },
-            { label: 'Awal Medis Neonatus', url: '#' },
-            { label: 'Awal Medis Psikiatri', url: '#' },
-            { label: 'Awal Medis Hemodialisa', url: '#' },
-            { label: 'Awal Medis Jantung', url: '#' },
-            { label: 'Pengkajian Pre Induksi', url: '#' },
-            { label: 'Check List Pre Operasi', url: '#' },
-            { label: 'Sign-In Sebelum Anestesi', url: '#' },
-            { label: 'Time-Out Sebelum Insisi', url: '#' },
-            { label: 'Sign-Out Sebelum Menutup Luka', url: '#' },
-            { label: 'Check List Post Operasi', url: '#' },
-            { label: 'Pengkajian Pre Operasi', url: '#' },
-            { label: 'Catatan Anestesi-Sedasi', url: '#' },
-            { label: 'Pengkajian Pre Anestesi', url: '#' },
-            { label: 'Check List Kesiapan Anestesi', url: '#' },
-            { label: 'Skor Aldrette Pasca Anestesi', url: '#' },
-            { label: 'Skor Steward Pasca Anestesi', url: '#' },
-            { label: 'Skor Bromage Pasca Anestesi', url: '#' },
-            { label: 'Pengkajian Pasca Operasi', url: '#' },
-            { label: 'Lanjutan Risiko Jatuh Dewasa', url: '#' },
-            { label: 'Lanjutan Risiko Jatuh Anak', url: '#' },
-            { label: 'Lanjutan Risiko Jatuh Lansia', url: '#' },
-            { label: 'Lanjutan Risiko Jatuh Neonatus', url: '#' },
-            { label: 'Lanjutan Risiko Jatuh Geriatri', url: '#' },
-            { label: 'Lanjutan Risiko Jatuh Psikiatri', url: '#' },
-            { label: 'Lanjutan Skrining Fungsional', url: '#' },
-            { label: 'Risiko Dekubitus', url: '#' },
-            { label: 'Pengkajian Derajat Dehidrasi', url: '#' },
-            { label: 'Hasil USG Kandungan', url: '#' },
-            { label: 'Hasil USG Urologi', url: '#' },
-            { label: 'Hasil USG Neonatus', url: '#' },
-            { label: 'Hasil USG Gynecologi', url: '#' },
-            { label: 'Hasil Pemeriksaan EKG', url: '#' },
-            { label: 'Hasil Pemeriksaan ECHO', url: '#' },
-            { label: 'Hasil ECHO Pediatrik', url: '#' },
-            { label: 'Hasil Pemeriksaan Slit Lamp', url: '#' },
-            { label: 'Hasil Pemeriksaan OCT', url: '#' },
-            { label: 'Hasil Pemeriksaan Treadmill', url: '#' },
-            { label: 'Hasil Endoskopi Faring/Laring', url: '#' },
-            { label: 'Hasil Endoskopi Hidung', url: '#' },
-            { label: 'Hasil Endoskopi Telinga', url: '#' },
-            { label: 'Dokumentasi Tindakan ESWL', url: '#' },
-            { label: 'Laporan Tindakan', url: '#' },
-            { label: 'Observasi Hemodialisa', url: '#' },
-            { label: 'Cairan Hemodialisa', url: '#' },
-            { label: 'Catatan Persalinan', url: '#' },
-            { label: 'Observasi Kebidanan', url: '#' },
-            { label: 'Observasi Post Partum', url: '#' },
-            { label: 'Observasi Induksi Persalinan', url: '#' },
-            { label: 'Observasi Bayi', url: '#' },
-            { label: 'Pengkajian Bayi Baru Lahir', url: '#' },
-            { label: 'Observasi Ranap', url: '#' },
-            { label: 'Observasi CHBP', url: '#' },
-            { label: 'Observasi Ventilator', url: '#' },
-            { label: 'Keseimbangan Cairan', url: '#' },
-            { label: 'Pemantauan PEWS Anak', url: '#' },
-            { label: 'Pemantauan EWS Dewasa', url: '#' },
-            { label: 'Pemantauan MEOWS Obstetri', url: '#' },
-            { label: 'Pemantauan EWS Neonatus', url: '#' },
-            { label: 'Psikologi & Khusus', url: '#' },
-            { label: 'Pengkajian Psikologi', url: '#' },
-            { label: 'Pengkajian Psikologi Klinis', url: '#' },
-            { label: 'Pengkajian Restrain', url: '#' },
-            { label: 'Observasi Restrain Nonfarma', url: '#' },
-            { label: 'Pengkajian Pasien Terminal', url: '#' },
-            { label: 'Pengkajian Korban Kekerasan', url: '#' },
-            { label: 'Pengkajian Kecemasan Anak', url: '#' },
-            { label: 'Pasien Penyakit Menular', url: '#' },
-            { label: 'Pasien Imunitas Rendah', url: '#' },
-            { label: 'Perencanaan Pemulangan', url: '#' },
-            { label: 'Catatan Pasien', url: '#' },
-            { label: 'Check List Pemberian Fibrinoli', url: '#' },
-            { label: 'Follow Up DBD', url: '#' },
-            { label: 'Catatan Keperawatan', url: '#' },
-            { label: 'Catatan Cek GDS', url: '#' },
-            { label: 'Pengkajian Ulang Nyeri', url: '#' },
-            { label: 'Check List Masuk/Keluar HCU', url: '#' },
-            { label: 'Check List Masuk/Keluar ICU', url: '#' },
-            { label: 'Transfer Antar Ruang', url: '#' },
-            { label: 'Pelaksanaan Edukasi', url: '#' },
-            { label: 'Tambahan Pasien Geriatri', url: '#' },
-            { label: 'Tambahan Bunuh Diri', url: '#' },
-            { label: 'Tambahan Perilaku Kekerasan', url: '#' },
-            { label: 'Tambahan Melarikan Diri', url: '#' }
+        openSubMenus: {},
+        toggleSubMenu(key) { this.openSubMenus[key] = !this.openSubMenus[key]; },
+        isSubMenuOpen(key) { return !!this.openSubMenus[key]; },
+        menuGroups: [
+            {
+                label: 'Data Rekam Medis',
+                items: [
+                    { label: 'Pengkajian Awal', children: [
+                        { label: 'Keperawatan Umum', url: '#' },
+                        { label: 'Keperawatan Kebidanan & Kandungan', url: '#' },
+                        { label: 'Keperawatan Neonatus', url: '#' },
+                        { label: 'Keperawatan Bayi/Anak', url: '#' },
+                        { label: 'Medis Umum', url: '#' },
+                        { label: 'Pengkajian Bayi Baru Lahir', url: '#' },
+                        { label: 'Medis Neonatus', url: '#' },
+                        { label: 'Medis Kebidanan & Kandungan', url: '#' },
+                        { label: 'Medis Psikiatri', url: '#' },
+                        { label: 'Medis Hemodialisa', url: '#' },
+                        { label: 'Medis Jantung', url: '#' },
+                        { label: 'Fisioterapi', url: '#' },
+                    ]},
+                    { label: 'RM Operasi', children: [
+                        { label: 'Pengkajian Pre Induksi', url: '#' },
+                        { label: 'Check List Pre Operasi', url: '#' },
+                        { label: 'Sign-In Sebelum Anestesi', url: '#' },
+                        { label: 'Time-Out Sebelum Insisi', url: '#' },
+                        { label: 'Sign-Out Sebelum Menutup Luka', url: '#' },
+                        { label: 'Check List Post Operasi', url: '#' },
+                        { label: 'Pengkajian Pre Operasi', url: '#' },
+                        { label: 'Catatan Anestesi-Sedasi', url: '#' },
+                        { label: 'Pengkajian Pre Anestesi', url: '#' },
+                        { label: 'Check List Kesiapan Anestesi', url: '#' },
+                        { label: 'Skor Aldrette Pasca Anestesi', url: '#' },
+                        { label: 'Skor Steward Pasca Anestesi', url: '#' },
+                        { label: 'Skor Bromage Pasca Anestesi', url: '#' },
+                        { label: 'Catatan Pengkajian Paska Operasi', url: '#' },
+                    ]},
+                    { label: 'RM HCU, ICU, NICU & PICU', children: [
+                        { label: 'Pengkajian Pre Induksi', url: '#' },
+                        { label: 'Check List Pre Operasi', url: '#' },
+                        { label: 'Sign-In Sebelum Anestesi', url: '#' },
+                        { label: 'Time-Out Sebelum Insisi', url: '#' },
+                        { label: 'Sign-Out Sebelum Menutup Luka', url: '#' },
+                        { label: 'Check List Post Operasi', url: '#' },
+                        { label: 'Pengkajian Pre Operasi', url: '#' },
+                        { label: 'Catatan Anestesi-Sedasi', url: '#' },
+                        { label: 'Pengkajian Pre Anestesi', url: '#' },
+                        { label: 'Check List Kesiapan Anestesi', url: '#' },
+                        { label: 'Skor Aldrette Pasca Anestesi', url: '#' },
+                        { label: 'Skor Steward Pasca Anestesi', url: '#' },
+                        { label: 'Skor Bromage Pasca Anestesi', url: '#' },
+                        { label: 'Catatan Pengkajian Paska Operasi', url: '#' },
+                        { label: 'Check List Kriteria Masuk HCU', url: '#' },
+                        { label: 'Check List Kriteria Keluar HCU', url: '#' },
+                        { label: 'Check List Kriteria Masuk ICU', url: '#' },
+                        { label: 'Check List Kriteria Keluar ICU', url: '#' },
+                        { label: 'Check List Kriteria Masuk NICU', url: '#' },
+                        { label: 'Check List Kriteria Keluar NICU', url: '#' },
+                        { label: 'Check List Kriteria Masuk PICU', url: '#' },
+                        { label: 'Check List Kriteria Keluar PICU', url: '#' },
+                    ]},
+                    { label: 'Uji Fungsi/Prosedur KFR', url: '#' },
+                    { label: 'Risiko Jatuh, Fungsional & Dekubitus', children: [
+                        { label: 'Pengkajian Lanjutan Risiko Jatuh Dewasa', url: '#' },
+                        { label: 'Pengkajian Lanjutan Risiko Jatuh Anak', url: '#' },
+                        { label: 'Pengkajian Lanjutan Risiko Jatuh Lansia', url: '#' },
+                        { label: 'Pengkajian Lanjutan Risiko Jatuh Neonatus', url: '#' },
+                        { label: 'Pengkajian Lanjutan Risiko Jatuh Geriatri', url: '#' },
+                        { label: 'Pengkajian Lanjutan Risiko Jatuh Psikiatri', url: '#' },
+                        { label: 'Pengkajian Lanjutan Skrining Fungsional', url: '#' },
+                        { label: 'Pengkajian Risiko Dekubitus', url: '#' },
+                    ]},
+                    { label: 'Pengkajian Lain', children: [
+                        { label: 'Pengkajian Tambahan Pasien Geriatri', url: '#' },
+                        { label: 'Pengkajian Tambahan Bunuh Diri', url: '#' },
+                        { label: 'Pengkajian Tambahan Perilaku Kekerasan', url: '#' },
+                        { label: 'Pengkajian Tambahan Melarikan Diri', url: '#' },
+                        { label: 'Pengkajian Pasien Terminal', url: '#' },
+                        { label: 'Pengkajian Korban Kekerasan', url: '#' },
+                        { label: 'Pengkajian Kecemasan Pasien Anak', url: '#' },
+                        { label: 'Pengkajian Pasien Penyakit Menular', url: '#' },
+                        { label: 'Pengkajian Pasien Imunitas Rendah', url: '#' },
+                        { label: 'Pengkajian Derajat Dehidrasi', url: '#' },
+                        { label: 'Pengkajian Psikologi', url: '#' },
+                        { label: 'Pengkajian Psikologi Klinis', url: '#' },
+                        { label: 'Hemodialisa', url: '#' },
+                        { label: 'Pengkajian Restrain', url: '#' },
+                    ]},
+                    { label: 'Pemantauan EWS', children: [
+                        { label: 'EWS Anak', url: '#' },
+                        { label: 'EWS Dewasa', url: '#' },
+                        { label: 'EWS Obstetri', url: '#' },
+                        { label: 'EWS Neonatus', url: '#' },
+                    ]},
+                    { label: 'RM Farmasi', children: [
+                        { label: 'Konseling Farmasi', url: '#' },
+                        { label: 'Rekonsiliasi Obat', url: '#' },
+                    ]},
+                    { label: 'Catatan & Dokumentasi', children: [
+                        { label: 'Observasi', url: '#' },
+                        { label: 'Follow Up DBD', url: '#' },
+                        { label: 'Catatan Keperawatan', url: '#' },
+                        { label: 'Cek GDS', url: '#' },
+                        { label: 'Monitoring Reaksi Transfusi', url: '#' },
+                        { label: 'Hasil USG', url: '#' },
+                        { label: 'Hasil Pemeriksaan', url: '#' },
+                        { label: 'Hasil Endoskopi', url: '#' },
+                        { label: 'Dokumentasi Tindakan ESWL', url: '#' },
+                        { label: 'Pengkajian Ulang Nyeri', url: '#' },
+                        { label: 'Catatan Persalinan', url: '#' },
+                        { label: 'Keseimbangan Cairan', url: '#' },
+                        { label: 'Catatan Cairan Hemodialisa', url: '#' },
+                        { label: 'Checklist Pemberian Fibrinolitik', url: '#' },
+                        { label: 'Laporan Tindakan', url: '#' },
+                    ]},
+                    { label: 'Diagnosa', url: '#' },
+                    { label: 'RM Gizi', children: [
+                        { label: 'Skrining Nutrisi Pasien Dewasa', url: '#' },
+                        { label: 'Skrining Nutrisi Pasien Lansia', url: '#' },
+                        { label: 'Skrining Nutrisi Pasien Anak', url: '#' },
+                        { label: 'Skrining Gizi Lanjut', url: '#' },
+                        { label: 'Asuhan Gizi', url: '#' },
+                        { label: 'Monitoring Gizi', url: '#' },
+                        { label: 'Catatan ADIME Gizi', url: '#' },
+                    ]},
+                    { label: 'Transfer Antar Ruang', url: '#' },
+                    { label: 'Perencanaan Pemulangan', url: '#' },
+                    { label: 'Edukasi (Pelaksanaan Informasi & Edukasi)', url: '#' },
+                    { label: 'Resume', url: '#' },
+                    { label: 'Riwayat Perawatan', url: '{{ route('modul.rawat-inap.sub-rawat-inap.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}', target: '_blank' },
+                ]
+            },
+            {
+                label: 'Permintaan',
+                items: [
+                    { label: 'Jadwal Operasi', url: '#' },
+                    { label: 'Pemeriksaan Lab', url: '#' },
+                    { label: 'Pemeriksaan Radiologi', url: '#' },
+                    { label: 'Informasi Obat', url: '#' },
+                    { label: 'Konsultasi Medik', url: '#' },
+                ]
+            },
+            {
+                label: 'Tindakan & Pemeriksaan',
+                items: [
+                    { label: 'Data Tagihan/Tindakan Rawat Jalan', url: '#' },
+                    { label: 'Data Tagihan/Tindakan Rawat Inap', url: '#' },
+                    { label: 'Periksa Lab PK', url: '#' },
+                    { label: 'Periksa Lab PA', url: '#' },
+                    { label: 'Periksa Lab MB', url: '#' },
+                    { label: 'Periksa Radiologi', url: '#' },
+                    { label: 'Tagihan Operasi/VK', url: '#' },
+                    { label: 'Diet Pasien', url: '#' },
+                    { label: 'Data Operasi', url: '#' },
+                ]
+            },
+            {
+                label: 'Obat',
+                items: [
+                    { label: 'Data Pemberian Obat/BHP', url: '#' },
+                    { label: 'Input Resep Pulang', url: '#' },
+                    { label: 'Input No. Resep', url: '#' },
+                    { label: 'Input Resep Dokter', url: '#' },
+                    { label: 'Permintaan Stok Obat Pasien', url: '#' },
+                    { label: 'Permintaan Resep Pulang', url: '#' },
+                    { label: 'Data Stok Obat Pasien', url: '#' },
+                    { label: 'Data Resep Pulang', url: '#' },
+                    { label: 'Retur Obat/Barang/Alkes', url: '#' },
+                    { label: 'Penjualan Obat/Alkes/Barang', url: '#' },
+                ]
+            },
+            {
+                label: 'Deposit & Billing',
+                items: [
+                    { label: 'Deposit/Titipan Pasien', url: '#' },
+                    { label: 'Billing/Pembayaran Pasien', url: '#' },
+                ]
+            },
+            {
+                label: 'Laporan & Dokumen',
+                items: [
+                    { label: 'Laporan & Surat', url: '#' },
+                    { label: 'Label & Gelang Pasien', url: '#' },
+                ]
+            },
+            {
+                label: 'Ranap & Kamar',
+                items: [
+                    { label: 'Ranap Gabung Ibu & Bayi', url: '#' },
+                    { label: 'Gabungkan Ke Kamar Ibu', url: '#' },
+                ]
+            },
+            {
+                label: 'Dokter DPJP',
+                items: [
+                    { label: 'Input Dokter', url: '#' },
+                    { label: 'Tampilkan Dokter', url: '#' },
+                    { label: 'Filter Dokter', url: '#' },
+                ]
+            },
+            {
+                label: 'Rujukan',
+                items: [
+                    { label: 'Rujukan Keluar', url: '#' },
+                    { label: 'Rujukan Masuk', url: '#' },
+                ]
+            },
+            {
+                label: 'Bridging BPJS & Lainnya',
+                items: [
+                    { label: 'Pencarian Peserta BPJS by No. Kepesertaan', url: '#' },
+                    { label: 'Pencarian Peserta BPJS by NIK/No.KTP', url: '#' },
+                    { label: 'Bridging SEP VClaim', url: '#' },
+                    { label: 'Data SEP BPJS', url: '#' },
+                    { label: 'Rencana Kontrol BPJS', url: '#' },
+                    { label: 'Perintah Rawat Inap BPJS', url: '#' },
+                    { label: 'Suplesi Jasa Raharja BPJS', url: '#' },
+                    { label: 'Data Induk Kecelakaan BPJS', url: '#' },
+                    { label: 'Belum Terbit SEP BPJS', url: '#' },
+                    { label: 'Sudah Terbit SEP BPJS', url: '#' },
+                    { label: 'Rujuk Keluar Via Sisrute', url: '#' },
+                    { label: 'Pasien Corona Kemenkes', url: '#' },
+                    { label: 'Perawatan Pasien Corona INACBG', url: '#' },
+                    { label: 'Teridentifikasi TB Kemenkes', url: '#' },
+                    { label: 'Data PCare', url: '#' },
+                ]
+            },
+            {
+                label: 'Lainnya',
+                items: [
+                    { label: 'Riwayat Pasien', url: '{{ route('modul.rawat-inap.sub-rawat-inap.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}', target: '_blank' },
+                    { label: 'Berkas Digital', url: '#' },
+                    { label: 'Surat Kontrol', url: '#' },
+                ]
+            },
         ],
-        get filteredMenus() {
-            let result = this.menus;
-            if (this.searchQuery) {
-                const lowerQ = this.searchQuery.toLowerCase();
-                result = result.filter(m => m.label.toLowerCase().includes(lowerQ));
+        get allItems() {
+            const all = [];
+            for (const g of this.menuGroups) {
+                for (const item of g.items) {
+                    if (item.children) {
+                        all.push({ label: item.label + ' ▸ (lihat sub-menu)', url: null, _parentLabel: g.label });
+                        for (const c of item.children) all.push({ ...c, _parentLabel: g.label + ' > ' + item.label });
+                    } else {
+                        all.push({ ...item, _parentLabel: g.label });
+                    }
+                }
             }
-            if (this.sortMode === 'abjad') {
-                return [...result].sort((a, b) => a.label.localeCompare(b.label));
-            }
-            return result;
+            return all;
+        },
+        get filteredGroups() {
+            const q = this.searchQuery.toLowerCase().trim();
+            if (!q) return this.menuGroups;
+            return this.menuGroups.map(g => {
+                const filteredItems = g.items.map(item => {
+                    if (!item.children) return item.label.toLowerCase().includes(q) ? item : null;
+                    const fc = item.children.filter(c => c.label.toLowerCase().includes(q));
+                    if (fc.length || item.label.toLowerCase().includes(q)) return { ...item, children: fc.length ? fc : item.children };
+                    return null;
+                }).filter(Boolean);
+                return filteredItems.length ? { ...g, items: filteredItems } : null;
+            }).filter(Boolean);
         }
      }">
     {{-- Header / Breadcrumb --}}
@@ -247,7 +390,7 @@
                         <div class="p-2.5 rounded-xl bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/30">
                             <flux:icon name="squares-2x2" class="w-5 h-5 text-[#4C5C2D] dark:text-[#8CC7C4]" />
                         </div>
-                        <h2 class="font-bold text-neutral-800 dark:text-neutral-100 text-lg">Menu & Modul Lainnya</h2>
+                        <h2 class="font-bold text-neutral-800 dark:text-neutral-100 text-lg">Sub Menu</h2>
                     </div>
                     
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
@@ -260,25 +403,17 @@
                                 class="block w-full pl-9 pr-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 focus:ring-2 focus:ring-[#4C5C2D] focus:border-[#4C5C2D] transition-colors placeholder-neutral-400">
                         </div>
 
-                        {{-- Sort Toggle --}}
-                        <div class="flex items-center bg-neutral-200/80 dark:bg-neutral-700/80 p-1 rounded-lg flex-shrink-0 w-full sm:w-auto justify-center">
-                            <button @click="sortMode = 'default'" 
-                                :class="sortMode === 'default' ? 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700'"
-                                class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all">Default</button>
-                            <button @click="sortMode = 'abjad'" 
-                                :class="sortMode === 'abjad' ? 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 shadow-sm' : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700'"
-                                class="px-3 py-1.5 text-xs font-semibold rounded-md transition-all">A-Z</button>
-                        </div>
-                        
                         <button @click="menuModalOpen = false" class="hidden sm:flex p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors flex-shrink-0">
                             <flux:icon name="x-mark" class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
-                {{-- Grid Menu Body --}}
-                <div class="overflow-y-auto flex-1 p-6 bg-white dark:bg-neutral-900">
-                    <template x-if="filteredMenus.length === 0">
+                {{-- Grouped Menu Body --}}
+                <div class="overflow-y-auto flex-1 p-5 bg-white dark:bg-neutral-900 space-y-6">
+
+                    {{-- No results --}}
+                    <template x-if="filteredGroups.length === 0">
                         <div class="py-16 flex flex-col items-center justify-center text-center">
                             <flux:icon name="magnifying-glass" class="w-12 h-12 text-neutral-300 dark:text-neutral-700 mb-4" />
                             <h3 class="text-lg font-semibold text-neutral-700 dark:text-neutral-300">Menu tidak ditemukan</h3>
@@ -286,16 +421,60 @@
                         </div>
                     </template>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" x-show="filteredMenus.length > 0">
-                        <template x-for="item in filteredMenus" :key="item.label">
-                            <a :href="item.url" :target="item.target || '_self'" class="group flex items-center gap-3 p-3 rounded-xl border border-neutral-200 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 hover:border-[#6A7E3F] dark:hover:border-[#6A7E3F] hover:bg-[#6A7E3F]/5 dark:hover:bg-[#6A7E3F]/10 transition-all cursor-pointer shadow-sm">
-                                <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 group-hover:bg-[#6A7E3F]/10 dark:group-hover:bg-[#6A7E3F]/30 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] transition-colors flex-shrink-0">
-                                    <flux:icon name="document-text" class="w-4 h-4" />
-                                </div>
-                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] leading-tight" x-text="item.label"></span>
-                            </a>
-                        </template>
-                    </div>
+                    {{-- Render each group --}}
+                    <template x-for="group in filteredGroups" :key="group.label">
+                        <div>
+                            {{-- Group Header --}}
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-xs font-bold uppercase tracking-widest text-[#4C5C2D] dark:text-[#8CC7C4]" x-text="group.label"></span>
+                                <div class="flex-1 h-px bg-[#4C5C2D]/20 dark:bg-[#8CC7C4]/20"></div>
+                            </div>
+
+                            {{-- Items grid --}}
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                                <template x-for="item in group.items" :key="item.label">
+                                    <div>
+                                        {{-- Item WITH children = expandable --}}
+                                        <template x-if="item.children && item.children.length > 0">
+                                            <div>
+                                                <button @click="toggleSubMenu(group.label + '_' + item.label)"
+                                                    class="group w-full flex items-center gap-2 p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700/60 bg-neutral-50 dark:bg-neutral-800/60 hover:border-[#6A7E3F] hover:bg-[#6A7E3F]/5 transition-all text-left shadow-sm">
+                                                    <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/30 text-[#4C5C2D] dark:text-[#8CC7C4] flex-shrink-0 transition-colors">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                                                    </div>
+                                                    <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 leading-tight flex-1" x-text="item.label"></span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-neutral-400 flex-shrink-0 transition-transform duration-200" :class="isSubMenuOpen(group.label + '_' + item.label) ? 'rotate-90' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                                                </button>
+                                                {{-- Children list --}}
+                                                <div x-show="isSubMenuOpen(group.label + '_' + item.label)" x-transition
+                                                    class="mt-1.5 ml-1 pl-2 border-l-2 border-[#4C5C2D]/20 dark:border-[#8CC7C4]/20 space-y-1">
+                                                    <template x-for="child in item.children" :key="child.label">
+                                                        <a :href="child.url" :target="child.target || '_self'"
+                                                            class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs text-neutral-600 dark:text-neutral-400 hover:bg-[#4C5C2D]/5 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-colors">
+                                                            <div class="w-1 h-1 rounded-full bg-current opacity-50 flex-shrink-0"></div>
+                                                            <span x-text="child.label" class="leading-snug"></span>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        {{-- Item WITHOUT children = direct link --}}
+                                        <template x-if="!item.children || item.children.length === 0">
+                                            <a :href="item.url" :target="item.target || '_self'"
+                                                class="group flex items-center gap-2 p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700/60 bg-white dark:bg-neutral-800 hover:border-[#6A7E3F] dark:hover:border-[#6A7E3F] hover:bg-[#6A7E3F]/5 dark:hover:bg-[#6A7E3F]/10 transition-all shadow-sm">
+                                                <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400 group-hover:bg-[#6A7E3F]/10 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] transition-colors flex-shrink-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                </div>
+                                                <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] leading-tight" x-text="item.label"></span>
+                                            </a>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
                 </div>
 
             </div>
