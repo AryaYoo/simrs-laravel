@@ -28,6 +28,11 @@ class PerawatanTindakan extends Component
         ->firstOrFail();
     }
 
+    public function setActiveTab(string $key): void
+    {
+        $this->activeTab = $key;
+    }
+
     public function render()
     {
         $rawatInapDrpr = \App\Models\RawatInapDrpr::with(['regPeriksa.pasien', 'jnsPerawatan', 'dokter', 'petugas'])
