@@ -17,6 +17,26 @@
         </div>
     </div>
 
+    {{-- Summary Cards --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 flex flex-col shadow-sm">
+            <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400 mb-1">Total Pasien</span>
+            <span class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['total']) }}</span>
+        </div>
+        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 flex flex-col shadow-sm">
+            <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400 mb-1">Pasien BPJS</span>
+            <span class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['bpjs']) }}</span>
+        </div>
+        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 flex flex-col shadow-sm">
+            <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400 mb-1">Pasien Umum</span>
+            <span class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['umum']) }}</span>
+        </div>
+        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 flex flex-col shadow-sm">
+            <span class="text-sm font-semibold text-neutral-500 dark:text-neutral-400 mb-1">Lainnya</span>
+            <span class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['lainnya']) }}</span>
+        </div>
+    </div>
+
     <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4">
         <div class="flex flex-col sm:flex-row gap-3 mb-4">
             <div class="flex-1">

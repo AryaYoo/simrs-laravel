@@ -32,8 +32,7 @@ class Index extends Component
     {
         $searchTerm = '%' . $this->search . '%';
 
-        $regPeriksas = RegPeriksa::query()
-            ->with(['pasien', 'penjab', 'dokter', 'poliklinik'])
+        $baseQuery = RegPeriksa::query()
             ->where('status_lanjut', 'Ralan')
             ->when($this->dari,    fn($q) => $q->whereDate('tgl_registrasi', '>=', $this->dari))
             ->when($this->sampai,  fn($q) => $q->whereDate('tgl_registrasi', '<=', $this->sampai))
@@ -43,13 +42,30 @@ class Index extends Component
                     ->orWhereHas('pasien', function ($q) use ($searchTerm) {
                         $q->where('nm_pasien', 'like', $searchTerm);
                     });
-            })
+            });
+
+        $counts = (clone $baseQuery)
+            ->join('penjab', 'reg_periksa.kd_pj', '=', 'penjab.kd_pj')
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN penjab.png_jawab LIKE '%BPJS%' THEN 1 ELSE 0 END) as bpjs,
+                SUM(CASE WHEN penjab.png_jawab LIKE '%UMUM%' OR penjab.png_jawab = '-' THEN 1 ELSE 0 END) as umum
+            ")->first();
+
+        $regPeriksas = (clone $baseQuery)
+            ->with(['pasien', 'penjab', 'dokter', 'poliklinik'])
             ->orderBy('tgl_registrasi', 'desc')
             ->orderBy('jam_reg', 'desc')
             ->paginate($this->perPage);
 
         return view('livewire.modul.rawat-jalan.index', [
             'regPeriksas' => $regPeriksas,
+            'summary' => [
+                'total' => $counts->total ?? 0,
+                'bpjs' => $counts->bpjs ?? 0,
+                'umum' => $counts->umum ?? 0,
+                'lainnya' => max(0, ($counts->total ?? 0) - ($counts->bpjs ?? 0) - ($counts->umum ?? 0)),
+            ]
         ]);
     }
 }
