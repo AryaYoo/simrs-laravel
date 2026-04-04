@@ -2,6 +2,10 @@
 
 Sistem Informasi Manajemen Rumah Sakit (SIMRS) berbasis Laravel 11 dengan antarmuka modern menggunakan Livewire 3 dan Flux UI.
 
+> [!CAUTION]
+> **PERINGATAN PENTING: LEGACY DATABASE**
+> Proyek ini menggunakan basis data peninggalan (**Legacy Database**) dari sistem SIMRS sebelumnya. Pengembang **dilarang keras** mengubah struktur tabel atau data secara sembarangan, karena berpotensi merusak alur kerja sistem lama yang masih aktif berjalan. Segala perubahan skema harus dikoordinasikan dengan tim terkait.
+
 ## Fitur Utama
 
 ### 1. Modul Registrasi Pasien (Transaksi)

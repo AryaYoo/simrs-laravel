@@ -55,6 +55,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('master-data/dokter', \App\Livewire\MasterData\Dokter\Index::class)->name('master-data.dokter.index');
     Route::get('master-data/poliklinik', \App\Livewire\MasterData\Poliklinik\Index::class)->name('master-data.poliklinik.index');
     Route::get('master-data/perujuk', \App\Livewire\MasterData\Perujuk\Index::class)->name('master-data.perujuk.index');
+
+    // Bridging
+    Route::get('bridging/erm-bpjs', \App\Livewire\Bridging\ErmBpjs\Index::class)->name('bridging.erm-bpjs.index');
 });
 
 require __DIR__ . '/settings.php';

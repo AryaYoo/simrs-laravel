@@ -11,6 +11,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\LogoutResponse;
 use Illuminate\Support\Facades\Hash;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -31,6 +32,17 @@ class FortifyServiceProvider extends ServiceProvider
                     }
 
                     return redirect()->intended('/user');
+                }
+            };
+        });
+
+        // Custom Logout Response and Redirection
+        $this->app->singleton(LogoutResponse::class, function ($app) {
+            return new class implements LogoutResponse {
+                public function toResponse($request)
+                {
+                    // Gunakan route('login') agar menyertakan prefix sub-direktori (laralite)
+                    return redirect()->route('login');
                 }
             };
         });
@@ -57,9 +69,26 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::authenticateUsing(function (Request $request) {
             $user = \App\Models\User::where('username', $request->username)->first();
 
-            if ($user && Hash::check($request->password, $user->password)) {
+            if (!$user) {
+                return null;
+            }
+
+            // Dapatkan nilai raw password dari database
+            $passwordInDb = $user->password;
+
+            // 1. Coba verifikasi MD5 (Karena ini Legacy Database dari SIMRS lama)
+            if (md5($request->password) === $passwordInDb) {
                 return $user;
             }
+
+            // 2. Coba verifikasi Native Bcrypt/Standard Hash
+            // Menggunakan password_verify lebih aman daripada Hash::check untuk format non-standar
+            // karena tidak akan melempar Exception (hanya return false).
+            if (password_verify($request->password, $passwordInDb)) {
+                return $user;
+            }
+
+            return null;
         });
     }
 
