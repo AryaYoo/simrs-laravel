@@ -91,6 +91,17 @@
                             <flux:icon name="circle-stack" class="w-4 h-4 flex-shrink-0" />
                             <span x-show="sidebarOpen">{{ __('Master Data') }}</span>
                         </a>
+                        
+                        <a href="{{ route('admin.settings') }}" wire:navigate
+                            class="flex items-center rounded-md text-sm font-medium transition-colors"
+                            :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                            style="color: white; text-decoration: none; background-color: {{ request()->routeIs('admin.settings') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('admin.settings') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
+                            title="{{ __('Pengaturan Aplikasi') }}">
+                            <flux:icon name="cog-8-tooth" class="w-4 h-4 flex-shrink-0" />
+                            <span x-show="sidebarOpen">{{ __('Pengaturan') }}</span>
+                        </a>
                     @endif
                 </nav>
             </div>
@@ -105,12 +116,12 @@
                         {{ __('Main Menu') }}
                     </p>
                 </div>
-                <div x-show="!sidebarOpen" class="h-4 border-t border-white/10 mx-2 mt-2 mb-2"></div>
+                <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
 
                 {{-- Main Navigation --}}
                 <nav class="overflow-y-auto" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
                     {{-- Modul with Dropdown --}}
-                    <div class="flex flex-col mb-1 w-full">
+                    <div class="flex flex-col mb-1" :class="sidebarOpen ? 'w-full' : 'w-full items-center'">
                         <div class="flex items-center rounded-md text-sm font-medium transition-colors group"
                             :class="sidebarOpen ? 'w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
                             style="background-color: {{ request()->is('modul*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};">
@@ -173,13 +184,13 @@
             {{-- SECONDARY ZONE: BRIDGING & FOOTER (Darker Olive Zone) --}}
             <div class="flex-1 flex flex-col pt-4" style="background-color: #3E4A25; border-top: 1px solid rgba(0,0,0,0.1);">
                 {{-- SECTION: BRIDGING (Integrated Style) --}}
-                <div style="padding: 0 1rem 0.25rem 1rem;">
+                <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
                     <p
                         style="color: rgba(255,255,255,0.4); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
                         {{ __('Bridging') }}
                     </p>
                 </div>
-                <div x-show="!sidebarOpen" class="h-px bg-white/10 mx-3 mb-2"></div>
+                <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
 
                     {{-- Bridging Navigation --}}
                     <nav class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">

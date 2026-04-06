@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/pasien/{no_rkm_medis}', \App\Livewire\Modul\Pasien\Show::class)->name('modul.pasien.show')->where('no_rkm_medis', '.*');
 
     Route::view('master-data', 'master-data.index')->name('master-data.index');
+    Route::get('admin/settings', \App\Livewire\Admin\Settings::class)->name('admin.settings');
     Route::get('master-data/penjamin', \App\Livewire\MasterData\Penjamin\Index::class)->name('master-data.penjamin.index');
     Route::get('master-data/kabupaten', \App\Livewire\MasterData\Kabupaten\Index::class)->name('master-data.kabupaten.index');
     Route::get('master-data/kecamatan', \App\Livewire\MasterData\Kecamatan\Index::class)->name('master-data.kecamatan.index');
