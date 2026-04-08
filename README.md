@@ -27,6 +27,14 @@ Sistem Informasi Manajemen Rumah Sakit (SIMRS) berbasis Laravel 11 dengan antarm
 - **Ekstraksi Data Instan**: Mampu membaca teks dari foto KTP dan memasukkannya langsung ke dalam formulir Pasien Baru (membaca NIK, Nama, Tanggal Lahir, Jenis Kelamin, dll).
 - **Pengaturan Dinamis**: API Key dan profil instansi diatur langsung lewat menu *Settings* tanpa menyentuh *source code*.
 
+### 5. Modul Riwayat Pasien & Resume Medis (Rekam Medis Digital)
+- **Sinkronisasi Riwayat**: Menampilkan seluruh riwayat kunjungan pasien secara kronologis (Rawat Jalan & Rawat Inap).
+- **Data SEP BPJS**: Integrasi informasi penjaminan, rujukan, dan data bridging SEP secara *real-time*.
+- **Pemeriksaan SOAPIE**: Visualisasi detail riwayat pemeriksaan klinis (Subjek, Objek, Asesmen, Plan) serta grafik *Vital Signs* yang komprehensif.
+- **Kodifikasi ICD**: Pencatatan Diagnosa (ICD-10) dan Prosedur/Tindakan (ICD-9) dalam format tabel terstruktur.
+- **Resume Medis**: Ringkasan medis otomatis untuk setiap visit yang mencakup keluhan, jalannya penyakit, hasil penunjang, hingga instruksi pulang.
+- **Informasi Biaya**: Transparansi rincian biaya tindakan, jasa medis, dan obat-obatan per kunjungan.
+
 ## Panduan Penggunaan & Setup Fitur OCR KTP
 
 Fitur pembacaan KTP otomatis (OCR) menggunakan teknologi kecerdasan buatan dari Google Cloud Vision API. Ikuti langkah berikut untuk persiapan hingga penggunaanya:
