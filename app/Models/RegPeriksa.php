@@ -48,7 +48,7 @@ class RegPeriksa extends Model
 
     public function kamarInap()
     {
-        return $this->hasOne(KamarInap::class, 'no_rawat', 'no_rawat');
+        return $this->hasMany(KamarInap::class, 'no_rawat', 'no_rawat');
     }
 
     public function permintaanRanap()
@@ -59,5 +59,85 @@ class RegPeriksa extends Model
     public function poliklinik()
     {
         return $this->belongsTo(Poliklinik::class, 'kd_poli', 'kd_poli');
+    }
+
+    public function diagnosaPasien()
+    {
+        return $this->hasMany(DiagnosaPasien::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function prosedurPasien()
+    {
+        return $this->hasMany(ProsedurPasien::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function rawatInapDrpr()
+    {
+        return $this->hasMany(RawatInapDrpr::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function detailPeriksaLab()
+    {
+        return $this->hasMany(DetailPeriksaLab::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function periksaRadiologi()
+    {
+        return $this->hasMany(PeriksaRadiologi::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function detailPemberianObat()
+    {
+        return $this->hasMany(DetailPemberianObat::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function pemeriksaanRanap()
+    {
+        return $this->hasMany(PemeriksaanRanap::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function pemeriksaanRalan()
+    {
+        return $this->hasMany(PemeriksaanRalan::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function rawatJlDrpr()
+    {
+        return $this->hasMany(RawatJlDrpr::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function rawatJlDr()
+    {
+        return $this->hasMany(RawatJlDr::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function rawatJlPr()
+    {
+        return $this->hasMany(RawatJlPr::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function rawatInapDr()
+    {
+        return $this->hasMany(RawatInapDr::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function rawatInapPr()
+    {
+        return $this->hasMany(RawatInapPr::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function bridgingSep()
+    {
+        return $this->hasOne(BridgingSep::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function resumePasien()
+    {
+        return $this->hasOne(ResumePasien::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function resumePasienRanap()
+    {
+        return $this->hasOne(ResumePasienRanap::class, 'no_rawat', 'no_rawat');
     }
 }

@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RawatInapDrpr extends Model
+class RawatInapDr extends Model
 {
-    protected $table = 'rawat_inap_drpr';
+    protected $table = 'rawat_inap_dr';
     public $timestamps = false;
-    protected $primaryKey = 'no_rawat'; // Not strictly unique, but helps Eloquent
+    protected $primaryKey = 'no_rawat';
     public $incrementing = false;
     protected $keyType = 'string';
 
@@ -16,13 +16,12 @@ class RawatInapDrpr extends Model
         'no_rawat',
         'kd_jenis_prw',
         'kd_dokter',
-        'nip',
         'tgl_perawatan',
         'jam_rawat',
         'material',
+        'bhp',
         'tarif_tindakandr',
-        'tarif_tindakanpr',
-        'kSO',
+        'kso',
         'menejemen',
         'biaya_rawat',
     ];
@@ -40,10 +39,5 @@ class RawatInapDrpr extends Model
     public function dokter()
     {
         return $this->belongsTo(Dokter::class, 'kd_dokter', 'kd_dokter');
-    }
-
-    public function petugas()
-    {
-        return $this->belongsTo(Petugas::class, 'nip', 'nip');
     }
 }

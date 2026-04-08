@@ -4,27 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class RawatInapDrpr extends Model
+class RawatJlPr extends Model
 {
-    protected $table = 'rawat_inap_drpr';
+    protected $table = 'rawat_jl_pr';
     public $timestamps = false;
-    protected $primaryKey = 'no_rawat'; // Not strictly unique, but helps Eloquent
+    protected $primaryKey = 'no_rawat';
     public $incrementing = false;
     protected $keyType = 'string';
 
     protected $fillable = [
         'no_rawat',
         'kd_jenis_prw',
-        'kd_dokter',
         'nip',
         'tgl_perawatan',
         'jam_rawat',
         'material',
-        'tarif_tindakandr',
+        'bhp',
         'tarif_tindakanpr',
-        'kSO',
+        'kso',
         'menejemen',
         'biaya_rawat',
+        'stts_bayar',
     ];
 
     public function regPeriksa()
@@ -34,12 +34,7 @@ class RawatInapDrpr extends Model
 
     public function jnsPerawatan()
     {
-        return $this->belongsTo(JnsPerawatanInap::class, 'kd_jenis_prw', 'kd_jenis_prw');
-    }
-
-    public function dokter()
-    {
-        return $this->belongsTo(Dokter::class, 'kd_dokter', 'kd_dokter');
+        return $this->belongsTo(JnsPerawatan::class, 'kd_jenis_prw', 'kd_jenis_prw');
     }
 
     public function petugas()

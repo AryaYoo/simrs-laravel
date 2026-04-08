@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class JnsPerawatan extends Model
+class JnsPerawatanRadiologi extends Model
 {
-    protected $table = 'jns_perawatan';
+    protected $table = 'jns_perawatan_radiologi';
     protected $primaryKey = 'kd_jenis_prw';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -15,12 +15,16 @@ class JnsPerawatan extends Model
     protected $fillable = [
         'kd_jenis_prw',
         'nm_perawatan',
-        'kd_kategori',
-        'material',
+        'bagian_rs',
+        'bhp',
+        'tarif_perujuk',
         'tarif_tindakan_dokter',
         'tarif_tindakan_petugas',
-        'tarif_karyawan',
+        'kso',
+        'menejemen',
         'total_byr',
+        'kd_pj',
         'status',
+        'kelas',
     ];
 }

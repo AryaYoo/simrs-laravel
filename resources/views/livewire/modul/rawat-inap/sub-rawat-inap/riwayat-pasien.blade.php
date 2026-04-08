@@ -181,62 +181,62 @@
                         <table class="w-full text-sm text-left">
                             <thead class="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
                                 <tr>
+                                    <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap w-12">No.</th>
                                     <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">No. Rawat</th>
                                     <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Tanggal</th>
                                     <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Jam</th>
-                                    <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Kode Dokter</th>
-                                    <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Nama Dokter</th>
+                                    <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Kd Dokter</th>
+                                    <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Dokter Dituju/DPJP</th>
                                     <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Umur</th>
-                                    <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Poli / Kamar</th>
+                                    <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Poliklinik/Kamar</th>
                                     <th class="px-4 py-3 text-[11px] font-semibold text-neutral-500 uppercase tracking-wider whitespace-nowrap">Jenis Bayar</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/50">
-                                @foreach($riwayatKunjungan as $kunjungan)
-                                    <tr class="bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors {{ $kunjungan->no_rawat === $no_rawat ? 'ring-2 ring-inset ring-[#4C5C2D]/30 dark:ring-[#8CC7C4]/30' : '' }}">
+                                @php $rowNum = 1; @endphp
+                                @foreach($kunjunganDetail as $item)
+                                    <tr class="bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors {{ $item['is_current'] ? 'ring-2 ring-inset ring-[#4C5C2D]/30 dark:ring-[#8CC7C4]/30' : '' }}">
+                                        <td class="px-4 py-3 whitespace-nowrap text-neutral-500 text-xs font-medium">
+                                            @if($item['is_first'])
+                                                {{ $rowNum++ }}
+                                            @endif
+                                        </td>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <span class="font-mono text-xs font-semibold text-[#4C5C2D] dark:text-[#8CC7C4]">
-                                                {{ $kunjungan->no_rawat }}
+                                                {{ $item['no_rawat'] }}
                                             </span>
-                                            @if($kunjungan->no_rawat === $no_rawat)
+                                            @if($item['is_current'] && $item['is_first'])
                                                 <span class="ml-1 inline-flex items-center rounded bg-[#4C5C2D]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#4C5C2D] dark:text-[#8CC7C4]">Saat ini</span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-neutral-700 dark:text-neutral-300">
-                                            {{ \Carbon\Carbon::parse($kunjungan->tgl_registrasi)->translatedFormat('d M Y') }}
+                                            {{ \Carbon\Carbon::parse($item['tgl'])->translatedFormat('d M Y') }}
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-neutral-700 dark:text-neutral-300">
-                                            {{ \Carbon\Carbon::parse($kunjungan->jam_reg)->format('H:i') }}
+                                            {{ \Carbon\Carbon::parse($item['jam'])->format('H:i:s') }}
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <span class="inline-flex items-center rounded bg-neutral-100 dark:bg-neutral-700 px-2 py-0.5 text-xs font-mono text-neutral-600 dark:text-neutral-300">
-                                                {{ $kunjungan->kd_dokter }}
+                                                {{ $item['kd_dokter'] }}
                                             </span>
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap font-medium text-neutral-800 dark:text-neutral-200">
-                                            {{ $kunjungan->dokter->nm_dokter ?? '-' }}
+                                            {{ $item['nm_dokter'] }}
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap text-neutral-700 dark:text-neutral-300">
-                                            @php
-                                                $tglLahir = $kunjungan->pasien->tgl_lahir ?? null;
-                                                $tglReg   = $kunjungan->tgl_registrasi;
-                                                $umur     = $tglLahir && $tglReg
-                                                    ? \Carbon\Carbon::parse($tglLahir)->diffInYears(\Carbon\Carbon::parse($tglReg))
-                                                    : '-';
-                                            @endphp
-                                            {{ is_numeric($umur) ? $umur . ' thn' : $umur }}
+                                            {{ $item['umur'] }}
                                         </td>
-                                        <td class="px-4 py-3 whitespace-nowrap text-neutral-700 dark:text-neutral-300">
-                                            {{ $kunjungan->kamarInap->kamar->kd_kamar ?? $kunjungan->kd_poli ?? '-' }}
+                                        <td class="px-4 py-3 whitespace-nowrap text-neutral-700 dark:text-neutral-300 font-medium">
+                                            {{ $item['lokasi'] }}
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <span class="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold
-                                                @if(strtolower($kunjungan->kd_pj) === 'bpjs' || str_contains(strtolower($kunjungan->penjab->png_jawab ?? ''), 'bpjs'))
+                                                @if(strtolower($item['kd_pj']) === 'bpjs' || str_contains(strtolower($item['png_jawab'] ?? ''), 'bpjs'))
                                                     bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400
                                                 @else
                                                     bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400
                                                 @endif">
-                                                {{ $kunjungan->penjab->png_jawab ?? $kunjungan->kd_pj ?? '-' }}
+                                                {{ $item['png_jawab'] }}
                                             </span>
                                         </td>
                                     </tr>
@@ -244,7 +244,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="mt-3 text-right text-xs text-neutral-400">Total: {{ $riwayatKunjungan->count() }} kunjungan</p>
+                    <p class="mt-3 text-right text-xs text-neutral-400 italic">Total: {{ $kunjunganDetail->count() }} baris riwayat</p>
                 @endif
 
             @elseif($activeTab === 'soapie')
@@ -269,21 +269,21 @@
                             @endphp
                             <div class="rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm bg-white dark:bg-neutral-800">
                                 {{-- Outer Card Header: No Rawat & Tgl Registrasi --}}
-                                <div class="sticky top-0 z-10 backdrop-blur-md rounded-t-xl flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-neutral-50/90 dark:bg-neutral-800/90 border-b border-neutral-200 dark:border-neutral-700">
+                                <div class="sticky top-0 z-10 backdrop-blur-md rounded-t-xl flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-[#4C5C2D] border-b border-[#4C5C2D] shadow-sm">
                                     <div class="flex flex-wrap items-center gap-4">
                                         <div class="flex items-center gap-1.5">
-                                            <span class="text-[10px] font-semibold text-neutral-400 uppercase">No. Rawat:</span>
-                                            <span class="font-mono text-sm font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">
+                                            <span class="text-[10px] font-semibold text-white/70 uppercase">No. Rawat:</span>
+                                            <span class="font-mono text-sm font-bold text-white">
                                                 {{ $noRawatKey }}
                                             </span>
                                             @if($noRawatKey === $no_rawat)
-                                                <span class="ml-1 inline-flex items-center rounded bg-[#4C5C2D]/10 px-1.5 py-0.5 text-[10px] font-semibold text-[#4C5C2D] dark:text-[#8CC7C4]">Saat ini</span>
+                                                <span class="ml-1 inline-flex items-center rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-bold text-white border border-white/20">Saat ini</span>
                                             @endif
                                         </div>
-                                        <span class="text-neutral-300 dark:text-neutral-600">|</span>
+                                        <span class="text-white/30">|</span>
                                         <div class="flex items-center gap-1.5">
-                                            <span class="text-[10px] font-semibold text-neutral-400 uppercase">Tgl. Registrasi:</span>
-                                            <span class="text-sm text-neutral-700 dark:text-neutral-300 font-medium">
+                                            <span class="text-[10px] font-semibold text-white/70 uppercase">Tgl. Registrasi:</span>
+                                            <span class="text-xs text-white font-bold">
                                                 {{ \Carbon\Carbon::parse($firstSoapie->regPeriksa->tgl_registrasi ?? '')->translatedFormat('d F Y') }}
                                             </span>
                                         </div>
@@ -315,7 +315,10 @@
                                                             {{ $soapie->pegawai->nama ?? $soapie->nip ?? '-' }}
                                                         </span>
                                                     </div>
-                                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $soapie->regPeriksa->stts === 'Sudah' ? 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400' }}">
+                                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase {{ $soapie->status_lanjut === 'Ranap' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' }}">
+                                                        {{ $soapie->status_lanjut }}
+                                                    </span>
+                                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold {{ ($soapie->regPeriksa->stts ?? '') === 'Sudah' ? 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400' }}">
                                                         {{ $soapie->regPeriksa->stts ?? '-' }}
                                                     </span>
                                                 </div>
@@ -361,9 +364,755 @@
                 @endif
 
             @elseif($activeTab === 'perawatan')
-                <div class="text-neutral-500 py-8 text-center text-sm border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl">
-                    Konten Riwayat Perawatan
-                </div>
+                @if($riwayatKunjungan->isEmpty())
+                    <div class="flex flex-col items-center justify-center py-16 text-neutral-400 dark:text-neutral-600">
+                        <flux:icon name="inbox" class="w-12 h-12 mb-3 opacity-50" />
+                        <p class="text-sm font-medium">Tidak ada riwayat perawatan</p>
+                    </div>
+                @else
+                    <div class="flex flex-col gap-4" x-data="{ expanded: null }">
+                        @foreach($riwayatKunjungan as $kunjungan)
+                            <div class="rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 overflow-hidden shadow-sm transition-all"
+                                 :class="expanded === '{{ $kunjungan->no_rawat }}' ? 'ring-1 ring-[#4C5C2D] dark:ring-[#8CC7C4]' : ''">
+                                {{-- Accordion Header --}}
+                                <button @click="expanded = expanded === '{{ $kunjungan->no_rawat }}' ? null : '{{ $kunjungan->no_rawat }}'"
+                                        class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors">
+                                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
+                                        <div class="flex flex-col">
+                                            <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Tgl. Registrasi</span>
+                                            <span class="text-sm font-bold text-neutral-800 dark:text-neutral-100 italic">
+                                                {{ \Carbon\Carbon::parse($kunjungan->tgl_registrasi)->translatedFormat('d F Y') }}
+                                            </span>
+                                        </div>
+                                        <div class="w-px h-6 bg-neutral-200 dark:border-neutral-700 hidden sm:block"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Dokter Penanggung Jawab</span>
+                                            <span class="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+                                                {{ $kunjungan->dokter->nm_dokter ?? '-' }}
+                                            </span>
+                                        </div>
+                                        <div class="w-px h-6 bg-neutral-200 dark:border-neutral-700 hidden sm:block"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">No. Rawat</span>
+                                            <span class="font-mono text-xs text-[#4C5C2D] dark:text-[#8CC7C4] font-bold">{{ $kunjungan->no_rawat }}</span>
+                                        </div>
+                                    </div>
+                                    <flux:icon name="chevron-down" class="w-5 h-5 text-neutral-400 transition-transform duration-200"
+                                                ::class="expanded === '{{ $kunjungan->no_rawat }}' ? 'rotate-180 text-[#4C5C2D]' : ''" />
+                                </button>
+
+                                {{-- Accordion Content --}}
+                                <div x-show="expanded === '{{ $kunjungan->no_rawat }}'"
+                                     x-transition:enter="transition ease-out duration-200"
+                                     x-transition:enter-start="opacity-0 -translate-y-2"
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     class="p-5 border-t border-neutral-100 dark:border-neutral-700 bg-neutral-50/30 dark:bg-neutral-900/10">
+
+                                    {{-- Section: Informasi Umum (Khanza Style) --}}
+                                    <div class="mb-8 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm">
+                                        <div class="bg-neutral-50 dark:bg-neutral-900/50 px-4 py-2 border-b border-neutral-200 dark:border-neutral-700">
+                                            <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2">
+                                                <flux:icon name="information-circle" class="w-4 h-4" /> Informasi pendaftaran & penanggung jawab
+                                            </h4>
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-8 p-4 text-[11px]">
+                                            {{-- Column 1 --}}
+                                            <div class="space-y-2">
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">No. Rawat</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-mono font-bold">: {{ $kunjungan->no_rawat }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">No. Registrasi</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold">: {{ $kunjungan->no_reg }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Tgl. Registrasi</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold">: {{ \Carbon\Carbon::parse($kunjungan->tgl_registrasi)->format('d-m-Y') }} {{ $kunjungan->jam_reg }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Umur Saat Daftar</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold">: {{ $kunjungan->umur_daftar }}</span>
+                                                </div>
+                                            </div>
+
+                                            {{-- Column 2 --}}
+                                            <div class="space-y-2">
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Unit/Poliklinik</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold">: {{ $kunjungan->poliklinik->nm_poli ?? '-' }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Dokter Poli</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold">: {{ $kunjungan->dokter->nm_dokter ?? '-' }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Cara Bayar</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold">: {{ $kunjungan->penjab->png_jawab ?? '-' }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Status</span>
+                                                    <span class="font-bold">: 
+                                                        <span class="px-2 py-0.5 rounded {{ $kunjungan->status_lanjut === 'Ranap' ? 'bg-purple-100 text-purple-700 dark:bg-purple-500/10' : 'bg-blue-100 text-blue-700 dark:bg-blue-500/10' }}">
+                                                            {{ $kunjungan->status_lanjut }}
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {{-- Column 3 --}}
+                                            <div class="space-y-2 lg:border-l lg:border-neutral-100 lg:dark:border-neutral-700 lg:pl-6 text-[10px]">
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">P.J.</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold text-sky-600 dark:text-sky-400 uppercase">: {{ $kunjungan->p_jawab }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Hubungan</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold">: {{ $kunjungan->hubunganpj }}</span>
+                                                </div>
+                                                <div class="flex items-start">
+                                                    <span class="w-24 shrink-0 text-neutral-400 font-semibold italic">Alamat</span>
+                                                    <span class="text-neutral-700 dark:text-neutral-300 font-bold leading-relaxed">: {{ $kunjungan->almt_pj }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Section: Data SEP BPJS --}}
+                                    @if($kunjungan->bridgingSep)
+                                        <div class="mb-8 overflow-hidden rounded-xl border border-blue-200 dark:border-blue-900/50 bg-white dark:bg-neutral-800 shadow-sm">
+                                            <div class="bg-blue-50/50 dark:bg-blue-900/20 px-4 py-2 border-b border-blue-100 dark:border-blue-900/30 flex items-center justify-between">
+                                                <h4 class="text-xs font-extrabold text-blue-700 dark:text-blue-400 uppercase tracking-widest flex items-center gap-2">
+                                                    <flux:icon name="identification" class="w-4 h-4" /> Data SEP BPJS
+                                                </h4>
+                                                <span class="text-[10px] font-mono text-blue-500 font-bold">{{ $kunjungan->bridgingSep->no_sep }}</span>
+                                            </div>
+                                            <div class="p-4 space-y-6">
+                                                {{-- Row 1: Informasi SEP & Kelas Rawat --}}
+                                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                                    <div class="space-y-4">
+                                                        <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1">Informasi SEP</h5>
+                                                        <div class="grid grid-cols-2 gap-y-2 text-[11px]">
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">No. Kartu</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->no_kartu }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">No. SEP</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->no_sep }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Tgl. SEP</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ \Carbon\Carbon::parse($kunjungan->bridgingSep->tglsep)->format('d-m-Y') }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Jenis Pelayanan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->jnspelayanan == '1' ? '1. Ranap' : '2. Ralan' }}</span></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="space-y-4">
+                                                        <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1">Kelas Rawat</h5>
+                                                        <div class="grid grid-cols-2 gap-y-2 text-[11px]">
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Hak Kelas Rawat</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->klsrawat ?? '-' }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Naik Kelas</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->klsnaik ?? '-' }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Pembiayaan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->pembiayaan ?? '-' }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">P.J. Naik Kelas</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->pjnaikkelas ?? '-' }}</span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Row 2: Rujukan --}}
+                                                <div class="space-y-4">
+                                                    <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1 flex items-center gap-2">
+                                                        <flux:icon name="truck" class="w-3.5 h-3.5" /> Rujukan
+                                                    </h5>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-[11px]">
+                                                        <div class="flex flex-col"><span class="text-neutral-400 italic">Asal Rujukan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->asal_rujukan }}</span></div>
+                                                        <div class="flex flex-col"><span class="text-neutral-400 italic">Tgl. Rujukan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->tglrujukan ? \Carbon\Carbon::parse($kunjungan->bridgingSep->tglrujukan)->format('d-m-Y') : '-' }}</span></div>
+                                                        <div class="flex flex-col"><span class="text-neutral-400 italic">No. Rujukan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->no_rujukan ?? '-' }}</span></div>
+                                                        <div class="flex flex-col"><span class="text-neutral-400 italic">PPK Rujukan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->nmppkrujukan ?? '-' }}</span></div>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Row 3: Keterangan & Jaminan --}}
+                                                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                                    <div class="space-y-4">
+                                                        <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1">Keterangan SEP</h5>
+                                                        <div class="space-y-2 text-[11px]">
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Catatan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->catatan ?? '-' }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Diagnosa Awal</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->diagawal }} - {{ $kunjungan->bridgingSep->nmdiagnosaawal }}</span></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="space-y-4">
+                                                        <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1">Informasi Poli & Katarak</h5>
+                                                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Tujuan</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->nmpolitujuan }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Eksekutif</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->eksekutif }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">COB</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->cob }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Katarak</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->katarak }}</span></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="space-y-4">
+                                                        <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1 flex items-center gap-2">
+                                                            <flux:icon name="shield-check" class="w-3.5 h-3.5" /> Jaminan
+                                                        </h5>
+                                                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Laka Lantas</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->lakalantas }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Tanggal KLL</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->tglkkl != '0000-00-00' ? $kunjungan->bridgingSep->tglkkl : '-' }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Suplesi</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->suplesi }}</span></div>
+                                                            <div class="flex flex-col"><span class="text-neutral-400 italic">Dokter DPJP</span><span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $kunjungan->bridgingSep->nmdpdjp }}</span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Row 4: Keterangan Lain (New) --}}
+                                                <div class="space-y-4 pt-2">
+                                                    <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1">Keterangan Lain</h5>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-[11px]">
+                                                        <div class="flex items-start">
+                                                            <span class="w-32 shrink-0 text-neutral-400 italic">Tujuan Kunjungan</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                : {{ match($kunjungan->bridgingSep->tujuankunjungan) {
+                                                                    '0' => '0. Normal',
+                                                                    '1' => '1. Prosedur',
+                                                                    '2' => '2. Konsul Dokter',
+                                                                    default => $kunjungan->bridgingSep->tujuankunjungan ?: '-'
+                                                                } }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-start">
+                                                            <span class="w-32 shrink-0 text-neutral-400 italic">Flag Prosedur</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                : {{ match($kunjungan->bridgingSep->flagprosedur) {
+                                                                    '0' => '0. Prosedur Tidak Berkelanjutan',
+                                                                    '1' => '1. Prosedur Berkelanjutan',
+                                                                    default => $kunjungan->bridgingSep->flagprosedur ?: '-'
+                                                                } }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-start">
+                                                            <span class="w-32 shrink-0 text-neutral-400 italic">Penunjang</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                : {{ match($kunjungan->bridgingSep->penunjang) {
+                                                                    '1' => '1. Radioterapi',
+                                                                    '2' => '2. Kemoterapi',
+                                                                    '3' => '3. Rehabilitasi Medik',
+                                                                    '4' => '4. Rehabilitasi Psikososial',
+                                                                    '5' => '5. Transfusi Darah',
+                                                                    '6' => '6. Pelayanan Gigi',
+                                                                    '7' => '7. Laboratorium',
+                                                                    '8' => '8. USG',
+                                                                    '9' => '9. Farmasi',
+                                                                    '10' => '10. Lain-lain',
+                                                                    '11' => '11. MRI',
+                                                                    '12' => '12. CT-SCAN',
+                                                                    default => $kunjungan->bridgingSep->penunjang ?: '-'
+                                                                } }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="flex items-start">
+                                                            <span class="w-32 shrink-0 text-neutral-400 italic">Asesmen Pelayanan</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                : {{ match($kunjungan->bridgingSep->asesmenpelayanan) {
+                                                                    '1' => '1. Poli spesialis tidak tersedia pada hari sebelumnya',
+                                                                    '2' => '2. Jam operasional poli spesialis telah berakhir pada hari sebelumnya',
+                                                                    '3' => '3. Dokter spesialis tidak ada pada hari sebelumnya',
+                                                                    '4' => '4. Atas Instruksi RS',
+                                                                    '5' => '5. Tujuan Kontrol',
+                                                                    default => $kunjungan->bridgingSep->asesmenpelayanan ?: '-'
+                                                                } }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    {{-- Section: Pemeriksaan Rawat Jalan (Khanza Style) --}}
+                                    @if($kunjungan->pemeriksaanRalan->isNotEmpty())
+                                        <div class="mb-10 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm">
+                                            <div class="bg-neutral-50 dark:bg-neutral-900/50 px-4 py-2 border-b border-neutral-200 dark:border-neutral-700">
+                                                <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2">
+                                                    <flux:icon name="clipboard-document-check" class="w-4 h-4" /> Pemeriksaan Rawat Jalan
+                                                </h4>
+                                            </div>
+                                            <div class="p-0 overflow-x-auto">
+                                                <table class="w-full text-[11px] border-collapse">
+                                                    @foreach($kunjungan->pemeriksaanRalan as $index => $soapRalan)
+                                                        <tbody class="border-b-4 border-neutral-100 dark:border-neutral-700 last:border-0">
+                                                            {{-- Header Row --}}
+                                                            <tr class="bg-neutral-50/50 dark:bg-neutral-800/50 text-[10px] font-bold text-neutral-500 uppercase tracking-tighter">
+                                                                <th class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 w-10">No.</th>
+                                                                <th class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 w-40 text-left">Tanggal</th>
+                                                                <th class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 text-left">Dokter/Paramedis</th>
+                                                                <th class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 text-left">Profesi</th>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 text-center font-bold">{{ $index + 1 }}</td>
+                                                                <td class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 font-medium">
+                                                                    {{ \Carbon\Carbon::parse($soapRalan->tgl_perawatan)->format('d-m-Y') }} {{ $soapRalan->jam_rawat }}
+                                                                </td>
+                                                                <td class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 font-bold text-neutral-800 dark:text-neutral-200">
+                                                                    {{ $soapRalan->pegawai->nama ?? $soapRalan->nip }}
+                                                                </td>
+                                                                <td class="px-3 py-2 border border-neutral-200 dark:border-neutral-700 text-neutral-500 italic">dokter</td>
+                                                            </tr>
+
+                                                            {{-- SOAP Rows --}}
+                                                            @if($soapRalan->keluhan)
+                                                                <tr>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-neutral-50/20 dark:bg-neutral-900/10 font-bold text-neutral-500 italic text-right">Subjek :</td>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 whitespace-pre-line leading-relaxed">{{ $soapRalan->keluhan }}</td>
+                                                                </tr>
+                                                            @endif
+                                                            @if($soapRalan->pemeriksaan)
+                                                                <tr>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-neutral-50/20 dark:bg-neutral-900/10 font-bold text-neutral-500 italic text-right">Objek :</td>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 whitespace-pre-line leading-relaxed">{{ $soapRalan->pemeriksaan }}</td>
+                                                                </tr>
+                                                            @endif
+
+                                                            {{-- Vital Signs Grid --}}
+                                                            <tr class="bg-neutral-100/30 dark:bg-neutral-800/30">
+                                                                <td colspan="4" class="p-0 border border-neutral-200 dark:border-neutral-700">
+                                                                    <div class="grid grid-cols-5 md:grid-cols-10 divide-x divide-y md:divide-y-0 divide-neutral-200 dark:divide-neutral-700">
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">Suhu(C)</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->suhu_tubuh ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">Tensi</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->tensi ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">Nadi</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->nadi ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">Resp</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->respirasi ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">Tinggi</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->tinggi ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">Berat</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->berat ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">SpO2</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->spo2 ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">GCS</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->gcs ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">Kesadaran</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->kesadaran ?: '-' }}</span>
+                                                                        </div>
+                                                                        <div class="p-2 flex flex-col items-center">
+                                                                            <span class="text-[9px] uppercase text-neutral-400 font-bold">L.P.</span>
+                                                                            <span class="font-bold text-neutral-700 dark:text-neutral-300">{{ $soapRalan->lingkar_perut ?: '-' }}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            {{-- Assessment & Plan --}}
+                                                            @if($soapRalan->penilaian)
+                                                                <tr>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-neutral-50/20 dark:bg-neutral-900/10 font-bold text-neutral-500 italic text-right">Asesmen :</td>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 whitespace-pre-line font-medium">{{ $soapRalan->penilaian }}</td>
+                                                                </tr>
+                                                            @endif
+                                                            @if($soapRalan->tindak_lanjut)
+                                                                <tr>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 bg-neutral-50/20 dark:bg-neutral-900/10 font-bold text-neutral-500 italic text-right">Plan :</td>
+                                                                    <td colspan="2" class="px-3 py-1.5 border border-neutral-200 dark:border-neutral-700 text-[#4C5C2D] dark:text-[#8CC7C4] whitespace-pre-line font-bold">{{ $soapRalan->tindak_lanjut }}</td>
+                                                                </tr>
+                                                            @endif
+                                                        </tbody>
+                                                    @endforeach
+                                                </table>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div class="flex flex-col gap-10 mb-10">
+                                        {{-- Section: Diagnosa ICD-10 (Khanza Style Table) --}}
+                                        <div>
+                                            <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2 mb-3">
+                                                <flux:icon name="bug-ant" class="w-4 h-4" /> Diagnosa/Penyakit/ICD 10
+                                            </h4>
+                                            <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm bg-white dark:bg-neutral-800">
+                                                <table class="w-full text-[11px] border-collapse">
+                                                    <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[10px]">
+                                                        <tr>
+                                                            <th class="px-3 py-2 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center tracking-tighter">No.</th>
+                                                            <th class="px-3 py-2 border-b border-r border-neutral-200 dark:border-neutral-700 w-32 text-left tracking-tighter">Kode</th>
+                                                            <th class="px-3 py-2 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Penyakit</th>
+                                                            <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 w-24 text-center">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @forelse($kunjungan->diagnosaPasien as $index => $diag)
+                                                            <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                <td class="px-3 py-1.5 border-r border-b border-neutral-200 dark:border-neutral-700 text-center font-bold text-neutral-400">{{ $index + 1 }}</td>
+                                                                <td class="px-3 py-1.5 border-r border-b border-neutral-200 dark:border-neutral-700 font-mono font-bold text-sky-700 dark:text-sky-400">{{ $diag->kd_penyakit }}</td>
+                                                                <td class="px-3 py-1.5 border-r border-b border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 leading-relaxed">{{ $diag->penyakit->nm_penyakit ?? '-' }}</td>
+                                                                <td class="px-3 py-1.5 border-b border-neutral-200 dark:border-neutral-700 text-center">
+                                                                    <span class="px-2 py-0.5 rounded-md text-[9px] font-bold border {{ $diag->status == 'Ralan' ? 'bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50' : 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50' }}">
+                                                                        {{ $diag->status }}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="4" class="px-3 py-4 text-center italic text-neutral-400 border border-neutral-200 dark:border-neutral-700">Tidak ada diagnosa terdaftar untuk kunjungan ini.</td>
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        {{-- Section: Prosedur ICD-9 (Khanza Style Table) --}}
+                                        <div>
+                                            <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2 mb-3">
+                                                <flux:icon name="wrench-screwdriver" class="w-4 h-4" /> Prosedur/Tindakan/ICD 9
+                                            </h4>
+                                            <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm bg-white dark:bg-neutral-800">
+                                                <table class="w-full text-[11px] border-collapse">
+                                                    <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[10px]">
+                                                        <tr>
+                                                            <th class="px-3 py-2 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center tracking-tighter">No.</th>
+                                                            <th class="px-3 py-2 border-b border-r border-neutral-200 dark:border-neutral-700 w-32 text-left tracking-tighter">Kode</th>
+                                                            <th class="px-3 py-2 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Prosedur</th>
+                                                            <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 w-24 text-center">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @forelse($kunjungan->prosedurPasien as $index => $pros)
+                                                            <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                <td class="px-3 py-1.5 border-r border-b border-neutral-200 dark:border-neutral-700 text-center font-bold text-neutral-400">{{ $index + 1 }}</td>
+                                                                <td class="px-3 py-1.5 border-r border-b border-neutral-200 dark:border-neutral-700 font-mono font-bold text-purple-700 dark:text-purple-400">{{ $pros->kode }}</td>
+                                                                <td class="px-3 py-1.5 border-r border-b border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 leading-relaxed">{{ $pros->icd9->deskripsi_panjang ?? '-' }}</td>
+                                                                <td class="px-3 py-1.5 border-b border-neutral-200 dark:border-neutral-700 text-center">
+                                                                    <span class="px-2 py-0.5 rounded-md text-[9px] font-bold border {{ $pros->status == 'Ralan' ? 'bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50' : 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50' }}">
+                                                                        {{ $pros->status }}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="4" class="px-3 py-4 text-center italic text-neutral-400 border border-neutral-200 dark:border-neutral-700">Tidak ada prosedur terdaftar untuk kunjungan ini.</td>
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        {{-- Section: Biaya & Perawatan (Khanza Style) --}}
+                                        <div>
+                                            <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2 mb-3">
+                                                <flux:icon name="banknotes" class="w-4 h-4" /> Biaya & Perawatan
+                                            </h4>
+                                            
+                                            <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700 shadow-sm bg-white dark:bg-neutral-800">
+                                                {{-- Administrasi --}}
+                                                <table class="w-full text-[11px] border-collapse bg-white dark:bg-neutral-800">
+                                                    <tbody>
+                                                        <tr class="bg-neutral-50/50 dark:bg-neutral-900/30">
+                                                            <td class="px-4 py-2 text-[11px] font-bold text-neutral-600 dark:text-neutral-400 border-b border-neutral-200 dark:border-neutral-700">Administrasi</td>
+                                                            <td class="px-2 py-2 w-4 text-center border-b border-neutral-200 dark:border-neutral-700">:</td>
+                                                            <td class="px-4 py-2 w-32 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right border-b border-neutral-200 dark:border-neutral-700">
+                                                                {{ number_format($kunjungan->biaya_reg, 0, ',', '.') }}
+                                                            </td>
+                                                        </tr>
+
+                                                        {{-- Group: Tindakan Rawat Jalan Dokter & Paramedis --}}
+                                                        @if($kunjungan->rawatJlDrpr->isNotEmpty())
+                                                            <tr>
+                                                                <td colspan="3" class="px-4 py-1.5 bg-neutral-50/30 dark:bg-neutral-900/10 text-[10.5px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] border-b border-neutral-200 dark:border-neutral-700 h-8 align-middle">
+                                                                    Tindakan Rawat Jalan Dokter & Paramedis
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" class="p-0 border-b border-neutral-200 dark:border-neutral-700">
+                                                                    <table class="w-full text-[10.5px] border-collapse">
+                                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                                                            <tr>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center uppercase tracking-tighter">No.</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-left uppercase tracking-tighter">Tanggal</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left uppercase tracking-tighter">Kode</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 text-left uppercase tracking-tighter">Nama Tindakan/Perawatan</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left uppercase tracking-tighter">Dokter</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left uppercase tracking-tighter">Paramedis</th>
+                                                                                <th class="px-3 py-1 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right uppercase tracking-tighter">Biaya</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($kunjungan->rawatJlDrpr->sortBy('tgl_perawatan') as $idx => $tind)
+                                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold tracking-tighter">{{ $idx + 1 }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 whitespace-nowrap text-neutral-500 italic">{{ $tind->tgl_perawatan }} {{ $tind->jam_rawat }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 font-mono text-sky-600 dark:text-sky-400 font-bold tracking-tighter">{{ $tind->kd_jenis_prw }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 leading-tight">{{ $tind->jnsPerawatan->nm_perawatan }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 tracking-tighter">{{ $tind->dokter->nm_dokter }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 tracking-tighter">{{ $tind->petugas->nama }}</td>
+                                                                                    <td class="px-3 py-1 border-b border-neutral-100 dark:border-neutral-700 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right">{{ number_format($tind->biaya_rawat, 0, ',', '.') }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+
+                                                        {{-- Total Biaya summary --}}
+                                                        @php
+                                                            $totBiaya = $kunjungan->biaya_reg;
+                                                            $totBiaya += $kunjungan->rawatJlDrpr->sum('biaya_rawat');
+                                                            $totBiaya += $kunjungan->rawatJlDr->sum('biaya_rawat');
+                                                            $totBiaya += $kunjungan->rawatJlPr->sum('biaya_rawat');
+                                                            $totBiaya += $kunjungan->rawatInapDrpr->sum('biaya_rawat');
+                                                            $totBiaya += $kunjungan->rawatInapDr->sum('biaya_rawat');
+                                                            $totBiaya += $kunjungan->rawatInapPr->sum('biaya_rawat');
+                                                        @endphp
+                                                        <tr class="bg-[#4C5C2D]/5 dark:bg-[#4C5C2D]/10">
+                                                            <td class="px-4 py-2 text-[11px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase">Total Biaya</td>
+                                                            <td class="px-2 py-2 w-4 text-center">:</td>
+                                                            <td class="px-4 py-2 w-32 font-mono font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] text-right">
+                                                                {{ number_format($totBiaya, 0, ',', '.') }}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        {{-- Section: Hasil Laboratorium per Parameter --}}
+                                        <div class="mb-10">
+                                            <h4 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <flux:icon name="beaker" class="w-3.5 h-3.5" /> Hasil Laboratorium (Detail Parameter)
+                                            </h4>
+                                            @if($kunjungan->detailPeriksaLab->isEmpty())
+                                                <p class="text-xs italic text-neutral-400 pl-5">Tidak ada data laboratorium</p>
+                                            @else
+                                                <div class="overflow-hidden rounded-lg border border-neutral-100 dark:border-neutral-700 ml-5">
+                                                    <table class="w-full text-[11px] text-left">
+                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500">
+                                                            <tr>
+                                                                <th class="px-3 py-2">Pemeriksaan</th>
+                                                                <th class="px-3 py-2">Hasil</th>
+                                                                <th class="px-3 py-2">Satuan</th>
+                                                                <th class="px-3 py-2">Nilai Rujukan</th>
+                                                                <th class="px-3 py-2">Keterangan</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
+                                                            @foreach($kunjungan->detailPeriksaLab as $lab)
+                                                                @php
+                                                                    $namaPemeriksaan = $lab->template->Pemeriksaan ?? '-';
+                                                                    // Bersihkan prefix angka (1_, 2_, dst) dan underscore
+                                                                    $namaBersih = preg_replace('/^\d+_/', '', $namaPemeriksaan);
+                                                                    $namaBersih = str_replace('_', ' ', $namaBersih);
+                                                                    
+                                                                    // Deteksi jika ini adalah header (nilai kosong/strip)
+                                                                    $isHeader = empty(trim($lab->nilai)) || $lab->nilai === '-' || $lab->nilai === '0';
+                                                                @endphp
+                                                                <tr class="{{ $isHeader ? 'bg-neutral-50/50 dark:bg-neutral-900/30' : 'hover:bg-neutral-50/50 dark:hover:bg-neutral-700/20' }}">
+                                                                    <td class="px-3 py-2.5 {{ $isHeader ? 'font-bold text-[#4C5C2D] dark:text-[#8CC7C4] italic' : 'font-medium text-neutral-700 dark:text-neutral-300 pl-6' }}">
+                                                                        {{ $namaBersih }}
+                                                                    </td>
+                                                                    <td class="px-3 py-2.5 font-bold {{ $lab->keterangan === 'L' || $lab->keterangan === 'H' ? 'text-red-600 dark:text-red-400' : 'text-neutral-900 dark:text-neutral-100' }}">
+                                                                        {{ $isHeader ? '' : $lab->nilai }}
+                                                                    </td>
+                                                                    <td class="px-3 py-2.5 text-neutral-500 italic">{{ $isHeader ? '' : ($lab->template->satuan ?? '-') }}</td>
+                                                                    <td class="px-3 py-2.5 text-neutral-600 dark:text-neutral-400 font-mono text-[10px]">{{ $isHeader ? '' : ($lab->nilai_rujukan ?? '-') }}</td>
+                                                                    <td class="px-3 py-2.5">
+                                                                        @if(!$isHeader)
+                                                                            @if($lab->keterangan === 'H')
+                                                                                <span class="inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-800 dark:bg-red-500/20 dark:text-red-400">Tinggi</span>
+                                                                            @elseif($lab->keterangan === 'L')
+                                                                                <span class="inline-flex items-center rounded-full bg-orange-100 px-1.5 py-0.5 text-[9px] font-bold text-orange-800 dark:bg-orange-500/20 dark:text-orange-400">Rendah</span>
+                                                                            @elseif(!empty($lab->keterangan) && $lab->keterangan !== '-')
+                                                                                <span class="inline-flex items-center rounded-full bg-green-100 px-1.5 py-0.5 text-[9px] font-bold text-green-800 dark:bg-green-500/20 dark:text-green-400">Normal</span>
+                                                                            @endif
+                                                                        @endif
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Section: Radiologi --}}
+                                        <div class="mb-10">
+                                            <h4 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <flux:icon name="document-magnifying-glass" class="w-3.5 h-3.5" /> Hasil Radiologi
+                                            </h4>
+                                            @if($kunjungan->periksaRadiologi->isEmpty())
+                                                <p class="text-xs italic text-neutral-400 pl-5">Tidak ada data radiologi</p>
+                                            @else
+                                                <div class="flex flex-col gap-3 ml-5">
+                                                    @foreach($kunjungan->periksaRadiologi as $rad)
+                                                        <div class="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-100 dark:border-neutral-700">
+                                                            <div class="flex items-center justify-between mb-2">
+                                                                <span class="text-xs font-bold text-neutral-800 dark:text-neutral-100 italic">{{ $rad->jnsPerawatan->nm_perawatan ?? '-' }}</span>
+                                                                <span class="text-[10px] text-neutral-400">{{ \Carbon\Carbon::parse($rad->tgl_periksa)->format('d/m/Y') }} {{ $rad->jam }}</span>
+                                                            </div>
+                                                            <div class="pl-4 border-l-2 border-neutral-200 dark:border-neutral-700">
+                                                                <p class="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed whitespace-pre-line font-mediumitalic">{{ $rad->hasil ?: '-' }}</p>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        {{-- Section: Farmasi (Obat & Alkes) --}}
+                                        <div class="mb-10">
+                                            <h4 class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                <flux:icon name="shopping-bag" class="w-3.5 h-3.5" /> Daftar Obat & Alkes
+                                            </h4>
+                                            @if($kunjungan->detailPemberianObat->isEmpty())
+                                                <p class="text-xs italic text-neutral-400 pl-5">Tidak ada data pemberian obat</p>
+                                            @else
+                                                <div class="overflow-hidden rounded-lg border border-neutral-100 dark:border-neutral-700 ml-5">
+                                                    <table class="w-full text-[11px] text-left">
+                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500">
+                                                            <tr>
+                                                                <th class="px-3 py-2">Nama Barang</th>
+                                                                <th class="px-3 py-2 text-center">Jumlah</th>
+                                                                <th class="px-3 py-2 whitespace-nowrap">Tgl. Diberikan</th>
+                                                                <th class="px-3 py-2 text-right">Total Biaya</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
+                                                            @foreach($kunjungan->detailPemberianObat as $obat)
+                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-700/20">
+                                                                    <td class="px-3 py-2.5 font-medium text-neutral-700 dark:text-neutral-300 italic">{{ $obat->barang->nama_brng ?? '-' }}</td>
+                                                                    <td class="px-3 py-2.5 text-center font-bold text-neutral-800 dark:text-neutral-100 italic">{{ $obat->jml }}</td>
+                                                                    <td class="px-3 py-2.5 text-neutral-500 italic">{{ \Carbon\Carbon::parse($obat->tgl_perawatan)->format('d/m/Y') }}</td>
+                                                                    <td class="px-3 py-2.5 text-right font-mono text-neutral-700 dark:text-neutral-300">
+                                                                        Rp {{ number_format($obat->biaya_obat * $obat->jml, 0, ',', '.') }}
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Section: Resume Pasien (Final Summary) --}}
+                                        @php
+                                            $resume = $kunjungan->resumePasienRanap ?? $kunjungan->resumePasien;
+                                        @endphp
+                                        @if($resume)
+                                            <div class="mt-6 border-t-2 border-dashed border-neutral-100 dark:border-neutral-700 pt-6">
+                                                <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2 mb-3">
+                                                    <flux:icon name="document-text" class="w-4 h-4" /> Resume Pasien
+                                                </h4>
+                                                
+                                                <div class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm ml-5">
+                                                    {{-- Header Info --}}
+                                                    <div class="grid grid-cols-4 bg-neutral-50/80 dark:bg-neutral-900/80 border-b border-neutral-200 dark:border-neutral-700 text-[9px] font-bold text-neutral-500 uppercase tracking-tighter">
+                                                        <div class="px-4 py-2 border-r border-neutral-200 dark:border-neutral-700">Status</div>
+                                                        <div class="px-4 py-2 border-r border-neutral-200 dark:border-neutral-700">Kode Dokter</div>
+                                                        <div class="px-4 py-2 border-r border-neutral-200 dark:border-neutral-700">Nama Dokter</div>
+                                                        <div class="px-4 py-2">Kondisi Pulang</div>
+                                                    </div>
+                                                    <div class="grid grid-cols-4 text-[10.5px] border-b border-neutral-100 dark:border-neutral-700">
+                                                        <div class="px-4 py-2 border-r border-neutral-100 dark:border-neutral-700 font-bold text-[#4C5C2D]">{{ $kunjungan->status_lanjut === 'Ralan' ? 'Ralan' : 'Ranap' }}</div>
+                                                        <div class="px-4 py-2 border-r border-neutral-100 dark:border-neutral-700 font-mono tracking-tighter">{{ $resume->kd_dokter }}</div>
+                                                        <div class="px-4 py-2 border-r border-neutral-100 dark:border-neutral-700 italic text-neutral-700 dark:text-neutral-300">{{ $resume->dokter->nm_dokter ?? '-' }}</div>
+                                                        <div class="px-4 py-2 font-bold text-emerald-600 dark:text-emerald-400 capitalize">
+                                                            @php
+                                                                $kondisi = $resume->keadaan ?? $resume->kondisi_pulang ?? '-';
+                                                            @endphp
+                                                            {{ strtolower($kondisi) === 'hidup' ? 'Hidup' : $kondisi }}
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Clinical Notes --}}
+                                                    <div class="p-4 space-y-4 text-[10.5px]">
+                                                        <div>
+                                                            <span class="block font-bold text-neutral-700 dark:text-neutral-300 mb-1 border-b border-neutral-50 dark:border-neutral-700 pb-0.5">Keluhan utama riwayat penyakit yang positif :</span>
+                                                            <p class="text-neutral-600 dark:text-neutral-400 italic leading-relaxed whitespace-pre-line pl-2">{{ $resume->keluhan_utama ?: '-' }}</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="block font-bold text-neutral-700 dark:text-neutral-300 mb-1 border-b border-neutral-50 dark:border-neutral-700 pb-0.5">Jalannya penyakit selama perawatan :</span>
+                                                            <p class="text-neutral-600 dark:text-neutral-400 italic leading-relaxed whitespace-pre-line pl-2">{{ $resume->jalannya_penyakit ?: '-' }}</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="block font-bold text-neutral-700 dark:text-neutral-300 mb-1 border-b border-neutral-50 dark:border-neutral-700 pb-0.5">Pemeriksaan penunjang yang positif :</span>
+                                                            <p class="text-neutral-600 dark:text-neutral-400 italic leading-relaxed whitespace-pre-line pl-2">{{ $resume->pemeriksaan_penunjang ?: '-' }}</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="block font-bold text-neutral-700 dark:text-neutral-300 mb-1 border-b border-neutral-50 dark:border-neutral-700 pb-0.5">Hasil laboratorium yang positif :</span>
+                                                            <p class="text-neutral-600 dark:text-neutral-400 italic leading-relaxed whitespace-pre-line pl-2">{{ $resume->hasil_laborat ?: '-' }}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Diagnosis & Procedures --}}
+                                                    <div class="border-t border-neutral-100 dark:border-neutral-700">
+                                                        <table class="w-full text-[10.5px] border-collapse">
+                                                            <tbody>
+                                                                <tr class="bg-neutral-50/30 dark:bg-neutral-900/10">
+                                                                    <td colspan="3" class="px-4 py-1.5 font-bold text-neutral-400 uppercase text-[9px] border-b border-neutral-100 dark:border-neutral-700 tracking-wider">Diagnosa Akhir :</td>
+                                                                </tr>
+                                                                @php
+                                                                    $diagnoses = [
+                                                                        'Diagnosa Utama' => ['name' => $resume->diagnosa_utama, 'code' => $resume->kd_diagnosa_utama],
+                                                                        'Diagnosa Sekunder 1' => ['name' => $resume->diagnosa_sekunder, 'code' => $resume->kd_diagnosa_sekunder],
+                                                                        'Diagnosa Sekunder 2' => ['name' => $resume->diagnosa_sekunder2, 'code' => $resume->kd_diagnosa_sekunder2],
+                                                                        'Diagnosa Sekunder 3' => ['name' => $resume->diagnosa_sekunder3, 'code' => $resume->kd_diagnosa_sekunder3],
+                                                                        'Diagnosa Sekunder 4' => ['name' => $resume->diagnosa_sekunder4, 'code' => $resume->kd_diagnosa_sekunder4],
+                                                                    ];
+                                                                @endphp
+                                                                @foreach($diagnoses as $label => $data)
+                                                                    @if($data['name'] || $data['code'])
+                                                                        <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50">
+                                                                            <td class="px-4 py-1 w-44 text-neutral-500 font-medium">{{ $label }}</td>
+                                                                            <td class="px-2 py-1 text-neutral-700 dark:text-neutral-300 italic"><span class="text-neutral-300 mr-2">:</span>{{ $data['name'] ?: '-' }}</td>
+                                                                            <td class="px-4 py-1 font-mono font-bold text-[#4C5C2D] dark:text-[#8CC7C4] text-right w-24 tracking-tighter">{{ $data['code'] ?: '-' }}</td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+
+                                                                <tr class="bg-neutral-50/30 dark:bg-neutral-900/10 border-t border-neutral-100 dark:border-neutral-700">
+                                                                    <td colspan="3" class="px-4 py-1.5 font-bold text-neutral-400 uppercase text-[9px] border-b border-neutral-100 dark:border-neutral-700 tracking-wider">Prosedur Akhir :</td>
+                                                                </tr>
+                                                                @php
+                                                                    $procedures = [
+                                                                        'Prosedur Utama' => ['name' => $resume->prosedur_utama, 'code' => $resume->kd_prosedur_utama],
+                                                                        'Prosedur Sekunder 1' => ['name' => $resume->prosedur_sekunder, 'code' => $resume->kd_prosedur_sekunder],
+                                                                        'Prosedur Sekunder 2' => ['name' => $resume->prosedur_sekunder2, 'code' => $resume->kd_prosedur_sekunder2],
+                                                                        'Prosedur Sekunder 3' => ['name' => $resume->prosedur_sekunder3, 'code' => $resume->kd_prosedur_sekunder3],
+                                                                    ];
+                                                                @endphp
+                                                                @foreach($procedures as $label => $data)
+                                                                    @if($data['name'] || $data['code'])
+                                                                        <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-900/50">
+                                                                            <td class="px-4 py-1 w-44 text-neutral-500 font-medium">{{ $label }}</td>
+                                                                            <td class="px-2 py-1 text-neutral-700 dark:text-neutral-300 italic"><span class="text-neutral-300 mr-2">:</span>{{ $data['name'] ?: '-' }}</td>
+                                                                            <td class="px-4 py-1 font-mono font-bold text-violet-600 dark:text-violet-400 text-right w-24 tracking-tighter">{{ $data['code'] ?: '-' }}</td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    {{-- Discharge Advice --}}
+                                                    <div class="p-4 bg-neutral-50/30 dark:bg-neutral-900/10 border-t border-neutral-100 dark:border-neutral-700 text-[10.5px]">
+                                                        <span class="block font-bold text-neutral-700 dark:text-neutral-300 mb-1 border-b border-neutral-50 dark:border-neutral-700 pb-0.5">Obat-obatan waktu pulang/nasihat :</span>
+                                                        <p class="text-neutral-600 dark:text-neutral-400 italic leading-relaxed whitespace-pre-line pl-2">{{ $resume->obat_pulang ?: '-' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                        @endforeach
+                    </div>
+                @endif
             @elseif($activeTab === 'pembelian_obat')
                 <div class="text-neutral-500 py-8 text-center text-sm border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl">
                     Konten Pembelian Obat

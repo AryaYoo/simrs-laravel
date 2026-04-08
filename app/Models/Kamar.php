@@ -20,4 +20,9 @@ class Kamar extends Model
         'kelas',
         'statusdata',
     ];
+
+    public function bangsal()
+    {
+        return $this->belongsTo(Bangsal::class, 'kd_bangsal', 'kd_bangsal');
+    }
 }
