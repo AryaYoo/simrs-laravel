@@ -1,21 +1,26 @@
 <div class="flex flex-col gap-6 pb-8 max-w-5xl mx-auto">
 
     {{-- Header / Breadcrumb --}}
-    <div class="flex items-center gap-3">
-        <a href="{{ route('modul.pasien.index') }}" wire:navigate
-           class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
-            <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
-        </a>
-        <div>
-            <nav class="text-xs text-neutral-400 mb-0.5">
-                <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
-                <span class="mx-1">/</span>
-                <a href="{{ route('modul.pasien.index') }}" wire:navigate class="hover:underline">Pasien</a>
-                <span class="mx-1">/</span>
-                <span>Detail</span>
-            </nav>
-            <h1 class="text-lg font-bold text-neutral-800 dark:text-neutral-100">Detail Rekam Medis Pasien</h1>
+    <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('modul.pasien.index') }}" wire:navigate
+               class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
+            </a>
+            <div>
+                <nav class="text-xs text-neutral-400 mb-0.5">
+                    <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
+                    <span class="mx-1">/</span>
+                    <a href="{{ route('modul.pasien.index') }}" wire:navigate class="hover:underline">Pasien</a>
+                    <span class="mx-1">/</span>
+                    <span>Detail</span>
+                </nav>
+                <h1 class="text-lg font-bold text-neutral-800 dark:text-neutral-100">Detail Rekam Medis Pasien</h1>
+            </div>
         </div>
+        <flux:button icon="pencil-square" :href="route('modul.pasien.edit', $pasien->no_rkm_medis)" wire:navigate size="sm" variant="filled" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white border-none">
+            Edit Data Pasien
+        </flux:button>
     </div>
 
     {{-- Content Layout --}}

@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-6 pb-8">
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center gap-3">
-        <a href="{{ route('modul.pasien.index') }}" wire:navigate
+        <a href="{{ route('modul.pasien.show', $no_rkm_medis) }}" wire:navigate
            class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
             <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
         </a>
@@ -11,9 +11,11 @@
                 <span class="mx-1">/</span>
                 <a href="{{ route('modul.pasien.index') }}" wire:navigate class="hover:underline">Master Pasien</a>
                 <span class="mx-1">/</span>
-                <span>Tambah Pasien</span>
+                <a href="{{ route('modul.pasien.show', $no_rkm_medis) }}" wire:navigate class="hover:underline">Detail</a>
+                <span class="mx-1">/</span>
+                <span>Edit Pasien</span>
             </nav>
-            <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Tambah Pasien Baru</h1>
+            <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Edit Data Pasien</h1>
         </div>
     </div>
 
@@ -65,140 +67,56 @@
                 this.isProcessing = false;
             }
         }"
-        class="p-6 border-b border-neutral-100 dark:border-neutral-800 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20"
+        class="p-6 border-b border-neutral-100 dark:border-neutral-800 bg-gradient-to-r from-amber-50/30 to-rose-50/30 dark:from-amber-950/10 dark:to-rose-950/10"
     >
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                 <h2 class="text-base font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
-                    <flux:icon name="viewfinder-circle" class="w-5 h-5 text-indigo-500" />
-                    Scan KTP (OCR)
+                    <flux:icon name="viewfinder-circle" class="w-5 h-5 text-amber-500" />
+                    Koreksi Data via Scan KTP
                 </h2>
-                <p class="text-sm text-neutral-500 mt-1">Scan atau unggah foto KTP untuk mengisi formulir secara otomatis.</p>
+                <p class="text-sm text-neutral-500 mt-1">Gunakan KTP untuk memperbarui data secara otomatis jika ada kesalahan.</p>
             </div>
             <button
                 type="button"
                 @click="openModal()"
                 x-bind:disabled="isProcessing"
-                x-bind:class="isProcessing ? 'opacity-60 cursor-not-allowed' : 'hover:bg-indigo-700 active:scale-95'"
-                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold transition-all shadow-sm"
+                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 text-neutral-700 dark:text-neutral-200 text-sm font-semibold transition-all shadow-sm hover:bg-neutral-50 dark:hover:bg-neutral-600"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.362a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-                <span x-text="isProcessing ? 'Memproses...' : 'Scan KTP'">Scan KTP</span>
+                <span x-text="isProcessing ? 'Memproses...' : 'Mulai Scan'">Mulai Scan</span>
             </button>
         </div>
 
-        {{-- Loading Bar saat Processing --}}
-        <div x-show="isProcessing" class="mt-4 flex items-center gap-3 text-sm text-indigo-600 dark:text-indigo-400">
-            <svg class="animate-spin h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>AI sedang membaca KTP Anda, mohon tunggu...</span>
-        </div>
-
-        {{-- Loading Livewire saat Upload File --}}
-        <div wire:loading wire:target="ktp_image" class="mt-4 flex items-center gap-3 text-sm text-indigo-600 dark:text-indigo-400">
-            <svg class="animate-spin h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>AI sedang membaca KTP Anda, mohon tunggu...</span>
-        </div>
-
-        {{-- Hidden File Input --}}
+        {{-- Hidden Inputs & Canvas --}}
         <input type="file" x-ref="fileInput" wire:model.live="ktp_image" accept="image/*" class="hidden" />
         <canvas x-ref="canvasEl" class="hidden"></canvas>
 
-        {{-- ===== MODAL POPUP ===== --}}
-        <div
-            x-show="showModal"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);"
-            @click.self="closeModal()"
-        >
-            <div
-                x-show="showModal"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
-                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 scale-100"
-                x-transition:leave-end="opacity-0 scale-95"
-                class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
-            >
-                {{-- Modal Header --}}
+        {{-- ===== MODAL POPUP (Reuse same as new.blade.php) ===== --}}
+        <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);" @click.self="closeModal()" x-cloak>
+             <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800">
-                    <div class="flex items-center gap-2">
-                        <flux:icon name="viewfinder-circle" class="w-5 h-5 text-indigo-500" />
-                        <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Scan KTP Pasien</h3>
-                    </div>
-                    <button @click="closeModal()" class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
+                    <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Koreksi via KTP</h3>
+                    <button @click="closeModal()" class="text-neutral-400 hover:text-neutral-600"><flux:icon name="x-mark" variant="mini" /></button>
                 </div>
-
-                {{-- Modal Body: Pilih Mode --}}
                 <div x-show="mode === null" class="p-6 grid grid-cols-2 gap-4">
-                    {{-- Opsi 1: Upload File --}}
-                    <button
-                        @click="closeModal(); $refs.fileInput.click();"
-                        class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-all group"
-                    >
-                        <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <flux:icon name="folder-open" class="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        <div class="text-center">
-                            <p class="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Dari Folder</p>
-                            <p class="text-xs text-neutral-400 mt-0.5">JPG, PNG, WEBP</p>
-                        </div>
+                    <button @click="closeModal(); $refs.fileInput.click();" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-amber-400 transition-all">
+                        <flux:icon name="folder-open" class="w-6 h-6 text-amber-500" />
+                        <span class="text-sm font-medium">Unggah File</span>
                     </button>
-
-                    {{-- Opsi 2: Webcam --}}
-                    <button
-                        @click="startWebcam()"
-                        class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-violet-400 hover:bg-violet-50/50 dark:hover:bg-violet-950/20 transition-all group"
-                    >
-                        <div class="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <flux:icon name="video-camera" class="w-6 h-6 text-violet-600 dark:text-violet-400" />
-                        </div>
-                        <div class="text-center">
-                            <p class="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Kamera/Webcam</p>
-                            <p class="text-xs text-neutral-400 mt-0.5">Ambil foto langsung</p>
-                        </div>
+                    <button @click="startWebcam()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-amber-400 transition-all">
+                        <flux:icon name="video-camera" class="w-6 h-6 text-amber-500" />
+                        <span class="text-sm font-medium">Webcam</span>
                     </button>
                 </div>
-
-                {{-- Modal Body: Webcam View --}}
                 <div x-show="mode === 'webcam'" class="flex flex-col">
-                    <div class="relative bg-black" style="aspect-ratio: 16/9;">
-                        <video x-ref="videoEl" autoplay playsinline muted class="w-full h-full object-cover"></video>
-                        {{-- Overlay guide frame --}}
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div class="border-2 border-white/60 rounded-lg w-4/5 h-3/4"
-                                style="box-shadow: 0 0 0 9999px rgba(0,0,0,0.3);">
-                            </div>
-                        </div>
-                        <p class="absolute bottom-3 left-0 right-0 text-center text-white/70 text-xs">Arahkan KTP ke dalam bingkai</p>
-                    </div>
-                    <div class="p-4 flex items-center justify-between gap-3 bg-neutral-50 dark:bg-neutral-800">
-                        <flux:button @click="mode = null; stopWebcam();" variant="ghost" icon="arrow-left" size="sm">Kembali</flux:button>
-                        <button
-                            @click="captureWebcam()"
-                            class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors shadow-md shadow-indigo-200 active:scale-95"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/></svg>
-                            Ambil Foto KTP
-                        </button>
-                        <div class="w-20"></div>
+                    <video x-ref="videoEl" autoplay playsinline muted class="w-full bg-black"></video>
+                    <div class="p-4 flex justify-between gap-3 bg-neutral-50 dark:bg-neutral-800">
+                        <flux:button @click="mode = null; stopWebcam();" size="sm">Batal</flux:button>
+                        <flux:button @click="captureWebcam()" variant="primary" size="sm">Tangkap Foto</flux:button>
                     </div>
                 </div>
-            </div>
+             </div>
         </div>
     </div>
 
@@ -213,16 +131,7 @@
                         <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Identitas Utama Pasien</h2>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <div class="flex flex-col gap-1.5">
-                            <div class="flex items-center justify-between">
-                                <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">No. Rekam Medis</label>
-                                <div class="flex items-center gap-1.5 grayscale" title="Gunakan penomoran otomatis">
-                                    <input type="checkbox" wire:model.live="auto_rm" class="rounded border-neutral-300 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5">
-                                    <span class="text-[10px] font-bold text-neutral-500 uppercase">Otomatis</span>
-                                </div>
-                            </div>
-                            <flux:input wire:model.blur="no_rkm_medis" placeholder="Masukkan No. RM" :disabled="$auto_rm" />
-                        </div>
+                        <flux:input wire:model="no_rkm_medis" label="No. Rekam Medis" read-only disabled />
                         <div class="md:col-span-2">
                             <flux:input wire:model="nm_pasien" label="Nama Lengkap Pasien" placeholder="Masukkan nama sesuai identitas" required />
                         </div>
@@ -235,7 +144,7 @@
                         
                         <flux:input wire:model="tmp_lahir" label="Tempat Lahir" placeholder="Kota kelahiran" required />
                         <flux:input type="date" wire:model.live="tgl_lahir" label="Tanggal Lahir" max="{{ date('Y-m-d') }}" required />
-                        <flux:input wire:model="umur" label="Umur Saat Ini" placeholder="Otomatis" read-only />
+                        <flux:input wire:model="umur" label="Umur Saat Ini" read-only />
                     </div>
                 </section>
 
@@ -264,7 +173,6 @@
                         </flux:select>
                         
                         <flux:select wire:model="stts_nikah" label="Status Pernikahan" required>
-                            @fluxOptions($keluargas, null, null) {{-- Menggunakan data keluarga atau status nikah --}}
                             <flux:select.option value="BELUM MENIKAH">BELUM MENIKAH</flux:select.option>
                             <flux:select.option value="MENIKAH">MENIKAH</flux:select.option>
                             <flux:select.option value="JANDA">JANDA</flux:select.option>
@@ -371,7 +279,6 @@
                             <flux:input wire:model="kelurahanpj" label="Kelurahan PJ" />
                             <flux:input wire:model="kecamatanpj" label="Kecamatan PJ" />
                             <flux:input wire:model="kabupatenpj" label="Kabupaten PJ" />
-                            {{-- Propinsi PJ sebagai input text agar fleksibel --}}
                             <flux:input wire:model="propinsipj" label="Provinsi PJ" />
                         </div>
                     </div>
@@ -391,10 +298,10 @@
                                 <flux:select.option value="{{ $pj->kd_pj }}">{{ $pj->png_jawab }}</flux:select.option>
                             @endforeach
                         </flux:select>
-                        <flux:input wire:model="no_peserta" label="No. Kartu Peserta" placeholder="No. BPJS/Asuransi" />
+                        <flux:input wire:model="no_peserta" label="No. Kartu Peserta" />
                         
-                        <flux:input wire:model="pekerjaan" label="Pekerjaan Pasien" placeholder="Pekerjaan saat ini" />
-                        <flux:input wire:model="nip" label="NIP / NRP" placeholder="Nomor Induk Pegawai" />
+                        <flux:input wire:model="pekerjaan" label="Pekerjaan Pasien" />
+                        <flux:input wire:model="nip" label="NIP / NRP" />
 
                         <flux:select wire:model="perusahaan_pasien" label="Instansi / Perusahaan">
                             <flux:select.option value="-">TIDAK ADA / UMUM</flux:select.option>
@@ -411,8 +318,8 @@
         </div>
         
         <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700 flex justify-end gap-3 rounded-b-xl">
-            <flux:button href="{{ route('modul.pasien.index') }}" wire:navigate variant="ghost">Batal</flux:button>
-            <flux:button type="submit" variant="primary" icon="check">Simpan Pasien Baru</flux:button>
+            <flux:button href="{{ route('modul.pasien.show', $no_rkm_medis) }}" wire:navigate variant="ghost">Batal</flux:button>
+            <flux:button type="submit" variant="primary" icon="check">Simpan Perubahan</flux:button>
         </div>
     </form>
 </div>

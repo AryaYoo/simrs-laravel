@@ -59,8 +59,9 @@
                         <flux:table.cell>{{ $pasien->tgl_lahir }}</flux:table.cell>
                         <flux:table.cell>{{ $pasien->nm_ibu }}</flux:table.cell>
                         <flux:table.cell class="truncate max-w-[200px]" title="{{ $pasien->alamat }}">{{ $pasien->alamat }}</flux:table.cell>
-                        <flux:table.cell>
+                        <flux:table.cell class="flex items-center gap-1">
                             <flux:button icon="eye" size="xs" :href="route('modul.pasien.show', $pasien->no_rkm_medis)" wire:navigate variant="ghost" />
+                            <flux:button icon="pencil-square" size="xs" :href="route('modul.pasien.edit', $pasien->no_rkm_medis)" wire:navigate variant="ghost" />
                         </flux:table.cell>
                     </flux:table.row>
                 @empty

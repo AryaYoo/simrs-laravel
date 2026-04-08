@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Modul\RegistrasiPasien;
+namespace App\Livewire\Modul\Pasien;
 
 use App\Models\Pasien;
 use Livewire\Attributes\Layout;
@@ -11,61 +11,96 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use App\Models\AppSetting;
 
-#[Layout('layouts.app', ['title' => 'Tambah Pasien Baru'])]
-class NewPatient extends Component
+#[Layout('layouts.app', ['title' => 'Edit Data Pasien'])]
+class Edit extends Component
 {
     use WithFileUploads;
 
     public $ktp_image;
     
-    public $auto_rm = true;
     public $no_rkm_medis;
     public $nm_pasien;
     public $no_ktp;
-    public $jk = 'L';
+    public $jk;
     public $tmp_lahir;
     public $tgl_lahir;
     public $umur;
-    public $pnd = '-';
+    public $pnd;
     public $nm_ibu;
     public $no_tlp;
-    public $email = '-';
-    public $pekerjaan = '-';
+    public $email;
+    public $pekerjaan;
     public $alamat;
-    public $gol_darah = '-';
-    public $stts_nikah = 'BELUM MENIKAH';
-    public $agama = 'ISLAM';
+    public $gol_darah;
+    public $stts_nikah;
+    public $agama;
     public $tgl_daftar;
 
     // Data Penanggung Jawab
-    public $keluarga = 'DIRI SENDIRI';
-    public $namakeluarga = '-';
-    public $pekerjaanpj = '-';
+    public $keluarga;
+    public $namakeluarga;
+    public $pekerjaanpj;
     public $alamatpj;
-    public $kelurahanpj = '1';
-    public $kecamatanpj = '1';
-    public $kabupatenpj = '1';
-    public $propinsipj = '1';
+    public $kelurahanpj;
+    public $kecamatanpj;
+    public $kabupatenpj;
+    public $propinsipj;
 
     // Data Master IDs
-    public $kd_pj = '-';
-    public $no_peserta = '-';
-    public $kd_kel = 1;
-    public $kd_kec = 1;
-    public $kd_kab = 1;
-    public $kd_prop = 1;
-    public $suku_bangsa = 1;
-    public $bahasa_pasien = 1;
-    public $cacat_fisik = 1;
-    public $perusahaan_pasien = '-';
-    public $nip = '-';
+    public $kd_pj;
+    public $no_peserta;
+    public $kd_kel;
+    public $kd_kec;
+    public $kd_kab;
+    public $kd_prop;
+    public $suku_bangsa;
+    public $bahasa_pasien;
+    public $cacat_fisik;
+    public $perusahaan_pasien;
+    public $nip;
 
-    public function mount()
+    public function mount($no_rkm_medis)
     {
-        $this->generateNoRkmMedis();
-        $this->tgl_lahir = Carbon::now()->format('Y-m-d');
-        $this->tgl_daftar = Carbon::now()->format('Y-m-d');
-        $this->hitungUmur();
+        $pasien = Pasien::where('no_rkm_medis', $no_rkm_medis)->firstOrFail();
+        
+        $this->no_rkm_medis = $pasien->no_rkm_medis;
+        $this->nm_pasien = $pasien->nm_pasien;
+        $this->no_ktp = $pasien->no_ktp;
+        $this->jk = $pasien->jk;
+        $this->tmp_lahir = $pasien->tmp_lahir;
+        $this->tgl_lahir = $pasien->tgl_lahir;
+        $this-> umur = $pasien->umur;
+        $this->pnd = $pasien->pnd;
+        $this->nm_ibu = $pasien->nm_ibu;
+        $this->no_tlp = $pasien->no_tlp;
+        $this->email = $pasien->email;
+        $this->pekerjaan = $pasien->pekerjaan;
+        $this->alamat = $pasien->alamat;
+        $this->gol_darah = $pasien->gol_darah;
+        $this->stts_nikah = $pasien->stts_nikah;
+        $this->agama = $pasien->agama;
+        $this->tgl_daftar = $pasien->tgl_daftar;
+
+        $this->keluarga = $pasien->keluarga;
+        $this->namakeluarga = $pasien->namakeluarga;
+        $this->pekerjaanpj = $pasien->pekerjaanpj;
+        $this->alamatpj = $pasien->alamatpj;
+        $this->kelurahanpj = $pasien->kelurahanpj;
+        $this->kecamatanpj = $pasien->kecamatanpj;
+        $this->kabupatenpj = $pasien->kabupatenpj;
+        $this->propinsipj = $pasien->propinsipj;
+
+        $this->kd_pj = $pasien->kd_pj;
+        $this->no_peserta = $pasien->no_peserta;
+        $this->kd_kel = $pasien->kd_kel;
+        $this->kd_kec = $pasien->kd_kec;
+        $this->kd_kab = $pasien->kd_kab;
+        $this->kd_prop = $pasien->kd_prop;
+        $this->suku_bangsa = $pasien->suku_bangsa;
+        $this->bahasa_pasien = $pasien->bahasa_pasien;
+        $this->cacat_fisik = $pasien->cacat_fisik;
+        $this->perusahaan_pasien = $pasien->perusahaan_pasien;
+        $this->nip = $pasien->nip;
     }
 
     public function updatedTglLahir()
@@ -98,40 +133,6 @@ class NewPatient extends Component
         ]);
     }
 
-    public function updatedAutoRm($value)
-    {
-        if ($value) {
-            $this->generateNoRkmMedis();
-        }
-    }
-
-    public function generateNoRkmMedis()
-    {
-        $lastPasien = Pasien::select('no_rkm_medis')->orderBy('no_rkm_medis', 'desc')->first();
-        
-        if ($lastPasien) {
-            $lastNumber = intval($lastPasien->no_rkm_medis);
-            $newNumber = $lastNumber + 1;
-            $this->no_rkm_medis = str_pad($newNumber, 6, "0", STR_PAD_LEFT);
-        } else {
-            $this->no_rkm_medis = '000001';
-        }
-    }
-
-    public function updatedNoRkmMedis($value)
-    {
-        if (empty($value)) return;
-
-        $exists = Pasien::where('no_rkm_medis', $value)->exists();
-        if ($exists) {
-            $this->dispatch('swal', [
-                'title' => 'Nomor RM Sudah Ada!',
-                'text'  => "Nomor Rekam Medis [{$value}] sudah digunakan oleh pasien lain. Silakan gunakan nomor lain.",
-                'icon'  => 'warning',
-            ]);
-        }
-    }
-
     public function updatedKtpImage()
     {
         $this->validate([
@@ -143,9 +144,7 @@ class NewPatient extends Component
 
     public function processKtpFromBase64($base64Image)
     {
-        // Hapus header data URL jika ada (e.g. "data:image/png;base64,")
         $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $base64Image);
-
         $apiKeySetting = AppSetting::where('setting_key', 'GOOGLE_VISION_API_KEY')->first();
         if (!$apiKeySetting || empty($apiKeySetting->setting_value)) {
             $this->dispatch('swal', [
@@ -155,137 +154,56 @@ class NewPatient extends Component
             ]);
             return;
         }
-
         $apiKey = $apiKeySetting->setting_value;
-
         try {
             $response = Http::post("https://vision.googleapis.com/v1/images:annotate?key={$apiKey}", [
-                'requests' => [[
-                    'image'    => ['content' => $base64Image],
-                    'features' => [['type' => 'TEXT_DETECTION']],
-                ]]
+                'requests' => [['image' => ['content' => $base64Image], 'features' => [['type' => 'TEXT_DETECTION']] ]]
             ]);
-
             if ($response->successful()) {
                 $data = $response->json();
                 if (isset($data['responses'][0]['textAnnotations'][0]['description'])) {
                     $this->parseKtpText($data['responses'][0]['textAnnotations'][0]['description']);
-                    $this->dispatch('swal', [
-                        'title' => 'Berhasil!',
-                        'text'  => 'Data KTP berhasil diekstrak dari webcam.',
-                        'icon'  => 'success',
-                    ]);
-                } else {
-                    $this->dispatch('swal', [
-                        'title' => 'Gagal Membaca',
-                        'text'  => 'KTP tidak terdeteksi. Coba dekatkan KTP ke kamera.',
-                        'icon'  => 'warning',
-                    ]);
+                    $this->hitungUmur();
+                    $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Data KTP berhasil diekstrak.', 'icon' => 'success']);
                 }
             }
-        } catch (\Exception $e) {
-            $this->dispatch('swal', [
-                'title' => 'Gagal!',
-                'text'  => substr($e->getMessage(), 0, 150),
-                'icon'  => 'error',
-            ]);
-        }
+        } catch (\Exception $e) {}
     }
 
     public function processKtpOcr()
     {
-        // Ambil Key dari Setting
         $apiKeySetting = AppSetting::where('setting_key', 'GOOGLE_VISION_API_KEY')->first();
-        if (!$apiKeySetting || empty($apiKeySetting->setting_value)) {
-            $this->dispatch('swal', [
-                'title' => 'API Key Belum Diset',
-                'text'  => 'Silakan atur Google Vision API Key di menu Pengaturan Aplikasi (Master Data).',
-                'icon'  => 'warning',
-            ]);
-            return;
-        }
-
+        if (!$apiKeySetting || empty($apiKeySetting->setting_value)) return;
         $apiKey = $apiKeySetting->setting_value;
         $imageData = base64_encode(file_get_contents($this->ktp_image->getRealPath()));
-
         try {
             $response = Http::post("https://vision.googleapis.com/v1/images:annotate?key={$apiKey}", [
-                'requests' => [
-                    [
-                        'image' => [
-                            'content' => $imageData
-                        ],
-                        'features' => [
-                            [
-                                'type' => 'TEXT_DETECTION'
-                            ]
-                        ]
-                    ]
-                ]
+                'requests' => [['image' => ['content' => $imageData], 'features' => [['type' => 'TEXT_DETECTION']] ]]
             ]);
-
             if ($response->successful()) {
                 $data = $response->json();
-                
                 if (isset($data['responses'][0]['textAnnotations'][0]['description'])) {
-                    $rawText = $data['responses'][0]['textAnnotations'][0]['description'];
-                    $this->parseKtpText($rawText);
-                    $this->hitungUmur(); // Pastikan umur terhitung setelah tgl_lahir diisi OCR
-
-                    $this->dispatch('swal', [
-                        'title' => 'Berhasil!',
-                        'text'  => 'Data KTP berhasil diekstrak dan diisi ke dalam form.',
-                        'icon'  => 'success',
-                    ]);
-                } else {
-                    $this->dispatch('swal', [
-                        'title' => 'Gagal Membaca KTP',
-                        'text'  => 'Tidak ada teks yang terdeteksi di foto.',
-                        'icon'  => 'error',
-                    ]);
+                    $this->parseKtpText($data['responses'][0]['textAnnotations'][0]['description']);
+                    $this->hitungUmur();
+                    $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Data KTP berhasil diekstrak.', 'icon' => 'success']);
                 }
-            } else {
-                $this->dispatch('swal', [
-                    'title' => 'API Error',
-                    'text'  => 'Terjadi kesalahan saat menghubungi API Google Vision.',
-                    'icon'  => 'error',
-                ]);
             }
-        } catch (\Exception $e) {
-            $this->dispatch('swal', [
-                'title' => 'Gagal!',
-                'text'  => 'Proses unggah gagal: ' . substr($e->getMessage(), 0, 150),
-                'icon'  => 'error',
-            ]);
-        }
+        } catch (\Exception $e) {}
     }
 
     private function parseKtpText($text)
     {
         $lines = explode("\n", $text);
-        
-        $nik_found = false;
-
         foreach ($lines as $i => $line) {
             $line = trim($line);
             if (empty($line)) continue;
-
-            // Cari NIK
-            if (preg_match('/(?:^|\D)(\d{16})(?:\D|$)/', $line, $matches) || preg_match('/NIK\s*:\s*(\d{16})/i', $line, $matches)) {
-                $this->no_ktp = $matches[1];
-                $nik_found = true;
-            }
-
-            // Cari Nama
+            // Nama
             if (str_contains(strtolower($line), 'nama')) {
                 $nama = trim(preg_replace('/nama|\:|:/i', '', $line));
-                if (empty($nama) && isset($lines[$i+1])) {
-                    $nama = trim($lines[$i+1]);
-                }
+                if (empty($nama) && isset($lines[$i+1])) $nama = trim($lines[$i+1]);
                 if(strlen($nama) > 2) $this->nm_pasien = substr(strtoupper($nama), 0, 40);
             }
-            
-            // Cari Agama
+            // Agama
             if (str_contains(strtolower($line), 'agama')) {
                 $agamaText = strtoupper($line);
                 if (str_contains($agamaText, 'ISLAM')) $this->agama = 'ISLAM';
@@ -294,75 +212,46 @@ class NewPatient extends Component
                 elseif (str_contains($agamaText, 'HINDU')) $this->agama = 'HINDU';
                 elseif (str_contains($agamaText, 'BUDHA') || str_contains($agamaText, 'BUDDHA')) $this->agama = 'BUDHA';
             }
-
             // Status Perkawinan
             if (str_contains(strtolower($line), 'status perkawinan') || str_contains(strtolower($line), 'perkawinan')) {
                 $statusText = strtoupper(trim(preg_replace('/status\s*perkawinan|\:|:/i', '', strtolower($line))));
-                if (empty($statusText) && isset($lines[$i+1])) {
-                    $statusText = strtoupper(trim($lines[$i+1]));
-                }
-                
+                if (empty($statusText) && isset($lines[$i+1])) $statusText = strtoupper(trim($lines[$i+1]));
                 if (str_contains($statusText, 'BELUM')) $this->stts_nikah = 'BELUM MENIKAH';
                 elseif (str_contains($statusText, 'KAWIN')) $this->stts_nikah = 'MENIKAH';
                 elseif (str_contains($statusText, 'CERAI HIDUP') || str_contains($statusText, 'JANDA') || str_contains($statusText, 'DUDHA')) $this->stts_nikah = 'JANDA';
             }
-            
-            // Tempat Tgl Lahir
+            // TTL
             if (str_contains(strtolower($line), 'tempat/tgl') || str_contains(strtolower($line), 'lahir')) {
                 $ttl = trim(preg_replace('/tempat\/tgl\s*lahir|\:|:/i', '', strtolower($line)));
-                if (empty($ttl) && isset($lines[$i+1])) {
-                    $ttl = trim($lines[$i+1]);
-                }
-
+                if (empty($ttl) && isset($lines[$i+1])) $ttl = trim($lines[$i+1]);
                 if (str_contains($ttl, ',')) {
                     $parts = explode(',', $ttl);
-                    if(strlen(trim($parts[0])) > 2) {
-                        $this->tmp_lahir = substr(strtoupper(trim($parts[0])), 0, 15);
-                    }
+                    if(strlen(trim($parts[0])) > 2) $this->tmp_lahir = substr(strtoupper(trim($parts[0])), 0, 15);
                     $dateStr = trim($parts[1] ?? ''); 
-                    if (preg_match('/(\d{2})[- \/]+(\d{2})[- \/]+(\d{4})/', $dateStr, $dMatch)) {
-                        $this->tgl_lahir = $dMatch[3] . '-' . $dMatch[2] . '-' . $dMatch[1];
-                    }
+                    if (preg_match('/(\d{2})[- \/]+(\d{2})[- \/]+(\d{4})/', $dateStr, $dMatch)) $this->tgl_lahir = $dMatch[3] . '-' . $dMatch[2] . '-' . $dMatch[1];
                 }
             }
-
-            // Jenis Kelamin
+            // JK
             if (str_contains(strtolower($line), 'jenis kelamin') || str_contains(strtolower($line), 'kelamin')) {
                 $jkText = strtolower($line);
                 if (str_contains($jkText, 'laki')) $this->jk = 'L';
                 elseif (str_contains($jkText, 'perempuan')) $this->jk = 'P';
             }
-
             // Alamat
             if (str_contains(strtolower($line), 'alamat')) {
                 $alamat = trim(preg_replace('/alamat|\:|:/i', '', $line));
-                if (empty($alamat) && isset($lines[$i+1])) {
-                    $alamat = trim($lines[$i+1]);
-                }
+                if (empty($alamat) && isset($lines[$i+1])) $alamat = trim($lines[$i+1]);
                 if(strlen($alamat) > 5) $this->alamat = strtoupper($alamat);
             }
-
             // Pekerjaan
             if (str_contains(strtolower($line), 'pekerjaan')) {
                 $pekerjaan = trim(preg_replace('/pekerjaan|\:|:/i', '', $line));
-                if (empty($pekerjaan) && isset($lines[$i+1])) {
-                    $pekerjaan = trim($lines[$i+1]);
-                }
+                if (empty($pekerjaan) && isset($lines[$i+1])) $pekerjaan = trim($lines[$i+1]);
                 if(strlen($pekerjaan) > 2) $this->pekerjaan = strtoupper($pekerjaan);
             }
-
-            // Golongan Darah
+            // Gol Darah
             if (str_contains(strtolower($line), 'gol. darah') || str_contains(strtolower($line), 'gol darah')) {
-                $goldarahText = strtoupper($line);
-                if (preg_match('/\b(A|B|AB|O)\b/', $goldarahText, $matches)) {
-                    $this->gol_darah = $matches[1];
-                }
-            }
-        }
-        
-        if (!$nik_found) {
-            if (preg_match('/(?:^|\D)(\d{16})(?:\D|$)/', $text, $matches)) {
-                $this->no_ktp = $matches[1];
+                if (preg_match('/\b(A|B|AB|O)\b/i', $line, $matches)) $this->gol_darah = strtoupper($matches[1]);
             }
         }
     }
@@ -370,7 +259,6 @@ class NewPatient extends Component
     public function save()
     {
         $this->validate([
-            'no_rkm_medis' => 'required|unique:pasien,no_rkm_medis',
             'nm_pasien' => 'required|string|max:40',
             'no_ktp' => 'nullable|string|max:20',
             'jk' => 'required|in:L,P',
@@ -394,8 +282,8 @@ class NewPatient extends Component
 
         DB::beginTransaction();
         try {
-            Pasien::create([
-                'no_rkm_medis' => $this->no_rkm_medis,
+            $pasien = Pasien::where('no_rkm_medis', $this->no_rkm_medis)->firstOrFail();
+            $pasien->update([
                 'nm_pasien' => $this->nm_pasien,
                 'no_ktp' => $this->no_ktp ?? '-',
                 'jk' => $this->jk,
@@ -437,7 +325,7 @@ class NewPatient extends Component
 
             $this->dispatch('swal', [
                 'title' => 'Berhasil!',
-                'text'  => 'Data pasien baru berhasil disimpan.',
+                'text'  => 'Data pasien berhasil diperbarui.',
                 'icon'  => 'success',
             ]);
 
@@ -455,7 +343,7 @@ class NewPatient extends Component
 
     public function render()
     {
-        return view('livewire.modul.registrasi-pasien.new', [
+        return view('livewire.modul.pasien.edit', [
             'penjabs' => \App\Models\Penjab::orderBy('png_jawab')->get(),
             'sukuBangsas' => \App\Models\SukuBangsa::all(),
             'bahasaPasiens' => \App\Models\BahasaPasien::all(),
