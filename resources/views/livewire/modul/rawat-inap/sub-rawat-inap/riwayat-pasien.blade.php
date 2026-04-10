@@ -379,7 +379,12 @@
                                         class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors">
                                     <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
                                         <div class="flex flex-col">
-                                            <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mb-0.5">Tgl. Registrasi</span>
+                                            <div class="flex items-center gap-2 mb-0.5">
+                                                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Tgl. Registrasi</span>
+                                                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-tighter border {{ $kunjungan->status_lanjut == 'Ranap' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50' : 'bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-900/50' }}">
+                                                    {{ $kunjungan->status_lanjut }}
+                                                </span>
+                                            </div>
                                             <span class="text-sm font-bold text-neutral-800 dark:text-neutral-100 italic">
                                                 {{ \Carbon\Carbon::parse($kunjungan->tgl_registrasi)->translatedFormat('d F Y') }}
                                             </span>
@@ -743,6 +748,186 @@
                                             </div>
                                         </div>
                                     @endif
+ 
+                                    {{-- Section: Hasil USG Kandungan (New) --}}
+                                    @if($kunjungan->hasilPemeriksaanUsg)
+                                        <div class="mb-6 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm transition-all hover:shadow-md">
+                                            <div class="bg-neutral-50 dark:bg-neutral-900/50 px-4 py-2 border-b border-neutral-200 dark:border-neutral-700 flex justify-between items-center">
+                                                <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2">
+                                                    <flux:icon name="magnifying-glass-circle" class="w-4 h-4" /> Hasil USG Kandungan
+                                                </h4>
+                                                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-tighter">Obstetric Ultrasound Report</span>
+                                            </div>
+                                            
+                                            <div class="p-6">
+                                                {{-- Part 1: Pengkajian & Gambar --}}
+                                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                                    {{-- Meta Data --}}
+                                                    <div class="space-y-4">
+                                                        <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1 flex items-center gap-2">
+                                                            <flux:icon name="user-circle" class="w-3.5 h-3.5" /> Informasi Pengkajian
+                                                        </h5>
+                                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px]">
+                                                            <div class="flex flex-col">
+                                                                <span class="text-neutral-400 italic">Tanggal Pemeriksaan</span>
+                                                                <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                    {{ \Carbon\Carbon::parse($kunjungan->hasilPemeriksaanUsg->tanggal)->format('d-m-Y H:i:s') }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex flex-col">
+                                                                <span class="text-neutral-400 italic">Dokter Pengkaji</span>
+                                                                <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                    {{ $kunjungan->hasilPemeriksaanUsg->dokter->nm_dokter ?? $kunjungan->hasilPemeriksaanUsg->kd_dokter }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex flex-col">
+                                                                <span class="text-neutral-400 italic">Kiriman Dari</span>
+                                                                <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                    {{ $kunjungan->hasilPemeriksaanUsg->kiriman_dari ?: '-' }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex flex-col">
+                                                                <span class="text-neutral-400 italic">Jenis Prestasi</span>
+                                                                <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                    {{ $kunjungan->hasilPemeriksaanUsg->jenis_prestasi ?: '-' }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex flex-col">
+                                                                <span class="text-neutral-400 italic">HTA</span>
+                                                                <span class="font-bold text-neutral-700 dark:text-neutral-300">
+                                                                    {{ $kunjungan->hasilPemeriksaanUsg->hta ?: '-' }}
+                                                                </span>
+                                                            </div>
+                                                            <div class="flex flex-col sm:col-span-2">
+                                                                <span class="text-neutral-400 italic">Diagnosa Klinis</span>
+                                                                <span class="font-bold text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900/50 p-2 rounded-lg border border-neutral-100 dark:border-neutral-800 mt-1">
+                                                                    {{ $kunjungan->hasilPemeriksaanUsg->diagnosa_klinis ?: '-' }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Photo --}}
+                                                    <div class="space-y-4">
+                                                        <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1 flex items-center gap-2">
+                                                            <flux:icon name="photo" class="w-3.5 h-3.5" /> Photo USG
+                                                        </h5>
+                                                        <div class="relative group aspect-video bg-neutral-100 dark:bg-neutral-900 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-inner flex items-center justify-center">
+                                                            @if($kunjungan->hasilPemeriksaanUsg->gambar && $kunjungan->hasilPemeriksaanUsg->gambar->photo)
+                                                                <img src="{{ asset('storage/' . $kunjungan->hasilPemeriksaanUsg->gambar->photo) }}" 
+                                                                     alt="Photo USG" 
+                                                                     class="object-contain w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                                                     onerror="this.onerror=null; this.src='/assets/images/placeholder-image.png';">
+                                                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
+                                                            @else
+                                                                <div class="flex flex-col items-center gap-2 text-neutral-400">
+                                                                    <flux:icon name="no-symbol" class="w-8 h-8 opacity-20" />
+                                                                    <span class="text-[10px] font-medium uppercase tracking-widest">Tidak Ada Foto</span>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Part 2: Hasil Bacaan --}}
+                                                <div class="space-y-6">
+                                                    <h5 class="text-[10px] uppercase font-bold text-neutral-400 border-b border-neutral-100 dark:border-neutral-700 pb-1 flex items-center gap-2">
+                                                        <flux:icon name="clipboard-document-list" class="w-3.5 h-3.5" /> Hasil Bacaan & Biometri Janin
+                                                    </h5>
+                                                    
+                                                    {{-- Biometry Grid --}}
+                                                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-0 border border-neutral-100 dark:border-neutral-700 rounded-xl overflow-hidden divide-x divide-y md:divide-y-0 divide-neutral-100 dark:divide-neutral-700 shadow-sm">
+                                                        <div class="p-3 flex flex-col items-center bg-neutral-50/50 dark:bg-neutral-900/30">
+                                                            <span class="text-[9px] uppercase font-bold text-neutral-400 mb-1">Kantong (GS)</span>
+                                                            <span class="text-sm font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $kunjungan->hasilPemeriksaanUsg->kantong_gestasi ?: '-' }}</span>
+                                                            <span class="text-[9px] text-neutral-500">cm</span>
+                                                        </div>
+                                                        <div class="p-3 flex flex-col items-center bg-white dark:bg-neutral-800">
+                                                            <span class="text-[9px] uppercase font-bold text-neutral-400 mb-1">Bokong (CRL)</span>
+                                                            <span class="text-sm font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $kunjungan->hasilPemeriksaanUsg->ukuran_bokongkepala ?: '-' }}</span>
+                                                            <span class="text-[9px] text-neutral-500">cm</span>
+                                                        </div>
+                                                        <div class="p-3 flex flex-col items-center bg-neutral-50/50 dark:bg-neutral-900/30">
+                                                            <span class="text-[9px] uppercase font-bold text-neutral-400 mb-1">Kepala (BPD)</span>
+                                                            <span class="text-sm font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $kunjungan->hasilPemeriksaanUsg->diameter_biparietal ?: '-' }}</span>
+                                                            <span class="text-[9px] text-neutral-500">cm</span>
+                                                        </div>
+                                                        <div class="p-3 flex flex-col items-center bg-white dark:bg-neutral-800">
+                                                            <span class="text-[9px] uppercase font-bold text-neutral-400 mb-1">Femur (FL)</span>
+                                                            <span class="text-sm font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $kunjungan->hasilPemeriksaanUsg->panjang_femur ?: '-' }}</span>
+                                                            <span class="text-[9px] text-neutral-500">cm</span>
+                                                        </div>
+                                                        <div class="p-3 flex flex-col items-center bg-neutral-50/50 dark:bg-neutral-900/30">
+                                                            <span class="text-[9px] uppercase font-bold text-neutral-400 mb-1">Abdomen (AC)</span>
+                                                            <span class="text-sm font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $kunjungan->hasilPemeriksaanUsg->lingkar_abdomen ?: '-' }}</span>
+                                                            <span class="text-[9px] text-neutral-500">cm</span>
+                                                        </div>
+                                                        <div class="p-3 flex flex-col items-center bg-white dark:bg-neutral-800">
+                                                            <span class="text-[9px] uppercase font-bold text-neutral-400 mb-1">Berat (TBJ)</span>
+                                                            <span class="text-sm font-extrabold text-amber-600 dark:text-amber-400">{{ $kunjungan->hasilPemeriksaanUsg->tafsiran_berat_janin ?: '-' }}</span>
+                                                            <span class="text-[9px] text-neutral-500">gram</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Detailed Findings --}}
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-[11px]">
+                                                        <div class="flex flex-col p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-900/60">
+                                                            <span class="text-neutral-400 italic mb-1">Usia Kehamilan Sesuai</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-200">{{ $kunjungan->hasilPemeriksaanUsg->usia_kehamilan ?: '-' }}</span>
+                                                        </div>
+                                                        <div class="flex flex-col p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-900/60">
+                                                            <span class="text-neutral-400 italic mb-1">Plasenta Berimplantasi Di</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-200">{{ $kunjungan->hasilPemeriksaanUsg->plasenta_berimplatansi ?: '-' }}</span>
+                                                        </div>
+                                                        <div class="flex flex-col p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-900/60">
+                                                            <span class="text-neutral-400 italic mb-1">Maturitas Plasenta</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-200">Grade {{ $kunjungan->hasilPemeriksaanUsg->derajat_maturitas ?: '0' }}</span>
+                                                        </div>
+                                                        <div class="flex flex-col p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-900/60">
+                                                            <span class="text-neutral-400 italic mb-1">Jumlah Air Ketuban</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-200">{{ $kunjungan->hasilPemeriksaanUsg->jumlah_air_ketuban ?: '-' }}</span>
+                                                        </div>
+                                                        <div class="flex flex-col p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-900/60">
+                                                            <span class="text-neutral-400 italic mb-1">Peluang Sex</span>
+                                                            <span class="font-bold text-emerald-600 dark:text-emerald-400">{{ $kunjungan->hasilPemeriksaanUsg->peluang_sex ?: '-' }}</span>
+                                                        </div>
+                                                        <div class="flex flex-col p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-900/60">
+                                                            <span class="text-neutral-400 italic mb-1">Indeks Cairan Ketuban (ICK)</span>
+                                                            <span class="font-bold text-neutral-700 dark:text-neutral-200">{{ $kunjungan->hasilPemeriksaanUsg->indek_cairan_ketuban ?: '-' }}</span>
+                                                        </div>
+                                                        <div class="flex flex-col sm:col-span-2 p-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 transition-colors hover:bg-neutral-100/50 dark:hover:bg-neutral-900/60">
+                                                            <span class="text-neutral-400 italic mb-1">Kelainan Kongenital Mayor</span>
+                                                            <span class="font-bold text-rose-600 dark:text-rose-400">{{ $kunjungan->hasilPemeriksaanUsg->kelainan_kongenital ?: '-' }}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Conclusion --}}
+                                                    <div class="p-4 bg-neutral-50 dark:bg-neutral-900/20 border-2 border-dashed border-[#4C5C2D]/20 dark:border-[#8CC7C4]/20 rounded-xl relative overflow-hidden group">
+                                                        <div class="absolute -top-2 -right-2 p-1 opacity-5 transition-transform group-hover:scale-110">
+                                                            <flux:icon name="chat-bubble-bottom-center-text" class="w-16 h-16" />
+                                                        </div>
+                                                        <span class="block text-[10px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest mb-2 flex items-center gap-1.5 underline decoration-2 underline-offset-4">
+                                                            Kesimpulan USG
+                                                        </span>
+                                                        <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200 leading-relaxed italic">
+                                                            "{{ $kunjungan->hasilPemeriksaanUsg->kesimpulan ?: '-' }}"
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="mb-6 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm">
+                                            <div class="bg-neutral-50 dark:bg-neutral-900/50 px-4 py-2 border-b border-neutral-200 dark:border-neutral-700 flex justify-between items-center">
+                                                <h4 class="text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-widest flex items-center gap-2">
+                                                    <flux:icon name="magnifying-glass-circle" class="w-4 h-4" /> Hasil USG Kandungan
+                                                </h4>
+                                            </div>
+                                            <div class="p-10 text-center text-neutral-400 dark:text-neutral-600">
+                                                <p class="text-xs italic">Tidak ada data hasil USG kandungan</p>
+                                            </div>
+                                        </div>
+                                    @endif
 
                                         {{-- Section: Diagnosa ICD-10 (Khanza Style Table) --}}
                                         <div class="mb-6 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm">
@@ -880,6 +1065,232 @@
                                                             </tr>
                                                         @endif
 
+                                                        {{-- Group: Tindakan Rawat Inap Dokter & Paramedis --}}
+                                                        @if($kunjungan->rawatInapDrpr->isNotEmpty())
+                                                            <tr>
+                                                                <td colspan="3" class="px-4 py-1.5 bg-neutral-50/30 dark:bg-neutral-900/10 text-[10.5px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] border-b border-neutral-200 dark:border-neutral-700 h-8 align-middle">
+                                                                    Tindakan Rawat Inap Dokter &amp; Paramedis
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" class="p-0 border-b border-neutral-200 dark:border-neutral-700">
+                                                                    <table class="w-full text-[10.5px] border-collapse">
+                                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                                                            <tr>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center">No.</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-left">Tanggal</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left">Kode</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Tindakan/Perawatan</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left">Dokter</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left">Paramedis</th>
+                                                                                <th class="px-3 py-1 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right">Biaya</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($kunjungan->rawatInapDrpr->sortBy('tgl_perawatan') as $idx => $tind)
+                                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold">{{ $idx + 1 }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 whitespace-nowrap text-neutral-500 italic">{{ $tind->tgl_perawatan }} {{ $tind->jam_rawat }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 font-mono text-sky-600 dark:text-sky-400 font-bold tracking-tighter">{{ $tind->kd_jenis_prw }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">{{ $tind->jnsPerawatan->nm_perawatan ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">{{ $tind->dokter->nm_dokter ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">{{ $tind->petugas->nama ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-b border-neutral-100 dark:border-neutral-700 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right">{{ number_format($tind->biaya_rawat, 0, ',', '.') }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+
+                                                        {{-- Group: Tindakan Rawat Inap Dokter --}}
+                                                        @if($kunjungan->rawatInapDr->isNotEmpty())
+                                                            <tr>
+                                                                <td colspan="3" class="px-4 py-1.5 bg-neutral-50/30 dark:bg-neutral-900/10 text-[10.5px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] border-b border-neutral-200 dark:border-neutral-700 h-8 align-middle">
+                                                                    Tindakan Rawat Inap Dokter
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" class="p-0 border-b border-neutral-200 dark:border-neutral-700">
+                                                                    <table class="w-full text-[10.5px] border-collapse">
+                                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                                                            <tr>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center">No.</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-left">Tanggal</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left">Kode</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Tindakan/Perawatan</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left">Dokter</th>
+                                                                                <th class="px-3 py-1 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right">Biaya</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($kunjungan->rawatInapDr->sortBy('tgl_perawatan') as $idx => $tind)
+                                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold">{{ $idx + 1 }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 whitespace-nowrap text-neutral-500 italic">{{ $tind->tgl_perawatan }} {{ $tind->jam_rawat }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 font-mono text-sky-600 dark:text-sky-400 font-bold tracking-tighter">{{ $tind->kd_jenis_prw }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">{{ $tind->jnsPerawatan->nm_perawatan ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">{{ $tind->dokter->nm_dokter ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-b border-neutral-100 dark:border-neutral-700 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right">{{ number_format($tind->biaya_rawat, 0, ',', '.') }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+
+                                                        {{-- Group: Tindakan Rawat Inap Paramedis --}}
+                                                        @if($kunjungan->rawatInapPr->isNotEmpty())
+                                                            <tr>
+                                                                <td colspan="3" class="px-4 py-1.5 bg-neutral-50/30 dark:bg-neutral-900/10 text-[10.5px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] border-b border-neutral-200 dark:border-neutral-700 h-8 align-middle">
+                                                                    Tindakan Rawat Inap Paramedis
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" class="p-0 border-b border-neutral-200 dark:border-neutral-700">
+                                                                    <table class="w-full text-[10.5px] border-collapse">
+                                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                                                            <tr>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center">No.</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-left">Tanggal</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left">Kode</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Tindakan/Perawatan</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left">Paramedis</th>
+                                                                                <th class="px-3 py-1 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right">Biaya</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($kunjungan->rawatInapPr->sortBy('tgl_perawatan') as $idx => $tind)
+                                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold">{{ $idx + 1 }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 whitespace-nowrap text-neutral-500 italic">{{ $tind->tgl_perawatan }} {{ $tind->jam_rawat }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 font-mono text-sky-600 dark:text-sky-400 font-bold tracking-tighter">{{ $tind->kd_jenis_prw }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">{{ $tind->jnsPerawatan->nm_perawatan ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">{{ $tind->petugas->nama ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-b border-neutral-100 dark:border-neutral-700 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right">{{ number_format($tind->biaya_rawat, 0, ',', '.') }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+
+                                                        {{-- Group: Tindakan Rawat Jalan Dokter --}}
+                                                        @if($kunjungan->rawatJlDr->isNotEmpty())
+                                                            <tr>
+                                                                <td colspan="3" class="px-4 py-1.5 bg-neutral-50/30 dark:bg-neutral-900/10 text-[10.5px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] border-b border-neutral-200 dark:border-neutral-700 h-8 align-middle">
+                                                                    Tindakan Rawat Jalan Dokter
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" class="p-0 border-b border-neutral-200 dark:border-neutral-700">
+                                                                    <table class="w-full text-[10.5px] border-collapse">
+                                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                                                            <tr>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center">No.</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-left">Tanggal</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left">Kode</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Tindakan/Perawatan</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left">Dokter</th>
+                                                                                <th class="px-3 py-1 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right">Biaya</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($kunjungan->rawatJlDr->sortBy('tgl_perawatan') as $idx => $tind)
+                                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold">{{ $idx + 1 }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 whitespace-nowrap text-neutral-500 italic">{{ $tind->tgl_perawatan }} {{ $tind->jam_rawat }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 font-mono text-sky-600 dark:text-sky-400 font-bold tracking-tighter">{{ $tind->kd_jenis_prw }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">{{ $tind->jnsPerawatan->nm_perawatan ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">{{ $tind->dokter->nm_dokter ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-b border-neutral-100 dark:border-neutral-700 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right">{{ number_format($tind->biaya_rawat, 0, ',', '.') }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+
+                                                        {{-- Group: Tindakan Rawat Jalan Paramedis --}}
+                                                        @if($kunjungan->rawatJlPr->isNotEmpty())
+                                                            <tr>
+                                                                <td colspan="3" class="px-4 py-1.5 bg-neutral-50/30 dark:bg-neutral-900/10 text-[10.5px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] border-b border-neutral-200 dark:border-neutral-700 h-8 align-middle">
+                                                                    Tindakan Rawat Jalan Paramedis
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" class="p-0 border-b border-neutral-200 dark:border-neutral-700">
+                                                                    <table class="w-full text-[10.5px] border-collapse">
+                                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                                                            <tr>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center">No.</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-left">Tanggal</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left">Kode</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Tindakan/Perawatan</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-44 text-left">Paramedis</th>
+                                                                                <th class="px-3 py-1 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right">Biaya</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($kunjungan->rawatJlPr->sortBy('tgl_perawatan') as $idx => $tind)
+                                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold">{{ $idx + 1 }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 whitespace-nowrap text-neutral-500 italic">{{ $tind->tgl_perawatan }} {{ $tind->jam_rawat }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 font-mono text-sky-600 dark:text-sky-400 font-bold tracking-tighter">{{ $tind->kd_jenis_prw }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">{{ $tind->jnsPerawatan->nm_perawatan ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">{{ $tind->petugas->nama ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-b border-neutral-100 dark:border-neutral-700 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right">{{ number_format($tind->biaya_rawat, 0, ',', '.') }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+
+                                                        {{-- Group: Pemberian Obat/BHP/Alkes --}}
+                                                        @if($kunjungan->detailPemberianObat->isNotEmpty())
+                                                            <tr>
+                                                                <td colspan="3" class="px-4 py-1.5 bg-neutral-50/30 dark:bg-neutral-900/10 text-[10.5px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] border-b border-neutral-200 dark:border-neutral-700 h-8 align-middle">
+                                                                    Pemberian Obat/BHP/Alkes
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3" class="p-0 border-b border-neutral-200 dark:border-neutral-700">
+                                                                    <table class="w-full text-[10.5px] border-collapse">
+                                                                        <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                                                            <tr>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center">No.</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-left">Tanggal</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left">Kode</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Obat/BHP/Alkes</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-right">Jumlah</th>
+                                                                                <th class="px-3 py-1 border-b border-r border-neutral-200 dark:border-neutral-700 w-36 text-left">Aturan Pakai</th>
+                                                                                <th class="px-3 py-1 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right">Biaya</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach($kunjungan->detailPemberianObat->sortBy('tgl_perawatan') as $idx => $obat)
+                                                                                <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold">{{ $idx + 1 }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 whitespace-nowrap text-neutral-500 italic">{{ $obat->tgl_perawatan }} {{ $obat->jam }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 font-mono text-emerald-600 dark:text-emerald-400 font-bold tracking-tighter">{{ $obat->kode_brng }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300">{{ $obat->barang->nama_brng ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 text-right font-mono">{{ $obat->jml }} -</td>
+                                                                                    <td class="px-3 py-1 border-r border-b border-neutral-100 dark:border-neutral-700 text-neutral-500 italic">{{ $obat->barang->aturan_pakai ?? '-' }}</td>
+                                                                                    <td class="px-3 py-1 border-b border-neutral-100 dark:border-neutral-700 font-mono font-bold text-neutral-700 dark:text-neutral-300 text-right">{{ number_format($obat->total, 0, ',', '.') }}</td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+
                                                         {{-- Total Biaya summary --}}
                                                         @php
                                                             $totBiaya = $kunjungan->biaya_reg;
@@ -889,6 +1300,7 @@
                                                             $totBiaya += $kunjungan->rawatInapDrpr->sum('biaya_rawat');
                                                             $totBiaya += $kunjungan->rawatInapDr->sum('biaya_rawat');
                                                             $totBiaya += $kunjungan->rawatInapPr->sum('biaya_rawat');
+                                                            $totBiaya += $kunjungan->detailPemberianObat->sum('total');
                                                         @endphp
                                                         <tr class="bg-[#4C5C2D]/5 dark:bg-[#4C5C2D]/10">
                                                             <td class="px-4 py-2 text-[11px] font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase">Total Biaya</td>
@@ -910,7 +1322,7 @@
                                                 </h4>
                                             </div>
                                             @if($kunjungan->detailPeriksaLab->isEmpty())
-                                                <div class="p-6 text-center text-neutral-400 dark:text-neutral-600">
+                                                <div class="p-10 text-center text-neutral-400 dark:text-neutral-600">
                                                     <p class="text-xs italic">Tidak ada data laboratorium</p>
                                                 </div>
                                             @else
@@ -972,7 +1384,7 @@
                                                 </h4>
                                             </div>
                                             @if($kunjungan->periksaRadiologi->isEmpty())
-                                                <div class="p-6 text-center text-neutral-400 dark:text-neutral-600">
+                                                <div class="p-10 text-center text-neutral-400 dark:text-neutral-600">
                                                     <p class="text-xs italic">Tidak ada data radiologi</p>
                                                 </div>
                                             @else
@@ -1000,7 +1412,7 @@
                                                 </h4>
                                             </div>
                                             @if($kunjungan->detailPemberianObat->isEmpty())
-                                                <div class="p-6 text-center text-neutral-400 dark:text-neutral-600">
+                                                <div class="p-10 text-center text-neutral-400 dark:text-neutral-600">
                                                     <p class="text-xs italic">Tidak ada data pemberian obat</p>
                                                 </div>
                                             @else
@@ -1148,9 +1560,104 @@
                     </div>
                 @endif
             @elseif($activeTab === 'pembelian_obat')
-                <div class="text-neutral-500 py-8 text-center text-sm border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl">
-                    Konten Pembelian Obat
+            @if($riwayatPenjualan->isEmpty())
+                <div class="text-neutral-500 py-16 text-center border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl bg-neutral-50/50 dark:bg-neutral-900/20">
+                    <flux:icon name="beaker" class="w-12 h-12 mx-auto mb-3 opacity-20" />
+                    <p class="text-sm italic">Tidak ada riwayat pembelian obat</p>
                 </div>
+            @else
+                <div class="flex flex-col gap-6">
+                    @foreach($riwayatPenjualan as $jual)
+                        <div class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-sm transition-all hover:shadow-md">
+                            {{-- Transaction Header --}}
+                            <div class="bg-neutral-50 dark:bg-neutral-900/50 px-5 py-3 border-b border-neutral-200 dark:border-neutral-700 flex flex-wrap items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest leading-none mb-1">No. Nota</span>
+                                        <span class="font-mono text-xs font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $jual->nota_jual }}</span>
+                                    </div>
+                                    <div class="w-px h-8 bg-neutral-200 dark:bg-neutral-700"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest leading-none mb-1">Tanggal</span>
+                                        <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+                                            {{ \Carbon\Carbon::parse($jual->tgl_jual)->translatedFormat('d F Y') }}
+                                        </span>
+                                    </div>
+                                    <div class="w-px h-8 bg-neutral-200 dark:bg-neutral-700"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest leading-none mb-1">Petugas</span>
+                                        <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+                                            {{ $jual->petugas->nama ?? $jual->nip }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 text-[10px] font-bold uppercase">{{ $jual->jns_jual }}</span>
+                                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 text-[10px] font-bold uppercase">{{ $jual->nama_bayar }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Transaction Meta Info --}}
+                            <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-neutral-50/30 dark:bg-neutral-900/10 border-b border-neutral-100 dark:border-neutral-700">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-neutral-400 uppercase font-medium">Asal Barang</span>
+                                    <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300">{{ $jual->bangsal->nm_bangsal ?? $jual->kd_bangsal }}</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-neutral-400 uppercase font-medium">Keterangan</span>
+                                    <span class="text-xs italic text-neutral-600 dark:text-neutral-400">{{ $jual->keterangan ?: '-' }}</span>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[10px] text-neutral-400 uppercase font-medium">PPN</span>
+                                    <span class="text-xs font-mono font-bold text-neutral-700 dark:text-neutral-300">{{ number_format($jual->ppn, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[10px] text-neutral-400 uppercase font-medium">Grand Total</span>
+                                    <span class="text-xs font-mono font-extrabold text-[#4C5C2D] dark:text-[#8CC7C4]">
+                                        {{ number_format($jual->detailJual->sum('total'), 0, ',', '.') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {{-- Detail Table --}}
+                            <div class="p-0 overflow-x-auto">
+                                <table class="w-full text-[10.5px] border-collapse">
+                                    <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase font-bold text-[9px]">
+                                        <tr>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-10 text-center">No.</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-24 text-left">Kode</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 text-left">Nama Barang</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-20 text-right">Jml</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-20 text-left">Satuan</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-right">Harga(Rp)</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-right">Potongan</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-right">Embalase</th>
+                                            <th class="px-3 py-1.5 border-b border-r border-neutral-200 dark:border-neutral-700 w-28 text-right">Tuslah</th>
+                                            <th class="px-3 py-1.5 border-b border-neutral-200 dark:border-neutral-700 w-28 text-right">Total(Rp)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
+                                        @foreach($jual->detailJual as $idx => $det)
+                                            <tr class="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors">
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 text-center text-neutral-400 font-bold">{{ $idx + 1 }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 font-mono text-emerald-600 dark:text-emerald-400 font-bold tracking-tighter">{{ $det->kode_brng }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 font-medium text-neutral-800 dark:text-neutral-200">{{ $det->barang->nama_brng ?? '-' }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 text-right font-mono">{{ $det->jumlah }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 text-neutral-500 italic">{{ $det->kode_sat }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 text-right font-mono">{{ number_format($det->h_jual, 0, ',', '.') }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 text-right font-mono text-rose-600">{{ number_format($det->bsr_dis, 0, ',', '.') }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 text-right font-mono">{{ number_format($det->embalase, 0, ',', '.') }}</td>
+                                                <td class="px-3 py-1.5 border-r border-neutral-100 dark:border-neutral-700 text-right font-mono">{{ number_format($det->tuslah, 0, ',', '.') }}</td>
+                                                <td class="px-3 py-1.5 text-right font-mono font-bold text-neutral-900 dark:text-neutral-100 bg-neutral-50/40 dark:bg-neutral-900/40">{{ number_format($det->total, 0, ',', '.') }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
             @elseif($activeTab === 'piutang_obat')
                 <div class="text-neutral-500 py-8 text-center text-sm border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl">
                     Konten Piutang Obat

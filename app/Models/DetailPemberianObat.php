@@ -12,9 +12,9 @@ class DetailPemberianObat extends Model
     protected $primaryKey = 'no_rawat';
 
     protected $fillable = [
+        'tgl_perawatan',
+        'jam',
         'no_rawat',
-        'tgl_pemberian',
-        'jam_pemberian',
         'kode_brng',
         'h_beli',
         'biaya_obat',

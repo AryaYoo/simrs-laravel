@@ -27,4 +27,9 @@ class Pasien extends Model
     public function bahasa() { return $this->belongsTo(BahasaPasien::class, 'bahasa_pasien', 'id'); }
     public function perusahaan() { return $this->belongsTo(PerusahaanPasien::class, 'perusahaan_pasien', 'kode_perusahaan'); }
     public function cacatFisik() { return $this->belongsTo(CacatFisik::class, 'cacat_fisik', 'id'); }
+    
+    public function penjualan()
+    {
+        return $this->hasMany(Penjualan::class, 'no_rkm_medis', 'no_rkm_medis');
+    }
 }

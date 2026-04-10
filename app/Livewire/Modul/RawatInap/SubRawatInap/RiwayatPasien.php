@@ -4,6 +4,7 @@ namespace App\Livewire\Modul\RawatInap\SubRawatInap;
 
 use App\Models\PemeriksaanRanap;
 use App\Models\RegPeriksa;
+use App\Models\Penjualan;
 use Livewire\Component;
 
 class RiwayatPasien extends Component
@@ -56,7 +57,9 @@ class RiwayatPasien extends Component
             'pemeriksaanRalan.pegawai',
             'bridgingSep',
             'resumePasien.dokter',
-            'resumePasienRanap.dokter'
+            'resumePasienRanap.dokter',
+            'hasilPemeriksaanUsg.dokter',
+            'hasilPemeriksaanUsg.gambar'
         ])
             ->where('no_rkm_medis', $this->no_rkm_medis)
             ->orderByDesc('tgl_registrasi')
@@ -132,11 +135,17 @@ class RiwayatPasien extends Component
             return $item->tgl_perawatan . ' ' . $item->jam_rawat;
         })->groupBy('no_rawat');
 
+        $riwayatPenjualan = Penjualan::with(['detailJual.barang', 'petugas', 'bangsal'])
+            ->where('no_rkm_medis', $this->no_rkm_medis)
+            ->orderByDesc('tgl_jual')
+            ->get();
+
         return view('livewire.modul.rawat-inap.sub-rawat-inap.riwayat-pasien', [
             'regPeriksa'       => $regPeriksa,
             'riwayatKunjungan' => $riwayatKunjungan,
             'kunjunganDetail'  => $kunjunganDetail,
             'riwayatSoapie'    => $riwayatSoapie,
+            'riwayatPenjualan' => $riwayatPenjualan,
         ]);
     }
 }
