@@ -145,4 +145,9 @@ class RegPeriksa extends Model
     {
         return $this->hasOne(HasilPemeriksaanUsg::class, 'no_rawat', 'no_rawat');
     }
+
+    public function rujukMasuk()
+    {
+        return $this->hasOne(RujukMasuk::class, 'no_rawat', 'no_rawat');
+    }
 }

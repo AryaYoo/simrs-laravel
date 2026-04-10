@@ -126,7 +126,7 @@
                     { label: 'Transfer Antar Ruang', url: '#' },
                     { label: 'Perencanaan Pemulangan', url: '#' },
                     { label: 'Edukasi (Pelaksanaan Informasi & Edukasi)', url: '#' },
-                    { label: 'Resume', url: '#' },
+                    { label: 'Resume', url: '{{ route('modul.rawat-inap.sub-rawat-inap.resume', str_replace('/', '-', $no_rawat)) }}' },
                     { label: 'Riwayat Perawatan', url: '{{ route('modul.rawat-inap.sub-rawat-inap.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}', target: '_blank' },
                 ]
             },
