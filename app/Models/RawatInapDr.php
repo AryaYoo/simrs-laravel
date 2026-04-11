@@ -11,6 +11,18 @@ class RawatInapDr extends Model
     protected $primaryKey = 'no_rawat';
     public $incrementing = false;
     protected $keyType = 'string';
+    
+    /**
+     * Override for composite primary keys.
+     */
+    protected function setKeysForSaveQuery($query)
+    {
+        $keys = ['no_rawat', 'kd_jenis_prw', 'kd_dokter', 'tgl_perawatan', 'jam_rawat'];
+        foreach ($keys as $keyName) {
+            $query->where($keyName, '=', $this->getAttribute($keyName));
+        }
+        return $query;
+    }
 
     protected $fillable = [
         'no_rawat',

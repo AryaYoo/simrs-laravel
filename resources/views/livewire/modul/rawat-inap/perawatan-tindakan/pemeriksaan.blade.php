@@ -4,7 +4,12 @@
             <flux:icon name="clipboard-document-check" class="w-5 h-5 text-[#4C5C2D]" />
             <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Data Pemeriksaan Rawat Inap</h3>
         </div>
-        <span class="text-xs text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-full">{{ $pemeriksaanRanap->count() }} catatan</span>
+        <div class="flex items-center gap-3">
+            <span class="text-xs text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-full">{{ $pemeriksaanRanap->count() }} catatan</span>
+            <flux:button wire:click="openCreateModal" icon="plus" size="sm" variant="primary">
+                Tambah Pemeriksaan
+            </flux:button>
+        </div>
     </div>
 
     <flux:table>
@@ -86,13 +91,22 @@
                         @endif
                     </flux:table.cell>
                     <flux:table.cell>
-                        <button
-                            type="button"
-                            @click="showDetailModal({{ $detailJson }})"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#4C5C2D]/10 text-[#4C5C2D] hover:bg-[#4C5C2D]/20 dark:bg-[#4C5C2D]/30 dark:text-[#4C5C2D] dark:hover:bg-[#4C5C2D]/50 transition-colors cursor-pointer border border-[#4C5C2D]/20 dark:border-[#4C5C2D]/50">
-                            <flux:icon name="eye" class="w-3.5 h-3.5" />
-                            Detail
-                        </button>
+                        <div class="flex items-center gap-1.5">
+                            <button
+                                type="button"
+                                @click="showDetailModal({{ $detailJson }})"
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#4C5C2D]/10 text-[#4C5C2D] hover:bg-[#4C5C2D]/20 transition-colors cursor-pointer border border-[#4C5C2D]/20">
+                                <flux:icon name="eye" class="w-3.5 h-3.5" />
+                                Detail
+                            </button>
+                            <button
+                                type="button"
+                                wire:click="editPemeriksaan({{ $detailJson }})"
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200">
+                                <flux:icon name="pencil-square" class="w-3.5 h-3.5" />
+                                Edit
+                            </button>
+                        </div>
                     </flux:table.cell>
                 </flux:table.row>
             @empty
@@ -106,6 +120,226 @@
         </flux:table.rows>
     </flux:table>
 </div>
+
+{{-- ===== CREATE MODAL (Livewire + Flux) ===== --}}
+<flux:modal wire:model="createModalOpen" class="w-full max-w-6xl" variant="flyout">
+    <div class="bg-white dark:bg-neutral-900 flex flex-col items-stretch max-h-[95vh]">
+        {{-- Header --}}
+        <div class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-[#4C5C2D]/10 text-[#4C5C2D]">
+                    <flux:icon name="document-plus" class="w-5 h-5" />
+                </div>
+                <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100" x-text="$wire.isEditMode ? 'Edit Pemeriksaan Rawat Inap' : 'Tambah Pemeriksaan Rawat Inap'"></h2>
+            </div>
+            <flux:modal.close>
+                <flux:button variant="ghost" icon="x-mark" size="sm" />
+            </flux:modal.close>
+        </div>
+
+        {{-- Reference Alert --}}
+        @if($lastPemeriksaan && !$isEditMode)
+            <div class="px-6 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/50 flex items-center gap-3 animate-in slide-in-from-top-1 duration-300">
+                <flux:icon name="information-circle" class="w-5 h-5 text-amber-500 flex-shrink-0" />
+                <p class="text-[11px] text-amber-800 dark:text-amber-300 leading-tight">
+                    <span class="font-bold">Mode Patokan Aktif:</span> Menampilkan rujukan dari pemeriksaan terakhir tanggal <span class="font-bold">{{ $lastPemeriksaan->tgl_perawatan }}</span> jam <span class="font-bold">{{ $lastPemeriksaan->jam_rawat }}</span>. 
+                    Input yang berwarna <span class="text-amber-600 dark:text-amber-400 font-bold italic">kuning gading</span> adalah data rujukan, silakan sesuaikan dengan kondisi terbaru.
+                </p>
+            </div>
+        @endif
+
+        {{-- Form Content --}}
+        <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+            {{-- Header Row: Time & Date --}}
+            <div class="grid grid-cols-2 gap-4">
+                <flux:input wire:model="tgl_perawatan" type="date" label="Tanggal Pemeriksaan" x-bind:disabled="$wire.isEditMode" />
+                <flux:input wire:model="jam_rawat" type="time" step="1" label="Jam Pemeriksaan" x-bind:disabled="$wire.isEditMode" />
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                
+                {{-- LEFT COLUMN: Staff + S & O + Vitals --}}
+                <div class="flex flex-col gap-6">
+                    {{-- Petugas Section --}}
+                    <div class="bg-blue-50/30 dark:bg-blue-900/10 p-5 rounded-xl border border-blue-100 dark:border-blue-800/50">
+                        <div class="grid grid-cols-1 gap-4">
+                            {{-- Dilakukan (Staff Selection) --}}
+                            <flux:field>
+                                <flux:label class="text-blue-600 font-bold tracking-tight">Dilakukan :</flux:label>
+                                <div class="relative">
+                                    <flux:input wire:model.live.debounce.300ms="pegawaiSearch" icon="magnifying-glass" placeholder="Cari Nama / NIK Petugas..." />
+                                    
+                                    @if($nip)
+                                        @php $selectedPegawai = \App\Models\Pegawai::find($nip); @endphp
+                                        <div class="mt-2 flex items-center justify-between p-2.5 bg-white dark:bg-neutral-800 rounded-lg border border-emerald-500 shadow-sm animate-in fade-in duration-300">
+                                            <div class="flex items-center gap-2">
+                                                <div class="p-1 px-2 rounded-md bg-emerald-500 text-white text-[10px] font-bold">{{ $selectedPegawai->nik }}</div>
+                                                <span class="text-sm font-bold text-neutral-800 dark:text-white">{{ $selectedPegawai->nama }}</span>
+                                            </div>
+                                            <button type="button" wire:click="$set('nip', null)" class="p-1 text-neutral-400 hover:text-red-500 transition-colors">
+                                                <flux:icon name="x-mark" class="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    @elseif(!empty($pegawaiList))
+                                        <div class="absolute w-full mt-1 max-h-48 overflow-y-auto rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-lg z-50">
+                                            @foreach($pegawaiList as $pg)
+                                                <button type="button" wire:click="$set('nip', '{{ $pg->nik }}')" class="w-full flex flex-col text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b border-neutral-50 dark:border-neutral-700/50 last:border-0">
+                                                    <span class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{{ $pg->nama }}</span>
+                                                    <span class="text-[10px] text-neutral-400">{{ $pg->jbtn }} | {{ $pg->nik }}</span>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                    @error('nip') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            </flux:field>
+
+                            {{-- Profesi / Jabatan / Departemen (Auto-filled) --}}
+                            <flux:field>
+                                <flux:label class="text-neutral-500">Profesi / Jabatan / Departemen :</flux:label>
+                                <flux:input wire:model="currentJabatan" read-only disabled class="bg-neutral-100/50 dark:bg-neutral-800/50" />
+                            </flux:field>
+                        </div>
+                    </div>
+
+                    {{-- SOAP: S & O --}}
+                    <div class="flex flex-col gap-4">
+                        <flux:textarea wire:model="keluhan" label="Subjek (Keluhan Utama) :" placeholder="Masukkan subjek/keluhan..." resize="none" rows="3" />
+                        <flux:textarea wire:model="pemeriksaan" label="Objek (Pemeriksaan Fisik) :" placeholder="Masukkan objek/pemeriksaan..." resize="none" rows="3" />
+                    </div>
+
+                    {{-- Vital Signs Grid (Refined) --}}
+                    <div class="bg-white dark:bg-neutral-800 p-5 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm mt-2">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-5 flex items-center gap-1.5"><flux:icon name="heart" class="w-3.5 h-3.5" /> Tanda-Tanda Vital</p>
+                        
+                        {{-- Numeric Vitals: 4 Column Grid --}}
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-5">
+                            {{-- Suhu --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">Suhu (C)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->suhu_tubuh }}</span>@endif
+                                </div>
+                                <flux:input wire:model="suhu_tubuh" size="sm" placeholder="36,1" class="{{ $lastPemeriksaan && $suhu_tubuh == $lastPemeriksaan->suhu_tubuh ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+
+                            {{-- Tensi --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">Tensi (mmHg)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->tensi }}</span>@endif
+                                </div>
+                                <flux:input wire:model="tensi" size="sm" placeholder="120/80" class="{{ $lastPemeriksaan && $tensi == $lastPemeriksaan->tensi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+
+                            {{-- Berat --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">Berat (Kg)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->berat }}</span>@endif
+                                </div>
+                                <flux:input wire:model="berat" size="sm" placeholder="65" class="{{ $lastPemeriksaan && $berat == $lastPemeriksaan->berat ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+
+                            {{-- TB --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">TB (Cm)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->tinggi }}</span>@endif
+                                </div>
+                                <flux:input wire:model="tinggi" size="sm" placeholder="170" class="{{ $lastPemeriksaan && $tinggi == $lastPemeriksaan->tinggi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+
+                            {{-- RR --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">RR (/mnt)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->respirasi }}</span>@endif
+                                </div>
+                                <flux:input wire:model="respirasi" size="sm" placeholder="18" class="{{ $lastPemeriksaan && $respirasi == $lastPemeriksaan->respirasi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+
+                            {{-- Nadi --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">Nadi (/mnt)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->nadi }}</span>@endif
+                                </div>
+                                <flux:input wire:model="nadi" size="sm" placeholder="75" class="{{ $lastPemeriksaan && $nadi == $lastPemeriksaan->nadi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+
+                            {{-- SpO2 --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">SpO2 (%)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->spo2 }}%</span>@endif
+                                </div>
+                                <flux:input wire:model="spo2" size="sm" placeholder="98" class="{{ $lastPemeriksaan && $spo2 == $lastPemeriksaan->spo2 ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+
+                            {{-- GCS --}}
+                            <flux:field>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <flux:label class="!mb-0">GCS (E,V,M)</flux:label>
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->gcs }}</span>@endif
+                                </div>
+                                <flux:input wire:model="gcs" size="sm" placeholder="15" class="{{ $lastPemeriksaan && $gcs == $lastPemeriksaan->gcs ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                            </flux:field>
+                        </div>
+
+                        {{-- Final Row: Kesadaran (Wider) --}}
+                        <div class="mt-6 pt-5 border-t border-neutral-100 dark:border-neutral-700/50">
+                            <flux:field variant="horizontal">
+                                <flux:label class="!mb-0 w-32">Kesadaran :</flux:label>
+                                <div class="flex-1">
+                                    <flux:select wire:model="kesadaran" placeholder="Pilih Tingkat Kesadaran..." class="w-full">
+                                        <flux:select.option value="Compos Mentis">Compos Mentis</flux:select.option>
+                                        <flux:select.option value="Somnolence">Somnolence</flux:select.option>
+                                        <flux:select.option value="Sopor">Sopor</flux:select.option>
+                                        <flux:select.option value="Coma">Coma</flux:select.option>
+                                        <flux:select.option value="Apatis">Apatis</flux:select.option>
+                                        <flux:select.option value="Delirium">Delirium</flux:select.option>
+                                    </flux:select>
+                                </div>
+                            </flux:field>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- RIGHT COLUMN: Alergi + A, P, Inst/Impl, Eval --}}
+                <div class="flex flex-col gap-6">
+                    {{-- Alergi --}}
+                    <flux:field>
+                        <flux:label class="font-bold text-red-500">Alergi :</flux:label>
+                        <flux:input wire:model="alergi" placeholder="Ada alergi makanan/obat?" class="border-red-200 focus:border-red-500" />
+                    </flux:field>
+
+                    {{-- SOAP: A & P --}}
+                    <div class="flex flex-col gap-5 mt-2">
+                        <flux:textarea wire:model="penilaian" label="Asesmen (Penilaian Klinis)" placeholder="Masukkan penilaian..." resize="none" rows="4" />
+                        <flux:textarea wire:model="rtl" label="Plan (Rencana Tindak Lanjut)" placeholder="Masukkan rencana..." resize="none" rows="4" />
+                    </div>
+
+                    {{-- Inst/Impl & Evaluasi --}}
+                    <div class="flex flex-col gap-5">
+                        <flux:textarea wire:model="instruksi" label="Inst/Impl (Tindakan Dilakukan)" placeholder="Masukkan instruksi..." resize="none" rows="4" />
+                        <flux:textarea wire:model="evaluasi" label="Evaluasi (Respon Pasien)" placeholder="Masukkan evaluasi..." resize="none" rows="4" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Footer Actions --}}
+        <div class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 flex items-center justify-end gap-3 flex-shrink-0">
+            <flux:modal.close>
+                <flux:button variant="ghost">Batal</flux:button>
+            </flux:modal.close>
+            <flux:button wire:click="$wire.isEditMode ? 'updatePemeriksaan' : 'storePemeriksaan'" variant="primary" class="px-8">
+                <span x-text="$wire.isEditMode ? 'Update Perubahan' : 'Simpan Pemeriksaan'"></span>
+            </flux:button>
+        </div>
+    </div>
+</flux:modal>
 
 {{-- ===== DETAIL MODAL (Alpine.js - pure client-side) ===== --}}
 {{-- Positioned via x-teleport to body to completely escape parent CSS stacking contexts --}}
@@ -245,84 +479,81 @@
                         </section>
                     </div>
 
-                    {{-- SOAP & Evaluasi (Right Column, col-span-8) --}}
-                    <div class="lg:col-span-8 flex flex-col gap-5">
-                        
-                        {{-- SOAP --}}
-                        <section class="bg-white dark:bg-neutral-800/80 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm flex-1">
-                            <p class="text-[11px] font-bold uppercase tracking-widest text-[#6A7E3F] mb-4 flex items-center gap-1.5"><flux:icon name="document-text" class="w-3.5 h-3.5" /> Catatan SOAP</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
-                                    <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
-                                        <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">S</span>
-                                        <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Subjek (Keluhan)</p>
-                                    </div>
-                                    <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
-                                        <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.keluhan || '-'"></p>
-                                    </div>
-                                </div>
-
-                                <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
-                                    <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
-                                        <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">O</span>
-                                        <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Objek (Pemeriksaan)</p>
-                                    </div>
-                                    <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
-                                        <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.pemeriksaan || '-'"></p>
-                                    </div>
-                                </div>
-
-                                <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
-                                    <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
-                                        <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">A</span>
-                                        <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Asesment (Penilaian)</p>
-                                    </div>
-                                    <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
-                                        <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.penilaian || '-'"></p>
-                                    </div>
-                                </div>
-
-                                <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
-                                    <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
-                                        <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">P</span>
-                                        <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Plan (RTL)</p>
-                                    </div>
-                                    <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
-                                        <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.rtl || '-'"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        {{-- Instruksi & Evaluasi --}}
-                        <template x-if="detail.instruksi || detail.evaluasi">
-                            <section class="bg-white dark:bg-neutral-800/80 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm">
-                                <p class="text-[11px] font-bold uppercase tracking-widest text-[#6A7E3F] mb-4 flex items-center gap-1.5"><flux:icon name="arrow-path" class="w-3.5 h-3.5" /> Tindak Lanjut & Evaluasi</p>
+                        {{-- SOAP & Evaluasi (Right Column, col-span-8) --}}
+                        <div class="lg:col-span-8 flex flex-col gap-5">
+                            
+                            {{-- SOAP --}}
+                            <section class="bg-white dark:bg-neutral-800/80 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm flex-1">
+                                <p class="text-[11px] font-bold uppercase tracking-widest text-[#6A7E3F] mb-4 flex items-center gap-1.5"><flux:icon name="document-text" class="w-3.5 h-3.5" /> Catatan Pemeriksaan (SOAPIE)</p>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <template x-if="detail.instruksi">
-                                        <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
-                                            <div class="px-4 py-2 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70">
-                                                <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Inst / Impl (Instruksi)</p>
-                                            </div>
-                                            <div class="px-4 py-3 bg-white dark:bg-neutral-800/40">
-                                                <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.instruksi"></p>
-                                            </div>
+                                    {{-- S --}}
+                                    <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
+                                            <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">S</span>
+                                            <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Subjek (Keluhan)</p>
                                         </div>
-                                    </template>
-                                    <template x-if="detail.evaluasi">
-                                        <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
-                                            <div class="px-4 py-2 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70">
-                                                <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Evaluasi</p>
-                                            </div>
-                                            <div class="px-4 py-3 bg-white dark:bg-neutral-800/40">
-                                                <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.evaluasi"></p>
-                                            </div>
+                                        <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
+                                            <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.keluhan || '-'"></p>
                                         </div>
-                                    </template>
+                                    </div>
+
+                                    {{-- O --}}
+                                    <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
+                                            <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">O</span>
+                                            <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Objek (Pemeriksaan)</p>
+                                        </div>
+                                        <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
+                                            <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.pemeriksaan || '-'"></p>
+                                        </div>
+                                    </div>
+
+                                    {{-- A --}}
+                                    <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
+                                            <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">A</span>
+                                            <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Asesment (Penilaian)</p>
+                                        </div>
+                                        <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
+                                            <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.penilaian || '-'"></p>
+                                        </div>
+                                    </div>
+
+                                    {{-- P --}}
+                                    <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
+                                            <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">P</span>
+                                            <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Plan (RTL)</p>
+                                        </div>
+                                        <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
+                                            <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.rtl || '-'"></p>
+                                        </div>
+                                    </div>
+
+                                    {{-- I --}}
+                                    <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
+                                            <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">I</span>
+                                            <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Inst / Impl (Instruksi)</p>
+                                        </div>
+                                        <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
+                                            <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.instruksi || '-'"></p>
+                                        </div>
+                                    </div>
+
+                                    {{-- E --}}
+                                    <div class="border border-neutral-100 dark:border-neutral-700/70 rounded-xl overflow-hidden shadow-sm">
+                                        <div class="px-4 py-2.5 bg-neutral-50/80 dark:bg-neutral-800 border-b border-neutral-100 dark:border-neutral-700/70 flex items-center gap-2">
+                                            <span class="w-5 h-5 rounded-md bg-white dark:bg-neutral-700 shadow-sm text-neutral-700 dark:text-neutral-300 text-xs font-bold flex items-center justify-center flex-shrink-0 border border-neutral-200 dark:border-neutral-600">E</span>
+                                            <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">Evaluasi</p>
+                                        </div>
+                                        <div class="px-4 py-3 min-h-[70px] bg-white dark:bg-neutral-800/40">
+                                            <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed" x-text="detail.evaluasi || '-'"></p>
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
-                        </template>
-                    </div>
+                        </div>
                 </div>
 
                 {{-- Petugas (Bottom Full Width) --}}
@@ -346,11 +577,20 @@
             </div>
 
             {{-- Footer --}}
-            <div class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50/80 dark:bg-neutral-800/60 flex justify-end flex-shrink-0">
-                <button @click="closeDetailModal()" class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors cursor-pointer border border-neutral-200 dark:border-neutral-600 shadow-sm">
-                    <flux:icon name="x-mark" class="w-4 h-4" />
-                    Tutup
+            <div class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50/80 dark:bg-neutral-800/60 flex items-center justify-between flex-shrink-0">
+                <button 
+                    @click="closeDetailModal(); $wire.editPemeriksaan(detail)"
+                    class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200 shadow-sm">
+                    <flux:icon name="pencil-square" class="w-4 h-4" />
+                    Edit Data Ini
                 </button>
+
+                <div class="flex items-center gap-2">
+                    <button @click="closeDetailModal()" class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors cursor-pointer border border-neutral-200 dark:border-neutral-600 shadow-sm">
+                        <flux:icon name="x-mark" class="w-4 h-4" />
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -337,8 +337,10 @@
 
             @foreach($tabs as $tab)
                 <button wire:click="$set('activeTab', '{{ $tab['id'] }}')"
-                    class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer {{ $activeTab === $tab['id'] ? 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 shadow-sm' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50' }}">
-                    <flux:icon :name="$tab['icon']" class="w-4 h-4" />
+                    wire:loading.attr="disabled"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all relative cursor-pointer {{ $activeTab === $tab['id'] ? 'bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 shadow-sm' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200/50 dark:hover:bg-neutral-700/50' }}">
+                    <flux:icon wire:loading.remove.delay :name="$tab['icon']" class="w-4 h-4" />
+                    <flux:icon wire:loading.delay name="arrow-path" class="w-4 h-4 animate-spin" />
                     {{ $tab['label'] }}
                 </button>
             @endforeach
