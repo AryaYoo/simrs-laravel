@@ -14,7 +14,7 @@ use App\Models\AppSetting;
 #[Layout('layouts.app', ['title' => 'Edit Data Pasien'])]
 class Edit extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, \App\Livewire\Concerns\WithOptimisticLocking;
 
     public $ktp_image;
     
@@ -63,6 +63,9 @@ class Edit extends Component
     {
         $pasien = Pasien::where('no_rkm_medis', $no_rkm_medis)->firstOrFail();
         
+        // Capture initial state for concurrency check
+        $this->initializeLock($pasien);
+
         $this->no_rkm_medis = $pasien->no_rkm_medis;
         $this->nm_pasien = $pasien->nm_pasien;
         $this->no_ktp = $pasien->no_ktp;
@@ -258,6 +261,16 @@ class Edit extends Component
 
     public function save()
     {
+        $pasien = Pasien::where('no_rkm_medis', $this->no_rkm_medis)->firstOrFail();
+
+        // Perform concurrency check before proceeding
+        try {
+            $this->validateLock($pasien);
+        } catch (\Exception $e) {
+            // Error already handled by swal dispatch in trait
+            return;
+        }
+
         $this->validate([
             'nm_pasien' => 'required|string|max:40',
             'no_ktp' => 'nullable|string|max:20',

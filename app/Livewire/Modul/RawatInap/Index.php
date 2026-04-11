@@ -15,6 +15,7 @@ class Index extends Component
     public string $search = '';
     public string $dari = '';
     public string $sampai = '';
+    public string $filterType = '';
     public int $perPage = 20;
 
     public function mount()
@@ -27,6 +28,12 @@ class Index extends Component
     public function updatedDari()    { $this->resetPage(); }
     public function updatedSampai()  { $this->resetPage(); }
     public function updatedPerPage() { $this->resetPage(); }
+
+    public function setFilter(string $type)
+    {
+        $this->filterType = ($this->filterType === $type) ? '' : $type;
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -44,6 +51,7 @@ class Index extends Component
                     });
             });
 
+        // Current count for summary
         $counts = (clone $baseQuery)
             ->join('penjab', 'reg_periksa.kd_pj', '=', 'penjab.kd_pj')
             ->selectRaw("
@@ -52,7 +60,21 @@ class Index extends Component
                 SUM(CASE WHEN penjab.png_jawab LIKE '%UMUM%' OR penjab.png_jawab = '-' THEN 1 ELSE 0 END) as umum
             ")->first();
 
-        $regPeriksas = (clone $baseQuery)
+        // Apply visual filter to results only
+        $resultsQuery = (clone $baseQuery)
+            ->when($this->filterType === 'bpjs', function($q) {
+                $q->whereHas('penjab', fn($sq) => $sq->where('png_jawab', 'like', '%BPJS%'));
+            })
+            ->when($this->filterType === 'umum', function($q) {
+                $q->whereHas('penjab', fn($sq) => $sq->where('png_jawab', 'like', '%UMUM%')->orWhere('png_jawab', '-'));
+            })
+            ->when($this->filterType === 'lainnya', function($q) {
+                $q->whereHas('penjab', fn($sq) => $sq->where('png_jawab', 'not like', '%BPJS%')
+                    ->where('png_jawab', 'not like', '%UMUM%')
+                    ->where('png_jawab', '!=', '-'));
+            });
+
+        $regPeriksas = $resultsQuery
             ->with(['pasien', 'penjab', 'permintaanRanap'])
             ->orderBy('tgl_registrasi', 'desc')
             ->orderBy('jam_reg', 'desc')
