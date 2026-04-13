@@ -89,54 +89,60 @@
             <div class="px-5 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50">
                 <h3 class="font-bold text-neutral-700 dark:text-neutral-200">Informasi Kamar & Inap</h3>
             </div>
+            
+            @php
+                // Kamar inap is a hasMany relation, get the last (most recent) record
+                $kamarInap = $regPeriksa->kamarInap->last();
+            @endphp
+            
             <div class="p-5 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <flux:description>
                         <flux:label>Kamar</flux:label>
-                        <div class="text-neutral-800 dark:text-neutral-100 font-medium">{{ $regPeriksa->permintaanRanap->kd_kamar ?? ($regPeriksa->kamarInap->kd_kamar ?? '-') }}</div>
+                        <div class="text-neutral-800 dark:text-neutral-100 font-medium">{{ $regPeriksa->permintaanRanap->kd_kamar ?? ($kamarInap->kd_kamar ?? '-') }}</div>
                     </flux:description>
                     <flux:description>
                         <flux:label>Tarif Kamar</flux:label>
-                        <div class="text-neutral-800 dark:text-neutral-100 font-medium">Rp {{ number_format($regPeriksa->kamarInap->kamar->trf_kamar ?? ($regPeriksa->permintaanRanap->kamar->trf_kamar ?? 0), 0, ',', '.') }}</div>
+                        <div class="text-neutral-800 dark:text-neutral-100 font-medium">Rp {{ number_format($kamarInap->kamar->trf_kamar ?? ($regPeriksa->permintaanRanap->kamar->trf_kamar ?? 0), 0, ',', '.') }}</div>
                     </flux:description>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <flux:description>
                         <flux:label>Tanggal Masuk</flux:label>
-                        <div class="text-neutral-800 dark:text-neutral-100">{{ $regPeriksa->kamarInap->tgl_masuk ?? '-' }} {{ $regPeriksa->kamarInap->jam_masuk ?? '' }}</div>
+                        <div class="text-neutral-800 dark:text-neutral-100">{{ $kamarInap->tgl_masuk ?? '-' }} {{ $kamarInap->jam_masuk ?? '' }}</div>
                     </flux:description>
                     <flux:description>
                         <flux:label>Tanggal Keluar</flux:label>
-                        <div class="text-neutral-800 dark:text-neutral-100">{{ $regPeriksa->kamarInap->tgl_keluar ?? '-' }} {{ $regPeriksa->kamarInap->jam_keluar ?? '' }}</div>
+                        <div class="text-neutral-800 dark:text-neutral-100">{{ $kamarInap->tgl_keluar ?? '-' }} {{ $kamarInap->jam_keluar ?? '' }}</div>
                     </flux:description>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <flux:description>
                         <flux:label>Lama Inap</flux:label>
-                        <div class="text-neutral-800 dark:text-neutral-100">{{ $regPeriksa->kamarInap->lama ?? 0 }} Hari</div>
+                        <div class="text-neutral-800 dark:text-neutral-100">{{ $kamarInap->lama ?? 0 }} Hari</div>
                     </flux:description>
                     <flux:description>
                         <flux:label>Status Pulang</flux:label>
-                        <div class="text-neutral-800 dark:text-neutral-100">{{ $regPeriksa->kamarInap->stts_pulang ?? '-' }}</div>
+                        <div class="text-neutral-800 dark:text-neutral-100">{{ $kamarInap->stts_pulang ?? '-' }}</div>
                     </flux:description>
                 </div>
 
                 <flux:description>
                     <flux:label>Diagnosa Awal</flux:label>
-                    <div class="text-neutral-800 dark:text-neutral-100">{{ $regPeriksa->kamarInap->diagnosa_awal ?? '-' }}</div>
+                    <div class="text-neutral-800 dark:text-neutral-100">{{ $kamarInap->diagnosa_awal ?? '-' }}</div>
                 </flux:description>
 
                 <flux:description>
                     <flux:label>Diagnosa Akhir</flux:label>
-                    <div class="text-neutral-800 dark:text-neutral-100">{{ $regPeriksa->kamarInap->diagnosa_akhir ?? '-' }}</div>
+                    <div class="text-neutral-800 dark:text-neutral-100">{{ $kamarInap->diagnosa_akhir ?? '-' }}</div>
                 </flux:description>
 
                 <div class="pt-4 border-t border-neutral-100 dark:border-neutral-700">
                     <flux:description>
                         <flux:label>Total Biaya Kamar</flux:label>
-                        <div class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">Rp {{ number_format($regPeriksa->kamarInap->ttl_biaya ?? 0, 0, ',', '.') }}</div>
+                        <div class="text-2xl font-bold text-neutral-800 dark:text-neutral-100">Rp {{ number_format($kamarInap->ttl_biaya ?? 0, 0, ',', '.') }}</div>
                     </flux:description>
                 </div>
             </div>

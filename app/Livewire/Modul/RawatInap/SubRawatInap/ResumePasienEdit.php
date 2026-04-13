@@ -302,7 +302,7 @@ class ResumePasienEdit extends Component
                     ->where('no_rawat', $this->no_rawat)
                     ->get()
                     ->groupBy('kode_brng')
-                    ->map(fn($items, $kode) => [
+                    ->map(fn(\Illuminate\Support\Collection $items, $kode) => [
                         'id' => $kode,
                         'label' => ($items->first()->barang?->nama_brng ?? '-') . ' (Total: ' . $items->sum('jml') . ' ' . ($items->first()->barang?->kode_sat ?? '') . ')',
                         'name' => $items->first()->barang?->nama_brng ?? '-'

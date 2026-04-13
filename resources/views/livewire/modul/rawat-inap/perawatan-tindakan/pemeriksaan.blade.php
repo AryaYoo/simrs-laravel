@@ -593,12 +593,36 @@
 
             {{-- Footer --}}
             <div class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50/80 dark:bg-neutral-800/60 flex items-center justify-between flex-shrink-0">
-                <button 
-                    @click="closeDetailModal(); $wire.editPemeriksaan(detail)"
-                    class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200 shadow-sm">
-                    <flux:icon name="pencil-square" class="w-4 h-4" />
-                    Edit Data Ini
-                </button>
+                <div class="flex items-center gap-2">
+                    <button 
+                        @click="closeDetailModal(); $wire.editPemeriksaan(detail)"
+                        class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200 shadow-sm">
+                        <flux:icon name="pencil-square" class="w-4 h-4" />
+                        Edit Data Ini
+                    </button>
+                    <button 
+                        @click="
+                            closeDetailModal(); 
+                            Swal.fire({
+                                title: 'Hapus Pemeriksaan?',
+                                text: 'Data yang dihapus tidak dapat dikembalikan!',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#4C5C2D',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Ya, Hapus!',
+                                cancelButtonText: 'Batal'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $wire.deletePemeriksaan(detail.tgl_perawatan, detail.jam_rawat);
+                                }
+                            });
+                        "
+                        class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 hover:bg-red-100 transition-colors cursor-pointer border border-red-200 shadow-sm">
+                        <flux:icon name="trash" class="w-4 h-4" />
+                        Hapus Data
+                    </button>
+                </div>
 
                 <div class="flex items-center gap-2">
                     <button @click="closeDetailModal()" class="inline-flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium bg-white dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-colors cursor-pointer border border-neutral-200 dark:border-neutral-600 shadow-sm">

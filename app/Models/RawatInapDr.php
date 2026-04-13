@@ -24,19 +24,7 @@ class RawatInapDr extends Model
         return $query;
     }
 
-    protected $fillable = [
-        'no_rawat',
-        'kd_jenis_prw',
-        'kd_dokter',
-        'tgl_perawatan',
-        'jam_rawat',
-        'material',
-        'bhp',
-        'tarif_tindakandr',
-        'kso',
-        'menejemen',
-        'biaya_rawat',
-    ];
+    protected $guarded = [];
 
     public function regPeriksa()
     {

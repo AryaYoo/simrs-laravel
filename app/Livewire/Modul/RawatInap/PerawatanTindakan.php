@@ -39,6 +39,9 @@ class PerawatanTindakan extends Component
     
     public bool $tindakanLookupOpen = false;
     public string $lookupType = 'dr'; // 'dr' or 'pr'
+    public $kd_jenis_prw_selected, $nm_perawatan_selected;
+    public $isEditTindakanMode = false;
+    public $original_tindakan_type, $original_tgl_perawatan, $original_jam_rawat, $original_kd_jenis_prw;
 
     public function mount(string $no_rawat): void
     {
@@ -154,7 +157,7 @@ class PerawatanTindakan extends Component
 
     public function openTindakanCreateModal()
     {
-        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan']);
+        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'kd_jenis_prw_selected', 'nm_perawatan_selected', 'isEditTindakanMode', 'original_tindakan_type', 'original_tgl_perawatan', 'original_jam_rawat', 'original_kd_jenis_prw']);
         $this->tindakanCreateModalOpen = true;
     }
 
@@ -168,22 +171,47 @@ class PerawatanTindakan extends Component
     public function editTindakan($data)
     {
         // Reset and populate
-        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan']);
+        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'kd_jenis_prw_selected', 'nm_perawatan_selected']);
+        
+        $this->isEditTindakanMode = true;
+        $this->original_tindakan_type = $data['type']; // drpr, dr, pr
+        $this->original_tgl_perawatan = $data['tgl_perawatan'];
+        $this->original_jam_rawat = $data['jam_rawat'];
+        $this->original_kd_jenis_prw = $data['kd_jenis_prw'];
+
+        $this->kd_jenis_prw_selected = $data['kd_jenis_prw'];
+        $this->nm_perawatan_selected = $data['nm_perawatan'];
         
         $this->kd_dokter_tindakan = $data['kd_staff_dr'] != '-' ? $data['kd_staff_dr'] : null;
         $this->nm_dokter_tindakan = $data['staff_dr'] != '-' ? $data['staff_dr'] : null;
         $this->nip_tindakan = $data['kd_staff_pr'] != '-' ? $data['kd_staff_pr'] : null;
         $this->nm_petugas_tindakan = $data['staff_pr'] != '-' ? $data['staff_pr'] : null;
         
-        // Note: In typical SIMRS Khanza SOP, "editing" a treatment usually involves 
-        // deleting the old one and adding a new one because they use composite keys (No. Rawat, Jam, Tgl, Kode).
-        // For this UI, we open the entry modal with the existing data to allow "re-entry".
+        $this->lookupType = ($data['type'] == 'pr') ? 'pr' : 'dr';
         
         $this->tindakanCreateModalOpen = true;
     }
 
-    public function storeSingleTindakan($kd_jenis_prw)
+    public function previewTindakan($kd, $nm)
     {
+        $this->kd_jenis_prw_selected = $kd;
+        $this->nm_perawatan_selected = $nm;
+        $this->tindakanLookupOpen = false;
+    }
+
+    public function saveTindakan()
+    {
+        // SOP Rekam Medis: Validate if admission is already completed or canceled.
+        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah selesai/dibatalkan. Modifikasi data tindakan ditolak (SOP).', 'icon' => 'error']);
+            return;
+        }
+
+        if (!$this->kd_jenis_prw_selected) {
+            $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Tindakan belum dipilih.', 'icon' => 'error']);
+            return;
+        }
+
         if ($this->lookupType == 'dr' && !$this->kd_dokter_tindakan) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Dokter belum dipilih.', 'icon' => 'error']);
             return;
@@ -196,31 +224,45 @@ class PerawatanTindakan extends Component
 
         \Illuminate\Support\Facades\DB::beginTransaction();
         try {
-            $tgl = now()->format('Y-m-d');
-            $jam = now()->format('H:i:s');
-            
-            $tarif = \App\Models\JnsPerawatanInap::find($kd_jenis_prw);
+            $tarif = \App\Models\JnsPerawatanInap::find($this->kd_jenis_prw_selected);
             if (!$tarif) throw new \Exception("Tarif tidak ditemukan.");
+
+            if ($this->isEditTindakanMode) {
+                // Hapus tindakan lama sebelum memasukkan yang baru
+                if ($this->original_tindakan_type == 'drpr') {
+                    \App\Models\RawatInapDrpr::where(['no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $this->original_kd_jenis_prw, 'tgl_perawatan' => $this->original_tgl_perawatan, 'jam_rawat' => $this->original_jam_rawat])->delete();
+                } elseif ($this->original_tindakan_type == 'dr') {
+                    \App\Models\RawatInapDr::where(['no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $this->original_kd_jenis_prw, 'tgl_perawatan' => $this->original_tgl_perawatan, 'jam_rawat' => $this->original_jam_rawat])->delete();
+                } else {
+                    \App\Models\RawatInapPr::where(['no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $this->original_kd_jenis_prw, 'tgl_perawatan' => $this->original_tgl_perawatan, 'jam_rawat' => $this->original_jam_rawat])->delete();
+                }
+
+                $tgl = $this->original_tgl_perawatan;
+                $jam = $this->original_jam_rawat;
+            } else {
+                $tgl = now()->format('Y-m-d');
+                $jam = now()->format('H:i:s');
+            }
 
             if ($this->kd_dokter_tindakan && $this->nip_tindakan) {
                 \App\Models\RawatInapDrpr::create([
-                    'no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $kd_jenis_prw, 'kd_dokter' => $this->kd_dokter_tindakan, 'nip' => $this->nip_tindakan, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
-                    'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakandr' => $tarif->tarif_tindakandr, 'tarif_tindakanpr' => $tarif->tarif_tindakanpr, 'kSO' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrdrpr
+                    'no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $this->kd_jenis_prw_selected, 'kd_dokter' => $this->kd_dokter_tindakan, 'nip' => $this->nip_tindakan, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
+                    'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakandr' => $tarif->tarif_tindakandr, 'tarif_tindakanpr' => $tarif->tarif_tindakanpr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrdrpr
                 ]);
             } elseif ($this->kd_dokter_tindakan) {
                 \App\Models\RawatInapDr::create([
-                    'no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $kd_jenis_prw, 'kd_dokter' => $this->kd_dokter_tindakan, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
+                    'no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $this->kd_jenis_prw_selected, 'kd_dokter' => $this->kd_dokter_tindakan, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
                     'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakandr' => $tarif->tarif_tindakandr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrdr
                 ]);
             } else {
                 \App\Models\RawatInapPr::create([
-                    'no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $kd_jenis_prw, 'nip' => $this->nip_tindakan, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
+                    'no_rawat' => $this->no_rawat, 'kd_jenis_prw' => $this->kd_jenis_prw_selected, 'nip' => $this->nip_tindakan, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
                     'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakanpr' => $tarif->tarif_tindakanpr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrpr
                 ]);
             }
 
             \Illuminate\Support\Facades\DB::commit();
-            $this->tindakanLookupOpen = false;
+            $this->tindakanCreateModalOpen = false;
             $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Tindakan berhasil disimpan.', 'icon' => 'success']);
 
         } catch (\Exception $e) {
@@ -231,6 +273,12 @@ class PerawatanTindakan extends Component
 
     public function deleteTindakan($type, $kd_jenis_prw, $tgl, $jam, $kd_staff)
     {
+        // SOP Rekam Medis: Validate if admission is already completed or canceled.
+        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah selesai/dibatalkan. Penghapusan data ditolak (SOP).', 'icon' => 'error']);
+            return;
+        }
+
         try {
             if ($type == 'drpr') {
                 \App\Models\RawatInapDrpr::where([
@@ -260,20 +308,35 @@ class PerawatanTindakan extends Component
         }
     }
 
+    public function deletePemeriksaan($tgl, $jam)
+    {
+        // SOP Rekam Medis: Validate if admission is already completed or canceled.
+        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah selesai/dibatalkan. Penghapusan data ditolak (SOP).', 'icon' => 'error']);
+            return;
+        }
+
+        try {
+            \App\Models\PemeriksaanRanap::where([
+                'no_rawat'      => $this->no_rawat,
+                'tgl_perawatan' => $tgl,
+                'jam_rawat'     => $jam,
+            ])->delete();
+            
+            $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Pemeriksaan dihapus.', 'icon' => 'success']);
+        } catch (\Exception $e) {
+            $this->dispatch('swal', ['title' => 'Gagal!', 'text' => 'Gagal menghapus.', 'icon' => 'error']);
+        }
+    }
+
     public function save()
     {
         $this->validate([
             'tgl_perawatan' => 'required|date',
             'jam_rawat'     => 'required',
             'nip'           => 'required',
-            'kesadaran'     => 'required',
-            'penilaian'     => 'required',
-            'rtl'           => 'required',
         ], [
             'nip.required' => 'Petugas (Dokter/Perawat) harus dipilih.',
-            'kesadaran.required' => 'Tingkat kesadaran harus dipilih.',
-            'penilaian.required' => 'Asesmen (Penilaian) wajib diisi.',
-            'rtl.required' => 'Plan (RTL) wajib diisi.',
         ]);
 
         if ($this->isEditMode) {
@@ -299,7 +362,7 @@ class PerawatanTindakan extends Component
                 'berat'         => $this->berat ?: '-',
                 'spo2'          => $this->spo2 ?: '-',
                 'gcs'           => $this->gcs ?: '-',
-                'kesadaran'     => $this->kesadaran,
+                'kesadaran'     => $this->kesadaran ?: 'Compos Mentis',
                 'keluhan'       => $this->keluhan ?: '-',
                 'pemeriksaan'   => $this->pemeriksaan ?: '-',
                 'alergi'        => $this->alergi ?: '-',
@@ -356,7 +419,7 @@ class PerawatanTindakan extends Component
                 'berat'         => $this->berat ?: '-',
                 'spo2'          => $this->spo2 ?: '-',
                 'gcs'           => $this->gcs ?: '-',
-                'kesadaran'     => $this->kesadaran,
+                'kesadaran'     => $this->kesadaran ?: 'Compos Mentis',
                 'keluhan'       => $this->keluhan ?: '-',
                 'pemeriksaan'   => $this->pemeriksaan ?: '-',
                 'alergi'        => $this->alergi ?: '-',

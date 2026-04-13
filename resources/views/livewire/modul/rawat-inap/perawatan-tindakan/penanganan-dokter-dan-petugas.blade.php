@@ -2,24 +2,9 @@
     @php
         // Local script-based helpers can be moved to the parent or handled via Alpine events
     @endphp
-    <script>
-        window.confirmDeleteTindakan = function(type, kd, tgl, jam, staff) {
-            Swal.fire({
-                title: 'Hapus Tindakan?',
-                text: 'Data yang dihapus tidak dapat dikembalikan!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#4C5C2D',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    @this.deleteTindakan(type, kd, tgl, jam, staff);
-                }
-            })
-        }
-    </script>
+    @php
+        // Local script-based helpers can be moved to the parent or handled via Alpine events
+    @endphp
     {{-- Header Content --}}
     <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
@@ -41,8 +26,8 @@
             <flux:table.column>{{ __('Perawatan/Tindakan') }}</flux:table.column>
             <flux:table.column>{{ __('Dokter Pelaksana') }}</flux:table.column>
             <flux:table.column>{{ __('Petugas Pelaksana') }}</flux:table.column>
-            <flux:table.column class="text-right pr-6">{{ __('Biaya') }}</flux:table.column>
-            <flux:table.column>{{ __('Aksi') }}</flux:table.column>
+            <flux:table.column><div class="w-full text-center">{{ __('Biaya') }}</div></flux:table.column>
+            <flux:table.column><div class="w-full text-center">{{ __('Aksi') }}</div></flux:table.column>
         </flux:table.columns>
 
         <flux:table.rows>
@@ -62,22 +47,22 @@
                     <flux:table.cell>
                         <span class="text-xs text-neutral-600 dark:text-neutral-400 truncate block max-w-[150px]">{{ $item['staff_pr'] }}</span>
                     </flux:table.cell>
-                    <flux:table.cell class="text-right pr-6">
-                        <div class="inline-flex flex-col items-end">
+                    <flux:table.cell class="text-center">
+                        <div class="inline-flex flex-col items-center">
                             <span class="text-[9px] text-neutral-400 font-bold uppercase leading-none mb-1">Total Biaya</span>
                             <span class="text-xs font-mono font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">
                                 Rp{{ number_format($item['biaya_rawat'], 0, ',', '.') }}
                             </span>
                         </div>
                     </flux:table.cell>
-                    <flux:table.cell>
-                        <div class="flex items-center gap-1.5">
+                    <flux:table.cell class="text-center">
+                        <div class="flex items-center justify-center gap-1.5">
                             <button type="button" @click="showDetailModal({{ $itemJson }})"
                                 class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#4C5C2D]/10 text-[#4C5C2D] hover:bg-[#4C5C2D]/20 transition-colors cursor-pointer border border-[#4C5C2D]/20">
                                 <flux:icon name="eye" class="w-3.5 h-3.5" />
                                 Detail
                             </button>
-                            <button type="button" @click="editTindakan({{ $itemJson }})"
+                            <button type="button" @click="$wire.editTindakan({{ $itemJson }})"
                                 class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200">
                                 <flux:icon name="pencil-square" class="w-3.5 h-3.5" />
                                 Edit
@@ -183,33 +168,46 @@
 
                 <hr class="border-neutral-100 dark:border-neutral-800">
 
-                {{-- Treatment Links --}}
-                <div class="space-y-4">
-                    <flux:label class="text-xs font-bold uppercase text-neutral-400 block mb-2 tracking-widest">Pilih Jenis Tindakan :</flux:label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button type="button" wire:click="openTindakanLookup('dr')"
-                            class="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-white dark:bg-neutral-800 border-2 border-dashed border-[#4C5C2D]/20 hover:border-[#4C5C2D] hover:bg-[#F1F5E9]/30 transition-all group shadow-sm active:scale-95">
-                            <div class="p-3 rounded-full bg-[#4C5C2D]/10 text-[#4C5C2D]">
-                                <flux:icon name="paper-clip" class="w-6 h-6" />
+                {{-- Treatment Selection Preview --}}
+                <div class="relative rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/30 p-5">
+                    <flux:label class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest mb-4 block">Pilih & Preview Tindakan :</flux:label>
+                    
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="flex-1 flex items-center gap-2">
+                            <div class="w-20 h-10 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg flex items-center justify-center text-[11px] font-mono text-emerald-600 shadow-sm">
+                                {{ $kd_jenis_prw_selected ?: '-' }}
                             </div>
-                            <span class="text-xs font-bold text-[#4C5C2D] uppercase tracking-wider">Tindakan Medis (Dokter)</span>
+                            <div class="flex-1 h-10 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg flex items-center px-4 text-sm font-bold text-neutral-800 dark:text-neutral-100 shadow-sm">
+                                @if($nm_perawatan_selected)
+                                    <span class="truncate">{{ $nm_perawatan_selected }}</span>
+                                @else
+                                    <span class="text-neutral-400 font-medium italic text-xs">Belum ada tindakan dipilih...</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" wire:click="openTindakanLookup('dr')"
+                            class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-neutral-800 border border-[#4C5C2D]/20 hover:border-[#4C5C2D] hover:bg-[#F1F5E9] transition-all text-xs font-bold text-[#4C5C2D] shadow-sm active:scale-95">
+                            <flux:icon name="magnifying-glass" class="w-4 h-4" /> Cari Tindakan Medis
                         </button>
                         <button type="button" wire:click="openTindakanLookup('pr')"
-                            class="flex flex-col items-center justify-center gap-3 p-8 rounded-2xl bg-white dark:bg-neutral-800 border-2 border-dashed border-blue-600/20 hover:border-blue-600 hover:bg-blue-50/30 transition-all group shadow-sm active:scale-95">
-                            <div class="p-3 rounded-full bg-blue-600/10 text-blue-600">
-                                <flux:icon name="paper-clip" class="w-6 h-6" />
-                            </div>
-                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tindakan Paramedis (Petugas)</span>
+                            class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-neutral-800 border border-blue-600/20 hover:border-blue-600 hover:bg-blue-50 transition-all text-xs font-bold text-blue-600 shadow-sm active:scale-95">
+                            <flux:icon name="magnifying-glass" class="w-4 h-4" /> Cari Tindakan Paramedis
                         </button>
                     </div>
                 </div>
             </div>
 
             {{-- Footer --}}
-            <div class="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800 flex items-center gap-3">
+            <div class="p-6 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800 flex items-center justify-end gap-3 flex-shrink-0">
                 <flux:modal.close>
-                    <flux:button variant="ghost" class="flex-1">Selesai / Tutup</flux:button>
+                    <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
+                <flux:button wire:click="saveTindakan" variant="primary" icon="check" class="w-48">
+                    Simpan Tindakan
+                </flux:button>
             </div>
         </div>
     </flux:modal>
@@ -242,7 +240,7 @@
                     </thead>
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
                         @forelse($tindakanList as $t)
-                            <tr class="hover:bg-[#F1F5E9]/50 dark:hover:bg-neutral-800 transition-colors cursor-pointer group" wire:click="storeSingleTindakan('{{ $t->kd_jenis_prw }}')">
+                            <tr class="hover:bg-[#F1F5E9]/50 dark:hover:bg-neutral-800 transition-colors cursor-pointer group" wire:click="previewTindakan('{{ $t->kd_jenis_prw }}', '{{ addslashes($t->nm_perawatan) }}')">
                                 <td class="p-4 pl-6 text-xs font-mono text-neutral-500 group-hover:text-[#4C5C2D]">{{ $t->kd_jenis_prw }}</td>
                                 <td class="p-4">
                                     <span class="text-sm font-bold text-neutral-700 dark:text-neutral-200 uppercase group-hover:text-[#4C5C2D]">{{ $t->nm_perawatan }}</span>
@@ -266,7 +264,7 @@
             </div>
             
             <div class="p-4 bg-neutral-50/50 dark:bg-neutral-800 border-t border-neutral-100 flex items-center justify-center">
-                <p class="text-[10px] text-neutral-400 uppercase tracking-[.3em] font-medium">Klik pada baris untuk menyimpan tindakan secara otomatis</p>
+                <p class="text-[10px] text-neutral-400 uppercase tracking-[.3em] font-medium">Klik pada baris untuk memilih tindakan</p>
             </div>
         </div>
     </flux:modal>
@@ -407,13 +405,30 @@
                             <flux:icon name="pencil-square" class="w-4 h-4" />
                             Edit Penanganan
                         </button>
+                        <button type="button" @click="
+                            closeDetailModal(); 
+                            Swal.fire({
+                                title: 'Hapus Tindakan?',
+                                text: 'Data yang dihapus tidak dapat dikembalikan!',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#4C5C2D',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Ya, Hapus!',
+                                cancelButtonText: 'Batal'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $wire.deleteTindakan(detail.type, detail.kd_jenis_prw, detail.tgl_perawatan, detail.jam_rawat, detail.type == 'dr' ? detail.kd_staff_dr : (detail.type == 'pr' ? detail.kd_staff_pr : ''));
+                                }
+                            });
+                        "
+                            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-red-50 text-red-700 text-sm font-bold border border-red-200 hover:bg-red-100 transition-all shadow-sm">
+                            <flux:icon name="trash" class="w-4 h-4" />
+                            Hapus Data
+                        </button>
                     </div>
                     
                     <div class="flex items-center gap-3">
-                        <button type="button" @click="closeDetailModal(); confirmDeleteTindakan(detail.type, detail.kd_jenis_prw, detail.tgl_perawatan, detail.jam_rawat, detail.type == 'dr' ? detail.kd_staff_dr : (detail.type == 'pr' ? detail.kd_staff_pr : ''))"
-                            class="px-6 py-2.5 rounded-2xl bg-white text-red-600 text-sm font-bold border border-red-100 hover:bg-red-50 transition-all shadow-sm">
-                            Hapus Data
-                        </button>
                         <button type="button" @click="closeDetailModal()"
                             class="px-8 py-2.5 rounded-2xl bg-neutral-900 text-white text-sm font-bold hover:bg-black transition-all shadow-lg active:scale-95">
                             Selesai
