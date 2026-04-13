@@ -260,18 +260,31 @@ class PerawatanTindakan extends Component
         }
     }
 
-    public function storePemeriksaan()
+    public function save()
     {
         $this->validate([
             'tgl_perawatan' => 'required|date',
             'jam_rawat'     => 'required',
             'nip'           => 'required',
             'kesadaran'     => 'required',
+            'penilaian'     => 'required',
+            'rtl'           => 'required',
         ], [
-            'nip.required' => 'Petugas harus dipilih.',
-            'kesadaran.required' => 'Kesadaran harus dipilih.',
+            'nip.required' => 'Petugas (Dokter/Perawat) harus dipilih.',
+            'kesadaran.required' => 'Tingkat kesadaran harus dipilih.',
+            'penilaian.required' => 'Asesmen (Penilaian) wajib diisi.',
+            'rtl.required' => 'Plan (RTL) wajib diisi.',
         ]);
 
+        if ($this->isEditMode) {
+            $this->updatePemeriksaan();
+        } else {
+            $this->storePemeriksaan();
+        }
+    }
+
+    public function storePemeriksaan()
+    {
         \Illuminate\Support\Facades\DB::beginTransaction();
         try {
             \App\Models\PemeriksaanRanap::create([
@@ -310,8 +323,8 @@ class PerawatanTindakan extends Component
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
             $this->dispatch('swal', [
-                'title' => 'Gagal!',
-                'text'  => 'Terjadi kesalahan: ' . substr($e->getMessage(), 0, 100),
+                'title' => 'Gagal Menyimpan!',
+                'text'  => 'Terjadi kesalahan sistem: ' . substr($e->getMessage(), 0, 150),
                 'icon'  => 'error',
             ]);
         }
@@ -319,11 +332,6 @@ class PerawatanTindakan extends Component
 
     public function updatePemeriksaan()
     {
-        $this->validate([
-            'nip'           => 'required',
-            'kesadaran'     => 'required',
-        ]);
-
         \Illuminate\Support\Facades\DB::beginTransaction();
         try {
             // Find the record using composite keys
@@ -333,22 +341,11 @@ class PerawatanTindakan extends Component
                 ->first();
 
             if (!$model) {
-                throw new \Exception("Data tidak ditemukan.");
+                throw new \Exception("Data pemeriksaan tidak ditemukan di database. Mungkin sudah dihapus.");
             }
 
-            // Standard SOP: Validate lock before saving
-            // Note: Since we are using composite keys, we need to be careful with the trait's find() logic
-            // However, our initializeLock already took a snapshot of the model.
-            // We'll manually check the hash here to ensure composite key compatibility
-            $currentHash = md5(json_encode($model->getAttributes()));
-            if ($currentHash !== $this->initialRecordHash) {
-                $this->dispatch('swal', [
-                    'title' => 'Konflik Data!',
-                    'text'  => 'Data ini telah diubah oleh orang lain. Silakan perbarui halaman.',
-                    'icon'  => 'warning',
-                ]);
-                throw new \Exception("CONCURRENCY_ERROR");
-            }
+            // Standard SOP: Validate lock before saving to handle concurrency
+            $this->validateLock($model);
 
             $model->update([
                 'suhu_tubuh'    => $this->suhu_tubuh ?: '-',
@@ -382,15 +379,18 @@ class PerawatanTindakan extends Component
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\DB::rollBack();
-            if ($e->getMessage() !== 'CONCURRENCY_ERROR') {
+            
+            // Only dispatch generic error if it's NOT a concurrency error (already handled by trait)
+            if (strpos($e->getMessage(), 'CONCURRENCY_ERROR') === false) {
                 $this->dispatch('swal', [
-                    'title' => 'Gagal!',
-                    'text'  => 'Terjadi kesalahan: ' . substr($e->getMessage(), 0, 100),
+                    'title' => 'Gagal Memperbarui!',
+                    'text'  => 'Terjadi kesalahan: ' . substr($e->getMessage(), 0, 150),
                     'icon'  => 'error',
                 ]);
             }
         }
     }
+
     public function render()
     {
         $rawatInapDrpr = \App\Models\RawatInapDrpr::with(['regPeriksa.pasien:no_rkm_medis,nm_pasien', 'jnsPerawatan:kd_jenis_prw,nm_perawatan', 'dokter:kd_dokter,nm_dokter', 'petugas:nip,nama'])

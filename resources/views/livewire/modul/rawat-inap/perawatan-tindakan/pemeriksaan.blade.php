@@ -152,8 +152,14 @@
         <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
             {{-- Header Row: Time & Date --}}
             <div class="grid grid-cols-2 gap-4">
-                <flux:input wire:model="tgl_perawatan" type="date" label="Tanggal Pemeriksaan" x-bind:disabled="$wire.isEditMode" />
-                <flux:input wire:model="jam_rawat" type="time" step="1" label="Jam Pemeriksaan" x-bind:disabled="$wire.isEditMode" />
+                <flux:field>
+                    <flux:input wire:model="tgl_perawatan" type="date" label="Tanggal Pemeriksaan" x-bind:disabled="$wire.isEditMode" />
+                    @error('tgl_perawatan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </flux:field>
+                <flux:field>
+                    <flux:input wire:model="jam_rawat" type="time" step="1" label="Jam Pemeriksaan" x-bind:disabled="$wire.isEditMode" />
+                    @error('jam_rawat') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </flux:field>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -300,6 +306,7 @@
                                         <flux:select.option value="Apatis">Apatis</flux:select.option>
                                         <flux:select.option value="Delirium">Delirium</flux:select.option>
                                     </flux:select>
+                                    @error('kesadaran') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                                 </div>
                             </flux:field>
                         </div>
@@ -316,8 +323,14 @@
 
                     {{-- SOAP: A & P --}}
                     <div class="flex flex-col gap-5 mt-2">
-                        <flux:textarea wire:model="penilaian" label="Asesmen (Penilaian Klinis)" placeholder="Masukkan penilaian..." resize="none" rows="4" />
-                        <flux:textarea wire:model="rtl" label="Plan (Rencana Tindak Lanjut)" placeholder="Masukkan rencana..." resize="none" rows="4" />
+                        <flux:field>
+                            <flux:textarea wire:model="penilaian" label="Asesmen (Penilaian Klinis)" placeholder="Masukkan penilaian..." resize="none" rows="4" />
+                            @error('penilaian') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </flux:field>
+                        <flux:field>
+                            <flux:textarea wire:model="rtl" label="Plan (Rencana Tindak Lanjut)" placeholder="Masukkan rencana..." resize="none" rows="4" />
+                            @error('rtl') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                        </flux:field>
                     </div>
 
                     {{-- Inst/Impl & Evaluasi --}}
@@ -334,7 +347,9 @@
             <flux:modal.close>
                 <flux:button variant="ghost">Batal</flux:button>
             </flux:modal.close>
-            <flux:button wire:click="$wire.isEditMode ? 'updatePemeriksaan' : 'storePemeriksaan'" variant="primary" class="px-8">
+            <flux:button wire:click="save" variant="primary" class="px-8" wire:loading.attr="disabled">
+                <flux:icon name="check" class="w-4 h-4 mr-2" wire:loading.remove wire:target="save" />
+                <flux:icon name="arrow-path" class="w-4 h-4 mr-2 animate-spin" wire:loading wire:target="save" />
                 <span x-text="$wire.isEditMode ? 'Update Perubahan' : 'Simpan Pemeriksaan'"></span>
             </flux:button>
         </div>
