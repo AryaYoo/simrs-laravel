@@ -370,13 +370,13 @@
                         <p class="text-sm font-medium">Tidak ada riwayat perawatan</p>
                     </div>
                 @else
-                    <div class="flex flex-col gap-4" x-data="{ expanded: null }">
+                    <div class="flex flex-col gap-4 pb-32" x-data="{ expanded: null }">
                         @foreach($riwayatKunjungan as $kunjungan)
                             <div class="rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 overflow-hidden shadow-sm transition-all"
                                  :class="expanded === '{{ $kunjungan->no_rawat }}' ? 'ring-1 ring-[#4C5C2D] dark:ring-[#8CC7C4]' : ''">
                                 {{-- Accordion Header --}}
                                 <button @click="expanded = expanded === '{{ $kunjungan->no_rawat }}' ? null : '{{ $kunjungan->no_rawat }}'"
-                                        class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors">
+                                        class="w-full group/header relative z-10 flex items-center justify-between px-5 py-4 text-left hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors">
                                     <div class="flex flex-wrap items-center gap-x-6 gap-y-2">
                                         <div class="flex flex-col">
                                             <div class="flex items-center gap-2 mb-0.5">

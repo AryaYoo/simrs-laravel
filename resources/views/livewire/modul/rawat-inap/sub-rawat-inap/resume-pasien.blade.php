@@ -56,8 +56,16 @@
     {{-- Main List Card --}}
     <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/20 flex items-center justify-between">
-            <h3 class="font-bold text-neutral-800 dark:text-neutral-100">Daftar Resume Medis</h3>
-            <span class="px-2.5 py-1 rounded-full bg-[#4C5C2D] text-white text-[10px] font-bold uppercase tracking-wider">{{ $resumes->total() }} Total</span>
+            <div class="flex items-center gap-3">
+                <h3 class="font-bold text-neutral-800 dark:text-neutral-100">Daftar Resume Medis</h3>
+                <span class="px-2.5 py-1 rounded-full bg-[#4C5C2D] text-white text-[10px] font-bold uppercase tracking-wider">{{ $resumes->total() }} Total</span>
+            </div>
+            
+            <a href="{{ route('modul.rawat-inap.sub-rawat-inap.resume-create', str_replace('/', '-', $no_rawat)) }}" wire:navigate>
+                <flux:button variant="primary" icon="plus" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-[11px] h-8 font-bold uppercase tracking-wider">
+                    Buat Resume Baru
+                </flux:button>
+            </a>
         </div>
 
         <div class="overflow-x-auto">
@@ -112,9 +120,10 @@
                                        title="Detail Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-[#4C5C2D]/10 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-all">
                                         <flux:icon name="eye" class="w-4 h-4" />
                                     </a>
-                                    <button title="Edit Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-amber-100 hover:text-amber-600 transition-all">
+                                    <a href="{{ route('modul.rawat-inap.sub-rawat-inap.resume-edit', str_replace('/', '-', $resume->no_rawat)) }}" wire:navigate
+                                       title="Edit Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-amber-100 hover:text-amber-600 transition-all">
                                         <flux:icon name="pencil-square" class="w-4 h-4" />
-                                    </button>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

@@ -35,6 +35,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-inap/{no_rawat}/perawatan-tindakan', \App\Livewire\Modul\RawatInap\PerawatanTindakan::class)->name('modul.rawat-inap.perawatan-tindakan')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/riwayat-pasien', \App\Livewire\Modul\RawatInap\SubRawatInap\RiwayatPasien::class)->name('modul.rawat-inap.sub-rawat-inap.riwayat-pasien')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/resume', \App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasien::class)->name('modul.rawat-inap.sub-rawat-inap.resume')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/resume/create', \App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasienCreate::class)->name('modul.rawat-inap.sub-rawat-inap.resume-create')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/resume/edit', \App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasienEdit::class)->name('modul.rawat-inap.sub-rawat-inap.resume-edit')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/resume/detail', \App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasienDetail::class)->name('modul.rawat-inap.sub-rawat-inap.resume-detail')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}', \App\Livewire\Modul\RawatInap\Show::class)->name('modul.rawat-inap.show')->where('no_rawat', '.*');
 

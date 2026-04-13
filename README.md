@@ -22,16 +22,41 @@ Sistem Informasi Manajemen Rumah Sakit (SIMRS) modern berbasis **Laravel 11**, *
 
 ---
 
-## ✨ Fitur Utama
+## ✅ Progress & Roadmap Fitur
 
-| Kategori | Fitur Unggulan |
-| :--- | :--- |
-| **Registrasi** | List transaksi real-time, pencarian cepat, & detail pendaftaran. |
-| **Master Pasien** | Katalog identitas lengkap dengan relasi deskriptif (wilayah & penjamin). |
-| **Rekam Medis** | Grafik Vital Signs, riwayat SOAPIE, kodifikasi ICD-9/10, & Resume Medis otomatis. |
-| **Navigasi** | **Mega Menu "Fused Tab"** yang intuitif untuk akses 50+ layanan pasien dalam satu klik. |
-| **Dashboard** | Statistik interaktif yang berfungsi ganda sebagai filter kategori pasien (BPJS/Umum/Lainnya). |
-| **AI Powered** | Ekstraksi data KTP menggunakan Google Vision API (OCR). |
+Berikut adalah status pengembangan fitur SIMRS Laralite:
+
+### 🏥 Modul Core & Registrasi
+- [x] **Registrasi Pasien**: List transaksi real-time, pencarian cepat, & filtering.
+- [x] **Master Pasien**: Manajemen identitas dengan integrasi data wilayah & penjamin.
+- [x] **Master Data Medis**: Pengelolaan data Dokter, Poliklinik, Penjamin, & Perujuk.
+- [x] **Master Wilayah**: Manajemen data Provinsi, Kabupaten, Kecamatan, & Kelurahan.
+- [x] **AI OCR KTP**: Ekstraksi otomatis data KTP menggunakan Google Vision API.
+- [x] **Dashboard Statis**: Monitoring pasien aktif (BPJS/Umum/Lainnya).
+
+### 🛌 Modul Rawat Inap (Ranap)
+- [x] **Mega Menu "Fused Tab"**: Navigasi intuitif untuk 50+ layanan pasien.
+- [x] **Pemeriksaan (SOAPIE)**: Grafik Vital Signs & pencatatan riwayat medis terstruktur.
+- [x] **Perawatan & Tindakan**: Input tindakan medis, petugas, dan BHP secara terpadu.
+- [x] **Riwayat Pasien**: Timeline riwayat pemeriksaan dan kunjungan pasien.
+- [x] **Resume Medis**: Form pembuatan resume otomatis dengan sinkronisasi data SOAP/Pemeriksaan, lookup ICD-10 & ICD-9 CM, serta riwayat kontrol.
+- [ ] **E-Resep Ranap**: Digitalisasi resep obat Rawat Inap (Next).
+- [ ] **Integrasi Penunjang**: Laborat, Radiologi, & Bank Darah (Next).
+
+### 🏥 Modul Rawat Jalan (Ralan)
+- [x] **List Pasien Ralan**: Dashboard operasional poli.
+- [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
+
+### 🌉 Bridging & Integrasi
+- [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.
+- [ ] **Satu Sehat**: Integrasi SATUSEHAT Kemenkes (Roadmap).
+
+### 🛠️ Keamanan & Standar
+- [x] **Optimistic Locking**: Pencegahan *lost update* pada pengeditan bersama.
+- [x] **Olive Green Branding**: UI/UX standar premium yang konsisten.
+- [x] **Legacy Compatibility**: Bridge aman untuk database sistem lama.
+
+---
 
 ---
 
@@ -98,7 +123,10 @@ Aplikasi ini menggunakan identitas **Olive Green**.
 * **Background Aktif**: Gunakan `#F1F5E9` untuk elemen yang sedang dipilih/aktif.
 * **Komponen**: Selalu prioritaskan komponen dari **Flux UI** untuk menjaga konsistensi.
 
-### 3. Keamanan Database
+### 3. Dokumentasi Fitur (WAJIB!)
+Setiap penambahan fitur baru, perbaikan signifikan, atau modul baru **WAJIB** didokumentasikan minimal pada bagian [✅ Progress & Roadmap Fitur](#-progress--roadmap-fitur) di README ini. Hal ini penting untuk menjaga transparansi *progress* antar tim pengembang.
+
+### 4. Keamanan Database
 Jangan gunakan fitur `Model::create` atau `Model::update` tanpa validasi input yang ketat. Selalu gunakan `DB::beginTransaction()` untuk transaksi yang melibatkan lebih dari satu tabel.
 
 ---

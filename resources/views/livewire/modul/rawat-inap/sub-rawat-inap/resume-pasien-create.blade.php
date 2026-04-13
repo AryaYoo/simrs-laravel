@@ -1,0 +1,527 @@
+<div class="flex flex-col gap-6 pb-24" x-data="{ section: 1 }">
+    {{-- Sticky Header --}}
+    <div class="sticky top-0 z-40 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-700 -mx-4 px-4 py-3 mb-2 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('modul.rawat-inap.sub-rawat-inap.resume', str_replace('/', '-', $no_rawat)) }}" wire:navigate
+               class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
+            </a>
+            <div>
+                <h1 class="text-base font-bold text-neutral-800 dark:text-neutral-100">Buat Resume Medis</h1>
+                <p class="text-[10px] text-neutral-500 font-medium uppercase tracking-wider">{{ $regPeriksa->pasien->nm_pasien }} ({{ $no_rawat }})</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <flux:button wire:click="save" variant="primary" icon="check" class="bg-[#4C5C2D] hover:bg-[#3D4A24] h-9 px-6 text-sm">
+                Simpan Resume
+            </flux:button>
+        </div>
+    </div>
+
+    {{-- Progress Steps --}}
+    <div class="flex items-center justify-between px-2">
+        <button @click="section = 1" class="flex flex-col items-center gap-2 group outline-none">
+            <div :class="section >= 1 ? 'bg-[#4C5C2D] text-white' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'" class="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm">
+                <flux:icon name="information-circle" class="w-5 h-5" />
+            </div>
+            <span :class="section === 1 ? 'text-[#4C5C2D] font-bold' : 'text-neutral-400'" class="text-[10px] uppercase tracking-widest font-bold">Admisi</span>
+        </button>
+        <div class="flex-1 h-0.5 mx-4" :class="section > 1 ? 'bg-[#4C5C2D]/30' : 'bg-neutral-100 dark:bg-neutral-800'"></div>
+        <button @click="section = 2" class="flex flex-col items-center gap-2 group outline-none">
+            <div :class="section >= 2 ? 'bg-[#4C5C2D] text-white' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'" class="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm">
+                <flux:icon name="clipboard-document-list" class="w-5 h-5" />
+            </div>
+            <span :class="section === 2 ? 'text-[#4C5C2D] font-bold' : 'text-neutral-400'" class="text-[10px] uppercase tracking-widest font-bold">Ringkasan</span>
+        </button>
+        <div class="flex-1 h-0.5 mx-4" :class="section > 2 ? 'bg-[#4C5C2D]/30' : 'bg-neutral-100 dark:bg-neutral-800'"></div>
+        <button @click="section = 3" class="flex flex-col items-center gap-2 group outline-none">
+            <div :class="section >= 3 ? 'bg-[#4C5C2D] text-white' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'" class="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm">
+                <flux:icon name="magnifying-glass" class="w-5 h-5" />
+            </div>
+            <span :class="section === 3 ? 'text-[#4C5C2D] font-bold' : 'text-neutral-400'" class="text-[10px] uppercase tracking-widest font-bold">Diagnosa</span>
+        </button>
+        <div class="flex-1 h-0.5 mx-4" :class="section > 3 ? 'bg-[#4C5C2D]/30' : 'bg-neutral-100 dark:bg-neutral-800'"></div>
+        <button @click="section = 4" class="flex flex-col items-center gap-2 group outline-none">
+            <div :class="section >= 4 ? 'bg-[#4C5C2D] text-white' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'" class="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm">
+                <flux:icon name="home" class="w-5 h-5" />
+            </div>
+            <span :class="section === 4 ? 'text-[#4C5C2D] font-bold' : 'text-neutral-400'" class="text-[10px] uppercase tracking-widest font-bold">Pulang</span>
+        </button>
+    </div>
+
+    {{-- SECTION 1: ADMISI & IDENTITAS --}}
+    <div x-show="section === 1" x-transition class="space-y-6">
+        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
+                <flux:icon name="user" class="w-4 h-4 text-[#4C5C2D]" />
+                <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Identitas & Data Admisi</h2>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <flux:input label="No. Rawat" value="{{ $no_rawat }}" disabled />
+                    <flux:input label="Pasien" value="{{ $regPeriksa->pasien->nm_pasien }}" disabled />
+                    <flux:input label="Dokter P.J. (DPJP)" value="{{ $regPeriksa->dokter->nm_dokter }}" disabled />
+                    <flux:input label="Kamar/Bangsal" value="{{ $regPeriksa->kamarInap->last()->kamar->kd_kamar ?? '-' }} / {{ $regPeriksa->kamarInap->last()->kamar->bangsal->nm_bangsal ?? '-' }}" disabled />
+                </div>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <flux:input label="Tgl Masuk" value="{{ $regPeriksa->kamarInap->first()->tgl_masuk ?? '-' }}" disabled />
+                        <flux:input label="Jam Masuk" value="{{ $regPeriksa->kamarInap->first()->jam_masuk ?? '-' }}" disabled />
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <flux:input label="Tgl Keluar" value="{{ $regPeriksa->kamarInap->last()->tgl_keluar ?? '-' }}" disabled />
+                        <flux:input label="Jam Keluar" value="{{ $regPeriksa->kamarInap->last()->jam_keluar ?? '-' }}" disabled />
+                    </div>
+                    <flux:input label="Diagnosa Awal Masuk" wire:model="diagnosa_awal" placeholder="Keluhan / Diagnosa saat masuk..." />
+                    <flux:textarea label="Alasan Masuk Dirawat" wire:model="alasan" rows="2" placeholder="Mengapa pasien dirawat?" />
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <flux:button @click="section = 2" variant="ghost" icon-trailing="chevron-right">Selanjutnya: Ringkasan Klinis</flux:button>
+        </div>
+    </div>
+
+    {{-- SECTION 2: RINGKASAN KLINIS --}}
+    <div x-show="section === 2" x-transition class="space-y-6">
+        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
+                <flux:icon name="clipboard-document-list" class="w-4 h-4 text-[#4C5C2D]" />
+                <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Ringkasan Riwayat & Pemeriksaan</h2>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Keluhan Utama & Riwayat Penyakit</label>
+                            <div class="flex items-center gap-2">
+                                <flux:badge size="sm" color="amber" icon="information-circle" variant="flat">Referensi SOAP Terakhir</flux:badge>
+                                <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('KELUHAN', 'keluhan_utama')" wire:loading.attr="disabled" wire:target="openAttachModal">Attach Riwayat</flux:button>
+                            </div>
+                        </div>
+                        <flux:textarea wire:model="keluhan_utama" rows="3" placeholder="Isi keluhan utama..." />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Riwayat Penyakit Sekarang (Jalannya Penyakit)</label>
+                            {{-- Button not requested here but could be added if needed, sticking to requested list --}}
+                        </div>
+                        <flux:textarea wire:model="jalannya_penyakit" rows="3" placeholder="Perkembangan penyakit selama perawatan..." />
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Pemeriksaan Fisik</label>
+                        <div class="flex items-center gap-2">
+                            <flux:badge size="sm" color="amber" icon="information-circle" variant="flat">Referensi SOAP Terakhir</flux:badge>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('PEMERIKSAAN', 'pemeriksaan_fisik')" wire:loading.attr="disabled" wire:target="openAttachModal">Attach Riwayat</flux:button>
+                        </div>
+                    </div>
+                    <flux:textarea wire:model="pemeriksaan_fisik" rows="3" placeholder="Status generalis dan lokal..." />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Penunjang RAD Terpenting</label>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('RAD', 'pemeriksaan_penunjang')" wire:loading.attr="disabled" wire:target="openAttachModal">Attach Riwayat</flux:button>
+                        </div>
+                        <flux:textarea wire:model="pemeriksaan_penunjang" rows="3" placeholder="Hasil USG, Rontgen, CT-Scan, dll..." />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Penunjang LAB Terpenting</label>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('LAB', 'hasil_laborat')" wire:loading.attr="disabled" wire:target="openAttachModal">Attach Riwayat</flux:button>
+                        </div>
+                        <flux:textarea wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-between">
+            <flux:button @click="section = 1" variant="ghost" icon="chevron-left">Admisi</flux:button>
+            <flux:button @click="section = 3" variant="ghost" icon-trailing="chevron-right">Selanjutnya: Diagnosa & Prosedur</flux:button>
+        </div>
+    </div>
+
+    {{-- SECTION 3: DIAGNOSA & PROSEDUR --}}
+    <div x-show="section === 3" x-transition class="space-y-6">
+        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+             <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
+                <flux:icon name="magnifying-glass" class="w-4 h-4 text-[#4C5C2D]" />
+                <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Diagnosa & Prosedur Akhir</h2>
+            </div>
+            <div class="p-6 space-y-8">
+                {{-- Tindakan & Obat --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Tindakan/Operasi Selama Perawatan</label>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('TINDAKAN', 'tindakan_dan_operasi')" wire:loading.attr="disabled" wire:target="openAttachModal">Attach Riwayat</flux:button>
+                        </div>
+                        <flux:textarea wire:model="tindakan_dan_operasi" rows="3" />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-neutral-800 dark:text-neutral-200">Obat-obatan Selama Perawatan</label>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('OBAT', 'obat_di_rs')" wire:loading.attr="disabled" wire:target="openAttachModal">Attach Riwayat</flux:button>
+                        </div>
+                        <flux:textarea wire:model="obat_di_rs" rows="3" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    {{-- Diangnosa (ICD-10) --}}
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-black uppercase tracking-widest text-[#4C5C2D] mb-4">Diagnosa Akhir (ICD-10)</h3>
+                        
+                        {{-- Diagnosa Utama --}}
+                        <div class="flex items-end gap-2">
+                            <div class="flex-1 relative">
+                                <flux:input label="Diagnosa Utama" wire:model.live.debounce.300ms="diagnosa_utama" placeholder="Ketik minimal 3 karakter..." @focus="$wire.activeSearchField = 'diagnosa_utama'" />
+                                
+                                @if($activeSearchField === 'diagnosa_utama' && !empty($autocompleteResults))
+                                    <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
+                                        @foreach($autocompleteResults as $result)
+                                            <button type="button" 
+                                                wire:click="selectAutocompleteItem('{{ $result['kd_penyakit'] ?? $result['kode'] }}', '{{ $result['nm_penyakit'] ?? $result['deskripsi_panjang'] }}')"
+                                                class="w-full text-left px-4 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100 dark:border-neutral-800">
+                                                <p class="text-[11px] font-bold text-neutral-800 dark:text-neutral-100 leading-tight">{{ $result['nm_penyakit'] ?? $result['deskripsi_panjang'] }}</p>
+                                                <p class="text-[10px] text-neutral-500 uppercase mt-1">{{ $result['kd_penyakit'] ?? $result['kode'] }}</p>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="w-24">
+                                <flux:input label="Kode" wire:model="kd_diagnosa_utama" readonly />
+                            </div>
+                            <flux:button variant="ghost" icon="magnifying-glass" title="Cari ICD-10" @click="$wire.targetIcdField = 'diagnosa_utama'; $dispatch('open-modal', 'icd10-modal')" class="mb-0.5" />
+                        </div>
+
+                        {{-- Diagnosa Sekunder --}}
+                        @for($i = 1; $i <= 4; $i++)
+                            @php $field = 'diagnosa_sekunder' . ($i === 1 ? '' : $i); @endphp
+                            <div class="flex items-end gap-2">
+                                <div class="flex-1 relative">
+                                    <flux:input label="Diagnosa Sekunder {{ $i }}" wire:model.live.debounce.300ms="{{ $field }}" @focus="$wire.activeSearchField = '{{ $field }}'" />
+                                    
+                                    @if($activeSearchField === $field && !empty($autocompleteResults))
+                                        <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
+                                            @foreach($autocompleteResults as $result)
+                                                <button type="button" 
+                                                    wire:click="selectAutocompleteItem('{{ $result['kd_penyakit'] ?? $result['kode'] }}', '{{ $result['nm_penyakit'] ?? $result['deskripsi_panjang'] }}')"
+                                                    class="w-full text-left px-4 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100 dark:border-neutral-800">
+                                                    <p class="text-[11px] font-bold text-neutral-800 dark:text-neutral-100 leading-tight">{{ $result['nm_penyakit'] ?? $result['deskripsi_panjang'] }}</p>
+                                                    <p class="text-[10px] text-neutral-500 uppercase mt-1">{{ $result['kd_penyakit'] ?? $result['kode'] }}</p>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="w-24">
+                                    <flux:input wire:model="kd_{{ $field }}" readonly />
+                                </div>
+                                <flux:button variant="ghost" icon="magnifying-glass" @click="$wire.targetIcdField = '{{ $field }}'; $dispatch('open-modal', 'icd10-modal')" size="sm" />
+                            </div>
+                        @endfor
+                    </div>
+
+                    {{-- Prosedur (ICD-9) --}}
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-black uppercase tracking-widest text-[#4C5C2D] mb-4">Prosedur Akhir (ICD-9 CM)</h3>
+                        
+                        {{-- Prosedur Utama --}}
+                        <div class="flex items-end gap-2">
+                            <div class="flex-1 relative">
+                                <flux:input label="Prosedur Utama" wire:model.live.debounce.300ms="prosedur_utama" placeholder="Ketik minimal 3 karakter..." @focus="$wire.activeSearchField = 'prosedur_utama'" />
+                                
+                                @if($activeSearchField === 'prosedur_utama' && !empty($autocompleteResults))
+                                    <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
+                                        @foreach($autocompleteResults as $result)
+                                            <button type="button" 
+                                                wire:click="selectAutocompleteItem('{{ $result['kode'] ?? $result['kd_penyakit'] }}', '{{ $result['deskripsi_panjang'] ?? $result['nm_penyakit'] }}')"
+                                                class="w-full text-left px-4 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100 dark:border-neutral-800">
+                                                <p class="text-[11px] font-bold text-neutral-800 dark:text-neutral-100 leading-tight">{{ $result['deskripsi_panjang'] ?? $result['nm_penyakit'] }}</p>
+                                                <p class="text-[10px] text-neutral-500 uppercase mt-1">{{ $result['kode'] ?? $result['kd_penyakit'] }}</p>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="w-24">
+                                <flux:input label="Kode" wire:model="kd_prosedur_utama" readonly />
+                            </div>
+                            <flux:button variant="ghost" icon="magnifying-glass" @click="$wire.targetIcdField = 'prosedur_utama'; $dispatch('open-modal', 'icd9-modal')" class="mb-0.5" />
+                        </div>
+
+                        {{-- Prosedur Sekunder --}}
+                        @for($i = 1; $i <= 3; $i++)
+                            @php $field = 'prosedur_sekunder' . ($i === 1 ? '' : $i); @endphp
+                            <div class="flex items-end gap-2">
+                                <div class="flex-1 relative">
+                                    <flux:input label="Prosedur Sekunder {{ $i }}" wire:model.live.debounce.300ms="{{ $field }}" @focus="$wire.activeSearchField = '{{ $field }}'" />
+                                    
+                                    @if($activeSearchField === $field && !empty($autocompleteResults))
+                                        <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
+                                            @foreach($autocompleteResults as $result)
+                                                <button type="button" 
+                                                    wire:click="selectAutocompleteItem('{{ $result['kode'] ?? $result['kd_penyakit'] }}', '{{ $result['deskripsi_panjang'] ?? $result['nm_penyakit'] }}')"
+                                                    class="w-full text-left px-4 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100 dark:border-neutral-800">
+                                                    <p class="text-[11px] font-bold text-neutral-800 dark:text-neutral-100 leading-tight">{{ $result['deskripsi_panjang'] ?? $result['nm_penyakit'] }}</p>
+                                                    <p class="text-[10px] text-neutral-500 uppercase mt-1">{{ $result['kode'] ?? $result['kd_penyakit'] }}</p>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="w-24">
+                                    <flux:input wire:model="kd_{{ $field }}" readonly />
+                                </div>
+                                <flux:button variant="ghost" icon="magnifying-glass" @click="$wire.targetIcdField = '{{ $field }}'; $dispatch('open-modal', 'icd9-modal')" size="sm" />
+                            </div>
+                        @endfor
+
+                        <div class="pt-4">
+                            <flux:input label="Alergi Obat" wire:model="alergi" icon="exclamation-triangle" placeholder="Daftar alergi obat..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-between">
+            <flux:button @click="section = 2" variant="ghost" icon="chevron-left">Ringkasan</flux:button>
+            <flux:button @click="section = 4" variant="ghost" icon-trailing="chevron-right">Selanjutnya: Pemulangan Pasien</flux:button>
+        </div>
+    </div>
+
+    {{-- SECTION 4: PEMULANGAN & FOLLOW UP --}}
+    <div x-show="section === 4" x-transition class="space-y-6">
+        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+             <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
+                <flux:icon name="home" class="w-4 h-4 text-[#4C5C2D]" />
+                <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Pemulangan & Instruksi Lanjutan</h2>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label size="sm">Diet Selama di Rumah</flux:label>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('DIET', 'diet')" wire:loading.attr="disabled" />
+                        </div>
+                        <flux:textarea wire:model="diet" rows="2" />
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label size="sm">Hasil Lab yang Belum Selesai (Pending)</flux:label>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('LAB_PENDING', 'lab_belum')" wire:loading.attr="disabled" />
+                        </div>
+                        <flux:textarea wire:model="lab_belum" rows="2" />
+                    </div>
+                </div>
+                <flux:textarea label="Instruksi / Anjuran & Edukasi (Follow Up)" wire:model="edukasi" rows="3" />
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                    <div class="space-y-4">
+                        <flux:select label="Keadaan Pulang" wire:model="keadaan">
+                            <flux:select.option value="Membaik">Membaik</flux:select.option>
+                            <flux:select.option value="Sembuh">Sembuh</flux:select.option>
+                            <flux:select.option value="Keadaan Khusus">Keadaan Khusus</flux:select.option>
+                            <flux:select.option value="Meninggal">Meninggal</flux:select.option>
+                        </flux:select>
+                        <flux:input wire:model="ket_keadaan" placeholder="Keterangan tambahan..." />
+                    </div>
+                    <div class="space-y-4">
+                        <flux:select label="Cara Keluar" wire:model="cara_keluar">
+                            <flux:select.option value="Atas Izin Dokter">Atas Izin Dokter</flux:select.option>
+                            <flux:select.option value="Pindah RS">Pindah RS</flux:select.option>
+                            <flux:select.option value="Pulang Atas Permintaan Sendiri">Pulang Atas Permintaan Sendiri</flux:select.option>
+                            <flux:select.option value="Dirujuk">Dirujuk</flux:select.option>
+                            <flux:select.option value="Lainnya">Lainnya</flux:select.option>
+                        </flux:select>
+                        <flux:input wire:model="ket_keluar" placeholder="Keterangan tambahan..." />
+                    </div>
+                    <div class="space-y-4">
+                        <flux:select label="Dilanjutkan" wire:model="dilanjutkan">
+                            <flux:select.option value="Kembali Ke RS">Kembali Ke RS</flux:select.option>
+                            <flux:select.option value="RS Lain">RS Lain</flux:select.option>
+                            <flux:select.option value="Dokter Luar">Dokter Luar</flux:select.option>
+                            <flux:select.option value="Puskesmas">Puskesmas</flux:select.option>
+                            <flux:select.option value="Lainnya">Lainnya</flux:select.option>
+                        </flux:select>
+                        <flux:input wire:model="ket_dilanjutkan" placeholder="Keterangan tambahan..." />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                    <flux:input type="datetime-local" label="Tanggal & Jam Kontrol" wire:model="kontrol" />
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label size="sm">Obat Pulang</flux:label>
+                            <flux:button size="xs" variant="ghost" icon="paper-clip" wire:click="openAttachModal('OBAT_PULANG', 'obat_pulang')" wire:loading.attr="disabled" />
+                        </div>
+                        <flux:textarea wire:model="obat_pulang" rows="3" placeholder="Daftar obat yang dibawa pulang..." />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-between">
+            <flux:button @click="section = 3" variant="ghost" icon="chevron-left">Diagnosa</flux:button>
+            <flux:button wire:click="save" variant="primary" icon="check" class="bg-[#4C5C2D] hover:bg-[#3D4A24]">
+                Selesai & Simpan Resume
+            </flux:button>
+        </div>
+    </div>
+
+    {{-- MODAL LOOKUP ICD-10 --}}
+    <flux:modal name="icd10-modal" class="md:w-3/4 lg:w-1/2">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Cari Diagnosa (ICD-10)</flux:heading>
+                <flux:subheading>Masukkan setidaknya 3 karakter untuk mencari diagnosa dari database.</flux:subheading>
+            </div>
+            
+            <flux:input wire:model.live.debounce.300ms="searchIcd10" placeholder="Kode atau Nama Penyakit..." icon="magnifying-glass" autofocus />
+
+            <div class="max-h-96 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase text-[10px] font-bold tracking-widest border-b border-neutral-200">
+                        <tr>
+                            <th class="px-4 py-3">Kode</th>
+                            <th class="px-4 py-3">Nama Diagnosa</th>
+                            <th class="px-4 py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                        @forelse($icd10List as $icd)
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                <td class="px-4 py-3 font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $icd->kd_penyakit }}</td>
+                                <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ $icd->nm_penyakit }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <flux:button variant="ghost" size="sm" icon="plus" @click="$wire.selectIcd10('{{ $icd->kd_penyakit }}', '{{ addslashes($icd->nm_penyakit) }}')">Pilih</flux:button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
+                                    {{ strlen($searchIcd10) < 3 ? 'Ketikkan minimal 3 karakter untuk mencari...' : 'Tidak ada diagnosis ditemukan.' }}
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-end">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Batal</flux:button>
+                </flux:modal.close>
+            </div>
+        </div>
+    </flux:modal>
+
+    {{-- MODAL LOOKUP ICD-9 --}}
+    <flux:modal name="icd9-modal" class="md:w-3/4 lg:w-1/2">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Cari Prosedur (ICD-9 CM)</flux:heading>
+                <flux:subheading>Masukkan setidaknya 3 karakter untuk mencari prosedur dari database.</flux:subheading>
+            </div>
+            
+            <flux:input wire:model.live.debounce.300ms="searchIcd9" placeholder="Kode atau Deskripsi Prosedur..." icon="magnifying-glass" />
+
+            <div class="max-h-96 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase text-[10px] font-bold tracking-widest border-b border-neutral-200">
+                        <tr>
+                            <th class="px-4 py-3">Kode</th>
+                            <th class="px-4 py-3">Deskripsi Prosedur</th>
+                            <th class="px-4 py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                        @forelse($icd9List as $icd)
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                <td class="px-4 py-3 font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $icd->kode }}</td>
+                                <td class="px-4 py-3 text-neutral-700 dark:text-neutral-300">{{ $icd->deskripsi }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <flux:button variant="ghost" size="sm" icon="plus" @click="$wire.selectIcd9('{{ $icd->kode }}', '{{ addslashes($icd->deskripsi) }}')">Pilih</flux:button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
+                                    {{ strlen($searchIcd9) < 3 ? 'Ketikkan minimal 3 karakter untuk mencari...' : 'Tidak ada prosedur ditemukan.' }}
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex justify-end">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Batal</flux:button>
+                </flux:modal.close>
+            </div>
+        </div>
+    </flux:modal>
+
+    {{-- MODAL ATTACH HISTORY --}}
+    <flux:modal name="attach-history-modal" class="md:w-3/4 lg:w-1/2">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Lampirkan Riwayat {{ $currentAttachType }}</flux:heading>
+                <flux:subheading>Pilih satu atau lebih riwayat dari kunjungan ini untuk ditambahkan ke form.</flux:subheading>
+            </div>
+
+            <div class="max-h-96 overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+                <div class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                    @forelse($historyItems as $index => $item)
+                        @php $itemId = $item['id'] ?? $index; @endphp
+                        <div wire:key="history-{{ $itemId }}" class="p-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors flex items-start gap-3">
+                            <flux:checkbox wire:model.live="selectedHistoryItems" value="{{ $itemId }}" class="mt-0.5" />
+                            <div class="flex-1 min-w-0">
+                                @if($currentAttachType === 'SOAP')
+                                    <p class="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">{{ $item['tgl_perawatan'] }} {{ $item['jam_rawat'] }}</p>
+                                    <p class="text-sm text-neutral-700 dark:text-neutral-300 font-bold mb-1 line-clamp-2">Keluhan: {{ $item['keluhan'] }}</p>
+                                    <p class="text-xs text-neutral-500 line-clamp-2 italic">Objektif: {{ $item['pemeriksaan'] }}</p>
+                                @elseif($currentAttachType === 'KELUHAN')
+                                    <p class="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">{{ $item['tgl_perawatan'] }} {{ $item['jam_rawat'] }}</p>
+                                    <p class="text-sm text-neutral-700 dark:text-neutral-300 font-medium">{{ $item['keluhan'] }}</p>
+                                @elseif($currentAttachType === 'PEMERIKSAAN')
+                                    <p class="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">{{ $item['tgl_perawatan'] }} {{ $item['jam_rawat'] }}</p>
+                                    <p class="text-sm text-neutral-700 dark:text-neutral-300 font-medium">{{ $item['pemeriksaan'] }}</p>
+                                @else
+                                    @if(isset($item['date']))
+                                        <p class="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">{{ $item['date'] }}</p>
+                                    @endif
+                                    <p class="text-sm text-neutral-700 dark:text-neutral-300 font-medium">{{ $item['label'] ?? '-' }}</p>
+                                    @if($currentAttachType === 'LAB' && !empty($item['nilai_normal']))
+                                        <p class="text-[11px] text-neutral-500 mt-0.5"><span class="font-bold text-neutral-400">NN:</span> {{ $item['nilai_normal'] }}</p>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-12 flex flex-col items-center justify-center text-center opacity-50">
+                            <flux:icon name="circle-stack" class="w-12 h-12 mb-4" />
+                            <p class="text-sm italic">Tidak ada riwayat {{ $currentAttachType }} ditemukan untuk kunjungan ini.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-neutral-50 dark:bg-neutral-900/50 -mx-6 -mb-6 p-6 border-t border-neutral-200 dark:border-neutral-700">
+                <span class="text-xs text-neutral-500 font-medium">{{ count($selectedHistoryItems) }} item dipilih</span>
+                <div class="flex gap-2">
+                    <flux:modal.close>
+                        <flux:button variant="ghost">Batal</flux:button>
+                    </flux:modal.close>
+                    <flux:button variant="primary" icon="plus" wire:click="confirmAttach" class="bg-[#4C5C2D] hover:bg-[#3D4A24]">
+                        Gunakan Data Terpilih
+                    </flux:button>
+                </div>
+            </div>
+        </div>
+    </flux:modal>
+</div>

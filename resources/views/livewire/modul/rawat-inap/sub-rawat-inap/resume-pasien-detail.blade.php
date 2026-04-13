@@ -1,4 +1,29 @@
-<div class="flex flex-col gap-6 pb-8">
+<div class="flex flex-col gap-6 pb-24 relative" 
+     x-data="{ showScrollTop: false }" 
+     @scroll.window="showScrollTop = (window.pageYOffset > 400)">
+    
+    {{-- Floating Action Buttons --}}
+    <div class="fixed bottom-8 right-8 flex flex-col gap-3 z-50 no-print">
+        {{-- Scroll to Top --}}
+        <button x-show="showScrollTop" 
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-10"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 translate-y-10"
+                @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+                class="w-12 h-12 rounded-full bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 shadow-2xl flex items-center justify-center text-neutral-500 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-all group">
+            <flux:icon name="chevron-up" class="w-6 h-6 group-hover:-translate-y-1 transition-transform" />
+        </button>
+
+        {{-- Quick Edit FAB --}}
+        <a href="{{ route('modul.rawat-inap.sub-rawat-inap.resume-edit', str_replace('/', '-', $resume->no_rawat)) }}" wire:navigate
+           class="w-14 h-14 rounded-full bg-[#4C5C2D] shadow-2xl flex items-center justify-center text-white hover:bg-[#3D4A24] transition-all group active:scale-95">
+            <flux:icon name="pencil-square" class="w-7 h-7 group-hover:rotate-12 transition-transform" />
+        </a>
+    </div>
+
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between no-print">
         <div class="flex items-center gap-3">
@@ -22,6 +47,11 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
+            <a href="{{ route('modul.rawat-inap.sub-rawat-inap.resume-edit', str_replace('/', '-', $resume->no_rawat)) }}" wire:navigate
+               class="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 text-sm font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-100 transition-all shadow-sm">
+                <flux:icon name="pencil-square" class="w-4 h-4" />
+                Edit Resume
+            </a>
             <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-sm font-bold text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 transition-all shadow-sm">
                 <flux:icon name="printer" class="w-4 h-4" />
                 Cetak Resume
@@ -30,10 +60,10 @@
     </div>
 
     {{-- Main Document Container --}}
-    <div class="bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-200 dark:border-neutral-700 shadow-xl overflow-hidden print:border-0 print:shadow-none print:rounded-none">
+    <div class="bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-200 dark:border-neutral-700 shadow-xl print:border-0 print:shadow-none print:rounded-none">
         
-        {{-- Administrative Header --}}
-        <div class="p-8 bg-neutral-50/50 dark:bg-neutral-900/30 border-b border-neutral-100 dark:border-neutral-700 relative overflow-hidden">
+        {{-- Administrative Header (Sticky) --}}
+        <div class="sticky top-0 z-30 p-8 bg-neutral-50/90 dark:bg-neutral-900/90 backdrop-blur-md border-b border-neutral-100 dark:border-neutral-700 rounded-t-3xl relative overflow-hidden shadow-sm">
             <div class="absolute top-0 right-0 p-12 opacity-[0.03] rotate-12 pointer-events-none">
                 <flux:icon name="identification" class="w-64 h-64 text-[#4C5C2D]" />
             </div>
@@ -355,5 +385,5 @@
         .no-print { display: none !important; }
         body { background: white !important; }
         * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    </div>
+    }
 </style>

@@ -14,6 +14,7 @@ class Icd9 extends Model
 
     protected $fillable = [
         'kode',
-        'deskripsi',
+        'deskripsi_panjang',
+        'deskripsi_pendek',
     ];
 }
