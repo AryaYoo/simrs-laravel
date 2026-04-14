@@ -26,13 +26,15 @@
         getMenuUrl(url) {
             if (!url || url === '#') return '#';
             let template = this.routeTemplates[url] || url;
-            return template.replace(':noRawat', this.activePatient.noRawatSlug);
+            // Handle both :noRawat and %3AnoRawat
+            return template.replace(/(:noRawat|%3AnoRawat)/g, this.activePatient.noRawatSlug);
         },
         routeTemplates: {
             resume: '{{ route("modul.rawat-inap.sub-rawat-inap.resume", ":noRawat") }}',
             riwayat: '{{ route("modul.rawat-inap.sub-rawat-inap.riwayat-pasien", ":noRawat") }}',
             detail: '{{ route("modul.rawat-inap.show", ":noRawat") }}',
-            action: '{{ route("modul.rawat-inap.perawatan-tindakan", ":noRawat") }}'
+            action: '{{ route("modul.rawat-inap.perawatan-tindakan", ":noRawat") }}',
+            resepDokter: '{{ route("modul.rawat-inap.sub-rawat-inap.resep-dokter", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -190,7 +192,7 @@
                     { label: 'Data Pemberian Obat/BHP', url: '#' },
                     { label: 'Input Resep Pulang', url: '#' },
                     { label: 'Input No. Resep', url: '#' },
-                    { label: 'Input Resep Dokter', url: '#' },
+                    { label: 'Input Resep Dokter', url: 'resepDokter', target: '_blank' },
                     { label: 'Permintaan Stok Obat Pasien', url: '#' },
                     { label: 'Permintaan Resep Pulang', url: '#' },
                     { label: 'Data Stok Obat Pasien', url: '#' },
