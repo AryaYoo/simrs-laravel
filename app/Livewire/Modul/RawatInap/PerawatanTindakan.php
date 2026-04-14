@@ -58,6 +58,9 @@ class PerawatanTindakan extends Component
 
         $this->tgl_perawatan = now()->format('Y-m-d');
         $this->jam_rawat     = now()->format('H:i:s');
+
+        // SOP #1: Initialize concurrency lock
+        $this->initializeLock($this->regPeriksa);
     }
 
     public function openCreateModal()
@@ -222,6 +225,9 @@ class PerawatanTindakan extends Component
             return;
         }
 
+        // SOP #1: Validate concurrency lock
+        $this->validateLock($this->regPeriksa);
+
         \Illuminate\Support\Facades\DB::beginTransaction();
         try {
             $tarif = \App\Models\JnsPerawatanInap::find($this->kd_jenis_prw_selected);
@@ -279,6 +285,7 @@ class PerawatanTindakan extends Component
             return;
         }
 
+        \Illuminate\Support\Facades\DB::beginTransaction();
         try {
             if ($type == 'drpr') {
                 \App\Models\RawatInapDrpr::where([
@@ -302,8 +309,10 @@ class PerawatanTindakan extends Component
                     'jam_rawat' => $jam,
                 ])->delete();
             }
+            \Illuminate\Support\Facades\DB::commit();
             $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Tindakan dihapus.', 'icon' => 'success']);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
             $this->dispatch('swal', ['title' => 'Gagal!', 'text' => 'Gagal menghapus.', 'icon' => 'error']);
         }
     }
@@ -316,6 +325,7 @@ class PerawatanTindakan extends Component
             return;
         }
 
+        \Illuminate\Support\Facades\DB::beginTransaction();
         try {
             \App\Models\PemeriksaanRanap::where([
                 'no_rawat'      => $this->no_rawat,
@@ -323,8 +333,10 @@ class PerawatanTindakan extends Component
                 'jam_rawat'     => $jam,
             ])->delete();
             
+            \Illuminate\Support\Facades\DB::commit();
             $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Pemeriksaan dihapus.', 'icon' => 'success']);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
             $this->dispatch('swal', ['title' => 'Gagal!', 'text' => 'Gagal menghapus.', 'icon' => 'error']);
         }
     }
@@ -459,7 +471,7 @@ class PerawatanTindakan extends Component
         $rawatInapDrpr = \App\Models\RawatInapDrpr::with(['regPeriksa.pasien:no_rkm_medis,nm_pasien', 'jnsPerawatan:kd_jenis_prw,nm_perawatan', 'dokter:kd_dokter,nm_dokter', 'petugas:nip,nama'])
             ->select('no_rawat', 'kd_jenis_prw', 'kd_dokter', 'nip', 'tgl_perawatan', 'jam_rawat', 'material', 'bhp', 'tarif_tindakandr', 'tarif_tindakanpr', 'kSO', 'kso', 'menejemen', 'biaya_rawat')
             ->where('no_rawat', $this->no_rawat)
-            ->get()->map(fn($i) => [ 
+            ->get()->map(fn(\App\Models\RawatInapDrpr $i) => [ 
                 ...$i->toArray(), 
                 'type' => 'drpr', 
                 'staff_dr' => $i->dokter->nm_dokter ?? '-', 
@@ -480,7 +492,7 @@ class PerawatanTindakan extends Component
         $rawatInapDr = \App\Models\RawatInapDr::with(['regPeriksa.pasien:no_rkm_medis,nm_pasien', 'jnsPerawatan:kd_jenis_prw,nm_perawatan', 'dokter:kd_dokter,nm_dokter'])
             ->select('no_rawat', 'kd_jenis_prw', 'kd_dokter', 'tgl_perawatan', 'jam_rawat', 'material', 'bhp', 'tarif_tindakandr', 'kSO', 'kso', 'menejemen', 'biaya_rawat')
             ->where('no_rawat', $this->no_rawat)
-            ->get()->map(fn($i) => [ 
+            ->get()->map(fn(\App\Models\RawatInapDr $i) => [ 
                 ...$i->toArray(), 
                 'type' => 'dr', 
                 'staff_dr' => $i->dokter->nm_dokter ?? '-', 
@@ -501,7 +513,7 @@ class PerawatanTindakan extends Component
         $rawatInapPr = \App\Models\RawatInapPr::with(['regPeriksa.pasien:no_rkm_medis,nm_pasien', 'jnsPerawatan:kd_jenis_prw,nm_perawatan', 'petugas:nip,nama'])
             ->select('no_rawat', 'kd_jenis_prw', 'nip', 'tgl_perawatan', 'jam_rawat', 'material', 'bhp', 'tarif_tindakanpr', 'kSO', 'kso', 'menejemen', 'biaya_rawat')
             ->where('no_rawat', $this->no_rawat)
-            ->get()->map(fn($i) => [ 
+            ->get()->map(fn(\App\Models\RawatInapPr $i) => [ 
                 ...$i->toArray(), 
                 'type' => 'pr', 
                 'staff_dr' => '-', 

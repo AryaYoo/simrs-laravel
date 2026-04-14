@@ -5,11 +5,11 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login')->name('home');
 
 Route::middleware(['auth'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', \App\Livewire\Dashboard::class)->name('dashboard');
 
     // Role based dashboards
-    Route::view('admin', 'dashboard')->name('admin.dashboard');
-    Route::view('user', 'dashboard')->name('user.dashboard');
+    Route::get('admin', \App\Livewire\Dashboard::class)->name('admin.dashboard');
+    Route::get('user', \App\Livewire\Dashboard::class)->name('user.dashboard');
 
     // User management
     Route::get('users', \App\Livewire\User\Index::class)->name('users.index');

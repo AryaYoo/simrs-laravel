@@ -32,7 +32,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Master Data Medis**: Pengelolaan data Dokter, Poliklinik, Penjamin, & Perujuk.
 - [x] **Master Wilayah**: Manajemen data Provinsi, Kabupaten, Kecamatan, & Kelurahan.
 - [x] **AI OCR KTP**: Ekstraksi otomatis data KTP menggunakan Google Vision API.
-- [x] **Dashboard Statis**: Monitoring pasien aktif (BPJS/Umum/Lainnya).
+- [x] **Dashboard Dinamis**: Monitoring real-time pasien inhouse, tren registrasi harian, distribusi penjamin, dan okupansi bed.
 
 ### 🛌 Modul Rawat Inap (Ranap)
 - [x] **Mega Menu "Fused Tab"**: Navigasi intuitif untuk 50+ layanan pasien.
