@@ -154,7 +154,7 @@
                 label: 'Permintaan',
                 items: [
                     { label: 'Jadwal Operasi', url: '#' },
-                    { label: 'Pemeriksaan Lab', url: '#' },
+                    { label: 'Pemeriksaan Lab', url: '{{ route('modul.rawat-inap.sub-rawat-inap.permintaan-laboratorium', str_replace('/', '-', $no_rawat)) }}' },
                     { label: 'Pemeriksaan Radiologi', url: '#' },
                     { label: 'Informasi Obat', url: '#' },
                     { label: 'Konsultasi Medik', url: '#' },
