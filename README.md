@@ -27,6 +27,7 @@ Sistem Informasi Manajemen Rumah Sakit (SIMRS) modern berbasis **Laravel 11**, *
 Berikut adalah status pengembangan fitur SIMRS Laralite:
 
 ### 🏥 Modul Core & Registrasi
+- [x] **Registrasi Pasien (Baru)**: Form pendaftaran pasien rawat jalan dengan otomatisasi No. Reg & No. Rawat, serta lookup modal premium.
 - [x] **Registrasi Pasien**: List transaksi real-time, pencarian cepat, & filtering.
 - [x] **Master Pasien**: Manajemen identitas dengan integrasi data wilayah & penjamin.
 - [x] **Master Data Medis**: Pengelolaan data Dokter, Poliklinik, Penjamin, & Perujuk.

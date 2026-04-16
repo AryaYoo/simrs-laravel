@@ -19,6 +19,7 @@ class RegPeriksa extends Model
         'jam_reg',
         'kd_dokter',
         'no_rkm_medis',
+        'kd_poli',
         'kd_pj',
         'p_jawab',
         'almt_pj',
@@ -29,6 +30,8 @@ class RegPeriksa extends Model
         'stts_poli',
         'status_bayar',
         'status_lanjut',
+        'umur_daftar',
+        'stts_umur',
     ];
 
     public function dokter()

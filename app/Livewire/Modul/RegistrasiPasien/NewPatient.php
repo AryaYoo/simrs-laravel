@@ -86,10 +86,17 @@ class NewPatient extends Component
     public function copyAddressToPj()
     {
         $this->alamatpj = $this->alamat;
-        $this->kelurahanpj = $this->kd_kel;
-        $this->kecamatanpj = $this->kd_kec;
-        $this->kabupatenpj = $this->kd_kab;
-        $this->propinsipj = $this->kd_prop;
+        
+        // Ambil nama berdasarkan kode yang dipilih
+        $kel = \App\Models\Kelurahan::where('kd_kel', $this->kd_kel)->first();
+        $kec = \App\Models\Kecamatan::where('kd_kec', $this->kd_kec)->first();
+        $kab = \App\Models\Kabupaten::where('kd_kab', $this->kd_kab)->first();
+        $prop = \App\Models\Propinsi::where('kd_prop', $this->kd_prop)->first();
+
+        $this->kelurahanpj = $kel ? $kel->nm_kel : $this->kd_kel;
+        $this->kecamatanpj = $kec ? $kec->nm_kec : $this->kd_kec;
+        $this->kabupatenpj = $kab ? $kab->nm_kab : $this->kd_kab;
+        $this->propinsipj = $prop ? $prop->nm_prop : $this->kd_prop;
         
         $this->dispatch('swal', [
             'title' => 'Berhasil!',
