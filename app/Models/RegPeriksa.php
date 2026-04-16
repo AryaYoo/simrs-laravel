@@ -27,11 +27,11 @@ class RegPeriksa extends Model
         'biaya_reg',
         'stts_daftar',
         'stts',
-        'stts_poli',
+        'status_poli',
         'status_bayar',
         'status_lanjut',
-        'umur_daftar',
-        'stts_umur',
+        'umurdaftar',
+        'sttsumur',
     ];
 
     public function dokter()

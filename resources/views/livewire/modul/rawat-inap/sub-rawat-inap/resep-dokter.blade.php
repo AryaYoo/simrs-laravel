@@ -54,19 +54,19 @@
                         <flux:input type="date" wire:model="tgl_peresepan" class="w-36 !py-1 !text-sm" />
                         
                         <div class="flex items-center gap-1">
-                            <flux:select wire:model="jam_peresepan_jam" class="w-16 !py-1 !text-sm" :disabled="$auto_waktu">
+                            <flux:select wire:model="jam_peresepan_jam" class="w-20 !py-1 !text-sm" :disabled="$auto_waktu">
                                 @for($i = 0; $i < 24; $i++)
                                     <option value="{{ sprintf('%02d', $i) }}">{{ sprintf('%02d', $i) }}</option>
                                 @endfor
                             </flux:select>
-                            
-                            <flux:select wire:model="jam_peresepan_menit" class="w-16 !py-1 !text-sm" :disabled="$auto_waktu">
+                            <span class="text-neutral-400">:</span>
+                            <flux:select wire:model="jam_peresepan_menit" class="w-20 !py-1 !text-sm" :disabled="$auto_waktu">
                                 @for($i = 0; $i < 60; $i++)
                                     <option value="{{ sprintf('%02d', $i) }}">{{ sprintf('%02d', $i) }}</option>
                                 @endfor
                             </flux:select>
-                            
-                            <flux:select wire:model="jam_peresepan_detik" class="w-16 !py-1 !text-sm" :disabled="$auto_waktu">
+                            <span class="text-neutral-400">:</span>
+                            <flux:select wire:model="jam_peresepan_detik" class="w-20 !py-1 !text-sm" :disabled="$auto_waktu">
                                 @for($i = 0; $i < 60; $i++)
                                     <option value="{{ sprintf('%02d', $i) }}">{{ sprintf('%02d', $i) }}</option>
                                 @endfor
@@ -109,8 +109,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
         
         {{-- Section 1: Kiri - Master Obat --}}
-        <div class="lg:col-span-7 space-y-6 flex flex-col h-full">
-            <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col flex-1 overflow-hidden">
+        <div class="lg:col-span-7 space-y-6">
+            <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 flex flex-col overflow-hidden">
                 <div class="p-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 flex flex-col gap-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -126,7 +126,7 @@
                     />
                 </div>
 
-                <div class="flex-1 overflow-x-auto p-0">
+                <div class="flex-1 overflow-x-auto overflow-y-auto p-0" style="max-height: 500px;">
                     <table class="w-full text-[11px] text-left whitespace-nowrap">
                         <thead class="text-neutral-500 bg-neutral-50 dark:bg-neutral-800/80 uppercase border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10 shadow-sm">
                             <tr>
@@ -142,7 +142,13 @@
                         </thead>
                         <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
                             @forelse($this->obatList as $obat)
-                                <tr wire:click="pushToCart('{{ $obat->kode_brng }}', '{{ addslashes($obat->nama_brng) }}', '{{ $obat->kode_sat }}', {{ $obat->harga }}, {{ $obat->stok }})" 
+                                <tr wire:key="obat-{{ $obat->kode_brng }}"
+                                    x-data="{ clicked: false }"
+                                    x-show="!clicked"
+                                    x-transition:leave="transition ease-in duration-300"
+                                    x-transition:leave-start="opacity-100 translate-x-0"
+                                    x-transition:leave-end="opacity-0 translate-x-full"
+                                    @click="clicked = true; setTimeout(() => $wire.pushToCart('{{ $obat->kode_brng }}', '{{ addslashes($obat->nama_brng) }}', '{{ $obat->kode_sat }}', {{ $obat->harga }}, {{ $obat->stok }}), 250)"
                                     class="bg-white dark:bg-neutral-900 hover:bg-[#F1F5E9] dark:hover:bg-[#4C5C2D]/20 transition-colors cursor-pointer group">
                                     <td class="px-3 py-2.5 font-mono text-neutral-500 group-hover:text-[#4C5C2D]">{{ $obat->kode_brng }}</td>
                                     <td class="px-3 py-2.5 font-bold text-neutral-800 dark:text-neutral-200 whitespace-normal min-w-[200px]">{{ $obat->nama_brng }}</td>
@@ -245,8 +251,7 @@
 
                 @if(count($cart) > 0)
                     <div class="p-4 border-t border-[#4C5C2D]/30 bg-[#F1F5E9] dark:bg-[#4C5C2D]/10">
-                        <flux:button wire:click="save" variant="primary" class="w-full bg-[#4C5C2D] hover:bg-[#3D4A24] text-white shadow-md font-bold py-2 h-auto text-sm">
-                            <flux:icon name="paper-airplane" class="w-4 h-4 mr-2" />
+                        <flux:button wire:click="save" variant="primary" icon="paper-airplane" class="w-full bg-[#4C5C2D] hover:bg-[#3D4A24] text-white shadow-md font-bold py-3 h-auto text-sm flex items-center justify-center gap-2">
                             Kirim Permintaan Resep
                         </flux:button>
                     </div>
@@ -278,7 +283,25 @@
                                     </div>
                                 </div>
                                 
-                                <button type="button" wire:click="hapusResep('{{ $resep->no_resep }}')" wire:confirm="Yakin ingin menghapus resep ini secara permanen?" class="text-xs text-red-500 hover:text-white border border-red-200 hover:bg-red-500 hover:border-red-500 px-2.5 py-1 rounded transition-colors font-medium flex items-center gap-1">
+                                <button type="button" 
+                                    @click="
+                                        Swal.fire({
+                                            title: 'Hapus Resep?',
+                                            text: 'Resep #{{ $resep->no_resep }} akan dihapus secara permanen!',
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#4C5C2D',
+                                            cancelButtonColor: '#ef4444',
+                                            confirmButtonText: 'Ya, Hapus!',
+                                            cancelButtonText: 'Batal',
+                                            reverseButtons: true
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $wire.hapusResep('{{ $resep->no_resep }}')
+                                            }
+                                        })
+                                    "
+                                    class="text-xs text-red-500 hover:text-white border border-red-200 hover:bg-red-500 hover:border-red-500 px-2.5 py-1 rounded transition-colors font-medium flex items-center gap-1">
                                     <flux:icon name="trash" class="w-3 h-3" /> Hapus
                                 </button>
                             </div>

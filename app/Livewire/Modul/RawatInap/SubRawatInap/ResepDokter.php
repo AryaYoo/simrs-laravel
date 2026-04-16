@@ -180,6 +180,12 @@ class ResepDokter extends Component
             });
         }
 
+        // Exclude obat yang sudah ada di keranjang
+        $cartKodes = collect($this->cart)->pluck('kode_brng')->filter()->toArray();
+        if (!empty($cartKodes)) {
+            $query->whereNotIn('databarang.kode_brng', $cartKodes);
+        }
+
         return $query->paginate(10);
     }
 
@@ -196,57 +202,64 @@ class ResepDokter extends Component
 
         $this->validateLock($this->regPeriksa);
 
-        DB::beginTransaction();
         try {
-            $tglSekarang = \Carbon\Carbon::parse($this->tgl_peresepan)->format('Ymd');
-            
-            if ($this->auto_nomor || empty($this->no_resep_input)) {
-                // Generate NO RESEP (format YYYYMMDDXXXX)
-                $maxData = ResepObat::where('no_resep', 'like', $tglSekarang . '%')->max('no_resep');
-                if ($maxData) {
-                    $lastNumber = (int) substr($maxData, -4);
-                    $newNumber = $lastNumber + 1;
-                } else {
-                    $newNumber = 1;
-                }
-                $no_resep = $tglSekarang . sprintf('%04d', $newNumber);
-            } else {
-                $no_resep = $this->no_resep_input;
-            }
+            $no_resep = retry(5, function () {
+                return DB::transaction(function () {
+                    $tglSekarang = \Carbon\Carbon::parse($this->tgl_peresepan)->format('Ymd');
+                    
+                    if ($this->auto_nomor || empty($this->no_resep_input)) {
+                        // Generate NO RESEP (format YYYYMMDDXXXX)
+                        // Gunakan lockForUpdate untuk mencegah proses lain membaca MAX yang sama secara bersamaan
+                        $maxData = ResepObat::where('no_resep', 'like', $tglSekarang . '%')
+                            ->lockForUpdate()
+                            ->max('no_resep');
 
-            // Sync waktu bila auto_waktu
-            if ($this->auto_waktu) {
-                $this->jam_peresepan_jam = now()->format('H');
-                $this->jam_peresepan_menit = now()->format('i');
-                $this->jam_peresepan_detik = now()->format('s');
-            }
-            $jamF = sprintf('%02d:%02d:%02d', $this->jam_peresepan_jam, $this->jam_peresepan_menit, $this->jam_peresepan_detik);
+                        if ($maxData) {
+                            $lastNumber = (int) substr($maxData, -4);
+                            $newNumber = $lastNumber + 1;
+                        } else {
+                            $newNumber = 1;
+                        }
+                        $generatedNo = $tglSekarang . sprintf('%04d', $newNumber);
+                    } else {
+                        $generatedNo = $this->no_resep_input;
+                    }
 
-            // Create Header
-            ResepObat::create([
-                'no_resep' => $no_resep,
-                'tgl_perawatan' => '0000-00-00', 
-                'jam' => '00:00:00',
-                'no_rawat' => $this->no_rawat,
-                'kd_dokter' => $this->kd_dokter_peresep,
-                'tgl_peresepan' => $this->tgl_peresepan,
-                'jam_peresepan' => $jamF,
-                'status' => 'ranap',
-                'tgl_penyerahan' => '0000-00-00',
-                'jam_penyerahan' => '00:00:00',
-            ]);
+                    // Sync waktu bila auto_waktu
+                    if ($this->auto_waktu) {
+                        $this->jam_peresepan_jam = now()->format('H');
+                        $this->jam_peresepan_menit = now()->format('i');
+                        $this->jam_peresepan_detik = now()->format('s');
+                    }
+                    $jamF = sprintf('%02d:%02d:%02d', $this->jam_peresepan_jam, $this->jam_peresepan_menit, $this->jam_peresepan_detik);
 
-            // Save details
-            foreach ($this->cart as $item) {
-                ResepDokterModel::create([
-                    'no_resep' => $no_resep,
-                    'kode_brng' => $item['kode_brng'],
-                    'jml' => $item['jml'],
-                    'aturan_pakai' => $item['aturan_pakai'],
-                ]);
-            }
+                    // Create Header
+                    ResepObat::create([
+                        'no_resep' => $generatedNo,
+                        'tgl_perawatan' => $this->tgl_peresepan,
+                        'jam' => $jamF,
+                        'no_rawat' => $this->no_rawat,
+                        'kd_dokter' => $this->kd_dokter_peresep,
+                        'tgl_peresepan' => $this->tgl_peresepan,
+                        'jam_peresepan' => $jamF,
+                        'status' => 'ranap',
+                        'tgl_penyerahan' => $this->tgl_peresepan,
+                        'jam_penyerahan' => $jamF,
+                    ]);
 
-            DB::commit();
+                    // Save details
+                    foreach ($this->cart as $item) {
+                        ResepDokterModel::create([
+                            'no_resep' => $generatedNo,
+                            'kode_brng' => $item['kode_brng'],
+                            'jml' => $item['jml'],
+                            'aturan_pakai' => $item['aturan_pakai'],
+                        ]);
+                    }
+
+                    return $generatedNo;
+                });
+            }, 100); // retry 5 kali dengan jeda 100ms bila gagal karena deadlock/duplicate
 
             $this->cart = [];
             $this->loadSavedResep();
@@ -258,7 +271,6 @@ class ResepDokter extends Component
             ]);
 
         } catch (\Exception $e) {
-            DB::rollBack();
             $this->dispatch('swal', [
                 'title' => 'Gagal',
                 'text' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
