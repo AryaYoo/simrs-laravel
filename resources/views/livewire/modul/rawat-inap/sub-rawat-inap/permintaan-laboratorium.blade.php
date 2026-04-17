@@ -556,11 +556,14 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-20 text-center flex flex-col items-center justify-center text-neutral-400">
-                                <flux:icon name="archive-box" class="w-12 h-12 mb-4 opacity-10" />
-                                <p class="text-sm font-medium italic">Belum ada riwayat permintaan untuk pasien ini.</p>
+                            <td colspan="5" class="py-20">
+                                <div class="flex flex-col items-center justify-center text-center text-neutral-400">
+                                    <flux:icon name="archive-box" class="w-12 h-12 mb-4 opacity-20" />
+                                    <p class="text-sm font-medium italic">Belum ada riwayat permintaan untuk pasien ini.</p>
+                                </div>
                             </td>
                         </tr>
+
                     @endforelse
                 </tbody>
             </table>

@@ -9,15 +9,18 @@ use App\Models\PermintaanLabPa;
 use App\Models\PermintaanPemeriksaanLabPa;
 use App\Models\PermintaanPemeriksaanLab;
 use App\Models\Dokter;
+use App\Livewire\Concerns\WithOptimisticLocking;
 
 use Livewire\Component;
+
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class PermintaanLaboratorium extends Component
 {
-    use WithPagination;
+    use WithPagination, WithOptimisticLocking;
+
 
     public $no_rawat;
     public $regPeriksa;
@@ -72,6 +75,9 @@ class PermintaanLaboratorium extends Component
         $this->pa_tanggal_sebelumnya = date('Y-m-d');
         $this->syncWaktu();
         $this->updatePredictedOrderNo();
+
+        // SOP: Initialize Lock
+        $this->initializeLock($this->regPeriksa);
     }
 
     public function updatedKategori()
@@ -80,6 +86,7 @@ class PermintaanLaboratorium extends Component
         $this->selectedDetails = [];
         $this->searchPemeriksaan = '';
         $this->searchDetail = '';
+        $this->resetPage('masterPage');
         $this->updatePredictedOrderNo();
     }
 
@@ -170,6 +177,9 @@ class PermintaanLaboratorium extends Component
     public function updatedSelectedTests($values)
     {
         $allTemplateIds = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests)
+            ->whereHas('pemeriksaanHeader', function($q) {
+                $q->where('kategori', $this->kategori);
+            })
             ->pluck('id_template')
             ->map(fn($id) => (string)$id)
             ->toArray();
@@ -212,7 +222,10 @@ class PermintaanLaboratorium extends Component
     {
         if (empty($this->selectedTests)) return collect([]);
 
-        $query = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests);
+        $query = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests)
+            ->whereHas('pemeriksaanHeader', function($q) {
+                $q->where('kategori', $this->kategori);
+            });
 
         if ($this->searchDetail) {
             $query->where('Pemeriksaan', 'like', '%' . $this->searchDetail . '%');
@@ -232,12 +245,15 @@ class PermintaanLaboratorium extends Component
 
     public function save()
     {
-        if (empty($this->selectedTests) && empty($this->selectedDetails)) {
+        if (empty($this->selectedTests) && empty($this->selectedDetails) && $this->kategori !== 'PA') {
             $this->dispatch('swal', ['title' => 'Peringatan', 'text' => 'Pilih setidaknya satu pemeriksaan.', 'icon' => 'warning']);
             return;
         }
 
         try {
+            // SOP: Validate Lock
+            $this->validateLock($this->regPeriksa);
+
             DB::transaction(function () {
                 // Generate Fresh No Order (Locking)
                 $dateStr = date('Ymd');
@@ -385,6 +401,9 @@ class PermintaanLaboratorium extends Component
     public function batalPermintaan($noorder)
     {
         try {
+            // SOP: Validate Lock
+            $this->validateLock($this->regPeriksa);
+
             $isPA = str_starts_with($noorder, 'PA');
             $headerTable = $isPA ? 'permintaan_labpa' : 'permintaan_lab';
             $itemTable = $isPA ? 'permintaan_pemeriksaan_labpa' : 'permintaan_pemeriksaan_lab';
