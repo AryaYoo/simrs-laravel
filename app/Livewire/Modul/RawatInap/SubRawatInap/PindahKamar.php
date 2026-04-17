@@ -1,3 +1,7 @@
+<?php
+
+namespace App\Livewire\Modul\RawatInap\SubRawatInap;
+
 use App\Models\Kamar;
 use App\Models\KamarInap;
 use App\Models\RegPeriksa;
