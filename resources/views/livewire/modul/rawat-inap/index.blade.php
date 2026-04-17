@@ -34,7 +34,8 @@
             riwayat: '{{ route("modul.rawat-inap.sub-rawat-inap.riwayat-pasien", ":noRawat") }}',
             detail: '{{ route("modul.rawat-inap.show", ":noRawat") }}',
             action: '{{ route("modul.rawat-inap.perawatan-tindakan", ":noRawat") }}',
-            resepDokter: '{{ route("modul.rawat-inap.sub-rawat-inap.resep-dokter", ":noRawat") }}'
+            resepDokter: '{{ route("modul.rawat-inap.sub-rawat-inap.resep-dokter", ":noRawat") }}',
+            radiologi: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-radiologi", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -167,7 +168,7 @@
                 items: [
                     { label: 'Jadwal Operasi', url: '#' },
                     { label: 'Pemeriksaan Lab', url: '#' },
-                    { label: 'Pemeriksaan Radiologi', url: '#' },
+                    { label: 'Pemeriksaan Radiologi', url: 'radiologi' },
                     { label: 'Informasi Obat', url: '#' },
                     { label: 'Konsultasi Medik', url: '#' },
                 ]
