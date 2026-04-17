@@ -40,7 +40,7 @@ class PindahKamar extends Component
     public function mount(string $no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'kamarInap' => function($q) {
+        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'kamarInap' => function($q) {
             $q->where('tgl_keluar', '0000-00-00')->orderBy('tgl_masuk', 'desc')->orderBy('jam_masuk', 'desc');
         }, 'kamarInap.kamar.bangsal'])
             ->where('no_rawat', $this->no_rawat)
