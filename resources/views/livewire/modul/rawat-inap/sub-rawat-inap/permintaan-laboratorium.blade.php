@@ -592,18 +592,29 @@
                     @if(count($listDokter) > 0)
                         <ul class="divide-y divide-neutral-100 dark:divide-neutral-800">
                             @foreach($listDokter as $dr)
-                                <li>
+                                <li class="group">
                                     <button 
                                         type="button" 
                                         wire:click="selectDokter('{{ $dr['kd_dokter'] }}', '{{ addslashes($dr['nm_dokter']) }}')" 
-                                        class="w-full text-left px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-[#4C5C2D] transition-colors focus:outline-none focus:bg-neutral-50 dark:focus:bg-neutral-800"
+                                        class="w-full text-left px-5 py-4 hover:bg-[#F1F5E9] dark:hover:bg-neutral-800 transition-all duration-200 focus:outline-none group-last:rounded-b-lg"
                                     >
-                                        <div class="font-medium text-sm">{{ $dr['nm_dokter'] }}</div>
-                                        <div class="text-[10px] text-neutral-500 font-mono">{{ $dr['kd_dokter'] }}</div>
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="flex-1">
+                                                <div class="font-semibold text-sm text-neutral-800 dark:text-neutral-200 group-hover:text-[#4C5C2D] transition-colors">
+                                                    {{ $dr['nm_dokter'] }}
+                                                </div>
+                                                <div class="text-[10px] text-neutral-400 font-mono mt-1 flex items-center gap-1">
+                                                    <flux:icon name="identification" class="w-3 h-3 opacity-50" />
+                                                    {{ $dr['kd_dokter'] }}
+                                                </div>
+                                            </div>
+                                            <flux:icon name="chevron-right" class="w-4 h-4 text-neutral-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                                        </div>
                                     </button>
                                 </li>
                             @endforeach
                         </ul>
+
                     @else
                         <div class="p-8 text-center text-neutral-400 italic text-sm">Dokter tidak ditemukan.</div>
                     @endif
