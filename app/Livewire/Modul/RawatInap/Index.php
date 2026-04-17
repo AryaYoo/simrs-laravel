@@ -16,6 +16,7 @@ class Index extends Component
     public string $dari = '';
     public string $sampai = '';
     public string $filterType = '';
+    public string $statusFilter = 'belum_pulang';
     public int $perPage = 20;
 
     public function mount()
@@ -28,6 +29,7 @@ class Index extends Component
     public function updatedDari()    { $this->resetPage(); }
     public function updatedSampai()  { $this->resetPage(); }
     public function updatedPerPage() { $this->resetPage(); }
+    public function updatedStatusFilter() { $this->resetPage(); }
 
     public function setFilter(string $type)
     {
@@ -41,6 +43,12 @@ class Index extends Component
 
         $baseQuery = RegPeriksa::query()
             ->where('status_lanjut', 'Ranap')
+            // Apply Status Filter (Inhouse vs All)
+            ->when($this->statusFilter === 'belum_pulang', function($q) {
+                $q->whereHas('kamarInap', fn($sq) => $sq->where('tgl_keluar', '0000-00-00'));
+            })
+            // Date Filter only applies strictly when status is 'semua', 
+            // or as an additional filter if status is 'belum_pulang' (filter by registration date)
             ->when($this->dari,    fn($q) => $q->whereDate('tgl_registrasi', '>=', $this->dari))
             ->when($this->sampai,  fn($q) => $q->whereDate('tgl_registrasi', '<=', $this->sampai))
             ->where(function ($query) use ($searchTerm) {

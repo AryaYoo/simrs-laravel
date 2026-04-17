@@ -64,11 +64,15 @@ class CheckOut extends Component
             $start = Carbon::parse($this->currentKamarInapArray['tgl_masuk'] . ' ' . $this->currentKamarInapArray['jam_masuk']);
             $end = Carbon::parse($this->tgl_keluar . ' ' . $this->jam_keluar);
             
-            // SIMRS Khanza Standard DATEDIFF
-            $days = $start->diffInDays($end);
+            // SIMRS Khanza Standard: Calculate days
+            // If the difference is less than 24h, but spans across days, it usually counts as one full day.
+            // We'll use ceil on the float difference to ensure partial days count as full days.
+            $diffInDays = $start->diffInMinutes($end) / (60 * 24);
+            $this->lama = (int) ceil($diffInDays);
             
-            // Min 1 day logic for billing if standard practice
-            $this->lama = ($days == 0) ? 1 : $days;
+            // Minimum 1 day logic
+            if ($this->lama <= 0) $this->lama = 1;
+
             $this->total_biaya = $this->lama * $this->currentKamarInapArray['trf_kamar'];
         }
     }
@@ -101,18 +105,13 @@ class CheckOut extends Component
 
         DB::beginTransaction();
         try {
-            // 1. Re-fetch the active model using composite key
-            $activeModel = KamarInap::where([
+            // SOP #4: Use direct query builder update to avoid 'id' column requirement on legacy composite tables
+            $updated = KamarInap::where([
                 'no_rawat' => $this->currentKamarInapArray['no_rawat'],
                 'kd_kamar' => $this->currentKamarInapArray['kd_kamar'],
                 'tgl_masuk' => $this->currentKamarInapArray['tgl_masuk'],
                 'jam_masuk' => $this->currentKamarInapArray['jam_masuk'],
-            ])->first();
-
-            if (!$activeModel) throw new \Exception("Data inap aktif tidak ditemukan untuk sinkronisasi.");
-
-            // 2. Update KamarInap
-            $activeModel->update([
+            ])->update([
                 'tgl_keluar' => $this->tgl_keluar,
                 'jam_keluar' => $this->jam_keluar,
                 'lama' => $this->lama,
@@ -121,8 +120,10 @@ class CheckOut extends Component
                 'diagnosa_akhir' => $this->kd_penyakit_akhir ?: '-',
             ]);
 
+            if (!$updated) throw new \Exception("Gagal memperbarui data inap aktif. Data mungkin sudah berubah.");
+
             // 3. Update Kamar Status to KOSONG
-            Kamar::where('kd_kamar', $activeModel->kd_kamar)->update(['status' => 'KOSONG']);
+            Kamar::where('kd_kamar', $this->currentKamarInapArray['kd_kamar'])->update(['status' => 'KOSONG']);
 
             // 4. Update RegPeriksa (Optional but standard in some Khanza variants)
             // Some hospitals update stts_daftar here, some wait for billing.

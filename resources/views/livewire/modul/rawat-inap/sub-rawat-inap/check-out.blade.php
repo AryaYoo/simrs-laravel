@@ -117,7 +117,7 @@
             {{-- 3. Status Pulang --}}
             <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 <div class="p-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
-                    <flux:icon name="arrow-right-on-rectangle" class="w-5 h-5 text-[#4C5C2D]" />
+                    <flux:icon name="arrow-right-start-on-rectangle" class="w-5 h-5 text-[#4C5C2D]" />
                     <h3 class="font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-tight text-sm">Status Discharge</h3>
                 </div>
                 <div class="p-5">

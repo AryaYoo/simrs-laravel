@@ -326,6 +326,30 @@
     </div>
 
     <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4">
+        {{-- Status Filter Tabs --}}
+        <div class="flex items-center gap-4 mb-6 pb-4 border-b border-neutral-100 dark:border-neutral-700">
+            <div class="flex items-center gap-1 p-1 bg-neutral-100 dark:bg-neutral-900 rounded-xl">
+                <button wire:click="$set('statusFilter', 'belum_pulang')" 
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $statusFilter === 'belum_pulang' ? 'bg-white dark:bg-neutral-800 text-[#4C5C2D] shadow-sm' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200' }}">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        Aktif (Belum Pulang)
+                    </div>
+                </button>
+                <button wire:click="$set('statusFilter', 'semua')" 
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $statusFilter === 'semua' ? 'bg-white dark:bg-neutral-800 text-[#4C5C2D] shadow-sm' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200' }}">
+                    Semua Pasien
+                </button>
+            </div>
+            <div class="hidden md:block h-4 w-px bg-neutral-200 dark:bg-neutral-700"></div>
+            <p class="hidden md:block text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                {{ $statusFilter === 'belum_pulang' ? 'Menampilkan pasien yang saat ini masih dirawat' : 'Menampilkan seluruh riwayat pasien dalam periode tanggal' }}
+            </p>
+        </div>
+
         <div class="flex flex-col sm:flex-row gap-3 mb-4">
             <div class="flex-1">
                 <flux:input wire:model.live.debounce.300ms="search"
