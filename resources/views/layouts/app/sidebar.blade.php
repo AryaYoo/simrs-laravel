@@ -91,7 +91,7 @@
                             <flux:icon name="circle-stack" class="w-4 h-4 flex-shrink-0" />
                             <span x-show="sidebarOpen">{{ __('Master Data') }}</span>
                         </a>
-                        
+
                         <a href="{{ route('admin.settings') }}" wire:navigate
                             class="flex items-center rounded-md text-sm font-medium transition-colors"
                             :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
@@ -113,7 +113,7 @@
                 <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
                     <p
                         style="color: rgba(255,255,255,0.5); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-                        {{ __('Main Menu') }}
+                        {{ __('User Menu') }}
                     </p>
                 </div>
                 <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
@@ -182,7 +182,8 @@
             </div>
 
             {{-- SECONDARY ZONE: BRIDGING & FOOTER (Darker Olive Zone) --}}
-            <div class="flex-1 flex flex-col pt-4" style="background-color: #3E4A25; border-top: 1px solid rgba(0,0,0,0.1);">
+            <div class="flex-1 flex flex-col pt-4"
+                style="background-color: #3E4A25; border-top: 1px solid rgba(0,0,0,0.1);">
                 {{-- SECTION: BRIDGING (Integrated Style) --}}
                 <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
                     <p
@@ -192,19 +193,19 @@
                 </div>
                 <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
 
-                    {{-- Bridging Navigation --}}
-                    <nav class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
-                        <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate
-                            class="flex items-center rounded-md text-sm font-medium transition-colors"
-                            :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
-                            style="color: white; text-decoration: none; background-color: {{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }};"
-                            onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
-                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }}'"
-                            title="{{ __('ERM BPJS') }}">
-                            <flux:icon name="document-text" class="w-4 h-4 flex-shrink-0" />
-                            <span x-show="sidebarOpen">{{ __('Rekam Medis (E-Claim)') }}</span>
-                        </a>
-                    </nav>
+                {{-- Bridging Navigation --}}
+                <nav class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                    <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate
+                        class="flex items-center rounded-md text-sm font-medium transition-colors"
+                        :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                        style="color: white; text-decoration: none; background-color: {{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }};"
+                        onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                        onmouseout="this.style.backgroundColor='{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }}'"
+                        title="{{ __('ERM BPJS') }}">
+                        <flux:icon name="document-text" class="w-4 h-4 flex-shrink-0" />
+                        <span x-show="sidebarOpen">{{ __('Rekam Medis (E-Claim)') }}</span>
+                    </a>
+                </nav>
 
                 <div class="flex-1"></div>
 
@@ -282,7 +283,8 @@
                                         :initials="auth()->user()->initials()" />
                                     <div class="grid flex-1 text-start leading-tight">
                                         <flux:heading class="truncate text-base font-semibold">
-                                            {{ auth()->user()->fullname }}</flux:heading>
+                                            {{ auth()->user()->fullname }}
+                                        </flux:heading>
                                         <flux:text class="truncate text-sm text-zinc-500"
                                             style="text-transform:capitalize;">{{ auth()->user()->role }}</flux:text>
                                     </div>

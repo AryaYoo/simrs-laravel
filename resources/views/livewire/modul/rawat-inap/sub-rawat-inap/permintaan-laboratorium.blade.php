@@ -573,53 +573,46 @@
 
 
     {{-- MODAL LOOKUP DOKTER --}}
-    <flux:modal name="dokter_modal" wire:model="isDokterModalOpen" variant="flyout" class="w-full max-w-lg p-0">
-        <div class="flex flex-col h-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl overflow-hidden shadow-2xl">
-            <div class="px-5 py-4 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between bg-neutral-50 dark:bg-neutral-800">
-                <h3 class="font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
-                    <flux:icon name="user-group" class="w-5 h-5 text-[#4C5C2D]" />
-                    Pilih Dokter Perujuk
-                </h3>
-                <button type="button" wire:click="$set('isDokterModalOpen', false)" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200">
-                    <flux:icon name="x-mark" class="w-5 h-5" />
-                </button>
-            </div>
-            
-            <div class="p-5 flex-1 overflow-hidden flex flex-col">
-                <flux:input wire:model.live.debounce.300ms="searchDokterModal" icon="magnifying-glass" placeholder="Cari nama dokter..." class="mb-4" />
+    <flux:modal name="dokter_modal" wire:model="isDokterModalOpen" variant="flyout" class="w-full max-w-lg">
+        <div class="mb-4">
+            <h3 class="font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-2 text-lg">
+                <flux:icon name="user-group" class="w-5 h-5 text-[#4C5C2D]" />
+                Pilih Dokter Perujuk
+            </h3>
+        </div>
 
-                <div class="flex-1 overflow-y-auto border border-neutral-200 dark:border-neutral-700 rounded-lg">
-                    @if(count($listDokter) > 0)
-                        <ul class="divide-y divide-neutral-100 dark:divide-neutral-800">
-                            @foreach($listDokter as $dr)
-                                <li class="group">
-                                    <button 
-                                        type="button" 
-                                        wire:click="selectDokter('{{ $dr['kd_dokter'] }}', '{{ addslashes($dr['nm_dokter']) }}')" 
-                                        class="w-full text-left px-5 py-4 hover:bg-[#F1F5E9] dark:hover:bg-neutral-800 transition-all duration-200 focus:outline-none group-last:rounded-b-lg"
-                                    >
-                                        <div class="flex items-start justify-between gap-3">
-                                            <div class="flex-1">
-                                                <div class="font-semibold text-sm text-neutral-800 dark:text-neutral-200 group-hover:text-[#4C5C2D] transition-colors">
-                                                    {{ $dr['nm_dokter'] }}
-                                                </div>
-                                                <div class="text-[10px] text-neutral-400 font-mono mt-1 flex items-center gap-1">
-                                                    <flux:icon name="identification" class="w-3 h-3 opacity-50" />
-                                                    {{ $dr['kd_dokter'] }}
-                                                </div>
-                                            </div>
-                                            <flux:icon name="chevron-right" class="w-4 h-4 text-neutral-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+        <flux:input wire:model.live.debounce.300ms="searchDokterModal" icon="magnifying-glass" placeholder="Cari nama dokter..." class="mb-4" />
+
+        <div class="overflow-y-auto border border-neutral-200 dark:border-neutral-700 rounded-lg" style="max-height: 60vh;">
+            @if(count($listDokter) > 0)
+                <ul class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                    @foreach($listDokter as $dr)
+                        <li class="group">
+                            <button 
+                                type="button" 
+                                wire:click="selectDokter('{{ $dr['kd_dokter'] }}', '{{ addslashes($dr['nm_dokter']) }}')" 
+                                class="w-full text-left px-5 py-4 hover:bg-[#F1F5E9] dark:hover:bg-neutral-800 transition-all duration-200 focus:outline-none group-last:rounded-b-lg"
+                            >
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm text-neutral-800 dark:text-neutral-200 group-hover:text-[#4C5C2D] transition-colors">
+                                            {{ $dr['nm_dokter'] }}
                                         </div>
-                                    </button>
-                                </li>
-                            @endforeach
-                        </ul>
-
-                    @else
-                        <div class="p-8 text-center text-neutral-400 italic text-sm">Dokter tidak ditemukan.</div>
-                    @endif
-                </div>
-            </div>
+                                        <div class="text-[10px] text-neutral-400 font-mono mt-1 flex items-center gap-1">
+                                            <flux:icon name="identification" class="w-3 h-3 opacity-50" />
+                                            {{ $dr['kd_dokter'] }}
+                                        </div>
+                                    </div>
+                                    <flux:icon name="chevron-right" class="w-4 h-4 text-neutral-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
+                                </div>
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <div class="p-8 text-center text-neutral-400 italic text-sm">Dokter tidak ditemukan.</div>
+            @endif
         </div>
     </flux:modal>
+
 </div>

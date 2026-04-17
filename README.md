@@ -41,6 +41,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Perawatan & Tindakan**: Input tindakan medis, petugas, dan BHP secara terpadu.
 - [x] **Riwayat Pasien**: Timeline riwayat pemeriksaan dan kunjungan pasien.
 - [x] **Resume Medis**: Form pembuatan resume otomatis dengan sinkronisasi data SOAP/Pemeriksaan, lookup ICD-10 & ICD-9 CM, serta riwayat kontrol.
+- [x] **Pindah & Pulang**: Modul perpindahan kamar pasien (4 opsi logika) dan proses check-out pasien terintegrasi.
 - [x] **E-Resep Ranap**: Digitalisasi resep obat Rawat Inap & Antarmuka Cepat (Split View).
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) telah terintegrasi penuh untuk Rawat Inap. Radiologi & Bank Darah (Next).
 

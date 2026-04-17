@@ -17,6 +17,13 @@
                 <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Detail Pasien Rawat Inap</h1>
             </div>
         </div>
+
+        <div class="flex items-center gap-3">
+            <flux:button icon="arrow-path" :href="route('modul.rawat-inap.sub-rawat-inap.pindah', str_replace('/', '-', $no_rawat))" wire:navigate
+                style="background-color: #4C5C2D; color: white; border: none; font-weight: 700; padding-left: 1.25rem; padding-right: 1.25rem;">Pindah</flux:button>
+            <flux:button icon="arrow-right-start-on-rectangle" :href="route('modul.rawat-inap.sub-rawat-inap.pulang', str_replace('/', '-', $no_rawat))" wire:navigate
+                style="background-color: #6A7E3F; color: white; border: none; font-weight: 700; padding-left: 1.25rem; padding-right: 1.25rem;">Pulang</flux:button>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
