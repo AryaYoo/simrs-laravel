@@ -1,7 +1,6 @@
-<div class="flex flex-col gap-6 pb-24 relative" x-data="{ showScrollTop: false }" @scroll.window="showScrollTop = (window.pageYOffset > 400)">
-    
-    {{-- Header / Breadcrumb --}}
-    <div class="flex items-center justify-between no-print">
+<div class="flex flex-col gap-6 pb-8">
+    {{-- Header --}}
+    <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
             <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate
                class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
@@ -22,269 +21,297 @@
         </div>
     </div>
 
-    {{-- Patient Information Banner --}}
-    <div class="bg-[#4C5C2D] rounded-3xl p-6 text-white shadow-xl shadow-[#4C5C2D]/20 relative overflow-hidden group transition-all duration-500 hover:shadow-2xl hover:shadow-[#4C5C2D]/30 no-print">
-        <div class="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform duration-700">
-            <flux:icon name="identification" class="w-48 h-48" />
-        </div>
-        
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-            <div class="flex items-center gap-5">
-                <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner group-hover:rotate-3 transition-transform">
-                    <flux:icon name="user-circle" class="w-10 h-10" />
+    {{-- Patient Info Banner --}}
+    <div class="bg-[#4C5C2D] text-white p-4 rounded-xl shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <flux:icon name="user" class="w-6 h-6 text-white" />
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="font-mono text-xs bg-white/20 px-2 py-0.5 rounded">{{ $regPeriksa->no_rawat }}</span>
+                    <span class="font-mono text-xs bg-white/20 px-2 py-0.5 rounded">{{ $regPeriksa->no_rkm_medis }}</span>
                 </div>
-                <div>
-                    <div class="flex items-center gap-2 mb-1.5">
-                        <span class="bg-white/20 px-2 py-0.5 rounded text-[10px] font-black tracking-widest uppercase border border-white/10">{{ $regPeriksa->no_rawat }}</span>
-                        <span class="bg-amber-400 text-[#4C5C2D] px-2 py-0.5 rounded text-[10px] font-black tracking-widest uppercase">{{ $regPeriksa->no_rkm_medis }}</span>
-                    </div>
-                    <h2 class="text-2xl font-black uppercase tracking-tighter leading-none">{{ $regPeriksa->pasien->nm_pasien ?? '-' }}</h2>
-                    <p class="text-white/60 text-xs mt-2 font-medium">
-                        DPJP: <span class="text-white font-bold">{{ $regPeriksa->dokter->nm_dokter ?? '-' }}</span> 
-                        <span class="mx-2 opacity-30">|</span> 
-                        Kamar: <span class="text-white font-bold">{{ $regPeriksa->kamarInap->first()->kamar->bangsal->nm_bangsal ?? '-' }} ({{ $regPeriksa->kamarInap->first()->kd_kamar ?? '-' }})</span>
-                    </p>
+                <h2 class="text-lg font-bold">{{ $regPeriksa->pasien->nm_pasien ?? '-' }}</h2>
+                <div class="text-xs text-white/80 mt-1 flex flex-wrap items-center gap-3">
+                    <span class="flex items-center gap-1"><flux:icon name="calendar" class="w-3 h-3"/> {{ $regPeriksa->umurdaftar }} {{ $regPeriksa->sttsumur }}</span>
+                    @if($regPeriksa->kamarInap->first())
+                        <span class="flex items-center gap-1"><flux:icon name="home" class="w-3 h-3"/> {{ $regPeriksa->kamarInap->first()->kamar->bangsal->nm_bangsal ?? '-' }} &middot; {{ $regPeriksa->kamarInap->first()->kd_kamar ?? '-' }}</span>
+                    @endif
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {{-- Main Input Form --}}
-        <div class="lg:col-span-12 space-y-6">
-            <div class="bg-white dark:bg-neutral-800 rounded-3xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/50 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-[#4C5C2D]/10 text-[#4C5C2D] flex items-center justify-center">
-                            <flux:icon name="pencil-square" class="w-5 h-5" />
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-neutral-800 dark:text-neutral-100">Detail Permintaan</h3>
-                            <p class="text-[10px] text-neutral-400 font-bold uppercase tracking-widest">Informasi Waktu & Dokter Perujuk</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                        {{-- Left Column: Basic Info --}}
-                        <div class="md:col-span-5 space-y-6">
-                            <div class="grid grid-cols-2 gap-4">
-                                <flux:field>
-                                    <flux:label class="text-[10px] uppercase font-black text-neutral-400 mb-2">Tanggal Periksa</flux:label>
-                                    <flux:input type="date" wire:model.live="tgl_permintaan" class="rounded-xl border-neutral-200" />
-                                </flux:field>
-                                
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <flux:label class="text-[10px] uppercase font-black text-neutral-400">Jam Periksa</flux:label>
-                                        <div class="flex items-center gap-1">
-                                            <flux:checkbox wire:model.live="auto_waktu" class="size-3" />
-                                            <span class="text-[9px] font-bold text-neutral-400 uppercase">Auto</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <flux:input type="number" wire:model="jam_permintaan_jam" class="w-full text-center font-mono rounded-xl border-neutral-200" min="0" max="23" :disabled="$auto_waktu" />
-                                        <span class="text-neutral-300 font-bold">:</span>
-                                        <flux:input type="number" wire:model="jam_permintaan_menit" class="w-full text-center font-mono rounded-xl border-neutral-200" min="0" max="59" :disabled="$auto_waktu" />
-                                        <span class="text-neutral-300 font-bold">:</span>
-                                        <flux:input type="number" wire:model="jam_permintaan_detik" class="w-full text-center font-mono rounded-xl border-neutral-200" min="0" max="59" :disabled="$auto_waktu" />
-                                    </div>
-                                </flux:field>
-                            </div>
-
-                            <flux:field>
-                                <flux:label class="text-[10px] uppercase font-black text-neutral-400 mb-2">No. Permintaan</flux:label>
-                                <flux:input wire:model="predictedOrderNo" readonly class="bg-neutral-50 dark:bg-neutral-900/50 font-mono font-bold text-[#4C5C2D] rounded-xl border-neutral-200" />
-                                <flux:description class="text-[9px] mt-1 italic">Nomor ini bersifat sementara & akan diverifikasi ulang saat simpan.</flux:description>
-                            </flux:field>
-
-                            <flux:field>
-                                <flux:label class="text-[10px] uppercase font-black text-neutral-400 mb-2">Dokter Perujuk (DPJP)</flux:label>
-                                <div class="flex items-center gap-2">
-                                    <flux:input wire:model="nm_dokter_perujuk" readonly class="flex-1 bg-neutral-50 dark:bg-neutral-900/50 font-bold rounded-xl border-neutral-200 cursor-default" />
-                                    <flux:button icon="paper-clip" variant="ghost" class="rounded-xl border border-neutral-200" wire:click="openDokterModal" />
-                                </div>
-                            </flux:field>
-                        </div>
-
-                        {{-- Right Column: Clinical Content --}}
-                        <div class="md:col-span-7 space-y-6">
-                            <flux:field>
-                                <flux:label class="text-[10px] uppercase font-black text-neutral-400 mb-2">Indikasi Pemeriksaan / Diagnosis Klinis</flux:label>
-                                <flux:textarea wire:model="diagnosa_klinis" rows="3" placeholder="Masukkan diagnosa klinis atau alasan pemeriksaan..." class="rounded-2xl border-neutral-200 resize-none focus:ring-[#4C5C2D] transition-all" />
-                            </flux:field>
-
-                            <flux:field>
-                                <flux:label class="text-[10px] uppercase font-black text-neutral-400 mb-2">Informasi Tambahan Permintaan Foto</flux:label>
-                                <flux:textarea wire:model="informasi_tambahan" rows="3" placeholder="Contoh: Thorax 2 posisi, Cito, dll..." class="rounded-2xl border-neutral-200 resize-none focus:ring-[#4C5C2D] transition-all" />
-                            </flux:field>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Examination Selection Section --}}
-                <div class="border-t border-neutral-100 dark:border-neutral-700">
-                    <div class="p-5 bg-neutral-50/30 dark:bg-neutral-900/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                                <flux:icon name="magnifying-glass" class="w-4 h-4" />
-                            </div>
-                            <h4 class="text-sm font-bold text-neutral-700 dark:text-neutral-300">Pilih Pemeriksaan Radiologi</h4>
-                        </div>
-                        <div class="w-full md:w-96">
-                            <flux:input wire:model.live.debounce.300ms="searchPemeriksaan" placeholder="Cari kode atau nama pemeriksaan..." icon="magnifying-glass" class="rounded-xl" />
-                        </div>
-                    </div>
-
-                    <div class="p-0 overflow-x-auto">
-                        <flux:table :paginate="$pemeriksaanList">
-                            <flux:table.columns>
-                                <flux:table.column width="40px" align="center">P</flux:table.column>
-                                <flux:table.column>Kode Periksa</flux:table.column>
-                                <flux:table.column>Nama Pemeriksaan</flux:table.column>
-                                <flux:table.column align="right">Tarif</flux:table.column>
-                            </flux:table.columns>
-                            <flux:table.rows>
-                                @forelse ($pemeriksaanList as $pemeriksaan)
-                                    <flux:table.row :key="$pemeriksaan->kd_jenis_prw" class="group hover:bg-[#F1F5E9] transition-colors">
-                                        <flux:table.cell align="center">
-                                            <flux:checkbox wire:model.live="selectedTests" value="{{ $pemeriksaan->kd_jenis_prw }}" class="accent-[#4C5C2D]" />
-                                        </flux:table.cell>
-                                        <flux:table.cell class="font-mono text-[11px] font-bold text-neutral-500">{{ $pemeriksaan->kd_jenis_prw }}</flux:table.cell>
-                                        <flux:table.cell class="font-bold text-neutral-700 dark:text-neutral-200 uppercase tracking-tight">{{ $pemeriksaan->nm_perawatan }}</flux:table.cell>
-                                        <flux:table.cell align="right" class="font-mono text-xs text-neutral-500">Rp {{ number_format($pemeriksaan->total_byr) }}</flux:table.cell>
-                                    </flux:table.row>
-                                @empty
-                                    <flux:table.row>
-                                        <flux:table.cell colspan="4" class="py-12 text-center">
-                                            <div class="flex flex-col items-center gap-2 opacity-30">
-                                                <flux:icon name="magnifying-glass" class="w-12 h-12" />
-                                                <p class="text-sm font-bold">Pemeriksaan tidak ditemukan</p>
-                                            </div>
-                                        </flux:table.cell>
-                                    </flux:table.row>
-                                @endforelse
-                            </flux:table.rows>
-                        </flux:table>
-                    </div>
-                </div>
-
-                {{-- Footer Save Area --}}
-                <div class="p-6 bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-100 dark:border-neutral-700 flex items-center justify-between">
-                    <div class="flex flex-col">
-                        <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest leading-none mb-1">Item Terpilih</span>
-                        <div class="flex items-center gap-2">
-                            <div class="px-2 py-0.5 rounded bg-[#4C5C2D] text-white text-xs font-black">{{ count($selectedTests) }}</div>
-                            <span class="text-xs font-bold text-neutral-600 dark:text-neutral-400">Pemeriksaan Radiologi</span>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-3">
-                        <flux:button variant="ghost" class="rounded-xl px-6" :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat))" wire:navigate>Batal</flux:button>
-                        <flux:button wire:click="save" variant="primary" icon="paper-airplane" class="px-8 rounded-xl bg-[#4C5C2D] hover:bg-[#3D4A24] shadow-lg shadow-[#4C5C2D]/30" wire:loading.attr="disabled">
-                            Kirim Permintaan
-                        </flux:button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- History Section --}}
-        <div class="lg:col-span-12 mt-4 no-print">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                    <flux:icon name="clock" class="w-4 h-4" />
-                </div>
-                <h3 class="font-bold text-neutral-800 dark:text-neutral-100">Riwayat Permintaan Radiologi</h3>
-            </div>
-
-            <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-                <flux:table>
-                    <flux:table.columns>
-                        <flux:table.column>No. Permintaan</flux:table.column>
-                        <flux:table.column>Dokter Perujuk</flux:table.column>
-                        <flux:table.column>Waktu Permintaan</flux:table.column>
-                        <flux:table.column>Diagnosis/Info</flux:table.column>
-                        <flux:table.column>Pemeriksaan</flux:table.column>
-                        <flux:table.column align="center">Hapus</flux:table.column>
-                    </flux:table.columns>
-                    
-                    <flux:table.rows>
-                        @forelse($history as $item)
-                        <flux:table.row class="align-top">
-                            <flux:table.cell class="font-mono text-xs font-black text-[#4C5C2D]">{{ $item->noorder }}</flux:table.cell>
-                            <flux:table.cell class="text-xs font-bold">{{ $item->dokter->nm_dokter ?? '-' }}</flux:table.cell>
-                            <flux:table.cell class="text-[10px] text-neutral-500 font-medium">
-                                {{ \Carbon\Carbon::parse($item->tgl_permintaan)->format('d/m/Y') }}<br>
-                                <span class="font-mono">{{ $item->jam_permintaan }}</span>
-                            </flux:table.cell>
-                            <flux:table.cell class="max-w-xs overflow-hidden">
-                                <p class="text-[10px] font-bold text-neutral-400 uppercase tracking-tighter mb-1">Indikasi:</p>
-                                <p class="text-xs text-neutral-600 italic leading-snug truncate">{{ $item->diagnosa_klinis }}</p>
-                            </flux:table.cell>
-                            <flux:table.cell>
-                                <div class="flex flex-wrap gap-1">
-                                    @foreach($item->detailPemeriksaan as $detail)
-                                        <span class="inline-flex px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700 text-[9px] font-bold text-neutral-600 uppercase tracking-tight">
-                                            {{ $detail->pemeriksaan->nm_perawatan ?? $detail->kd_jenis_prw }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </flux:table.cell>
-                            <flux:table.cell align="center">
-                                @if($item->tgl_sampel == '1000-01-01' || $item->tgl_sampel == '0000-00-00')
-                                    <flux:button variant="ghost" size="xs" icon="trash" class="text-rose-500 hover:text-rose-600 hover:bg-rose-50" 
-                                        wire:click="batalPermintaan('{{ $item->noorder }}')" 
-                                        wire:confirm="Yakin ingin membatalkan permintaan ini?" />
-                                @else
-                                    <flux:badge size="xs" color="emerald" class="text-[9px] uppercase font-black tracking-tighter">Processed</flux:badge>
-                                @endif
-                            </flux:table.cell>
-                        </flux:table.row>
-                        @empty
-                        <flux:table.row>
-                            <flux:table.cell colspan="6" class="py-8 text-center opacity-30 text-xs font-bold uppercase tracking-widest">Belum ada riwayat permintaan</flux:table.cell>
-                        </flux:table.row>
-                        @endforelse
-                    </flux:table.rows>
-                </flux:table>
-            </div>
+        <div class="text-left md:text-right text-sm border-t md:border-t-0 md:border-l border-white/20 pt-3 md:pt-0 md:pl-4">
+            <p class="text-white/80 text-xs mb-1">Dokter DPJP</p>
+            <p class="font-semibold">{{ $regPeriksa->dokter->nm_dokter ?? '-' }}</p>
         </div>
     </div>
 
-    {{-- Dokter Search Modal --}}
-    <flux:modal wire:model="isDokterModalOpen" variant="flyout" class="w-full max-w-lg no-print">
+    {{-- Main Content --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {{-- Left Column: Form Fields --}}
+        <div class="lg:col-span-2 space-y-6">
+
+            {{-- Informasi Permintaan --}}
+            <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+                <div class="p-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
+                    <flux:icon name="pencil-square" class="w-5 h-5 text-[#4C5C2D]" />
+                    <h3 class="font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-tight text-sm">Informasi Permintaan</h3>
+                </div>
+                <div class="p-5 space-y-5">
+                    {{-- Row 1: Tanggal & Jam --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <flux:field>
+                            <flux:label>Tanggal Periksa</flux:label>
+                            <flux:input type="date" wire:model.live="tgl_permintaan" />
+                        </flux:field>
+                        <flux:field>
+                            <div class="flex items-center justify-between mb-1">
+                                <flux:label>Jam Periksa</flux:label>
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <flux:checkbox wire:model.live="auto_waktu" class="size-3" />
+                                    <span class="text-[10px] font-bold text-neutral-400 uppercase">Auto</span>
+                                </label>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <flux:input type="number" wire:model="jam_permintaan_jam" class="text-center font-mono" min="0" max="23" :disabled="$auto_waktu" />
+                                <span class="text-neutral-300 font-bold">:</span>
+                                <flux:input type="number" wire:model="jam_permintaan_menit" class="text-center font-mono" min="0" max="59" :disabled="$auto_waktu" />
+                                <span class="text-neutral-300 font-bold">:</span>
+                                <flux:input type="number" wire:model="jam_permintaan_detik" class="text-center font-mono" min="0" max="59" :disabled="$auto_waktu" />
+                            </div>
+                        </flux:field>
+                    </div>
+
+                    {{-- Row 2: No. Permintaan & Dokter --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <flux:field>
+                            <flux:label>No. Permintaan</flux:label>
+                            <flux:input wire:model="predictedOrderNo" readonly class="bg-neutral-50 font-mono font-bold text-[#4C5C2D]" />
+                            <flux:description class="text-[10px] mt-1 italic">Nomor ini bersifat sementara & akan dikunci saat simpan.</flux:description>
+                        </flux:field>
+                        <flux:field>
+                            <flux:label>Dokter Perujuk (DPJP)</flux:label>
+                            <div class="flex gap-2">
+                                <flux:input wire:model="nm_dokter_perujuk" readonly class="flex-1 bg-neutral-50 font-bold" />
+                                <button type="button" wire:click="openDokterModal" class="p-1.5 text-neutral-500 hover:text-[#4C5C2D] transition-colors border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                                    <flux:icon name="paper-clip" class="w-4 h-4" />
+                                </button>
+                            </div>
+                        </flux:field>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Diagnosis & Info Tambahan --}}
+            <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+                <div class="p-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
+                    <flux:icon name="document-text" class="w-5 h-5 text-[#4C5C2D]" />
+                    <h3 class="font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-tight text-sm">Indikasi & Informasi Tambahan</h3>
+                </div>
+                <div class="p-5 space-y-5">
+                    <flux:field>
+                        <flux:label>Indikasi Pemeriksaan / Diagnosis Klinis</flux:label>
+                        <flux:textarea wire:model="diagnosa_klinis" rows="2" placeholder="Masukkan diagnosa klinis atau alasan pemeriksaan..." class="resize-none" />
+                    </flux:field>
+                    <flux:field>
+                        <flux:label>Informasi Tambahan Permintaan Foto</flux:label>
+                        <flux:textarea wire:model="informasi_tambahan" rows="2" placeholder="Contoh: Thorax 2 posisi, Cito, dll..." class="resize-none" />
+                    </flux:field>
+                </div>
+            </div>
+        </div>
+
+        {{-- Right Column: Summary & Submit --}}
         <div class="space-y-6">
-            <header>
-                <flux:heading size="lg">Cari Dokter Perujuk</flux:heading>
-                <flux:subheading>Pilih dokter yang melakukan rujukan/permintaan.</flux:subheading>
-            </header>
-
-            <flux:input wire:model.live.debounce.300ms="searchDokterModal" placeholder="Nama dokter..." icon="magnifying-glass" />
-
-            <div class="flex flex-col gap-2 max-h-[60vh] overflow-y-auto">
-                @foreach($listDokter as $doc)
-                    <button wire:click="selectDokter('{{ $doc['kd_dokter'] }}', '{{ $doc['nm_dokter'] }}')" 
-                        class="w-full p-4 rounded-xl border border-neutral-100 dark:border-neutral-700 hover:border-[#4C5C2D] hover:bg-[#F1F5E9] transition-all flex items-center justify-between group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-400 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors">
-                                <flux:icon name="user" class="w-5 h-5" />
-                            </div>
-                            <div class="text-left">
-                                <p class="text-sm font-bold text-neutral-700 dark:text-neutral-200">{{ $doc['nm_dokter'] }}</p>
-                                <p class="text-[10px] font-mono text-neutral-400 uppercase">{{ $doc['kd_dokter'] }}</p>
-                            </div>
+            {{-- Selected Items Summary --}}
+            <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+                <div class="p-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
+                    <flux:icon name="clipboard-document-list" class="w-5 h-5 text-[#4C5C2D]" />
+                    <h3 class="font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-tight text-sm">Item Terpilih</h3>
+                </div>
+                <div class="p-5">
+                    @if(count($selectedTests) > 0)
+                        <div class="space-y-2 mb-4">
+                            @foreach($selectedTests as $kd)
+                                @php $item = \App\Models\JnsPerawatanRadiologi::find($kd); @endphp
+                                @if($item)
+                                <div class="flex items-center justify-between p-2.5 rounded-lg bg-[#F1F5E9] dark:bg-[#4C5C2D]/10 border border-[#4C5C2D]/10">
+                                    <div>
+                                        <p class="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-tight">{{ $item->nm_perawatan }}</p>
+                                        <p class="text-[10px] font-mono text-neutral-400">{{ $item->kd_jenis_prw }}</p>
+                                    </div>
+                                    <p class="text-xs font-mono font-bold text-neutral-600">Rp {{ number_format($item->total_byr, 0, ',', '.') }}</p>
+                                </div>
+                                @endif
+                            @endforeach
                         </div>
-                        <flux:icon name="chevron-right" class="w-4 h-4 text-neutral-300 group-hover:text-[#4C5C2D]" />
-                    </button>
-                @endforeach
+                        <div class="flex items-center justify-between p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-100 dark:border-neutral-700">
+                            <span class="text-xs font-bold text-neutral-500 uppercase tracking-wider">Total Item</span>
+                            <span class="text-lg font-black text-[#4C5C2D]">{{ count($selectedTests) }}</span>
+                        </div>
+                    @else
+                        <div class="py-8 text-center">
+                            <flux:icon name="clipboard-document-list" class="w-10 h-10 mx-auto mb-2 text-neutral-200" />
+                            <p class="text-xs font-bold text-neutral-400 uppercase tracking-wide">Belum ada pemeriksaan dipilih</p>
+                            <p class="text-[10px] text-neutral-400 mt-1">Pilih dari tabel di bawah</p>
+                        </div>
+                    @endif
+                </div>
             </div>
 
-            <div class="flex justify-end">
-                <flux:button variant="ghost" x-on:click="$modal.close()">Tutup</flux:button>
+            {{-- Submit Button --}}
+            <div class="bg-[#F1F5E9] dark:bg-[#4C5C2D]/10 rounded-xl border border-[#4C5C2D]/20 p-5">
+                <flux:button wire:click="save" variant="primary" icon="paper-airplane" class="w-full !bg-[#4C5C2D] hover:!bg-[#3D4A24] !border-none text-white shadow-md font-bold py-3 h-auto text-sm flex items-center justify-center gap-2" wire:loading.attr="disabled">
+                    Kirim Permintaan Radiologi
+                </flux:button>
+                <p class="text-[10px] text-neutral-500 text-center mt-3">Pastikan data sudah benar sebelum mengirim permintaan.</p>
             </div>
+        </div>
+    </div>
+
+    {{-- Pemeriksaan Selection Table --}}
+    <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+        <div class="p-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <flux:icon name="magnifying-glass" class="w-5 h-5 text-[#4C5C2D]" />
+                <h3 class="font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-tight text-sm">Pilih Pemeriksaan Radiologi</h3>
+            </div>
+            <div class="w-full md:w-80">
+                <flux:input wire:model.live.debounce.300ms="searchPemeriksaan" placeholder="Cari kode atau nama pemeriksaan..." icon="magnifying-glass" />
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <flux:table :paginate="$pemeriksaanList">
+                <flux:table.columns>
+                    <flux:table.column width="40px" align="center">P</flux:table.column>
+                    <flux:table.column>Kode Periksa</flux:table.column>
+                    <flux:table.column>Nama Pemeriksaan</flux:table.column>
+                    <flux:table.column align="right">Tarif</flux:table.column>
+                </flux:table.columns>
+                <flux:table.rows>
+                    @forelse ($pemeriksaanList as $pemeriksaan)
+                        <flux:table.row :key="$pemeriksaan->kd_jenis_prw" class="hover:bg-[#F1F5E9] dark:hover:bg-[#4C5C2D]/10 transition-colors cursor-pointer group">
+                            <flux:table.cell align="center">
+                                <flux:checkbox wire:model.live="selectedTests" value="{{ $pemeriksaan->kd_jenis_prw }}" />
+                            </flux:table.cell>
+                            <flux:table.cell class="font-mono text-xs font-bold text-neutral-500">{{ $pemeriksaan->kd_jenis_prw }}</flux:table.cell>
+                            <flux:table.cell class="font-semibold text-neutral-700 dark:text-neutral-300 uppercase tracking-tight">{{ $pemeriksaan->nm_perawatan }}</flux:table.cell>
+                            <flux:table.cell align="right" class="font-mono text-xs text-neutral-600 dark:text-neutral-400">Rp {{ number_format($pemeriksaan->total_byr, 0, ',', '.') }}</flux:table.cell>
+                        </flux:table.row>
+                    @empty
+                        <flux:table.row>
+                            <flux:table.cell colspan="4" class="py-12 text-center">
+                                <flux:icon name="magnifying-glass" class="w-8 h-8 mx-auto mb-2 opacity-30" />
+                                <p class="text-sm font-medium text-neutral-400">Pemeriksaan tidak ditemukan</p>
+                            </flux:table.cell>
+                        </flux:table.row>
+                    @endforelse
+                </flux:table.rows>
+            </flux:table>
+        </div>
+    </div>
+
+    {{-- History --}}
+    <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+        <div class="p-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/50 flex items-center gap-2">
+            <flux:icon name="clock" class="w-5 h-5 text-[#4C5C2D]" />
+            <h3 class="font-bold text-neutral-700 dark:text-neutral-300 uppercase tracking-tight text-sm">Riwayat Permintaan Radiologi</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <flux:table>
+                <flux:table.columns>
+                    <flux:table.column>No. Permintaan</flux:table.column>
+                    <flux:table.column>Dokter Perujuk</flux:table.column>
+                    <flux:table.column>Waktu</flux:table.column>
+                    <flux:table.column>Indikasi</flux:table.column>
+                    <flux:table.column>Pemeriksaan</flux:table.column>
+                    <flux:table.column align="center">Aksi</flux:table.column>
+                </flux:table.columns>
+
+                <flux:table.rows>
+                    @forelse($history as $item)
+                    <flux:table.row class="align-top">
+                        <flux:table.cell class="font-mono text-xs font-bold text-[#4C5C2D]">{{ $item->noorder }}</flux:table.cell>
+                        <flux:table.cell class="text-xs font-semibold text-neutral-700 dark:text-neutral-300">{{ $item->dokter->nm_dokter ?? '-' }}</flux:table.cell>
+                        <flux:table.cell class="text-xs text-neutral-500">
+                            {{ \Carbon\Carbon::parse($item->tgl_permintaan)->format('d/m/Y') }}
+                            <span class="font-mono text-[10px] text-neutral-400 block">{{ $item->jam_permintaan }}</span>
+                        </flux:table.cell>
+                        <flux:table.cell class="max-w-[200px]">
+                            <p class="text-xs text-neutral-600 leading-snug truncate" title="{{ $item->diagnosa_klinis }}">{{ $item->diagnosa_klinis }}</p>
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            <div class="flex flex-wrap gap-1">
+                                @foreach($item->detailPemeriksaan as $detail)
+                                    <span class="inline-flex px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-neutral-700 text-[9px] font-bold text-neutral-600 dark:text-neutral-400 uppercase tracking-tight">
+                                        {{ $detail->pemeriksaan->nm_perawatan ?? $detail->kd_jenis_prw }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </flux:table.cell>
+                        <flux:table.cell align="center">
+                            @if($item->tgl_sampel == '1000-01-01' || $item->tgl_sampel == '0000-00-00')
+                                <flux:button variant="ghost" size="xs" icon="trash" class="text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                                    wire:click="batalPermintaan('{{ $item->noorder }}')"
+                                    wire:confirm="Yakin ingin membatalkan permintaan ini?" />
+                            @else
+                                <span class="px-2 py-0.5 rounded-full bg-green-100 text-green-600 text-[10px] font-bold border border-green-200">Diproses</span>
+                            @endif
+                        </flux:table.cell>
+                    </flux:table.row>
+                    @empty
+                    <flux:table.row>
+                        <flux:table.cell colspan="6" class="py-12 text-center">
+                            <flux:icon name="clock" class="w-8 h-8 mx-auto mb-2 opacity-20" />
+                            <p class="text-sm font-medium text-neutral-400">Belum ada riwayat permintaan</p>
+                        </flux:table.cell>
+                    </flux:table.row>
+                    @endforelse
+                </flux:table.rows>
+            </flux:table>
+        </div>
+    </div>
+
+    {{-- Modal Dokter Lookup --}}
+    <flux:modal wire:model="isDokterModalOpen" variant="flyout" class="w-full max-w-lg">
+        <div class="mb-4">
+            <h3 class="font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-2 text-lg">
+                <flux:icon name="magnifying-glass" class="w-5 h-5 text-[#4C5C2D]" />
+                Cari Dokter Perujuk
+            </h3>
+            <p class="text-sm text-neutral-500 mt-1">Pilih dokter yang melakukan rujukan/permintaan.</p>
+        </div>
+
+        <flux:input wire:model.live.debounce.300ms="searchDokterModal" icon="magnifying-glass" placeholder="Cari berdasarkan nama dokter..." autofocus class="mb-4" />
+
+        <div class="overflow-y-auto border border-neutral-200 dark:border-neutral-700 rounded-lg" style="max-height: 60vh;">
+            <table class="w-full text-sm text-left">
+                <thead class="text-[10px] text-neutral-500 uppercase bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10 font-bold tracking-wider">
+                    <tr>
+                        <th class="px-4 py-3">Kode</th>
+                        <th class="px-4 py-3">Nama Dokter</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                    @forelse($listDokter as $doc)
+                        <tr class="hover:bg-[#F1F5E9] dark:hover:bg-[#4C5C2D]/10 transition-colors cursor-pointer group"
+                            wire:click="selectDokter('{{ $doc['kd_dokter'] }}', '{{ $doc['nm_dokter'] }}')">
+                            <td class="px-4 py-3 font-mono text-xs text-neutral-500">{{ $doc['kd_dokter'] }}</td>
+                            <td class="px-4 py-3 font-bold text-neutral-800 dark:text-neutral-100 group-hover:text-[#4C5C2D]">{{ $doc['nm_dokter'] }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="px-4 py-12 text-center text-neutral-400">
+                                <flux:icon name="magnifying-glass" class="w-8 h-8 mx-auto mb-2 opacity-30" />
+                                <p class="text-sm font-medium">Ketik nama dokter untuk mencari...</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </flux:modal>
-    
 </div>
