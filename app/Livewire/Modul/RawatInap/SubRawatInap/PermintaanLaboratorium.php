@@ -5,8 +5,11 @@ namespace App\Livewire\Modul\RawatInap\SubRawatInap;
 use App\Models\RegPeriksa;
 use App\Models\JnsPerawatanLab;
 use App\Models\PermintaanLab;
+use App\Models\PermintaanLabPa;
+use App\Models\PermintaanPemeriksaanLabPa;
 use App\Models\PermintaanPemeriksaanLab;
 use App\Models\Dokter;
+
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
@@ -33,13 +36,26 @@ class PermintaanLaboratorium extends Component
     public $jam_permintaan_detik;
     public $auto_waktu = true;
 
+    // Tab & Categories
+    public $kategori = 'PK'; // PK, PA, MB
+    
+    // Left Table (Pemeriksaan Master)
     public $searchPemeriksaan = '';
-    public $cart = [];
+    public $selectedTests = []; // Array of kd_jenis_prw
+    
+    // Right Table (Detail Parameters)
+    public $searchDetail = '';
+    public $selectedDetails = []; // Array of id_template
+    
     public $diagnosa_klinis = '-';
     public $informasi_tambahan = '-';
-    public $kategori = 'PK'; // Default Clinical Pathology
+    public $predictedOrderNo = '';
 
     protected $listeners = ['refresh' => '$refresh'];
+
+    // --- PA Form Fields ---
+    public $pa_pengambilan_bahan, $pa_diperoleh_dengan, $pa_lokasi_jaringan, $pa_diawetkan_dengan;
+    public $pa_pernah_dilakukan_di, $pa_tanggal_sebelumnya, $pa_nomor_sebelumnya, $pa_diagnosa_sebelumnya;
 
     public function mount($no_rawat)
     {
@@ -51,10 +67,50 @@ class PermintaanLaboratorium extends Component
         }
 
         $this->kd_dokter_perujuk = $this->regPeriksa->kd_dokter;
-        $this->nm_dokter_perujuk = $this->regPeriksa->dokter->nm_dokter ?? '';
-
         $this->tgl_permintaan = date('Y-m-d');
+        $this->pa_pengambilan_bahan = date('Y-m-d');
+        $this->pa_tanggal_sebelumnya = date('Y-m-d');
         $this->syncWaktu();
+        $this->updatePredictedOrderNo();
+    }
+
+    public function updatedKategori()
+    {
+        $this->selectedTests = [];
+        $this->selectedDetails = [];
+        $this->searchPemeriksaan = '';
+        $this->searchDetail = '';
+        $this->updatePredictedOrderNo();
+    }
+
+    public function updatePredictedOrderNo()
+    {
+        $dateStr = date('Ymd');
+        $prefix = $this->kategori; // Bisa PK, PA, atau MB
+        $mainTable = $this->kategori === 'PA' ? 'permintaan_labpa' : 'permintaan_lab';
+        
+        // Cari noorder terakhir untuk hari ini dengan prefix yang sesuai
+        $lastOrder = DB::table($mainTable)
+            ->where('noorder', 'like', $prefix . $dateStr . '%')
+            ->orderBy('noorder', 'desc')
+            ->first();
+
+        // Fallback untuk PA karena Khanza terkadang campur atau simpan di tempat berbeda
+        if ($this->kategori === 'PA' && !$lastOrder) {
+            $lastOrder = DB::table('permintaan_lab')
+                ->where('noorder', 'like', 'PA' . $dateStr . '%')
+                ->orderBy('noorder', 'desc')
+                ->first();
+        }
+
+        if ($lastOrder) {
+            $lastNum = (int) substr($lastOrder->noorder, -4);
+            $nextNum = str_pad($lastNum + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            $nextNum = '0001';
+        }
+
+        $this->predictedOrderNo = $prefix . $dateStr . $nextNum;
     }
 
     public function syncWaktu()
@@ -71,6 +127,11 @@ class PermintaanLaboratorium extends Component
         if ($value) {
             $this->syncWaktu();
         }
+    }
+
+    public function updatedTglPermintaan()
+    {
+        $this->updatePredictedOrderNo();
     }
 
     public function openDokterModal()
@@ -103,7 +164,33 @@ class PermintaanLaboratorium extends Component
 
     public function updatedSearchPemeriksaan()
     {
-        $this->resetPage();
+        $this->resetPage('masterPage');
+    }
+
+    public function updatedSelectedTests($values)
+    {
+        $allTemplateIds = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests)
+            ->pluck('id_template')
+            ->map(fn($id) => (string)$id)
+            ->toArray();
+            
+        $this->selectedDetails = $allTemplateIds;
+    }
+
+    public function toggleGroup($kd_jenis_prw)
+    {
+        $groupIds = \App\Models\TemplateLaboratorium::where('kd_jenis_prw', $kd_jenis_prw)
+            ->pluck('id_template')
+            ->map(fn($id) => (string)$id)
+            ->toArray();
+
+        $isAllSelected = collect($groupIds)->every(fn($id) => in_array($id, $this->selectedDetails));
+
+        if ($isAllSelected) {
+            $this->selectedDetails = array_diff($this->selectedDetails, $groupIds);
+        } else {
+            $this->selectedDetails = array_unique(array_merge($this->selectedDetails, $groupIds));
+        }
     }
 
     public function getPemeriksaanListProperty()
@@ -112,127 +199,242 @@ class PermintaanLaboratorium extends Component
             ->where('kategori', $this->kategori);
 
         if ($this->searchPemeriksaan) {
-            $query->where('nm_perawatan', 'like', '%' . $this->searchPemeriksaan . '%');
+            $query->where(function($q) {
+                $q->where('nm_perawatan', 'like', '%' . $this->searchPemeriksaan . '%')
+                  ->orWhere('kd_jenis_prw', 'like', '%' . $this->searchPemeriksaan . '%');
+            });
         }
 
-        // Exclude those already in cart
-        $cartIds = collect($this->cart)->pluck('kd_jenis_prw')->toArray();
-        if (!empty($cartIds)) {
-            $query->whereNotIn('kd_jenis_prw', $cartIds);
-        }
-
-        return $query->paginate(12);
+        return $query->paginate(15, ['*'], 'masterPage');
     }
 
-    public function addToCart($kd_jenis_prw, $nm_perawatan, $total_byr)
+    public function getDetailParametersProperty()
     {
-        // Prevent duplicate in cart
-        if (collect($this->cart)->where('kd_jenis_prw', $kd_jenis_prw)->first()) {
-            return;
+        if (empty($this->selectedTests)) return collect([]);
+
+        $query = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests);
+
+        if ($this->searchDetail) {
+            $query->where('Pemeriksaan', 'like', '%' . $this->searchDetail . '%');
         }
 
-        $this->cart[] = [
-            'kd_jenis_prw' => $kd_jenis_prw,
-            'nm_perawatan' => $nm_perawatan,
-            'total_byr' => $total_byr
-        ];
+        return $query->orderBy('kd_jenis_prw')->orderBy('urut')->get();
     }
 
-    public function removeFromCart($index)
+    public function toggleAllDetails($checked = true)
     {
-        unset($this->cart[$index]);
-        $this->cart = array_values($this->cart);
+        if ($checked) {
+            $this->selectedDetails = $this->detailParameters->pluck('id_template')->map(fn($id) => (string)$id)->toArray();
+        } else {
+            $this->selectedDetails = [];
+        }
     }
 
     public function save()
     {
-        if (empty($this->cart)) {
-            $this->dispatch('swal', [
-                'title' => 'Gagal',
-                'text' => 'Pilih setidaknya satu jenis pemeriksaan.',
-                'icon' => 'error'
-            ]);
+        if (empty($this->selectedTests) && empty($this->selectedDetails)) {
+            $this->dispatch('swal', ['title' => 'Peringatan', 'text' => 'Pilih setidaknya satu pemeriksaan.', 'icon' => 'warning']);
             return;
         }
 
         try {
             DB::transaction(function () {
-                $tglSekarang = Carbon::now();
-                $dateStr = $tglSekarang->format('Ymd');
-                $prefix = $this->kategori . $dateStr;
+                // Generate Fresh No Order (Locking)
+                $dateStr = date('Ymd');
+                $prefix = $this->kategori; 
+                $mainTable = $this->kategori === 'PA' ? 'permintaan_labpa' : 'permintaan_lab';
 
-                // Atomic noorder generation
-                $maxNoStr = DB::table('permintaan_lab')
-                    ->where('noorder', 'like', $prefix . '%')
+                $lastOrder = DB::table($mainTable)
+                    ->where('noorder', 'like', $prefix . $dateStr . '%')
+                    ->orderBy('noorder', 'desc')
                     ->lockForUpdate()
-                    ->max('noorder');
+                    ->first();
 
-                if ($maxNoStr) {
-                    $lastNo = (int) substr($maxNoStr, -4);
-                    $newNo = $lastNo + 1;
+                if ($lastOrder) {
+                    $lastNum = (int) substr($lastOrder->noorder, -4);
+                    $nextNum = str_pad($lastNum + 1, 4, '0', STR_PAD_LEFT);
                 } else {
-                    $newNo = 1;
+                    $nextNum = '0001';
                 }
 
-                $noorder = $prefix . sprintf('%04d', $newNo);
+                $noorder = $prefix . $dateStr . $nextNum;
 
-                // Build time string
                 if ($this->auto_waktu) {
                     $jamF = date('H:i:s');
                 } else {
                     $jamF = sprintf('%02d:%02d:%02d', $this->jam_permintaan_jam, $this->jam_permintaan_menit, $this->jam_permintaan_detik);
                 }
 
-                // Insert into permintaan_lab (header)
-                DB::table('permintaan_lab')->insert([
-                    'noorder' => $noorder,
-                    'no_rawat' => $this->no_rawat,
-                    'tgl_permintaan' => $this->tgl_permintaan,
-                    'jam_permintaan' => $jamF,
-                    'tgl_sampel' => '0000-00-00',
-                    'jam_sampel' => '00:00:00',
-                    'tgl_hasil' => '0000-00-00',
-                    'jam_hasil' => '00:00:00',
-                    'dokter_perujuk' => $this->kd_dokter_perujuk,
-                    'status' => 'ranap',
-                    'informasi_tambahan' => $this->informasi_tambahan ?: '-',
-                    'diagnosa_klinis' => $this->diagnosa_klinis ?: '-'
-                ]);
-
-                // Insert into permintaan_pemeriksaan_lab (detail)
-                foreach ($this->cart as $item) {
-                    DB::table('permintaan_pemeriksaan_lab')->insert([
+                if ($this->kategori === 'PA') {
+                    // Simpan ke Header PA
+                    DB::table('permintaan_labpa')->insert([
                         'noorder' => $noorder,
-                        'kd_jenis_prw' => $item['kd_jenis_prw'],
-                        'stts_bayar' => 'Belum'
+                        'no_rawat' => $this->no_rawat,
+                        'tgl_permintaan' => $this->tgl_permintaan,
+                        'jam_permintaan' => $jamF,
+                        'tgl_sampel' => '1000-01-01',
+                        'jam_sampel' => '00:00:00',
+                        'tgl_hasil' => '1000-01-01',
+                        'jam_hasil' => '00:00:00',
+                        'dokter_perujuk' => $this->kd_dokter_perujuk,
+                        'status' => 'ranap',
+                        'informasi_tambahan' => $this->informasi_tambahan ?: '-',
+                        'diagnosa_klinis' => $this->diagnosa_klinis ?: '-',
+                        'pengambilan_bahan' => $this->pa_pengambilan_bahan,
+                        'diperoleh_dengan' => $this->pa_diperoleh_dengan ?: '-',
+                        'lokasi_jaringan' => $this->pa_lokasi_jaringan ?: '-',
+                        'diawetkan_dengan' => $this->pa_diawetkan_dengan ?: '-',
+                        'pernah_dilakukan_di' => $this->pa_pernah_dilakukan_di ?: '-',
+                        'tanggal_pa_sebelumnya' => $this->pa_tanggal_sebelumnya,
+                        'nomor_pa_sebelumnya' => $this->pa_nomor_sebelumnya ?: '-',
+                        'diagnosa_pa_sebelumnya' => $this->pa_diagnosa_sebelumnya ?: '-'
                     ]);
+
+
+                    // Simpan Item Pemeriksaan PA
+                    foreach ($this->selectedTests as $kd) {
+                        DB::table('permintaan_pemeriksaan_labpa')->insert([
+                            'noorder' => $noorder,
+                            'kd_jenis_prw' => $kd,
+                            'stts_bayar' => 'Belum'
+                        ]);
+                    }
+
+                } else {
+                    // Header PK
+                    DB::table('permintaan_lab')->insert([
+                        'noorder' => $noorder,
+                        'no_rawat' => $this->no_rawat,
+                        'tgl_permintaan' => $this->tgl_permintaan,
+                        'jam_permintaan' => $jamF,
+                        'tgl_sampel' => '1000-01-01',
+                        'jam_sampel' => '00:00:00',
+                        'tgl_hasil' => '1000-01-01',
+                        'jam_hasil' => '00:00:00',
+                        'dokter_perujuk' => $this->kd_dokter_perujuk,
+                        'status' => 'ranap',
+                        'informasi_tambahan' => $this->informasi_tambahan ?: '-',
+                        'diagnosa_klinis' => $this->diagnosa_klinis ?: '-'
+                    ]);
+
+                    // Tests PK
+                    $testIdsToSave = \App\Models\TemplateLaboratorium::whereIn('id_template', $this->selectedDetails)
+                        ->distinct()
+                        ->pluck('kd_jenis_prw');
+
+                    foreach ($testIdsToSave as $kd) {
+                        DB::table('permintaan_pemeriksaan_lab')->insert([
+                            'noorder' => $noorder,
+                            'kd_jenis_prw' => $kd,
+                            'stts_bayar' => 'Belum'
+                        ]);
+                    }
+
+                    // Parameters PK
+                    foreach ($this->selectedDetails as $id_template) {
+                        $template = \App\Models\TemplateLaboratorium::find($id_template);
+                        DB::table('permintaan_detail_permintaan_lab')->insert([
+                            'noorder' => $noorder,
+                            'kd_jenis_prw' => $template->kd_jenis_prw,
+                            'id_template' => $id_template,
+                            'stts_bayar' => 'Belum'
+                        ]);
+                    }
                 }
             });
 
-            $this->dispatch('swal', [
-                'title' => 'Berhasil',
-                'text' => 'Permintaan pemeriksaan laboratorium berhasil dikirim.',
-                'icon' => 'success'
-            ]);
-
-            $this->cart = [];
+            $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Permintaan lab berhasil dikirim.', 'icon' => 'success']);
+            $this->selectedTests = [];
+            $this->selectedDetails = [];
             $this->diagnosa_klinis = '-';
             $this->informasi_tambahan = '-';
-            $this->syncWaktu(); // Update to newest current time if success
+            $this->reset(['pa_diperoleh_dengan', 'pa_lokasi_jaringan', 'pa_diawetkan_dengan', 'pa_pernah_dilakukan_di', 'pa_nomor_sebelumnya', 'pa_diagnosa_sebelumnya']);
+            $this->syncWaktu();
+            $this->updatePredictedOrderNo();
 
         } catch (\Exception $e) {
-            $this->dispatch('swal', [
-                'title' => 'Gagal',
-                'text' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                'icon' => 'error'
-            ]);
+            $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Kesalahan: ' . $e->getMessage(), 'icon' => 'error']);
+        }
+    }
+
+    public function getPemeriksaanHistoryProperty()
+    {
+        $historyPK = PermintaanLab::with(['dokter', 'detailPemeriksaan.pemeriksaan'])
+            ->where('no_rawat', $this->no_rawat)
+            ->get()
+            ->map(function($item) {
+                $item->tipe = 'PK';
+                return $item;
+            });
+
+        $historyPA = PermintaanLabPa::with(['dokter', 'detailPemeriksaan.pemeriksaan'])
+            ->where('no_rawat', $this->no_rawat)
+            ->get()
+            ->map(function($item) {
+                $item->tipe = 'PA';
+                return $item;
+            });
+
+        return $historyPK->concat($historyPA)
+            ->sortByDesc(function($item) {
+                return $item->tgl_permintaan . ' ' . $item->jam_permintaan;
+            })
+            ->values();
+    }
+
+    public function batalPermintaan($noorder)
+    {
+        try {
+            $isPA = str_starts_with($noorder, 'PA');
+            $headerTable = $isPA ? 'permintaan_labpa' : 'permintaan_lab';
+            $itemTable = $isPA ? 'permintaan_pemeriksaan_labpa' : 'permintaan_pemeriksaan_lab';
+            $detailTable = 'permintaan_detail_permintaan_lab'; // Hanya untuk PK
+
+            DB::transaction(function () use ($noorder, $isPA, $headerTable, $itemTable, $detailTable) {
+                $permintaan = DB::table($headerTable)
+                    ->where('noorder', $noorder)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$permintaan) {
+                    throw new \Exception("Data permintaan tidak ditemukan.");
+                }
+
+                // Proteksi: Jika sudah diproses (tgl_sampel di PK, atau status lain di PA)
+                // Di PA, Khanza terkadang tidak punya tgl_sampel yang sama perilakunya, 
+                // tapi kita asumsikan jika tgl_permintaan sudah lama mungkin sudah diproses.
+                // Namun untuk amannya gunakan logika placeholder yang sama jika kolomnya ada.
+                if (isset($permintaan->tgl_sampel)) {
+                    if ($permintaan->tgl_sampel != '1000-01-01' && $permintaan->tgl_sampel != '0000-00-00') {
+                        throw new \Exception("Permintaan tidak dapat dibatalkan karena sudah diproses.");
+                    }
+                }
+
+                // Hapus Items
+                if (!$isPA) {
+                    DB::table($detailTable)->where('noorder', $noorder)->delete();
+                }
+                DB::table($itemTable)->where('noorder', $noorder)->delete();
+                
+                // Hapus Header
+                DB::table($headerTable)->where('noorder', $noorder)->delete();
+            });
+
+            $this->dispatch('swal', ['title' => 'Dibatalkan', 'text' => 'Permintaan lab berhasil dibatalkan.', 'icon' => 'success']);
+            $this->dispatch('refresh');
+
+        } catch (\Exception $e) {
+            $this->dispatch('swal', ['title' => 'Gagal', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
     }
 
     public function render()
+
     {
         return view('livewire.modul.rawat-inap.sub-rawat-inap.permintaan-laboratorium', [
-            'pemeriksaanList' => $this->pemeriksaanList
+            'pemeriksaanList' => $this->pemeriksaanList,
+            'detailParameters' => $this->detailParameters
         ])->layout('layouts.app', ['title' => 'Permintaan Laboratorium']);
     }
+
 }

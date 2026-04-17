@@ -27,4 +27,10 @@ class TemplateLaboratorium extends Model
     {
         return $this->hasMany(DetailPeriksaLab::class, 'id_template', 'id_template');
     }
+
+    public function pemeriksaanHeader()
+    {
+        return $this->belongsTo(JnsPerawatanLab::class, 'kd_jenis_prw', 'kd_jenis_prw');
+    }
 }
+

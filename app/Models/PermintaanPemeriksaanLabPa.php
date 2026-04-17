@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PermintaanPemeriksaanLab extends Model
+class PermintaanPemeriksaanLabPa extends Model
 {
-    protected $table = 'permintaan_pemeriksaan_lab';
+    protected $table = 'permintaan_pemeriksaan_labpa';
     public $timestamps = false;
 
     public function pemeriksaan()
@@ -14,9 +14,8 @@ class PermintaanPemeriksaanLab extends Model
         return $this->belongsTo(JnsPerawatanLab::class, 'kd_jenis_prw', 'kd_jenis_prw');
     }
 
-
     public function permintaan()
     {
-        return $this->belongsTo(PermintaanLab::class, 'noorder', 'noorder');
+        return $this->belongsTo(PermintaanLabPa::class, 'noorder', 'noorder');
     }
 }
