@@ -3,6 +3,13 @@
 
 <head>
     @include('partials.head')
+    <style>
+        /* Force SweetAlert2 container to be above Flux UI Modals/Flyouts */
+        /* Flux UI Flyouts can have very high z-index, so we use a max value */
+        .swal2-container {
+            z-index: 99999999 !important;
+        }
+    </style>
 </head>
 
 <body class="min-h-screen antialiased" style="background-color: #FBF6F6;">
@@ -323,6 +330,19 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('livewire:initialized', () => {
+            // Global Override for SweetAlert2 to handle z-index/top-layer issues with Flux UI
+            const originalSwalFire = Swal.fire;
+            Swal.fire = function(...args) {
+                let options = args[0];
+                if (typeof options === 'object' && !options.target) {
+                    const activeModal = document.querySelector('dialog[open]');
+                    if (activeModal) {
+                        options.target = activeModal;
+                    }
+                }
+                return originalSwalFire.apply(Swal, args);
+            };
+
             Livewire.on('swal', (event) => {
                 const data = event[0];
                 Swal.fire({
