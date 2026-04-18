@@ -151,7 +151,7 @@ class Index extends Component
             return;
         }
 
-        $this->validateLock($this->regPeriksa);
+        $this->validateLock($this->regPeriksa->fresh());
 
         try {
             $data = [

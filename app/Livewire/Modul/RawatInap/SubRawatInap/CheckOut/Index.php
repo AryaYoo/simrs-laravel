@@ -101,7 +101,8 @@ class Index extends Component
         ]);
 
         // SOP #1: Validate lock
-        $this->validateLock($this->regPeriksa);
+        // SOP #1: Validate lock using fresh database state
+        $this->validateLock($this->regPeriksa->fresh());
 
         try {
             $data = [

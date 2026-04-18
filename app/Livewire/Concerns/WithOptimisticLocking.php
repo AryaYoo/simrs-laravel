@@ -28,14 +28,14 @@ trait WithOptimisticLocking
      */
     public function validateLock(Model $model): void
     {
-        // Re-fetch a fresh instance from the database to check its current state
-        $currentModel = $model->newInstance()->newQuery()->find($model->getKey());
-
-        if (!$currentModel) {
+        // We expect the caller to pass a "fresh" instance from the database.
+        // The trait will then compare its current state in DB with the state when it was loaded.
+        
+        if (!$model->exists) {
             throw new \Exception("Daftar data tidak ditemukan atau sudah dihapus oleh pengguna lain.");
         }
 
-        $currentHash = $this->generateModelHash($currentModel);
+        $currentHash = $this->generateModelHash($model);
 
         if ($currentHash !== $this->initialRecordHash) {
             $this->dispatch('swal', [

@@ -199,7 +199,7 @@ class Index extends Component
 
         try {
             // SOP: Validate Lock
-            $this->validateLock($this->regPeriksa);
+            $this->validateLock($this->regPeriksa->fresh());
 
             $data = [
                 'no_rawat' => $this->no_rawat,
@@ -251,7 +251,7 @@ class Index extends Component
     {
         try {
             // SOP: Validate Lock
-            $this->validateLock($this->regPeriksa);
+            $this->validateLock($this->regPeriksa->fresh());
 
             PermintaanLabRepository::batalPermintaan($noorder);
 

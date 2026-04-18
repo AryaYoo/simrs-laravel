@@ -277,7 +277,7 @@ class Edit extends Component
         ]);
 
         // SOP: Validate lock before saving
-        $this->validateLock($this->resume);
+        $this->validateLock($this->resume->fresh());
 
         try {
             $this->resume->update([
@@ -344,7 +344,7 @@ class Edit extends Component
     public function delete()
     {
         // SOP: Validate lock before deleting
-        $this->validateLock($this->resume);
+        $this->validateLock($this->resume->fresh());
 
         try {
             $this->resume->delete();

@@ -225,8 +225,9 @@ class Index extends Component
             return;
         }
 
-        // SOP #1: Validate concurrency lock
-        $this->validateLock($this->regPeriksa);
+        // SOP #1: Validate concurrency lock (Force fresh fetch from DB for accurate identification)
+        $freshRegPeriksa = $this->regPeriksa->fresh();
+        $this->validateLock($freshRegPeriksa);
 
         try {
             $data = [
@@ -349,6 +350,7 @@ class Index extends Component
             }
 
             // Standard SOP: Validate lock before saving to handle concurrency
+            // We pass the $model directly because it was just fetched using composite keys ($no_rawat, $tgl, $jam)
             $this->validateLock($model);
 
             $data = [

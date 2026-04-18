@@ -119,7 +119,8 @@ class Index extends Component
         }
 
         // SOP #1: Validate concurrency lock
-        $this->validateLock($this->regPeriksa);
+        // SOP #1: Validate lock using fresh model state
+        $this->validateLock($this->regPeriksa->fresh());
 
         try {
             $data = [

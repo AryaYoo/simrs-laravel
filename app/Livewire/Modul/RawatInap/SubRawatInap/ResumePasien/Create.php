@@ -250,7 +250,7 @@ class Create extends Component
         ]);
 
         // SOP: Validate lock before saving
-        $this->validateLock($this->regPeriksa);
+        $this->validateLock($this->regPeriksa->fresh());
 
         try {
             ResumePasienRanap::updateOrCreate(

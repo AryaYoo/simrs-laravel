@@ -94,7 +94,8 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 Untuk menjaga kualitas dan integritas data, setiap pengembang **WAJIB** mengikuti standar berikut:
 
 ### 1. Concurrency Control (PENTING!)
-Untuk mencegah data tertimpa (*Lost Update*) saat dua user mengedit data yang sama, gunakan Trait `WithOptimisticLocking`.
+Untuk mencegah data tertimpa (*Lost Update*) saat dua user mengedit data yang sama, gunakan Trait `WithOptimisticLocking`. 
+**Update:** Pastikan selalu menggunakan `$model->fresh()` saat validasi untuk tabel legacy dengan *composite key*.
 
 **Cara Implementasi di Livewire:**
 ```php
