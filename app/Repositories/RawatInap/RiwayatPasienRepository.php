@@ -1,34 +1,29 @@
 <?php
 
-namespace App\Livewire\Modul\RawatInap\SubRawatInap;
+namespace App\Repositories\RawatInap;
 
-use App\Models\PemeriksaanRanap;
 use App\Models\RegPeriksa;
 use App\Models\Penjualan;
-use Livewire\Component;
+use Illuminate\Support\Collection;
+use Carbon\Carbon;
 
-class RiwayatPasien extends Component
+class RiwayatPasienRepository
 {
-    public string $no_rawat;
-    public string $no_rkm_medis;
-    public $activeTab = 'kunjungan';
-
-    public function mount($no_rawat)
+    /**
+     * Get basic registration info for the patient.
+     */
+    public static function getRegPeriksa(string $no_rawat)
     {
-        $this->no_rawat = str_replace('-', '/', $no_rawat);
-        $regPeriksa = RegPeriksa::findOrFail($this->no_rawat);
-        $this->no_rkm_medis = $regPeriksa->no_rkm_medis;
+        return RegPeriksa::with(['pasien.bahasa', 'pasien.cacatFisik'])
+            ->find($no_rawat);
     }
 
-    public function render()
+    /**
+     * Get all visitation history with its massive eager loads.
+     */
+    public static function getRiwayatKunjungan(string $no_rkm_medis)
     {
-        $regPeriksa = RegPeriksa::with(['pasien.bahasa', 'pasien.cacatFisik'])
-            ->find($this->no_rawat);
-
-        $noRawatList = RegPeriksa::where('no_rkm_medis', $this->no_rkm_medis)
-            ->pluck('no_rawat');
-
-        $riwayatKunjungan = RegPeriksa::with([
+        return RegPeriksa::with([
             'dokter',
             'penjab',
             'poliklinik',
@@ -61,18 +56,24 @@ class RiwayatPasien extends Component
             'hasilPemeriksaanUsg.dokter',
             'hasilPemeriksaanUsg.gambar'
         ])
-            ->where('no_rkm_medis', $this->no_rkm_medis)
+            ->where('no_rkm_medis', $no_rkm_medis)
             ->orderByDesc('tgl_registrasi')
             ->orderByDesc('jam_reg')
             ->get();
+    }
 
+    /**
+     * Parse and format the collection into visitation details (table rows).
+     */
+    public static function formatKunjunganDetail(Collection $riwayatKunjungan, string $current_no_rawat): Collection
+    {
         $kunjunganDetail = collect();
-        $riwayatKunjungan->each(function ($kunjungan) use ($kunjunganDetail) {
+        $riwayatKunjungan->each(function ($kunjungan) use ($kunjunganDetail, $current_no_rawat) {
             // Calculate Rounded Age
             $tglLahir = $kunjungan->pasien->tgl_lahir ?? null;
             $tglReg   = $kunjungan->tgl_registrasi;
             $umur     = $tglLahir && $tglReg
-                ? \Carbon\Carbon::parse($tglLahir)->diffInYears(\Carbon\Carbon::parse($tglReg))
+                ? Carbon::parse($tglLahir)->diffInYears(Carbon::parse($tglReg))
                 : '-';
             $kunjungan->umur_daftar = is_numeric($umur) ? $umur . ' Th' : $umur;
 
@@ -87,7 +88,7 @@ class RiwayatPasien extends Component
                 'lokasi'         => $kunjungan->poliklinik->nm_poli ?? $kunjungan->kd_poli,
                 'png_jawab'      => $kunjungan->penjab->png_jawab ?? $kunjungan->kd_pj,
                 'is_first'       => true,
-                'is_current'     => $kunjungan->no_rawat === $this->no_rawat,
+                'is_current'     => $kunjungan->no_rawat === $current_no_rawat,
                 'kd_pj'          => $kunjungan->kd_pj,
             ]);
 
@@ -103,7 +104,7 @@ class RiwayatPasien extends Component
                     'lokasi'         => ($kamar->kamar->kd_kamar ?? '') . ' ' . ($kamar->kamar->bangsal->nm_bangsal ?? ''),
                     'png_jawab'      => $kunjungan->penjab->png_jawab ?? $kunjungan->kd_pj,
                     'is_first'       => false,
-                    'is_current'     => $kunjungan->no_rawat === $this->no_rawat,
+                    'is_current'     => $kunjungan->no_rawat === $current_no_rawat,
                     'kd_pj'          => $kunjungan->kd_pj,
                 ]);
             }
@@ -121,12 +122,20 @@ class RiwayatPasien extends Component
                 });
         });
 
-        $riwayatSoapie = $riwayatKunjungan->map(function ($kunjungan) {
-            $ranap = $kunjungan->pemeriksaanRanap->map(function($item) use ($kunjungan) {
+        return $kunjunganDetail;
+    }
+
+    /**
+     * Group SOAP records by visitation.
+     */
+    public static function formatRiwayatSoapie(Collection $riwayatKunjungan): Collection
+    {
+        return $riwayatKunjungan->map(function ($kunjungan) {
+            $ranap = $kunjungan->pemeriksaanRanap->map(function ($item) use ($kunjungan) {
                 $item->status_lanjut = $kunjungan->status_lanjut;
                 return $item;
             });
-            $ralan = $kunjungan->pemeriksaanRalan->map(function($item) use ($kunjungan) {
+            $ralan = $kunjungan->pemeriksaanRalan->map(function ($item) use ($kunjungan) {
                 $item->status_lanjut = $kunjungan->status_lanjut;
                 return $item;
             });
@@ -134,18 +143,16 @@ class RiwayatPasien extends Component
         })->collapse()->sortByDesc(function ($item) {
             return $item->tgl_perawatan . ' ' . $item->jam_rawat;
         })->groupBy('no_rawat');
+    }
 
-        $riwayatPenjualan = Penjualan::with(['detailJual.barang', 'petugas', 'bangsal'])
-            ->where('no_rkm_medis', $this->no_rkm_medis)
+    /**
+     * Get obat sales history.
+     */
+    public static function getRiwayatPenjualan(string $no_rkm_medis)
+    {
+        return Penjualan::with(['detailJual.barang', 'petugas', 'bangsal'])
+            ->where('no_rkm_medis', $no_rkm_medis)
             ->orderByDesc('tgl_jual')
             ->get();
-
-        return view('livewire.modul.rawat-inap.sub-rawat-inap.riwayat-pasien', [
-            'regPeriksa'       => $regPeriksa,
-            'riwayatKunjungan' => $riwayatKunjungan,
-            'kunjunganDetail'  => $kunjunganDetail,
-            'riwayatSoapie'    => $riwayatSoapie,
-            'riwayatPenjualan' => $riwayatPenjualan,
-        ]);
     }
 }

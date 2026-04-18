@@ -36,14 +36,15 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Dashboard Dinamis**: Monitoring real-time pasien inhouse, tren registrasi harian, distribusi penjamin, dan okupansi bed.
 
 ### 🛌 Modul Rawat Inap (Ranap)
+- [x] **Architecture Refactoring (SRP)**: Implementasi *Feature-Based Folder Structure* & *Repository Pattern* untuk seluruh sub-modul utama demi skalabilitas dan kemudahan *maintenance*.
 - [x] **Mega Menu "Fused Tab"**: Navigasi intuitif untuk 50+ layanan pasien.
-- [x] **Pemeriksaan (SOAPIE)**: Grafik Vital Signs & pencatatan riwayat medis terstruktur.
-- [x] **Perawatan & Tindakan**: Input tindakan medis, petugas, dan BHP secara terpadu.
-- [x] **Riwayat Pasien**: Timeline riwayat pemeriksaan dan kunjungan pasien.
-- [x] **Resume Medis**: Form pembuatan resume otomatis dengan sinkronisasi data SOAP/Pemeriksaan, lookup ICD-10 & ICD-9 CM, serta riwayat kontrol.
-- [x] **Pindah & Pulang**: Modul perpindahan kamar pasien (4 opsi logika) dan proses check-out pasien terintegrasi.
-- [x] **E-Resep Ranap**: Digitalisasi resep obat Rawat Inap & Antarmuka Cepat (Split View).
-- [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) telah terintegrasi penuh untuk Rawat Inap. Radiologi & Bank Darah (Next).
+- [x] **Pemeriksaan (SOAPIE)**: Grafik Vital Signs & pencatatan riwayat medis terstruktur (Refactored to Repository).
+- [x] **Perawatan & Tindakan**: Input tindakan medis, petugas, dan BHP secara terpadu (Refactored to Repository).
+- [x] **Riwayat Pasien**: Timeline riwayat pemeriksaan dan kunjungan pasien (Refactored to Repository).
+- [x] **Resume Medis**: Form pembuatan resume otomatis dengan sinkronisasi data SOAP/Pemeriksaan, lookup ICD-10 & ICD-9 CM, serta riwayat kontrol (Refactored to Feature-Based).
+- [x] **Pindah & Pulang**: Modul perpindahan kamar pasien (4 opsi logika) dan proses check-out pasien terintegrasi (Refactored to Repository).
+- [x] **E-Resep Ranap**: Digitalisasi resep obat Rawat Inap & Antarmuka Cepat (Split View) (Refactored to Repository).
+- [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) & Radiologi telah terintegrasi penuh dengan pola Repository.
 
 ### 🏥 Modul Rawat Jalan (Ralan)
 - [x] **List Pasien Ralan**: Dashboard operasional poli.
@@ -130,6 +131,17 @@ Setiap penambahan fitur baru, perbaikan signifikan, atau modul baru **WAJIB** di
 
 ### 4. Keamanan Database
 Jangan gunakan fitur `Model::create` atau `Model::update` tanpa validasi input yang ketat. Selalu gunakan `DB::beginTransaction()` untuk transaksi yang melibatkan lebih dari satu tabel.
+
+### 5. Single Responsibility Principle (SRP)
+Setiap class, component, atau function **WAJIB** memiliki satu tanggung jawab utama. Jangan menggabungkan logika bisnis, validasi, dan interaksi database dalam satu komponen Livewire yang sama.
+
+#### 5.1 Struktur Folder Berbasis Fitur (Feature-Based Structure)
+Sub-modul dengan operasi yang kompleks (Create, Read, Update, Detail) dilarang digabung dalam satu class file tunggal besar. Buatlah folder khusus untuk fitur tersebut (misal: `app/Livewire/Modul/RawatInap/ResumePasien/Index.php`, `Create.php`, dll).
+
+#### 5.2 Pemisahan Layer Data (Repository Pattern)
+Dilarang menumpuk proses query database berskala besar, `DB::transaction`, atau manipulasi *collection* multi-relasi lebih dari 5 baris di dalam Livewire Component. 
+* Semua operasi *data fetching*/query yang intens harus dipindahkan ke dalam class `Repository` atau `Query` (misal: `app/Repositories/RawatInap/RiwayatPasienRepository.php`).
+* Komponen Livewire harus setipis mungkin, hanya bertugas mengatur state UI dan menerima/mengirim *value* ke layer lain.
 
 ---
 

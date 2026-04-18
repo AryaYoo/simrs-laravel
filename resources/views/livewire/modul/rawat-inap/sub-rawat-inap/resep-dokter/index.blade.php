@@ -2,7 +2,7 @@
     {{-- Main Header --}}
     <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.rawat-inap.index') }}" wire:navigate
+            <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate
                class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
                 <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
             </a>
@@ -11,6 +11,8 @@
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
                     <span class="mx-1">/</span>
                     <a href="{{ route('modul.rawat-inap.index') }}" wire:navigate class="hover:underline">Rawat Inap</a>
+                    <span class="mx-1">/</span>
+                    <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate class="hover:underline">Perawatan</a>
                     <span class="mx-1">/</span>
                     <span>Resep Dokter</span>
                 </nav>

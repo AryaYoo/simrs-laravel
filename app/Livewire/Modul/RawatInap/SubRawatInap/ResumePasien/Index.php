@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Modul\RawatInap\SubRawatInap;
+namespace App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasien;
 
 use App\Models\RegPeriksa;
 use App\Models\ResumePasienRanap;
@@ -9,7 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('layouts.app', ['title' => 'Resume Medis Pasien Rawat Inap'])]
-class ResumePasien extends Component
+class Index extends Component
 {
     use WithPagination;
 
@@ -41,7 +41,7 @@ class ResumePasien extends Component
         ->orderByDesc('no_rawat') // Assuming chronological order by visit number
         ->paginate(10);
 
-        return view('livewire.modul.rawat-inap.sub-rawat-inap.resume-pasien', [
+        return view('livewire.modul.rawat-inap.sub-rawat-inap.resume-pasien.index', [
             'resumes' => $resumes
         ]);
     }

@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Livewire\Modul\RawatInap\SubRawatInap;
+namespace App\Livewire\Modul\RawatInap\SubRawatInap\CheckOut;
 
 use App\Models\Kamar;
 use App\Models\KamarInap;
 use App\Models\RegPeriksa;
 use App\Models\Penyakit;
+use App\Repositories\RawatInap\CheckOutRepository;
 use App\Livewire\Concerns\WithOptimisticLocking;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.app', ['title' => 'Check Out Pasien'])]
-class CheckOut extends Component
+class Index extends Component
 {
     use WithOptimisticLocking;
 
@@ -103,39 +103,24 @@ class CheckOut extends Component
         // SOP #1: Validate lock
         $this->validateLock($this->regPeriksa);
 
-        DB::beginTransaction();
         try {
-            // SOP #4: Use direct query builder update to avoid 'id' column requirement on legacy composite tables
-            $updated = KamarInap::where([
-                'no_rawat' => $this->currentKamarInapArray['no_rawat'],
-                'kd_kamar' => $this->currentKamarInapArray['kd_kamar'],
-                'tgl_masuk' => $this->currentKamarInapArray['tgl_masuk'],
-                'jam_masuk' => $this->currentKamarInapArray['jam_masuk'],
-            ])->update([
+            $data = [
+                'currentKamarInapArray' => $this->currentKamarInapArray,
                 'tgl_keluar' => $this->tgl_keluar,
                 'jam_keluar' => $this->jam_keluar,
                 'lama' => $this->lama,
-                'ttl_biaya' => $this->total_biaya,
+                'total_biaya' => $this->total_biaya,
                 'stts_pulang' => $this->stts_pulang,
-                'diagnosa_akhir' => $this->kd_penyakit_akhir ?: '-',
-            ]);
+                'kd_penyakit_akhir' => $this->kd_penyakit_akhir,
+            ];
 
-            if (!$updated) throw new \Exception("Gagal memperbarui data inap aktif. Data mungkin sudah berubah.");
+            CheckOutRepository::saveCheckOut($data);
 
-            // 3. Update Kamar Status to KOSONG
-            Kamar::where('kd_kamar', $this->currentKamarInapArray['kd_kamar'])->update(['status' => 'KOSONG']);
-
-            // 4. Update RegPeriksa (Optional but standard in some Khanza variants)
-            // Some hospitals update stts_daftar here, some wait for billing.
-            // We'll leave it for now to avoid side effects on billing modules.
-
-            DB::commit();
             $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Proses Check Out berhasil dilakukan.', 'icon' => 'success']);
             
             return $this->redirect(route('modul.rawat-inap.show', str_replace('/', '-', $this->no_rawat)), navigate: true);
 
         } catch (\Exception $e) {
-            DB::rollBack();
             $this->dispatch('swal', ['title' => 'Gagal!', 'text' => 'Terjadi kesalahan: ' . $e->getMessage(), 'icon' => 'error']);
         }
     }
@@ -143,14 +128,11 @@ class CheckOut extends Component
     public function render()
     {
         $listIcd = [];
-        if ($this->isIcdModalOpen && strlen($this->searchIcd) >= 3) {
-            $listIcd = Penyakit::where('kd_penyakit', 'like', '%' . $this->searchIcd . '%')
-                ->orWhere('nm_penyakit', 'like', '%' . $this->searchIcd . '%')
-                ->limit(20)
-                ->get();
+        if ($this->isIcdModalOpen) {
+            $listIcd = CheckOutRepository::searchIcd($this->searchIcd);
         }
 
-        return view('livewire.modul.rawat-inap.sub-rawat-inap.check-out', [
+        return view('livewire.modul.rawat-inap.sub-rawat-inap.check-out.index', [
             'listIcd' => $listIcd,
             'statusOptions' => [
                 'Membaik', 'Sembuh', 'Belum Sembuh', 'Rujuk', 'Meninggal', 'APS', 'Pindah RS', 'Lain-lain'

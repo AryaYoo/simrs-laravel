@@ -1,30 +1,19 @@
 <?php
 
-namespace App\Livewire\Modul\RawatInap\SubRawatInap;
+namespace App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasien;
 
 use App\Models\RegPeriksa;
 use App\Models\ResumePasienRanap;
-use App\Models\PemeriksaanRanap;
-use App\Models\PemeriksaanRalan;
-use App\Models\DetailPeriksaLab;
-use App\Models\PeriksaRadiologi;
-use App\Models\RawatInapDr;
-use App\Models\RawatInapPr;
-use App\Models\RawatInapDrpr;
-use App\Models\DetailPemberianObat;
+use App\Repositories\RawatInap\ResumePasienRepository;
 use App\Models\Penyakit;
 use App\Models\Icd9;
-use App\Models\Diet;
-use App\Models\DetailBeriDiet;
-use App\Models\PermintaanLab;
-use App\Models\ResepPulang;
 use App\Livewire\Concerns\WithOptimisticLocking;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('layouts.app', ['title' => 'Buat Resume Medis'])]
-class ResumePasienCreate extends Component
+class Create extends Component
 {
     use WithPagination, WithOptimisticLocking;
 
@@ -101,43 +90,9 @@ class ResumePasienCreate extends Component
 
     public function autoFillData()
     {
-        // 1. Fetch Latest Clinical Record (Pemeriksaan Ranap)
-        $latestPemeriksaan = PemeriksaanRanap::where('no_rawat', $this->no_rawat)
-            ->orderBy('tgl_perawatan', 'desc')
-            ->orderBy('jam_rawat', 'desc')
-            ->first();
-
-        if ($latestPemeriksaan) {
-            $this->keluhan_utama = $latestPemeriksaan->keluhan;
-            $this->pemeriksaan_fisik = $latestPemeriksaan->pemeriksaan;
-            $this->alergi = $latestPemeriksaan->alergi;
-        }
-
-        // 2. Fetch Latest Ward Info for Diagnosa Awal
-        $rooms = $this->regPeriksa->kamarInap;
-        if ($rooms->count() > 0) {
-            $this->diagnosa_awal = $rooms->first()->diagnosa_awal;
-        }
-
-        // 3. Fetch Existing Diagnoses
-        $diagnoses = $this->regPeriksa->diagnosaPasien;
-        
-        // Primary
-        $primary = $diagnoses->where('prioritas', 1)->first();
-        if ($primary) {
-            $this->kd_diagnosa_utama = $primary->kd_penyakit;
-            $this->diagnosa_utama = $primary->penyakit->nm_penyakit;
-        }
-
-        // Secondaries
-        $secondaries = $diagnoses->where('prioritas', '>', 1)->sortBy('prioritas')->values();
-        for ($i = 0; $i < 4; $i++) {
-            if (isset($secondaries[$i])) {
-                $fieldKd = 'kd_diagnosa_sekunder' . ($i === 0 ? '' : ($i + 1));
-                $fieldName = 'diagnosa_sekunder' . ($i === 0 ? '' : ($i + 1));
-                $this->$fieldKd = $secondaries[$i]->kd_penyakit;
-                $this->$fieldName = $secondaries[$i]->penyakit->nm_penyakit;
-            }
+        $data = ResumePasienRepository::getAutoFillData($this->no_rawat, $this->regPeriksa);
+        foreach ($data as $key => $value) {
+            $this->$key = $value;
         }
     }
 
@@ -225,129 +180,7 @@ class ResumePasienCreate extends Component
         $this->historyItems = [];
 
         try {
-            if ($type === 'KELUHAN') {
-                // Keluhan Utama diambil dari pemeriksaan_ralan (kolom keluhan)
-                $this->historyItems = PemeriksaanRalan::where('no_rawat', $this->no_rawat)
-                    ->orderBy('tgl_perawatan', 'desc')
-                    ->orderBy('jam_rawat', 'desc')
-                    ->get()
-                    ->map(fn($item) => [
-                        'id' => 'ralan_kel_' . $item->tgl_perawatan . '_' . $item->jam_rawat,
-                        'keluhan' => $item->keluhan,
-                        'tgl_perawatan' => $item->tgl_perawatan,
-                        'jam_rawat' => $item->jam_rawat,
-                    ])->values()->toArray();
-            } elseif ($type === 'PEMERIKSAAN') {
-                // Pemeriksaan Fisik diambil dari pemeriksaan_ralan
-                $this->historyItems = PemeriksaanRalan::where('no_rawat', $this->no_rawat)
-                    ->orderBy('tgl_perawatan', 'desc')
-                    ->orderBy('jam_rawat', 'desc')
-                    ->get()
-                    ->map(fn($item) => [
-                        'id' => 'ralan_' . $item->tgl_perawatan . '_' . $item->jam_rawat,
-                        'pemeriksaan' => $item->pemeriksaan,
-                        'tgl_perawatan' => $item->tgl_perawatan,
-                        'jam_rawat' => $item->jam_rawat,
-                    ])->values()->toArray();
-            } elseif ($type === 'SOAP') {
-                $this->historyItems = PemeriksaanRanap::where('no_rawat', $this->no_rawat)
-                    ->orderBy('tgl_perawatan', 'desc')
-                    ->orderBy('jam_rawat', 'desc')
-                    ->get()
-                    ->map(fn($item) => [
-                        'id' => 'ranap_soap_' . $item->tgl_perawatan . '_' . $item->jam_rawat,
-                        'keluhan' => $item->keluhan,
-                        'pemeriksaan' => $item->pemeriksaan,
-                        'tgl_perawatan' => $item->tgl_perawatan,
-                        'jam_rawat' => $item->jam_rawat,
-                    ])->values()->toArray();
-            } elseif ($type === 'LAB') {
-                $this->historyItems = DetailPeriksaLab::with('template')
-                    ->where('no_rawat', $this->no_rawat)
-                    ->get()
-                    ->map(function($item) {
-                        $ref = [];
-                        if ($item->template?->nilai_rujukan_ld) $ref[] = "L:" . $item->template->nilai_rujukan_ld;
-                        if ($item->template?->nilai_rujukan_pd) $ref[] = "P:" . $item->template->nilai_rujukan_pd;
-                        
-                        $nilaiNormal = !empty($ref) ? implode("; ", $ref) : null;
-                        
-                        return [
-                            'id' => $item->id_template . '_' . $item->tgl_periksa . '_' . $item->jam,
-                            'name' => $item->template?->Pemeriksaan ?? '-',
-                            'nilai' => $item->nilai,
-                            'satuan' => $item->template?->satuan ?? '',
-                            'label' => ($item->template?->Pemeriksaan ?? '-') . ': ' . $item->nilai . ' ' . ($item->template?->satuan ?? ''),
-                            'nilai_normal' => $nilaiNormal,
-                            'date' => $item->tgl_periksa . ' ' . $item->jam
-                        ];
-                    })->values()->toArray();
-            } elseif ($type === 'RAD') {
-                $this->historyItems = PeriksaRadiologi::with('jnsPerawatan')
-                    ->where('no_rawat', $this->no_rawat)
-                    ->get()
-                    ->map(fn($item) => [
-                        'id' => $item->kd_jenis_prw . '_' . $item->tgl_periksa . '_' . $item->jam,
-                        'label' => ($item->jnsPerawatan?->nm_perawatan ?? '-') . ' (Hasil: ' . $item->hasil . ')',
-                        'text' => $item->hasil,
-                        'date' => $item->tgl_periksa . ' ' . $item->jam
-                    ])->values()->toArray();
-            } elseif ($type === 'TINDAKAN') {
-                // Combine from 3 tables
-                $dr = RawatInapDr::with('jnsPerawatan')->where('no_rawat', $this->no_rawat)->get();
-                $pr = RawatInapPr::with('jnsPerawatan')->where('no_rawat', $this->no_rawat)->get();
-                $drpr = RawatInapDrpr::with('jnsPerawatan')->where('no_rawat', $this->no_rawat)->get();
-
-                $this->historyItems = $dr->concat($pr)->concat($drpr)
-                    ->map(fn($item) => [
-                        'id' => $item->kd_jenis_prw . '_' . $item->tgl_perawatan . '_' . ($item->jam_rawat ?? ''),
-                        'label' => $item->jnsPerawatan?->nm_perawatan ?? '-',
-                        'date' => $item->tgl_perawatan . ' ' . ($item->jam_rawat ?? '')
-                    ])->values()->toArray();
-            } elseif ($type === 'OBAT') {
-                $this->historyItems = DetailPemberianObat::with('barang')
-                    ->where('no_rawat', $this->no_rawat)
-                    ->get()
-                    ->groupBy('kode_brng')
-                    ->map(fn(\Illuminate\Support\Collection $items, $kode) => [
-                        'id' => $kode,
-                        'label' => ($items->first()->barang?->nama_brng ?? '-') . ' (Total: ' . $items->sum('jml') . ' ' . ($items->first()->barang?->kode_sat ?? '') . ')',
-                        'name' => $items->first()->barang?->nama_brng ?? '-'
-                    ])->values()->toArray();
-            } elseif ($type === 'DIET') {
-                $this->historyItems = DetailBeriDiet::with('diet')
-                    ->where('no_rawat', $this->no_rawat)
-                    ->orderBy('tanggal', 'desc')
-                    ->get()
-                    ->map(fn($item) => [
-                        'id' => $item->kd_diet . '_' . $item->tanggal . '_' . $item->waktu,
-                        'label' => ($item->diet?->nama_diet ?? '-') . ' (' . $item->tanggal . ' ' . $item->waktu . ')',
-                        'name' => $item->diet?->nama_diet ?? '-',
-                        'date' => $item->tanggal . ' ' . $item->waktu
-                    ])->values()->toArray();
-            } elseif ($type === 'LAB_PENDING') {
-                $this->historyItems = PermintaanLab::with('detailPemeriksaan.jnsPemeriksaan')
-                    ->where('no_rawat', $this->no_rawat)
-                    ->orderBy('tgl_permintaan', 'desc')
-                    ->get()
-                    ->map(fn($item) => [
-                        'id' => $item->noorder,
-                        'label' => 'Order: ' . $item->noorder . ' (' . $item->detailPemeriksaan->map(fn($d) => $d->jnsPemeriksaan->nm_perawatan ?? '-')->implode(', ') . ')',
-                        'text' => $item->detailPemeriksaan->map(fn($d) => $d->jnsPemeriksaan->nm_perawatan ?? '-')->implode(', '),
-                        'date' => $item->tgl_permintaan . ' ' . $item->jam_permintaan
-                    ])->values()->toArray();
-            } elseif ($type === 'OBAT_PULANG') {
-                $this->historyItems = ResepPulang::with('barang')
-                    ->where('no_rawat', $this->no_rawat)
-                    ->orderBy('tanggal', 'desc')
-                    ->get()
-                    ->map(fn($item) => [
-                        'id' => $item->kode_brng . '_' . $item->tanggal . '_' . $item->jam,
-                        'label' => ($item->barang?->nama_brng ?? '-') . ' (' . $item->dosis . ')',
-                        'text' => ($item->barang?->nama_brng ?? '-') . ' (' . $item->dosis . ')',
-                        'date' => $item->tanggal . ' ' . $item->jam
-                    ])->values()->toArray();
-            }
+            $this->historyItems = ResumePasienRepository::getHistoryItems($type, $this->no_rawat);
         } catch (\Exception $e) {
             \Log::error('Attach History Error: ' . $e->getMessage());
             $this->dispatch('notify', variant: 'error', message: 'Gagal mengambil riwayat: ' . $e->getMessage());
@@ -502,7 +335,7 @@ class ResumePasienCreate extends Component
                 ->get();
         }
 
-        return view('livewire.modul.rawat-inap.sub-rawat-inap.resume-pasien-create', [
+        return view('livewire.modul.rawat-inap.sub-rawat-inap.resume-pasien.create', [
             'icd10List' => $icd10List,
             'icd9List' => $icd9List,
         ]);
