@@ -124,6 +124,24 @@
                                        title="Edit Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-amber-100 hover:text-amber-600 transition-all">
                                         <flux:icon name="pencil-square" class="w-4 h-4" />
                                     </a>
+                                    <button type="button" 
+                                         @click="Swal.fire({
+                                             title: 'Hapus Resume Medis?',
+                                             text: 'Apakah Anda yakin? Data ini tidak dapat dikembalikan!',
+                                             icon: 'warning',
+                                             showCancelButton: true,
+                                             confirmButtonColor: '#4C5C2D',
+                                             cancelButtonColor: '#d33',
+                                             confirmButtonText: 'Ya, Hapus!',
+                                             cancelButtonText: 'Batal'
+                                         }).then((result) => {
+                                             if (result.isConfirmed) {
+                                                 $wire.delete('{{ $resume->no_rawat }}');
+                                             }
+                                         })"
+                                         title="Hapus Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-red-100 hover:text-red-600 transition-all cursor-pointer border-none">
+                                        <flux:icon name="trash" class="w-4 h-4" />
+                                    </button>
                                 </div>
                             </td>
                         </tr>

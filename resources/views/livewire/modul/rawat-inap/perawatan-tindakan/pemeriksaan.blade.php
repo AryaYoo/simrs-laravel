@@ -106,6 +106,28 @@
                                 <flux:icon name="pencil-square" class="w-3.5 h-3.5" />
                                 Edit
                             </button>
+                            <button
+                                type="button"
+                                @click="
+                                    Swal.fire({
+                                        title: 'Hapus Pemeriksaan?',
+                                        text: 'Data yang dihapus tidak dapat dikembalikan!',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#4C5C2D',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Ya, Hapus!',
+                                        cancelButtonText: 'Batal'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            $wire.deletePemeriksaan('{{ $item->tgl_perawatan }}', '{{ $item->jam_rawat }}');
+                                        }
+                                    });
+                                "
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors cursor-pointer border border-red-200">
+                                <flux:icon name="trash" class="w-3.5 h-3.5" />
+                                Hapus
+                            </button>
                         </div>
                     </flux:table.cell>
                 </flux:table.row>
@@ -132,9 +154,7 @@
                 </div>
                 <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100" x-text="$wire.isEditMode ? 'Edit Pemeriksaan Rawat Inap' : 'Tambah Pemeriksaan Rawat Inap'"></h2>
             </div>
-            <flux:modal.close>
-                <flux:button variant="ghost" icon="x-mark" size="sm" />
-            </flux:modal.close>
+
         </div>
 
         {{-- Reference Alert --}}
@@ -348,9 +368,11 @@
                 <flux:button variant="ghost">Batal</flux:button>
             </flux:modal.close>
             <flux:button wire:click="save" variant="primary" class="px-8" wire:loading.attr="disabled">
-                <flux:icon name="check" class="w-4 h-4 mr-2" wire:loading.remove wire:target="save" />
-                <flux:icon name="arrow-path" class="w-4 h-4 mr-2 animate-spin" wire:loading wire:target="save" />
-                <span x-text="$wire.isEditMode ? 'Update Perubahan' : 'Simpan Pemeriksaan'"></span>
+                <div class="flex items-center justify-center gap-2">
+                    <flux:icon name="check" class="w-4 h-4" wire:loading.remove wire:target="save" />
+                    <flux:icon name="arrow-path" class="w-4 h-4 animate-spin" wire:loading wire:target="save" />
+                    <span x-text="$wire.isEditMode ? 'Update Perubahan' : 'Simpan Pemeriksaan'"></span>
+                </div>
             </flux:button>
         </div>
     </div>

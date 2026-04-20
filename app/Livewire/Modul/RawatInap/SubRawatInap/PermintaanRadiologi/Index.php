@@ -124,6 +124,15 @@ class Index extends Component
         return PermintaanRadiologiRepository::getPemeriksaanList($this->searchPemeriksaan, $this->perPageRadiologi);
     }
 
+    public function toggleTest($kd_jenis_prw)
+    {
+        if (in_array($kd_jenis_prw, $this->selectedTests)) {
+            $this->selectedTests = array_values(array_diff($this->selectedTests, [$kd_jenis_prw]));
+        } else {
+            $this->selectedTests[] = $kd_jenis_prw;
+        }
+    }
+
     public function save()
     {
         if (empty($this->selectedTests)) {

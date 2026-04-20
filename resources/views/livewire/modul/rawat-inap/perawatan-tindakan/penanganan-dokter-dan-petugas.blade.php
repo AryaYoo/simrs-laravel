@@ -67,6 +67,26 @@
                                 <flux:icon name="pencil-square" class="w-3.5 h-3.5" />
                                 Edit
                             </button>
+                            <button type="button" @click="
+                                Swal.fire({
+                                    title: 'Hapus Tindakan?',
+                                    text: 'Data yang dihapus tidak dapat dikembalikan!',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#4C5C2D',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Ya, Hapus!',
+                                    cancelButtonText: 'Batal'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $wire.deleteTindakan('{{ $item['type'] }}', '{{ $item['kd_jenis_prw'] }}', '{{ $item['tgl_perawatan'] }}', '{{ $item['jam_rawat'] }}', '{{ $item['type'] == 'dr' ? $item['kd_staff_dr'] : ($item['type'] == 'pr' ? $item['kd_staff_pr'] : '') }}');
+                                    }
+                                });
+                            "
+                                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 transition-colors cursor-pointer border border-red-200">
+                                <flux:icon name="trash" class="w-3.5 h-3.5" />
+                                Hapus
+                            </button>
                         </div>
                     </flux:table.cell>
                 </flux:table.row>
@@ -92,9 +112,7 @@
                     </div>
                     <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 uppercase">Input Penanganan</h2>
                 </div>
-                <flux:modal.close>
-                    <flux:button variant="ghost" icon="x-mark" size="sm" />
-                </flux:modal.close>
+
             </div>
 
             {{-- Form Content --}}
@@ -205,8 +223,11 @@
                 <flux:modal.close>
                     <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
-                <flux:button wire:click="saveTindakan" variant="primary" icon="check" class="w-48">
-                    Simpan Tindakan
+                <flux:button wire:click="saveTindakan" variant="primary" class="w-48">
+                    <div class="flex items-center justify-center gap-2">
+                        <flux:icon name="check" class="w-4 h-4" />
+                        Simpan Tindakan
+                    </div>
                 </flux:button>
             </div>
         </div>

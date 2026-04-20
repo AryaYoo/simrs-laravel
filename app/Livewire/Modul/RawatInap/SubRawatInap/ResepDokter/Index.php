@@ -16,6 +16,7 @@ class Index extends Component
 
     public string $no_rawat;
     public $regPeriksa;
+    public string $tab = 'input'; // 'input' or 'riwayat'
 
     // Resep Header Status
     public $savedResep = null; 

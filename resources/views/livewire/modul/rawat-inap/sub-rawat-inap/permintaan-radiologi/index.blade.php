@@ -219,7 +219,7 @@
                             <thead class="text-[10px] text-neutral-500 uppercase bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10 font-bold tracking-wider">
                                 <tr>
                                     <th class="px-4 py-3 w-10 text-center">
-                                        <flux:icon name="check-circle" class="w-4 h-4 mx-auto text-neutral-400" />
+                                        <flux:icon name="check" class="w-4 h-4 mx-auto text-neutral-400" />
                                     </th>
                                     <th class="px-4 py-3">Kode Periksa</th>
                                     <th class="px-4 py-3">Nama Pemeriksaan</th>
@@ -229,9 +229,16 @@
                             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
                                 @forelse ($pemeriksaanList as $pemeriksaan)
                                     @php $isSelected = in_array($pemeriksaan->kd_jenis_prw, $selectedTests); @endphp
-                                    <tr class="transition-colors cursor-pointer {{ $isSelected ? 'bg-[#F1F5E9] dark:bg-[#4C5C2D]/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-900/50' }}">
+                                    <tr 
+                                        wire:key="pemeriksaan-{{ $pemeriksaan->kd_jenis_prw }}"
+                                        wire:click="toggleTest('{{ $pemeriksaan->kd_jenis_prw }}')"
+                                        class="transition-colors cursor-pointer {{ $isSelected ? 'bg-[#F1F5E9] dark:bg-[#4C5C2D]/10' : 'hover:bg-neutral-50 dark:hover:bg-neutral-900/50' }}">
                                         <td class="px-4 py-3.5 text-center">
-                                            <flux:checkbox wire:model.live="selectedTests" value="{{ $pemeriksaan->kd_jenis_prw }}" />
+                                            @if($isSelected)
+                                                <flux:icon name="check-circle" class="w-5 h-5 text-[#4C5C2D] mx-auto" variant="solid" />
+                                            @else
+                                                <div class="w-5 h-5 border-2 border-neutral-200 dark:border-neutral-700 rounded-full mx-auto"></div>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-3.5 font-mono text-xs font-bold {{ $isSelected ? 'text-[#4C5C2D]' : 'text-neutral-500' }}">{{ $pemeriksaan->kd_jenis_prw }}</td>
                                         <td class="px-4 py-3.5 text-sm font-semibold {{ $isSelected ? 'text-[#4C5C2D] dark:text-[#8CB86B]' : 'text-neutral-700 dark:text-neutral-300' }} uppercase tracking-tight">{{ $pemeriksaan->nm_perawatan }}</td>
