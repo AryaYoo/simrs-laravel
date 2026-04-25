@@ -55,6 +55,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Casemix Rawat Jalan**: Dashboard pasien & Manajemen Resume Medis Casemix (Pola Daftar + Form Vertikal).
 - [x] **Resume List & Edit**: Alur kerja pengecekan resume per pasien dengan fitur Create, Edit, dan Delete.
 - [x] **ICD Logic Support**: Integrasi pencarian ICD-10 & ICD-9 CM yang konsisten dengan modul medis utama.
+- [x] **Column Mapping Mapping Resume**: Penyesuaian sumber data otomatis (Keluhan Utama -> `keluhan`, Pemeriksaan Fisik -> `pemeriksaan`, Penunjang RAD -> `rtl`).
 
 ### 🌉 Bridging & Integrasi
 - [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.
@@ -186,6 +187,21 @@ Dilarang menumpuk proses query database berskala besar, `DB::transaction`, atau 
 | Trigger | Event dispatch (bisa hilang saat morph) | Variable boolean (selalu persisten) |
 | Ketahanan DOM morph | ❌ Listener bisa rusak | ✅ State tetap hidup |
 | Cocok untuk | Halaman statis / komponen sederhana | Halaman Livewire kompleks |
+
+### 7. Penanganan Race Condition pada Async Update ($wire)
+
+Saat membuka modal yang relies pada property Livewire (misal: menentukan kolom mana yang akan ditarik), sering terjadi **Race Condition** jika property di-set secara *deferred*. Modal Alpine akan terbuka sebelum server selesai mengupdate state Livewire.
+
+**Solusi — Gunakan Promise `.then()` pada $wire:**
+Pastikan method di Livewire (misal `prepareAttach`) me-return value atau gunakan chaining `.then()` di sisi Alpine untuk memastikan state sudah sinkron sebelum modal ditampilkan.
+
+```javascript
+// BURUK (Bisa menyebabkan data di modal salah/masih data sebelumnya)
+@click="$wire.targetColumn = 'pemeriksaan'; showModal = true"
+
+// BAIK (Modal hanya terbuka setelah server mengonfirmasi perubahan state)
+@click="$wire.prepareAttach('pemeriksaan').then(() => { showModal = true })"
+```
 
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:

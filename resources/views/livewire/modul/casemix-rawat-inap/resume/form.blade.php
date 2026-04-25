@@ -69,7 +69,7 @@
                             <flux:label>Keluhan Utama & Riwayat Penyakit</flux:label>
                             <div class="flex items-center gap-2">
                                 <flux:button wire:click="attachEarliest('keluhan_utama', 'keluhan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Keluhan Pertama" />
-                                <button type="button" @click="$wire.targetAttachField = 'keluhan_utama'; $wire.targetAttachColumn = 'keluhan'; $wire.selectedKeluhan = []; showKeluhanModal = true" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Pilih Keluhan">
+                                <button type="button" @click="$wire.prepareAttach('keluhan_utama', 'keluhan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Pilih Keluhan">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
@@ -83,7 +83,7 @@
                             <flux:label>Pemeriksaan Fisik</flux:label>
                             <div class="flex items-center gap-2">
                                 <flux:button wire:click="attachEarliest('pemeriksaan_fisik', 'pemeriksaan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Pemeriksaan Fisik Pertama" />
-                                <button type="button" @click="$wire.targetAttachField = 'pemeriksaan_fisik'; $wire.targetAttachColumn = 'pemeriksaan'; $wire.selectedKeluhan = []; showKeluhanModal = true" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Pilih Pemeriksaan Fisik">
+                                <button type="button" @click="$wire.prepareAttach('pemeriksaan_fisik', 'pemeriksaan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Pilih Pemeriksaan Fisik">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
@@ -97,7 +97,7 @@
                             <flux:label>Riwayat Penyakit Sekarang (Jalannya Penyakit)</flux:label>
                             <div class="flex items-center gap-2">
                                 <flux:button wire:click="attachEarliest('jalannya_penyakit', 'keluhan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Keluhan Pertama" />
-                                <button type="button" @click="$wire.targetAttachField = 'jalannya_penyakit'; $wire.targetAttachColumn = 'keluhan'; $wire.selectedKeluhan = []; showKeluhanModal = true" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Pilih Keluhan">
+                                <button type="button" @click="$wire.prepareAttach('jalannya_penyakit', 'keluhan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Pilih Keluhan">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
@@ -110,7 +110,7 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Penunjang RAD Terpenting</flux:label>
                             <div class="flex items-center gap-2">
-                                <button type="button" @click="$wire.targetAttachField = 'pemeriksaan_penunjang'; $wire.targetAttachColumn = 'keluhan'; $wire.selectedKeluhan = []; showKeluhanModal = true" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Ambil dari Pemeriksaan">
+                                <button type="button" @click="$wire.prepareAttach('pemeriksaan_penunjang', 'rtl').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Ambil dari RTL">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
@@ -123,7 +123,7 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Penunjang LAB Terpenting</flux:label>
                             <div class="flex items-center gap-2">
-                                <button type="button" @click="$wire.targetAttachField = 'hasil_laborat'; $wire.targetAttachColumn = 'keluhan'; $wire.selectedKeluhan = []; showKeluhanModal = true" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Ambil dari Pemeriksaan">
+                                <button type="button" @click="$wire.prepareAttach('hasil_laborat', 'keluhan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition" title="Ambil dari Pemeriksaan">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
@@ -554,6 +554,9 @@
                                                 @if($targetAttachColumn == 'pemeriksaan')
                                                     <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Pemeriksaan Fisik:</p>
                                                     <p>{{ $pemeriksaan->pemeriksaan }}</p>
+                                                @elseif($targetAttachColumn == 'rtl')
+                                                    <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">RTL:</p>
+                                                    <p>{{ $pemeriksaan->rtl }}</p>
                                                 @else
                                                     <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Keluhan:</p>
                                                     <p>{{ $pemeriksaan->keluhan }}</p>

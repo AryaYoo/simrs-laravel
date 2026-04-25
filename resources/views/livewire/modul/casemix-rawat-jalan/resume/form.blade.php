@@ -59,7 +59,7 @@
                             <flux:label>Keluhan Utama</flux:label>
                             <div class="flex items-center gap-2">
                                 <flux:button wire:click="attachEarliest('keluhan_utama', 'keluhan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Keluhan Pertama" />
-                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('keluhan_utama', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Keluhan" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('keluhan_utama', 'keluhan').then(() => { $dispatch('open-modal', 'modal-keluhan-rajal') })" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Keluhan" />
                             </div>
                         </div>
                         <flux:textarea wire:model="keluhan_utama" rows="3" placeholder="Isi keluhan utama pasien..." />
@@ -71,7 +71,7 @@
                             <flux:label>Pemeriksaan Fisik</flux:label>
                             <div class="flex items-center gap-2">
                                 <flux:button wire:click="attachEarliest('pemeriksaan_fisik', 'pemeriksaan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Pemeriksaan Fisik Pertama" />
-                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('pemeriksaan_fisik', 'pemeriksaan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Pemeriksaan Fisik" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('pemeriksaan_fisik', 'pemeriksaan').then(() => { $dispatch('open-modal', 'modal-keluhan-rajal') })" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Pemeriksaan Fisik" />
                             </div>
                         </div>
                         <flux:textarea wire:model="pemeriksaan_fisik" rows="3" placeholder="Status generalis dan lokal..." />
@@ -83,7 +83,7 @@
                             <flux:label>Jalannya Penyakit</flux:label>
                             <div class="flex items-center gap-2">
                                 <flux:button wire:click="attachEarliest('jalannya_penyakit', 'keluhan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Keluhan Pertama" />
-                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('jalannya_penyakit', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Keluhan" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('jalannya_penyakit', 'keluhan').then(() => { $dispatch('open-modal', 'modal-keluhan-rajal') })" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Keluhan" />
                             </div>
                         </div>
                         <flux:textarea wire:model="jalannya_penyakit" rows="3" placeholder="Riwayat jalannya penyakit / pemeriksaan..." />
@@ -94,7 +94,7 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Penunjang RAD Terpenting</flux:label>
                             <div class="flex items-center gap-2">
-                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('pemeriksaan_penunjang', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari Pemeriksaan" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('pemeriksaan_penunjang', 'rtl').then(() => { $dispatch('open-modal', 'modal-keluhan-rajal') })" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari RTL" />
                             </div>
                         </div>
                         <flux:textarea wire:model="pemeriksaan_penunjang" rows="3" placeholder="Hasil USG, Rontgen, CT-Scan, dll..." />
@@ -105,7 +105,7 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Penunjang LAB Terpenting</flux:label>
                             <div class="flex items-center gap-2">
-                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('hasil_laborat', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari Pemeriksaan" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('hasil_laborat', 'keluhan').then(() => { $dispatch('open-modal', 'modal-keluhan-rajal') })" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari Pemeriksaan" />
                             </div>
                         </div>
                         <flux:textarea wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
@@ -441,8 +441,8 @@
     <flux:modal name="modal-keluhan-rajal" class="md:w-3/4 lg:w-1/2">
         <div class="space-y-6">
             <div>
-                <flux:heading size="lg">Ambil Keluhan dari Pemeriksaan</flux:heading>
-                <flux:subheading>Pilih satu atau beberapa keluhan untuk ditambahkan ke Resume.</flux:subheading>
+                <flux:heading size="lg">Ambil Data dari Pemeriksaan</flux:heading>
+                <flux:subheading>Pilih satu atau beberapa data untuk ditambahkan ke Resume.</flux:subheading>
             </div>
             
             <div class="max-h-[500px] overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
@@ -451,7 +451,7 @@
                         <tr>
                             <th class="px-4 py-3 w-12 text-center">Pilih</th>
                             <th class="px-4 py-3">Tanggal/Jam</th>
-                            <th class="px-4 py-3">Isi Keluhan</th>
+                            <th class="px-4 py-3">Isi Data</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
@@ -469,6 +469,9 @@
                                         @if($targetAttachColumn == 'pemeriksaan')
                                             <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Pemeriksaan Fisik:</p>
                                             <p>{{ $pemeriksaan->pemeriksaan }}</p>
+                                        @elseif($targetAttachColumn == 'rtl')
+                                            <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">RTL:</p>
+                                            <p>{{ $pemeriksaan->rtl }}</p>
                                         @else
                                             <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Keluhan:</p>
                                             <p>{{ $pemeriksaan->keluhan }}</p>
