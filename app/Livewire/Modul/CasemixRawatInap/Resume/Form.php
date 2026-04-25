@@ -63,14 +63,21 @@ class Form extends Component
     
     // Modal Select State
     public $selectedKeluhan = [];
-    public $selectedLab = []; // New property for lab selection
+    public $selectedLab = []; 
+    public $selectedTindakan = []; 
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'kamarInap.kamar.bangsal', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template'])->findOrFail($this->no_rawat);
+        $this->regPeriksa = RegPeriksa::with([
+            'pasien', 'dokter', 'kamarInap.kamar.bangsal', 
+            'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 
+            'rawatInapDr.jnsPerawatan', 
+            'rawatInapPr.jnsPerawatan', 
+            'rawatInapDrpr.jnsPerawatan'
+        ])->findOrFail($this->no_rawat);
         $this->kd_dokter = $this->regPeriksa->kd_dokter;
         
         $resume = ResumePasienRanap::find($this->no_rawat);
@@ -272,6 +279,7 @@ class Form extends Component
         $this->targetAttachColumn = $column;
         $this->selectedKeluhan = [];
         $this->selectedLab = [];
+        $this->selectedTindakan = [];
     }
 
     public function toggleSelectAll()
@@ -282,6 +290,18 @@ class Form extends Component
             } else {
                 $this->selectedLab = $this->regPeriksa->detailPeriksaLab->map(fn($lab) => 
                     "{$lab->tgl_periksa}|{$lab->jam}|{$lab->kd_jenis_prw}|{$lab->id_template}"
+                )->toArray();
+            }
+        } elseif ($this->targetAttachColumn == 'tindakan') {
+            $allTindakan = collect($this->regPeriksa->rawatInapDr)
+                ->concat($this->regPeriksa->rawatInapPr)
+                ->concat($this->regPeriksa->rawatInapDrpr);
+            
+            if (count($this->selectedTindakan) === $allTindakan->count()) {
+                $this->selectedTindakan = [];
+            } else {
+                $this->selectedTindakan = $allTindakan->map(fn($t) => 
+                    "{$t->tgl_perawatan}|{$t->jam_rawat}|{$t->kd_jenis_prw}"
                 )->toArray();
             }
         } else {
@@ -295,9 +315,65 @@ class Form extends Component
         }
     }
 
+    public function attachTindakan()
+    {
+        if (empty($this->selectedTindakan)) return;
+
+        $texts = [];
+        foreach ($this->selectedTindakan as $id) {
+            [$tgl, $jam, $kd_jenis_prw] = explode('|', $id);
+            
+            $item = \App\Models\RawatInapDr::where(['no_rawat' => $this->no_rawat, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam, 'kd_jenis_prw' => $kd_jenis_prw])->first()
+                ?? \App\Models\RawatInapPr::where(['no_rawat' => $this->no_rawat, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam, 'kd_jenis_prw' => $kd_jenis_prw])->first()
+                ?? \App\Models\RawatInapDrpr::where(['no_rawat' => $this->no_rawat, 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam, 'kd_jenis_prw' => $kd_jenis_prw])->first();
+
+            if ($item && $item->jnsPerawatan) {
+                $texts[] = $item->jnsPerawatan->nm_perawatan;
+            }
+        }
+
+        if (!empty($texts)) {
+            $this->applyAttachments(implode(', ', array_unique($texts)));
+        }
+
+        $this->selectedTindakan = [];
+    }
+
+    public function autoFillTindakan()
+    {
+        $allTindakan = collect($this->regPeriksa->rawatInapDr)
+            ->concat($this->regPeriksa->rawatInapPr)
+            ->concat($this->regPeriksa->rawatInapDrpr)
+            ->map(fn($t) => $t->jnsPerawatan->nm_perawatan ?? null)
+            ->filter()
+            ->unique()
+            ->implode(', ');
+
+        if ($allTindakan) {
+            $this->tindakan_dan_operasi = $allTindakan;
+            $this->dispatch('swal', [
+                'title' => 'Otomatis Terisi',
+                'text' => 'Semua tindakan telah dimasukkan.',
+                'icon' => 'success',
+                'timer' => 1000
+            ]);
+        } else {
+            $this->dispatch('swal', [
+                'title' => 'Data Kosong',
+                'text' => 'Tidak ada riwayat tindakan ditemukan.',
+                'icon' => 'info'
+            ]);
+        }
+    }
+
     public function refreshData()
     {
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'kamarInap.kamar.bangsal', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 'pemeriksaanRanap'])->findOrFail($this->no_rawat);
+        $this->regPeriksa = RegPeriksa::with([
+            'pasien', 'dokter', 'kamarInap.kamar.bangsal', 
+            'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 
+            'pemeriksaanRanap', 'rawatInapDr.jnsPerawatan', 
+            'rawatInapPr.jnsPerawatan', 'rawatInapDrpr.jnsPerawatan'
+        ])->findOrFail($this->no_rawat);
         $this->dispatch('swal', [
             'title' => 'Data Diperbarui',
             'icon' => 'success',

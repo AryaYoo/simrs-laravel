@@ -129,6 +129,11 @@ class RegPeriksa extends Model
         return $this->hasMany(RawatInapPr::class, 'no_rawat', 'no_rawat');
     }
 
+    public function rawatInapDrpr()
+    {
+        return $this->hasMany(RawatInapDrpr::class, 'no_rawat', 'no_rawat');
+    }
+
     public function bridgingSep()
     {
         return $this->hasOne(BridgingSep::class, 'no_rawat', 'no_rawat');
