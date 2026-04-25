@@ -74,11 +74,6 @@ class RegPeriksa extends Model
         return $this->hasMany(ProsedurPasien::class, 'no_rawat', 'no_rawat');
     }
 
-    public function rawatInapDrpr()
-    {
-        return $this->hasMany(RawatInapDrpr::class, 'no_rawat', 'no_rawat');
-    }
-
     public function detailPeriksaLab()
     {
         return $this->hasMany(DetailPeriksaLab::class, 'no_rawat', 'no_rawat');

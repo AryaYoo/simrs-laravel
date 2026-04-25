@@ -366,6 +366,32 @@ class Form extends Component
         }
     }
 
+    public function autoFillSOAP($field, $column)
+    {
+        $allData = collect($this->regPeriksa->pemeriksaanRanap)
+            ->sortBy('tgl_perawatan')
+            ->map(fn($p) => $p->$column ?? null)
+            ->filter(fn($val) => !empty($val) && $val !== '-')
+            ->unique()
+            ->implode(', ');
+
+        if ($allData) {
+            $this->$field = $allData;
+            $this->dispatch('swal', [
+                'title' => 'Otomatis Terisi',
+                'text' => 'Data riwayat telah dimasukkan ke ' . str_replace('_', ' ', $field),
+                'icon' => 'success',
+                'timer' => 1000
+            ]);
+        } else {
+            $this->dispatch('swal', [
+                'title' => 'Data Kosong',
+                'text' => 'Tidak ada data riwayat SOAP ditemukan.',
+                'icon' => 'info'
+            ]);
+        }
+    }
+
     public function refreshData()
     {
         $this->regPeriksa = RegPeriksa::with([
