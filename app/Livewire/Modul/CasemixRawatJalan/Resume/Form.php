@@ -9,6 +9,7 @@ use App\Models\Icd9;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use App\Livewire\Concerns\WithOptimisticLocking;
+use App\Models\PemeriksaanRalan;
 
 #[Layout('layouts.app', ['title' => 'Buat Resume Casemix (RAJAL)'])]
 class Form extends Component
@@ -47,6 +48,11 @@ class Form extends Component
     public $activeSearchField = '';
     public $autocompleteResults = [];
     protected $isSelecting = false;
+
+    // Modal Select State
+    public $selectedKeluhan = [];
+    public $targetAttachField = 'keluhan_utama';
+    public $targetAttachColumn = 'keluhan';
 
     public function mount($no_rawat)
     {
@@ -165,6 +171,72 @@ class Form extends Component
     {
         $this->activeSearchField = '';
         $this->autocompleteResults = [];
+    }
+
+    public function attachKeluhan()
+    {
+        if (!empty($this->selectedKeluhan)) {
+            $keluhanTexts = [];
+            foreach ($this->selectedKeluhan as $key) {
+                [$tgl, $jam] = explode('|', $key);
+                $pemeriksaan = PemeriksaanRalan::where('no_rawat', $this->no_rawat)
+                    ->where('tgl_perawatan', $tgl)
+                    ->where('jam_rawat', $jam)
+                    ->first();
+                
+                $col = $this->targetAttachColumn;
+                if ($pemeriksaan && !empty($pemeriksaan->$col) && $pemeriksaan->$col !== '-') {
+                    $keluhanTexts[] = $pemeriksaan->$col;
+                }
+            }
+
+            if (!empty($keluhanTexts)) {
+                $keluhanText = implode(', ', array_unique($keluhanTexts));
+                $field = $this->targetAttachField;
+                
+                if (empty($this->$field)) {
+                    $this->$field = $keluhanText;
+                } else {
+                    $this->$field .= ', ' . $keluhanText;
+                }
+            }
+            
+            $this->selectedKeluhan = [];
+            $this->dispatch('close-modal', 'modal-keluhan-rajal');
+        }
+    }
+
+    public function prepareAttach($field, $column)
+    {
+        $this->targetAttachField = $field;
+        $this->targetAttachColumn = $column;
+        $this->selectedKeluhan = [];
+    }
+
+    public function attachEarliest($targetField = 'keluhan_utama', $column = 'keluhan')
+    {
+        $earliest = PemeriksaanRalan::where('no_rawat', $this->no_rawat)
+            ->orderBy('tgl_perawatan', 'asc')
+            ->orderBy('jam_rawat', 'asc')
+            ->first();
+
+        if ($earliest && !empty($earliest->$column)) {
+            $value = $earliest->$column;
+            if (empty($this->$targetField)) {
+                $this->$targetField = $value;
+            } else {
+                if (!str_contains($this->$targetField, $value)) {
+                    $this->$targetField .= ', ' . $value;
+                }
+            }
+            
+            $this->dispatch('swal', [
+                'title' => 'Berhasil!',
+                'text' => 'Data awal berhasil ditambahkan.',
+                'icon' => 'success',
+                'timer' => 1500
+            ]);
+        }
     }
 
     public function save()

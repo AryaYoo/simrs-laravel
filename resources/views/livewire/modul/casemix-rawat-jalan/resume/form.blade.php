@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 gap-8 max-w-5xl mx-auto w-full">
 
         {{-- 1. Identitas & Admisi --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+        <div id="section-1" class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
             <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
                 <div class="w-6 h-6 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center">
                     <span class="text-[#4C5C2D] font-bold text-xs">1</span>
@@ -44,7 +44,7 @@
         </div>
 
         {{-- 2. Ringkasan Klinis --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+        <div id="section-2" class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
             <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
                 <div class="w-6 h-6 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center">
                     <span class="text-[#4C5C2D] font-bold text-xs">2</span>
@@ -52,20 +52,70 @@
                 <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Ringkasan Klinis</h2>
             </div>
             <div class="p-6 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <flux:textarea label="Keluhan Utama" wire:model="keluhan_utama" rows="3" placeholder="Isi keluhan utama pasien..." />
-                    <flux:textarea label="Jalannya Penyakit" wire:model="jalannya_penyakit" rows="3" placeholder="Riwayat jalannya penyakit / pemeriksaan..." />
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <flux:textarea label="Pemeriksaan Penunjang" wire:model="pemeriksaan_penunjang" rows="3" placeholder="Hasil USG, Rontgen, CT-Scan, dll..." />
-                    <flux:textarea label="Hasil Laboratorium" wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
+                <div class="grid grid-cols-1 gap-6">
+                    {{-- 1. Keluhan Utama --}}
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label>Keluhan Utama</flux:label>
+                            <div class="flex items-center gap-2">
+                                <flux:button wire:click="attachEarliest('keluhan_utama', 'keluhan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Keluhan Pertama" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('keluhan_utama', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Keluhan" />
+                            </div>
+                        </div>
+                        <flux:textarea wire:model="keluhan_utama" rows="3" placeholder="Isi keluhan utama pasien..." />
+                    </div>
+
+                    {{-- 2. Pemeriksaan Fisik --}}
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label>Pemeriksaan Fisik</flux:label>
+                            <div class="flex items-center gap-2">
+                                <flux:button wire:click="attachEarliest('pemeriksaan_fisik', 'pemeriksaan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Pemeriksaan Fisik Pertama" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('pemeriksaan_fisik', 'pemeriksaan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Pemeriksaan Fisik" />
+                            </div>
+                        </div>
+                        <flux:textarea wire:model="pemeriksaan_fisik" rows="3" placeholder="Status generalis dan lokal..." />
+                    </div>
+
+                    {{-- 3. Jalannya Penyakit --}}
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label>Jalannya Penyakit</flux:label>
+                            <div class="flex items-center gap-2">
+                                <flux:button wire:click="attachEarliest('jalannya_penyakit', 'keluhan')" variant="primary" size="xs" icon="clock" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil Keluhan Pertama" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('jalannya_penyakit', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Pilih Keluhan" />
+                            </div>
+                        </div>
+                        <flux:textarea wire:model="jalannya_penyakit" rows="3" placeholder="Riwayat jalannya penyakit / pemeriksaan..." />
+                    </div>
+
+                    {{-- 4. RAD --}}
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label>Penunjang RAD Terpenting</flux:label>
+                            <div class="flex items-center gap-2">
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('pemeriksaan_penunjang', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari Pemeriksaan" />
+                            </div>
+                        </div>
+                        <flux:textarea wire:model="pemeriksaan_penunjang" rows="3" placeholder="Hasil USG, Rontgen, CT-Scan, dll..." />
+                    </div>
+
+                    {{-- 5. LAB --}}
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label>Penunjang LAB Terpenting</flux:label>
+                            <div class="flex items-center gap-2">
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('hasil_laborat', 'keluhan'); $dispatch('open-modal', 'modal-keluhan-rajal')" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari Pemeriksaan" />
+                            </div>
+                        </div>
+                        <flux:textarea wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
+                    </div>
                 </div>
             </div>
         </div>
 
         {{-- 3. Diagnosa & Prosedur --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+        <div id="section-3" class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
              <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
                 <div class="w-6 h-6 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center">
                     <span class="text-[#4C5C2D] font-bold text-xs">3</span>
@@ -73,7 +123,7 @@
                 <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Diagnosa & Prosedur Akhir</h2>
             </div>
             <div class="p-6 space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="grid grid-cols-1 gap-12">
                     {{-- Diangnosa (ICD-10) --}}
                     <div class="space-y-4">
                         <h3 class="text-xs font-black uppercase tracking-widest text-[#4C5C2D] mb-4">Diagnosa Akhir (ICD-10)</h3>
@@ -81,7 +131,10 @@
                         {{-- Diagnosa Utama --}}
                         <div class="flex items-end gap-2">
                             <div class="flex-1 relative">
-                                <flux:input label="Diagnosa Utama" wire:model.live.debounce.300ms="diagnosa_utama" placeholder="Ketik minimal 3 karakter..." @focus="$wire.activeSearchField = 'diagnosa_utama'" />
+                                <flux:input label="Diagnosa Utama" wire:model.live.debounce.500ms="diagnosa_utama" placeholder="Ketik minimal 3 karakter..." @focus="$wire.activeSearchField = 'diagnosa_utama'" />
+                                <div wire:loading wire:target="diagnosa_utama" class="absolute right-3 top-[34px]">
+                                    <flux:icon name="arrow-path" class="w-4 h-4 animate-spin text-neutral-400" />
+                                </div>
                                 
                                 @if($activeSearchField === 'diagnosa_utama' && !empty($autocompleteResults))
                                     <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
@@ -107,7 +160,10 @@
                             @php $field = 'diagnosa_sekunder' . ($i === 1 ? '' : $i); @endphp
                             <div class="flex items-end gap-2">
                                 <div class="flex-1 relative">
-                                    <flux:input label="Diagnosa Sekunder {{ $i }}" wire:model.live.debounce.300ms="{{ $field }}" @focus="$wire.activeSearchField = '{{ $field }}'" />
+                                    <flux:input label="Diagnosa Sekunder {{ $i }}" wire:model.live.debounce.500ms="{{ $field }}" @focus="$wire.activeSearchField = '{{ $field }}'" />
+                                    <div wire:loading wire:target="{{ $field }}" class="absolute right-3 top-[34px]">
+                                        <flux:icon name="arrow-path" class="w-4 h-4 animate-spin text-neutral-400" />
+                                    </div>
                                     
                                     @if($activeSearchField === $field && !empty($autocompleteResults))
                                         <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
@@ -137,7 +193,10 @@
                         {{-- Prosedur Utama --}}
                         <div class="flex items-end gap-2">
                             <div class="flex-1 relative">
-                                <flux:input label="Prosedur Utama" wire:model.live.debounce.300ms="prosedur_utama" placeholder="Ketik minimal 3 karakter..." @focus="$wire.activeSearchField = 'prosedur_utama'" />
+                                <flux:input label="Prosedur Utama" wire:model.live.debounce.500ms="prosedur_utama" placeholder="Ketik minimal 3 karakter..." @focus="$wire.activeSearchField = 'prosedur_utama'" />
+                                <div wire:loading wire:target="prosedur_utama" class="absolute right-3 top-[34px]">
+                                    <flux:icon name="arrow-path" class="w-4 h-4 animate-spin text-neutral-400" />
+                                </div>
                                 
                                 @if($activeSearchField === 'prosedur_utama' && !empty($autocompleteResults))
                                     <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
@@ -163,7 +222,10 @@
                             @php $field = 'prosedur_sekunder' . ($i === 1 ? '' : $i); @endphp
                             <div class="flex items-end gap-2">
                                 <div class="flex-1 relative">
-                                    <flux:input label="Prosedur Sekunder {{ $i }}" wire:model.live.debounce.300ms="{{ $field }}" @focus="$wire.activeSearchField = '{{ $field }}'" />
+                                    <flux:input label="Prosedur Sekunder {{ $i }}" wire:model.live.debounce.500ms="{{ $field }}" @focus="$wire.activeSearchField = '{{ $field }}'" />
+                                    <div wire:loading wire:target="{{ $field }}" class="absolute right-3 top-[34px]">
+                                        <flux:icon name="arrow-path" class="w-4 h-4 animate-spin text-neutral-400" />
+                                    </div>
                                     
                                     @if($activeSearchField === $field && !empty($autocompleteResults))
                                         <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto" x-on:click.outside="$wire.clearAutocomplete()">
@@ -190,7 +252,7 @@
         </div>
 
         {{-- 4. Pemulangan --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+        <div id="section-4" class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
              <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
                 <div class="w-6 h-6 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center">
                     <span class="text-[#4C5C2D] font-bold text-xs">4</span>
@@ -198,7 +260,7 @@
                 <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Pemulangan Pasien</h2>
             </div>
             <div class="p-6 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6">
                     <flux:select label="Kondisi Pulang" wire:model="kondisi_pulang">
                         <flux:select.option value="Hidup">Hidup</flux:select.option>
                         <flux:select.option value="Meninggal">Meninggal</flux:select.option>
@@ -298,6 +360,140 @@
                 <flux:modal.close>
                     <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
+            </div>
+        </div>
+    </flux:modal>
+
+
+
+    {{-- Floating Minimap Sidebar --}}
+    <div x-data="{ 
+            activeSection: 1,
+            sections: [
+                { id: 1, label: 'Identitas', icon: 'user' },
+                { id: 2, label: 'Klinis', icon: 'clipboard-document-list' },
+                { id: 3, label: 'Diagnosa', icon: 'bookmark-square' },
+                { id: 4, label: 'Instruksi', icon: 'document-text' }
+            ],
+            init() {
+                window.addEventListener('scroll', () => {
+                    this.sections.forEach(s => {
+                        const el = document.getElementById('section-' + s.id);
+                        if (el) {
+                            const rect = el.getBoundingClientRect();
+                            if (rect.top <= 150 && rect.bottom >= 150) {
+                                this.activeSection = s.id;
+                            }
+                        }
+                    });
+                });
+            },
+            scrollTo(id) {
+                const el = document.getElementById('section-' + id);
+                if (el) {
+                    const top = el.offsetTop - 100;
+                    window.scrollTo({ top: top, behavior: 'smooth' });
+                }
+            }
+         }" 
+         class="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col gap-3">
+        <div class="group flex items-center justify-end gap-3">
+            <span :class="activeSection === 1 ? 'opacity-100 text-[#4C5C2D] scale-100' : 'opacity-0 group-hover:opacity-100 text-neutral-400 scale-95 translate-x-2 group-hover:translate-x-0'"
+                  class="text-[10px] font-black uppercase tracking-widest transition-all duration-300">Identitas</span>
+            <button @click="scrollTo(1)"
+                    :class="activeSection === 1 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white dark:bg-neutral-800 text-neutral-400 hover:text-[#4C5C2D] border border-neutral-200 dark:border-neutral-700 shadow-sm hover:scale-105'"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300">
+                <flux:icon name="user" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="group flex items-center justify-end gap-3">
+            <span :class="activeSection === 2 ? 'opacity-100 text-[#4C5C2D] scale-100' : 'opacity-0 group-hover:opacity-100 text-neutral-400 scale-95 translate-x-2 group-hover:translate-x-0'"
+                  class="text-[10px] font-black uppercase tracking-widest transition-all duration-300">Klinis</span>
+            <button @click="scrollTo(2)"
+                    :class="activeSection === 2 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white dark:bg-neutral-800 text-neutral-400 hover:text-[#4C5C2D] border border-neutral-200 dark:border-neutral-700 shadow-sm hover:scale-105'"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300">
+                <flux:icon name="clipboard-document-list" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="group flex items-center justify-end gap-3">
+            <span :class="activeSection === 3 ? 'opacity-100 text-[#4C5C2D] scale-100' : 'opacity-0 group-hover:opacity-100 text-neutral-400 scale-95 translate-x-2 group-hover:translate-x-0'"
+                  class="text-[10px] font-black uppercase tracking-widest transition-all duration-300">Diagnosa</span>
+            <button @click="scrollTo(3)"
+                    :class="activeSection === 3 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white dark:bg-neutral-800 text-neutral-400 hover:text-[#4C5C2D] border border-neutral-200 dark:border-neutral-700 shadow-sm hover:scale-105'"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300">
+                <flux:icon name="bookmark-square" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="group flex items-center justify-end gap-3">
+            <span :class="activeSection === 4 ? 'opacity-100 text-[#4C5C2D] scale-100' : 'opacity-0 group-hover:opacity-100 text-neutral-400 scale-95 translate-x-2 group-hover:translate-x-0'"
+                  class="text-[10px] font-black uppercase tracking-widest transition-all duration-300">Instruksi</span>
+            <button @click="scrollTo(4)"
+                    :class="activeSection === 4 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white dark:bg-neutral-800 text-neutral-400 hover:text-[#4C5C2D] border border-neutral-200 dark:border-neutral-700 shadow-sm hover:scale-105'"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300">
+                <flux:icon name="document-text" class="w-5 h-5" />
+            </button>
+        </div>
+    </div>
+    {{-- MODAL ATTACH KELUHAN --}}
+    <flux:modal name="modal-keluhan-rajal" class="md:w-3/4 lg:w-1/2">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Ambil Keluhan dari Pemeriksaan</flux:heading>
+                <flux:subheading>Pilih satu atau beberapa keluhan untuk ditambahkan ke Resume.</flux:subheading>
+            </div>
+            
+            <div class="max-h-[500px] overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase text-[10px] font-bold tracking-widest border-b border-neutral-200">
+                        <tr>
+                            <th class="px-4 py-3 w-12 text-center">Pilih</th>
+                            <th class="px-4 py-3">Tanggal/Jam</th>
+                            <th class="px-4 py-3">Isi Keluhan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                        @forelse($regPeriksa->pemeriksaanRalan as $pemeriksaan)
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                <td class="px-4 py-3 text-center">
+                                    <flux:checkbox wire:model="selectedKeluhan" value="{{ $pemeriksaan->tgl_perawatan . '|' . $pemeriksaan->jam_rawat }}" />
+                                </td>
+                                <td class="px-4 py-3">
+                                    <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $pemeriksaan->tgl_perawatan }}</p>
+                                    <p class="text-[10px] text-neutral-500">{{ $pemeriksaan->jam_rawat }}</p>
+                                </td>
+                                <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                    <div class="space-y-1">
+                                        @if($targetAttachColumn == 'pemeriksaan')
+                                            <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Pemeriksaan Fisik:</p>
+                                            <p>{{ $pemeriksaan->pemeriksaan }}</p>
+                                        @else
+                                            <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Keluhan:</p>
+                                            <p>{{ $pemeriksaan->keluhan }}</p>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
+                                    Data pemeriksaan belum tersedia untuk pasien ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Batal</flux:button>
+                </flux:modal.close>
+                <flux:button wire:click="attachKeluhan" variant="primary" class="bg-[#4C5C2D] hover:bg-[#3D4A24]">
+                    Tambahkan yang Dipilih
+                </flux:button>
             </div>
         </div>
     </flux:modal>
