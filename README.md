@@ -56,6 +56,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Resume List & Edit**: Alur kerja pengecekan resume per pasien dengan fitur Create, Edit, dan Delete.
 - [x] **ICD Logic Support**: Integrasi pencarian ICD-10 & ICD-9 CM yang konsisten dengan modul medis utama.
 - [x] **Column Mapping Mapping Resume**: Penyesuaian sumber data otomatis (Keluhan Utama -> `keluhan`, Pemeriksaan Fisik -> `pemeriksaan`, Penunjang RAD -> `rtl`).
+- [x] **Integrasi Riwayat Medis**: Fitur *Attach* (Pilih Manual via Modal Premium) dan *Auto Fill* (Magic Wand) untuk menarik data Keluhan, Pemeriksaan, Lab, Tindakan, dan Obat-obatan secara otomatis ke dalam resume.
 
 ### 🌉 Bridging & Integrasi
 - [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.

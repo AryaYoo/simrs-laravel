@@ -65,6 +65,7 @@ class Form extends Component
     public $selectedKeluhan = [];
     public $selectedLab = []; 
     public $selectedTindakan = []; 
+    public $selectedObat = []; // New for obat
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
@@ -76,7 +77,8 @@ class Form extends Component
             'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 
             'rawatInapDr.jnsPerawatan', 
             'rawatInapPr.jnsPerawatan', 
-            'rawatInapDrpr.jnsPerawatan'
+            'rawatInapDrpr.jnsPerawatan',
+            'detailPemberianObat.barang'
         ])->findOrFail($this->no_rawat);
         $this->kd_dokter = $this->regPeriksa->kd_dokter;
         
@@ -280,6 +282,7 @@ class Form extends Component
         $this->selectedKeluhan = [];
         $this->selectedLab = [];
         $this->selectedTindakan = [];
+        $this->selectedObat = [];
     }
 
     public function toggleSelectAll()
@@ -302,6 +305,14 @@ class Form extends Component
             } else {
                 $this->selectedTindakan = $allTindakan->map(fn($t) => 
                     "{$t->tgl_perawatan}|{$t->jam_rawat}|{$t->kd_jenis_prw}"
+                )->toArray();
+            }
+        } elseif ($this->targetAttachColumn == 'obat') {
+            if (count($this->selectedObat) === count($this->regPeriksa->detailPemberianObat)) {
+                $this->selectedObat = [];
+            } else {
+                $this->selectedObat = $this->regPeriksa->detailPemberianObat->map(fn($o) => 
+                    "{$o->tgl_perawatan}|{$o->jam}|{$o->kode_brng}"
                 )->toArray();
             }
         } else {
@@ -337,6 +348,57 @@ class Form extends Component
         }
 
         $this->selectedTindakan = [];
+    }
+
+    public function attachObat()
+    {
+        if (empty($this->selectedObat)) return;
+
+        $texts = [];
+        foreach ($this->selectedObat as $id) {
+            [$tgl, $jam, $kode_brng] = explode('|', $id);
+            $obat = \App\Models\DetailPemberianObat::with('barang')
+                ->where('no_rawat', $this->no_rawat)
+                ->where('tgl_perawatan', $tgl)
+                ->where('jam', $jam)
+                ->where('kode_brng', $kode_brng)
+                ->first();
+            
+            if ($obat && $obat->barang) {
+                $texts[] = $obat->barang->nama_brng;
+            }
+        }
+
+        if (!empty($texts)) {
+            $this->applyAttachments(implode(', ', array_unique($texts)));
+        }
+
+        $this->selectedObat = [];
+    }
+
+    public function autoFillObat()
+    {
+        $allObat = collect($this->regPeriksa->detailPemberianObat)
+            ->map(fn($o) => $o->barang->nama_brng ?? null)
+            ->filter()
+            ->unique()
+            ->implode(', ');
+
+        if ($allObat) {
+            $this->obat_di_rs = $allObat;
+            $this->dispatch('swal', [
+                'title' => 'Otomatis Terisi',
+                'text' => 'Semua riwayat pemberian obat telah dimasukkan.',
+                'icon' => 'success',
+                'timer' => 1000
+            ]);
+        } else {
+            $this->dispatch('swal', [
+                'title' => 'Data Kosong',
+                'text' => 'Tidak ada riwayat pemberian obat ditemukan.',
+                'icon' => 'info'
+            ]);
+        }
     }
 
     public function autoFillTindakan()
@@ -398,7 +460,8 @@ class Form extends Component
             'pasien', 'dokter', 'kamarInap.kamar.bangsal', 
             'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 
             'pemeriksaanRanap', 'rawatInapDr.jnsPerawatan', 
-            'rawatInapPr.jnsPerawatan', 'rawatInapDrpr.jnsPerawatan'
+            'rawatInapPr.jnsPerawatan', 'rawatInapDrpr.jnsPerawatan',
+            'detailPemberianObat.barang'
         ])->findOrFail($this->no_rawat);
         $this->dispatch('swal', [
             'title' => 'Data Diperbarui',
