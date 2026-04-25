@@ -50,6 +50,12 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **List Pasien Ralan**: Dashboard operasional poli.
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
+### 💵 Modul Casemix
+- [x] **Casemix Rawat Inap**: Dashboard pasien & Manajemen Resume Medis Casemix (Pola Daftar + Form Vertikal).
+- [x] **Casemix Rawat Jalan**: Dashboard pasien & Manajemen Resume Medis Casemix (Pola Daftar + Form Vertikal).
+- [x] **Resume List & Edit**: Alur kerja pengecekan resume per pasien dengan fitur Create, Edit, dan Delete.
+- [x] **ICD Logic Support**: Integrasi pencarian ICD-10 & ICD-9 CM yang konsisten dengan modul medis utama.
+
 ### 🌉 Bridging & Integrasi
 - [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.
 - [ ] **Satu Sehat**: Integrasi SATUSEHAT Kemenkes (Roadmap).

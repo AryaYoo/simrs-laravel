@@ -424,21 +424,39 @@
 
     {{-- Summary Cards --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3.5 flex flex-col shadow-sm">
-            <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-0.5">Total Pasien</span>
-            <span class="text-xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['total']) }}</span>
+        <div wire:click="setFilter('')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === '' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === '' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Total
+                Pasien</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === '' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['total']) }}</span>
         </div>
-        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3.5 flex flex-col shadow-sm">
-            <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-0.5">Pasien BPJS</span>
-            <span class="text-xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['bpjs']) }}</span>
+
+        <div wire:click="setFilter('bpjs')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === 'bpjs' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === 'bpjs' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Pasien
+                BPJS</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === 'bpjs' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['bpjs']) }}</span>
         </div>
-        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3.5 flex flex-col shadow-sm">
-            <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-0.5">Pasien Umum</span>
-            <span class="text-xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['umum']) }}</span>
+
+        <div wire:click="setFilter('umum')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === 'umum' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === 'umum' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Pasien
+                Umum</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === 'umum' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['umum']) }}</span>
         </div>
-        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-3.5 flex flex-col shadow-sm">
-            <span class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-0.5">Lainnya</span>
-            <span class="text-xl font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($summary['lainnya']) }}</span>
+
+        <div wire:click="setFilter('lainnya')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === 'lainnya' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === 'lainnya' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Lainnya</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === 'lainnya' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['lainnya']) }}</span>
         </div>
     </div>
 

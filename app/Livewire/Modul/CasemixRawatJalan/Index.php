@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Livewire\Modul\RawatJalan;
+namespace App\Livewire\Modul\CasemixRawatJalan;
 
 use App\Models\RegPeriksa;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('layouts.app', ['title' => 'Daftar Rawat Jalan'])]
+#[Layout('layouts.app', ['title' => 'Casemix Rawat Jalan'])]
 class Index extends Component
 {
     use WithPagination;
@@ -78,7 +78,7 @@ class Index extends Component
             ->orderBy('jam_reg', 'desc')
             ->paginate($this->perPage);
 
-        return view('livewire.modul.rawat-jalan.index', [
+        return view('livewire.modul.casemix-rawat-jalan.index', [
             'regPeriksas' => $regPeriksas,
             'summary' => [
                 'total' => $counts->total ?? 0,

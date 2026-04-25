@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Livewire\Modul\RawatJalan;
+namespace App\Livewire\Modul\CasemixRawatInap;
 
 use App\Models\RegPeriksa;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('layouts.app', ['title' => 'Daftar Rawat Jalan'])]
+#[Layout('layouts.app', ['title' => 'Casemix Rawat Inap'])]
 class Index extends Component
 {
     use WithPagination;
@@ -16,6 +16,7 @@ class Index extends Component
     public string $dari = '';
     public string $sampai = '';
     public string $filterType = '';
+    public string $statusFilter = 'belum_pulang';
     public int $perPage = 20;
 
     public function mount()
@@ -28,6 +29,7 @@ class Index extends Component
     public function updatedDari()    { $this->resetPage(); }
     public function updatedSampai()  { $this->resetPage(); }
     public function updatedPerPage() { $this->resetPage(); }
+    public function updatedStatusFilter() { $this->resetPage(); }
 
     public function setFilter(string $type)
     {
@@ -40,7 +42,13 @@ class Index extends Component
         $searchTerm = '%' . $this->search . '%';
 
         $baseQuery = RegPeriksa::query()
-            ->where('status_lanjut', 'Ralan')
+            ->where('status_lanjut', 'Ranap')
+            // Apply Status Filter (Inhouse vs All)
+            ->when($this->statusFilter === 'belum_pulang', function($q) {
+                $q->whereHas('kamarInap', fn($sq) => $sq->where('tgl_keluar', '0000-00-00'));
+            })
+            // Date Filter only applies strictly when status is 'semua', 
+            // or as an additional filter if status is 'belum_pulang' (filter by registration date)
             ->when($this->dari,    fn($q) => $q->whereDate('tgl_registrasi', '>=', $this->dari))
             ->when($this->sampai,  fn($q) => $q->whereDate('tgl_registrasi', '<=', $this->sampai))
             ->where(function ($query) use ($searchTerm) {
@@ -51,6 +59,7 @@ class Index extends Component
                     });
             });
 
+        // Current count for summary
         $counts = (clone $baseQuery)
             ->join('penjab', 'reg_periksa.kd_pj', '=', 'penjab.kd_pj')
             ->selectRaw("
@@ -59,6 +68,7 @@ class Index extends Component
                 SUM(CASE WHEN penjab.png_jawab LIKE '%UMUM%' OR penjab.png_jawab = '-' THEN 1 ELSE 0 END) as umum
             ")->first();
 
+        // Apply visual filter to results only
         $resultsQuery = (clone $baseQuery)
             ->when($this->filterType === 'bpjs', function($q) {
                 $q->whereHas('penjab', fn($sq) => $sq->where('png_jawab', 'like', '%BPJS%'));
@@ -73,12 +83,12 @@ class Index extends Component
             });
 
         $regPeriksas = $resultsQuery
-            ->with(['pasien', 'penjab', 'dokter', 'poliklinik'])
+            ->with(['pasien', 'penjab', 'permintaanRanap'])
             ->orderBy('tgl_registrasi', 'desc')
             ->orderBy('jam_reg', 'desc')
             ->paginate($this->perPage);
 
-        return view('livewire.modul.rawat-jalan.index', [
+        return view('livewire.modul.casemix-rawat-inap.index', [
             'regPeriksas' => $regPeriksas,
             'summary' => [
                 'total' => $counts->total ?? 0,

@@ -48,6 +48,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-jalan', \App\Livewire\Modul\RawatJalan\Index::class)->name('modul.rawat-jalan.index');
     Route::get('modul/rawat-jalan/{no_rawat}', \App\Livewire\Modul\RawatJalan\Show::class)->name('modul.rawat-jalan.show')->where('no_rawat', '.*');
 
+    Route::get('modul/casemix-rawat-jalan', \App\Livewire\Modul\CasemixRawatJalan\Index::class)->name('modul.casemix-rawat-jalan.index');
+    Route::get('modul/casemix-rawat-jalan/{no_rawat}/resume', \App\Livewire\Modul\CasemixRawatJalan\Resume\Index::class)->name('modul.casemix-rawat-jalan.resume')->where('no_rawat', '.*');
+    Route::get('modul/casemix-rawat-jalan/{no_rawat}/resume/form', \App\Livewire\Modul\CasemixRawatJalan\Resume\Form::class)->name('modul.casemix-rawat-jalan.resume.form')->where('no_rawat', '.*');
+    
+    Route::get('modul/casemix-rawat-inap', \App\Livewire\Modul\CasemixRawatInap\Index::class)->name('modul.casemix-rawat-inap.index');
+    Route::get('modul/casemix-rawat-inap/{no_rawat}/resume', \App\Livewire\Modul\CasemixRawatInap\Resume\Index::class)->name('modul.casemix-rawat-inap.resume')->where('no_rawat', '.*');
+    Route::get('modul/casemix-rawat-inap/{no_rawat}/resume/form', \App\Livewire\Modul\CasemixRawatInap\Resume\Form::class)->name('modul.casemix-rawat-inap.resume.form')->where('no_rawat', '.*');
+
     Route::get('modul/pasien', \App\Livewire\Modul\Pasien\Index::class)->name('modul.pasien.index');
     Route::get('modul/pasien/{no_rkm_medis}/edit', \App\Livewire\Modul\Pasien\Edit::class)->name('modul.pasien.edit')->where('no_rkm_medis', '.*');
     Route::get('modul/pasien/{no_rkm_medis}', \App\Livewire\Modul\Pasien\Show::class)->name('modul.pasien.show')->where('no_rkm_medis', '.*');

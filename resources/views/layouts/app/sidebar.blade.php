@@ -17,7 +17,8 @@
     {{-- Wrapper dengan Alpine.js untuk toggle sidebar --}}
     <div x-data="{ 
             sidebarOpen: {{ isset($hideSidebar) && $hideSidebar ? 'false' : "localStorage.getItem('sidebarOpen') !== 'false'" }},
-            modulOpen: {{ request()->is('modul*') ? 'true' : 'false' }}
+            modulOpen: {{ request()->is('modul*') && !request()->is('modul/casemix*') ? 'true' : 'false' }},
+            casemixOpen: {{ request()->is('modul/casemix*') ? 'true' : 'false' }}
          }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))" class="flex min-h-screen">
 
         {{-- ===== SIDEBAR ===== --}}
@@ -137,7 +138,7 @@
                                 :class="sidebarOpen ? 'gap-2 px-3 py-2' : 'justify-center w-full h-full'"
                                 style="color: white; text-decoration: none;"
                                 onmouseover="this.parentElement.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
-                                onmouseout="this.parentElement.style.backgroundColor='{{ request()->is('modul*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
+                                onmouseout="this.parentElement.style.backgroundColor='{{ request()->is('modul*') && !request()->is('modul/casemix*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
                                 title="{{ __('Modul') }}">
                                 <flux:icon name="cube" class="w-4 h-4 flex-shrink-0" />
                                 <span x-show="sidebarOpen">{{ __('Modul') }}</span>
@@ -182,6 +183,59 @@
                                 style="color: {{ request()->routeIs('modul.rawat-jalan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.rawat-jalan*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
                                 <flux:icon name="calendar-days" class="w-3.5 h-3.5" />
                                 <span>Rawat Jalan</span>
+                            </a>
+                            
+                            <a href="{{ route('modul.index') }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.index') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.index') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="squares-2x2" class="w-3.5 h-3.5" />
+                                <span>Lainnya</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Casemix with Dropdown --}}
+                    <div class="flex flex-col mb-1" :class="sidebarOpen ? 'w-full' : 'w-full items-center'">
+                        <div class="flex items-center rounded-md text-sm font-medium transition-colors group"
+                            :class="sidebarOpen ? 'w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                            style="background-color: {{ request()->is('modul/casemix*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};">
+
+                            <a href="#" class="flex items-center grow"
+                                @click.prevent="casemixOpen = !casemixOpen; if(!sidebarOpen) sidebarOpen = true;"
+                                :class="sidebarOpen ? 'gap-2 px-3 py-2' : 'justify-center w-full h-full'"
+                                style="color: white; text-decoration: none;"
+                                onmouseover="this.parentElement.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                                onmouseout="this.parentElement.style.backgroundColor='{{ request()->is('modul/casemix*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
+                                title="{{ __('Casemix') }}">
+                                <flux:icon name="clipboard-document-check" class="w-4 h-4 flex-shrink-0" />
+                                <span x-show="sidebarOpen">{{ __('Casemix') }}</span>
+                            </a>
+
+                            <button x-show="sidebarOpen" @click.prevent="casemixOpen = !casemixOpen"
+                                class="p-2 mr-1 rounded-md hover:bg-white/10 transition-all text-white/50 hover:text-white"
+                                :class="casemixOpen ? 'rotate-180 text-white' : ''">
+                                <flux:icon name="chevron-down" class="w-3 h-3" />
+                            </button>
+                        </div>
+
+                        {{-- Sub-menus Casemix --}}
+                        <div x-show="sidebarOpen && casemixOpen" x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="ml-6 space-y-1 mt-1 mb-2 border-l border-white/10 pl-2">
+
+                            <a href="{{ route('modul.casemix-rawat-jalan.index') }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.casemix-rawat-jalan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.casemix-rawat-jalan*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="calendar-days" class="w-3.5 h-3.5" />
+                                <span>Casemix RAJAL</span>
+                            </a>
+
+                            <a href="{{ route('modul.casemix-rawat-inap.index') }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.casemix-rawat-inap*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.casemix-rawat-inap*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="home" class="w-3.5 h-3.5" />
+                                <span>Casemix RANAP</span>
                             </a>
                         </div>
                     </div>
