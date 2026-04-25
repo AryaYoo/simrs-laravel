@@ -63,13 +63,14 @@ class Form extends Component
     
     // Modal Select State
     public $selectedKeluhan = [];
+    public $selectedLab = []; // New property for lab selection
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'kamarInap.kamar.bangsal', 'diagnosaPasien.penyakit'])->findOrFail($this->no_rawat);
+        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'kamarInap.kamar.bangsal', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template'])->findOrFail($this->no_rawat);
         $this->kd_dokter = $this->regPeriksa->kd_dokter;
         
         $resume = ResumePasienRanap::find($this->no_rawat);
@@ -206,7 +207,7 @@ class Form extends Component
     public function attachKeluhan()
     {
         if (!empty($this->selectedKeluhan)) {
-            $keluhanTexts = [];
+            $texts = [];
             foreach ($this->selectedKeluhan as $key) {
                 [$tgl, $jam] = explode('|', $key);
                 $pemeriksaan = PemeriksaanRanap::where('no_rawat', $this->no_rawat)
@@ -216,22 +217,52 @@ class Form extends Component
                 
                 $col = $this->targetAttachColumn;
                 if ($pemeriksaan && !empty($pemeriksaan->$col) && $pemeriksaan->$col !== '-') {
-                    $keluhanTexts[] = $pemeriksaan->$col;
+                    $texts[] = $pemeriksaan->$col;
                 }
             }
 
-            if (!empty($keluhanTexts)) {
-                $keluhanText = implode(', ', array_unique($keluhanTexts));
-                $field = $this->targetAttachField;
+            $this->applyAttachments($texts);
+            $this->selectedKeluhan = [];
+        }
+    }
+
+    public function attachLab()
+    {
+        if (!empty($this->selectedLab)) {
+            $texts = [];
+            foreach ($this->selectedLab as $key) {
+                [$tgl, $jam, $kd_jenis_prw, $id_template] = explode('|', $key);
+                $lab = \App\Models\DetailPeriksaLab::with('template')
+                    ->where('no_rawat', $this->no_rawat)
+                    ->where('tgl_periksa', $tgl)
+                    ->where('jam', $jam)
+                    ->where('kd_jenis_prw', $kd_jenis_prw)
+                    ->where('id_template', $id_template)
+                    ->first();
                 
-                if (empty($this->$field)) {
-                    $this->$field = $keluhanText;
-                } else {
-                    $this->$field .= ', ' . $keluhanText;
+                if ($lab) {
+                    $namaPemeriksaan = $lab->template->Pemeriksaan ?? '-';
+                    $nilai = $lab->nilai ?? '';
+                    $texts[] = "{$namaPemeriksaan} : {$nilai}";
                 }
             }
+
+            $this->applyAttachments($texts);
+            $this->selectedLab = [];
+        }
+    }
+
+    private function applyAttachments($texts)
+    {
+        if (!empty($texts)) {
+            $joinedText = implode(', ', array_unique($texts));
+            $field = $this->targetAttachField;
             
-            $this->selectedKeluhan = [];
+            if (empty($this->$field)) {
+                $this->$field = $joinedText;
+            } else {
+                $this->$field .= ', ' . $joinedText;
+            }
         }
     }
 
@@ -240,6 +271,39 @@ class Form extends Component
         $this->targetAttachField = $field;
         $this->targetAttachColumn = $column;
         $this->selectedKeluhan = [];
+        $this->selectedLab = [];
+    }
+
+    public function toggleSelectAll()
+    {
+        if ($this->targetAttachColumn == 'lab_hasil') {
+            if (count($this->selectedLab) === count($this->regPeriksa->detailPeriksaLab)) {
+                $this->selectedLab = [];
+            } else {
+                $this->selectedLab = $this->regPeriksa->detailPeriksaLab->map(fn($lab) => 
+                    "{$lab->tgl_periksa}|{$lab->jam}|{$lab->kd_jenis_prw}|{$lab->id_template}"
+                )->toArray();
+            }
+        } else {
+            if (count($this->selectedKeluhan) === count($this->regPeriksa->pemeriksaanRanap)) {
+                $this->selectedKeluhan = [];
+            } else {
+                $this->selectedKeluhan = $this->regPeriksa->pemeriksaanRanap->map(fn($p) => 
+                    "{$p->tgl_perawatan}|{$p->jam_rawat}"
+                )->toArray();
+            }
+        }
+    }
+
+    public function refreshData()
+    {
+        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'kamarInap.kamar.bangsal', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 'pemeriksaanRanap'])->findOrFail($this->no_rawat);
+        $this->dispatch('swal', [
+            'title' => 'Data Diperbarui',
+            'icon' => 'success',
+            'timer' => 1000,
+            'showConfirmButton' => false
+        ]);
     }
 
     public function attachEarliest($targetField = 'keluhan_utama', $column = 'keluhan')
@@ -285,46 +349,46 @@ class Form extends Component
             ResumePasienRanap::updateOrCreate(
                 ['no_rawat' => $this->no_rawat],
                 [
-                    'kd_dokter' => $this->kd_dokter ?? '',
-                    'diagnosa_awal' => $this->diagnosa_awal ?? '',
-                    'alasan' => $this->alasan ?? '',
-                    'keluhan_utama' => $this->keluhan_utama ?? '',
-                    'pemeriksaan_fisik' => $this->pemeriksaan_fisik ?? '',
-                    'jalannya_penyakit' => $this->jalannya_penyakit ?? '',
-                    'pemeriksaan_penunjang' => $this->pemeriksaan_penunjang ?? '',
-                    'hasil_laborat' => $this->hasil_laborat ?? '',
-                    'tindakan_dan_operasi' => $this->tindakan_dan_operasi ?? '',
-                    'obat_di_rs' => $this->obat_di_rs ?? '',
-                    'diagnosa_utama' => $this->diagnosa_utama ?? '',
-                    'kd_diagnosa_utama' => $this->kd_diagnosa_utama ?? '',
-                    'diagnosa_sekunder' => $this->diagnosa_sekunder ?? '',
-                    'kd_diagnosa_sekunder' => $this->kd_diagnosa_sekunder ?? '',
-                    'diagnosa_sekunder2' => $this->diagnosa_sekunder2 ?? '',
-                    'kd_diagnosa_sekunder2' => $this->kd_diagnosa_sekunder2 ?? '',
-                    'diagnosa_sekunder3' => $this->diagnosa_sekunder3 ?? '',
-                    'kd_diagnosa_sekunder3' => $this->kd_diagnosa_sekunder3 ?? '',
-                    'diagnosa_sekunder4' => $this->diagnosa_sekunder4 ?? '',
-                    'kd_diagnosa_sekunder4' => $this->kd_diagnosa_sekunder4 ?? '',
-                    'prosedur_utama' => $this->prosedur_utama ?? '',
-                    'kd_prosedur_utama' => $this->kd_prosedur_utama ?? '',
-                    'prosedur_sekunder' => $this->prosedur_sekunder ?? '',
-                    'kd_prosedur_sekunder' => $this->kd_prosedur_sekunder ?? '',
-                    'prosedur_sekunder2' => $this->prosedur_sekunder2 ?? '',
-                    'kd_prosedur_sekunder2' => $this->kd_prosedur_sekunder2 ?? '',
-                    'prosedur_sekunder3' => $this->prosedur_sekunder3 ?? '',
-                    'kd_prosedur_sekunder3' => $this->kd_prosedur_sekunder3 ?? '',
-                    'alergi' => $this->alergi ?? '',
-                    'diet' => $this->diet ?? '',
-                    'lab_belum' => $this->lab_belum ?? '',
-                    'edukasi' => $this->edukasi ?? '',
-                    'cara_keluar' => $this->cara_keluar ?? '',
-                    'ket_keluar' => $this->ket_keluar ?? '',
-                    'keadaan' => $this->keadaan ?? '',
-                    'ket_keadaan' => $this->ket_keadaan ?? '',
-                    'dilanjutkan' => $this->dilanjutkan ?? '',
-                    'ket_dilanjutkan' => $this->ket_dilanjutkan ?? '',
+                    'kd_dokter' => $this->kd_dokter ?? '-',
+                    'diagnosa_awal' => $this->defaultEmpty($this->diagnosa_awal),
+                    'alasan' => $this->defaultEmpty($this->alasan),
+                    'keluhan_utama' => $this->defaultEmpty($this->keluhan_utama),
+                    'pemeriksaan_fisik' => $this->defaultEmpty($this->pemeriksaan_fisik),
+                    'jalannya_penyakit' => $this->defaultEmpty($this->jalannya_penyakit),
+                    'pemeriksaan_penunjang' => $this->defaultEmpty($this->pemeriksaan_penunjang),
+                    'hasil_laborat' => $this->defaultEmpty($this->hasil_laborat),
+                    'tindakan_dan_operasi' => $this->defaultEmpty($this->tindakan_dan_operasi),
+                    'obat_di_rs' => $this->defaultEmpty($this->obat_di_rs),
+                    'diagnosa_utama' => $this->defaultEmpty($this->diagnosa_utama),
+                    'kd_diagnosa_utama' => $this->defaultEmpty($this->kd_diagnosa_utama),
+                    'diagnosa_sekunder' => $this->defaultEmpty($this->diagnosa_sekunder),
+                    'kd_diagnosa_sekunder' => $this->defaultEmpty($this->kd_diagnosa_sekunder),
+                    'diagnosa_sekunder2' => $this->defaultEmpty($this->diagnosa_sekunder2),
+                    'kd_diagnosa_sekunder2' => $this->defaultEmpty($this->kd_diagnosa_sekunder2),
+                    'diagnosa_sekunder3' => $this->defaultEmpty($this->diagnosa_sekunder3),
+                    'kd_diagnosa_sekunder3' => $this->defaultEmpty($this->kd_diagnosa_sekunder3),
+                    'diagnosa_sekunder4' => $this->defaultEmpty($this->diagnosa_sekunder4),
+                    'kd_diagnosa_sekunder4' => $this->defaultEmpty($this->kd_diagnosa_sekunder4),
+                    'prosedur_utama' => $this->defaultEmpty($this->prosedur_utama),
+                    'kd_prosedur_utama' => $this->defaultEmpty($this->kd_prosedur_utama),
+                    'prosedur_sekunder' => $this->defaultEmpty($this->prosedur_sekunder),
+                    'kd_prosedur_sekunder' => $this->defaultEmpty($this->kd_prosedur_sekunder),
+                    'prosedur_sekunder2' => $this->defaultEmpty($this->prosedur_sekunder2),
+                    'kd_prosedur_sekunder2' => $this->defaultEmpty($this->kd_prosedur_sekunder2),
+                    'prosedur_sekunder3' => $this->defaultEmpty($this->prosedur_sekunder3),
+                    'kd_prosedur_sekunder3' => $this->defaultEmpty($this->kd_prosedur_sekunder3),
+                    'alergi' => $this->defaultEmpty($this->alergi),
+                    'diet' => $this->defaultEmpty($this->diet),
+                    'lab_belum' => $this->defaultEmpty($this->lab_belum),
+                    'edukasi' => $this->defaultEmpty($this->edukasi),
+                    'cara_keluar' => $this->defaultEmpty($this->cara_keluar),
+                    'ket_keluar' => $this->defaultEmpty($this->ket_keluar),
+                    'keadaan' => $this->defaultEmpty($this->keadaan),
+                    'ket_keadaan' => $this->defaultEmpty($this->ket_keadaan),
+                    'dilanjutkan' => $this->defaultEmpty($this->dilanjutkan),
+                    'ket_dilanjutkan' => $this->defaultEmpty($this->ket_dilanjutkan),
                     'kontrol' => $this->kontrol ?? null,
-                    'obat_pulang' => $this->obat_pulang ?? '',
+                    'obat_pulang' => $this->defaultEmpty($this->obat_pulang),
                 ]
             );
 
@@ -343,6 +407,11 @@ class Form extends Component
                 'icon' => 'error'
             ]);
         }
+    }
+
+    private function defaultEmpty($value)
+    {
+        return empty($value) ? '-' : $value;
     }
 
     public function render()

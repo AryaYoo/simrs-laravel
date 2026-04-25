@@ -105,7 +105,7 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Penunjang LAB Terpenting</flux:label>
                             <div class="flex items-center gap-2">
-                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('hasil_laborat', 'keluhan').then(() => { $dispatch('open-modal', 'modal-keluhan-rajal') })" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari Pemeriksaan" />
+                                <flux:button variant="primary" size="xs" icon="paper-clip" @click="$wire.prepareAttach('hasil_laborat', 'lab_hasil').then(() => { $dispatch('open-modal', 'modal-keluhan-rajal') })" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white" title="Ambil dari Pemeriksaan Lab" />
                             </div>
                         </div>
                         <flux:textarea wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
@@ -440,52 +440,91 @@
     {{-- MODAL ATTACH KELUHAN --}}
     <flux:modal name="modal-keluhan-rajal" class="md:w-3/4 lg:w-1/2">
         <div class="space-y-6">
-            <div>
-                <flux:heading size="lg">Ambil Data dari Pemeriksaan</flux:heading>
-                <flux:subheading>Pilih satu atau beberapa data untuk ditambahkan ke Resume.</flux:subheading>
+            <div class="flex items-center justify-between">
+                <div>
+                    <flux:heading size="lg">Ambil Data dari Pemeriksaan</flux:heading>
+                    <flux:subheading>Pilih satu atau beberapa data untuk ditambahkan ke Resume.</flux:subheading>
+                </div>
+                <button type="button" wire:click="refreshData" class="p-2 text-neutral-400 hover:text-[#4C5C2D] transition-colors" title="Refresh Data">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 antialiased" wire:loading.class="animate-spin"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                </button>
             </div>
             
             <div class="max-h-[500px] overflow-y-auto rounded-xl border border-neutral-200 dark:border-neutral-700">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase text-[10px] font-bold tracking-widest border-b border-neutral-200">
                         <tr>
-                            <th class="px-4 py-3 w-12 text-center">Pilih</th>
+                            <th class="px-4 py-3 w-12 text-center">
+                                <input type="checkbox" wire:click="toggleSelectAll" 
+                                    class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" 
+                                    {{ ($targetAttachColumn == 'lab_hasil' ? (count($selectedLab) === count($regPeriksa->detailPeriksaLab) && count($selectedLab) > 0) : (count($selectedKeluhan) === count($regPeriksa->pemeriksaanRalan) && count($selectedKeluhan) > 0)) ? 'checked' : '' }}
+                                />
+                            </th>
                             <th class="px-4 py-3">Tanggal/Jam</th>
                             <th class="px-4 py-3">Isi Data</th>
+                            @if($targetAttachColumn == 'lab_hasil')
+                                <th class="px-4 py-3">Nilai Normal</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
-                        @forelse($regPeriksa->pemeriksaanRalan as $pemeriksaan)
-                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
-                                <td class="px-4 py-3 text-center">
-                                    <flux:checkbox wire:model="selectedKeluhan" value="{{ $pemeriksaan->tgl_perawatan . '|' . $pemeriksaan->jam_rawat }}" />
-                                </td>
-                                <td class="px-4 py-3">
-                                    <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $pemeriksaan->tgl_perawatan }}</p>
-                                    <p class="text-[10px] text-neutral-500">{{ $pemeriksaan->jam_rawat }}</p>
-                                </td>
-                                <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                                    <div class="space-y-1">
-                                        @if($targetAttachColumn == 'pemeriksaan')
-                                            <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Pemeriksaan Fisik:</p>
-                                            <p>{{ $pemeriksaan->pemeriksaan }}</p>
-                                        @elseif($targetAttachColumn == 'rtl')
-                                            <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">RTL:</p>
-                                            <p>{{ $pemeriksaan->rtl }}</p>
-                                        @else
-                                            <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Keluhan:</p>
-                                            <p>{{ $pemeriksaan->keluhan }}</p>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
-                                    Data pemeriksaan belum tersedia untuk pasien ini.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @if($targetAttachColumn == 'lab_hasil')
+                            @forelse($regPeriksa->detailPeriksaLab->sortByDesc(fn($lab) => $lab->tgl_periksa . ' ' . $lab->jam) as $lab)
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                    <td class="px-4 py-3 text-center">
+                                        <input type="checkbox" wire:model="selectedLab" value="{{ $lab->tgl_periksa . '|' . $lab->jam . '|' . $lab->kd_jenis_prw . '|' . $lab->id_template }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $lab->tgl_periksa }}</p>
+                                        <p class="text-[10px] text-neutral-500">{{ $lab->jam }}</p>
+                                    </td>
+                                    <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                        <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $lab->template->Pemeriksaan ?? '-' }}</span> : <span class="text-[#4C5C2D] font-bold">{{ $lab->nilai }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-xs text-neutral-500 italic">
+                                        {{ $lab->nilai_rujukan }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-4 py-10 text-center text-neutral-400 italic">
+                                        Data pemeriksaan lab belum tersedia untuk pasien ini.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        @else
+                            @forelse($regPeriksa->pemeriksaanRalan as $pemeriksaan)
+                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                    <td class="px-4 py-3 text-center">
+                                        <input type="checkbox" wire:model="selectedKeluhan" value="{{ $pemeriksaan->tgl_perawatan . '|' . $pemeriksaan->jam_rawat }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $pemeriksaan->tgl_perawatan }}</p>
+                                        <p class="text-[10px] text-neutral-500">{{ $pemeriksaan->jam_rawat }}</p>
+                                    </td>
+                                    <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                        <div class="space-y-1">
+                                            @if($targetAttachColumn == 'pemeriksaan')
+                                                <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Pemeriksaan Fisik:</p>
+                                                <p>{{ $pemeriksaan->pemeriksaan }}</p>
+                                            @elseif($targetAttachColumn == 'rtl')
+                                                <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">RTL:</p>
+                                                <p>{{ $pemeriksaan->rtl }}</p>
+                                            @else
+                                                <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Keluhan:</p>
+                                                <p>{{ $pemeriksaan->keluhan }}</p>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
+                                        Data pemeriksaan belum tersedia untuk pasien ini.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -494,9 +533,7 @@
                 <flux:modal.close>
                     <flux:button variant="ghost">Batal</flux:button>
                 </flux:modal.close>
-                <flux:button wire:click="attachKeluhan" variant="primary" class="bg-[#4C5C2D] hover:bg-[#3D4A24]">
-                    Tambahkan yang Dipilih
-                </flux:button>
+                <flux:button variant="primary" wire:click="{{ $targetAttachColumn == 'lab_hasil' ? 'attachLab' : 'attachKeluhan' }}" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-white">Tambahkan yang Dipilih</flux:button>
             </div>
         </div>
     </flux:modal>
