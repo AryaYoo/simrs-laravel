@@ -150,7 +150,42 @@ Dilarang menumpuk proses query database berskala besar, `DB::transaction`, atau 
 * Semua operasi *data fetching*/query yang intens harus dipindahkan ke dalam class `Repository` atau `Query` (misal: `app/Repositories/RawatInap/RiwayatPasienRepository.php`).
 * Komponen Livewire harus setipis mungkin, hanya bertugas mengatur state UI dan menerima/mengirim *value* ke layer lain.
 
----
+### 6. Modal dalam Komponen Livewire (PENTING!)
+
+> [!WARNING]
+> **Flux Modal (`<flux:modal>`) TIDAK RELIABLE** pada halaman Livewire yang kompleks (banyak `wire:model`, banyak interaksi server). Gunakan **Alpine.js Modal murni** sebagai gantinya.
+
+**Masalah:** Livewire melakukan *DOM morphing* setiap kali ada interaksi (bukan full page reload). Proses morphing ini dapat menghancurkan *event listener* internal yang didaftarkan oleh Flux modal saat inisialisasi. Akibatnya, `$dispatch('open-modal', 'nama-modal')` tidak akan membuka modal meskipun kode terlihat benar.
+
+**Solusi — Gunakan Alpine.js Modal:**
+```blade
+{{-- 1. Tambahkan x-data di root div komponen --}}
+<div x-data="{ showModal: false }">
+
+    {{-- 2. Tombol trigger: langsung toggle variable --}}
+    <button type="button" @click="showModal = true">
+        Buka Modal
+    </button>
+
+    {{-- 3. Modal: gunakan x-show + x-cloak --}}
+    <div x-show="showModal" x-cloak class="fixed inset-0 z-[99]">
+        <div class="fixed inset-0 bg-black/50" @click="showModal = false"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-6" @click.stop>
+                {{-- Konten modal --}}
+                <button @click="showModal = false">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+**Kenapa Alpine Modal lebih reliable:**
+| | Flux Modal | Alpine Modal |
+|---|---|---|
+| Trigger | Event dispatch (bisa hilang saat morph) | Variable boolean (selalu persisten) |
+| Ketahanan DOM morph | ❌ Listener bisa rusak | ✅ State tetap hidup |
+| Cocok untuk | Halaman statis / komponen sederhana | Halaman Livewire kompleks |
 
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
