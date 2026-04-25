@@ -128,7 +128,13 @@
                                 </button>
                             </div>
                         </div>
-                        <flux:textarea wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
+                    <flux:textarea wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
+                    </div>
+
+                    {{-- 6. Tindakan & Obat --}}
+                    <div class="grid grid-cols-1 gap-6 pt-2">
+                        <flux:textarea label="Tindakan/Operasi Selama Perawatan" wire:model="tindakan_dan_operasi" rows="3" placeholder="Sebutkan tindakan medis atau operasi yang dilakukan..." />
+                        <flux:textarea label="Obat-obatan Selama Perawatan" wire:model="obat_di_rs" rows="3" placeholder="Daftar obat-obatan selama pasien dirawat..." />
                     </div>
                 </div>
             </div>
@@ -143,12 +149,6 @@
                 <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100 capitalize">Diagnosa & Prosedur Akhir</h2>
             </div>
             <div class="p-6 space-y-8">
-                {{-- Tindakan & Obat --}}
-                <div class="grid grid-cols-1 gap-6">
-                    <flux:textarea label="Tindakan/Operasi Selama Perawatan" wire:model="tindakan_dan_operasi" rows="3" />
-                    <flux:textarea label="Obat-obatan Selama Perawatan" wire:model="obat_di_rs" rows="3" />
-                </div>
-
                 <div class="grid grid-cols-1 gap-12">
                     {{-- Diangnosa (ICD-10) --}}
                     <div class="space-y-4">
