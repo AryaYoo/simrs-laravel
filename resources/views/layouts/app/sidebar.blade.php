@@ -22,7 +22,7 @@
             sidebarOpen: {{ isset($hideSidebar) && $hideSidebar ? 'false' : "localStorage.getItem('sidebarOpen') !== 'false'" }},
             modulOpen: {{ request()->is('modul*') && !request()->is('modul/casemix*') ? 'true' : 'false' }},
             casemixOpen: {{ request()->is('modul/casemix*') ? 'true' : 'false' }}
-         }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))" class="flex min-h-screen">
+         }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))" class="flex min-h-screen relative z-10">
 
         {{-- ===== SIDEBAR ===== --}}
         <aside
