@@ -32,12 +32,6 @@
                     class="bg-zinc-50 border-[#6A7E3F]/20 focus:border-[#4C5C2D] dark:bg-zinc-800 dark:border-zinc-700"
                     style="background-color: rgba(106, 126, 63, 0.05);" />
 
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0 font-medium" :href="route('password.request')"
-                        wire:navigate style="color: #4C5C2D;">
-                        {{ __('Forgot?') }}
-                    </flux:link>
-                @endif
             </div>
 
             <!-- Remember Me -->
@@ -54,14 +48,12 @@
             </div>
         </form>
 
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center dark:text-zinc-400" style="color: rgba(76, 76, 109, 0.5);">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" class="font-bold hover:underline" wire:navigate
-                    style="color: #4C5C2D;">
-                    {{ __('Request Access') }}
-                </flux:link>
-            </div>
-        @endif
+        <div class="mt-2 space-x-1 text-sm text-center dark:text-zinc-400" style="color: rgba(76, 76, 109, 0.5);">
+            <span>Butuh bantuan?</span>
+            <flux:link href="http://192.168.100.177/mastolongmas" target="_blank" class="font-bold hover:underline"
+                style="color: #4C5C2D;">
+                Hubungi Tim IT
+            </flux:link>
+        </div>
     </div>
 </x-layouts::auth>
