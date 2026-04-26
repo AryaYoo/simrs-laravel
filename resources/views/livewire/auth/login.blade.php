@@ -1,13 +1,14 @@
 <x-layouts::auth :title="__('Log in')">
-    <div class="auth-card p-7">
-        <div class="flex flex-col gap-2 text-center">
+    <div class="auth-card p-8 sm:p-10 rounded-2xl bg-white/90 backdrop-blur-md shadow-2xl border border-white/50">
+        <div class="flex flex-col gap-3 text-center mb-8">
             <div class="flex flex-col items-center mb-2">
-                <h1 class="font-extrabold" style="color: #4C5C2D; font-size: 1.75rem; line-height: 1.2; letter-spacing: 0.05em;">LARALITE</h1>
-                <p style="color: rgba(76, 76, 109, 0.5); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px;">
+                <img src="{{ asset('logo.png') }}" class="h-20 sm:h-24 w-auto object-contain mb-5 drop-shadow-md" alt="Logo" />
+                <h1 class="font-extrabold" style="color: #4C5C2D; font-size: 1.5rem; line-height: 1.2; letter-spacing: 0.05em;">CASEMIX RAWAT INAP</h1>
+                <p style="color: rgba(76, 76, 109, 0.6); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 6px;">
                     {{ __('System Information Management') }}
                 </p>
             </div>
-            <flux:text style="color: rgba(76, 76, 109, 0.7); font-size: 0.875rem;">
+            <flux:text style="color: rgba(76, 76, 109, 0.8); font-size: 0.875rem;">
                 {{ __('Please enter your credentials to access the system') }}
             </flux:text>
         </div>
