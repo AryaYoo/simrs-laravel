@@ -127,7 +127,7 @@
                         <flux:table.cell>{{ $reg->permintaanRanap->kd_kamar ?? '-' }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex justify-center text-center">
-                                <a href="{{ route('modul.casemix-rawat-inap.resume', str_replace('/', '-', $reg->no_rawat)) }}" wire:navigate
+                                <a href="{{ route('modul.casemix-rawat-inap.resume', str_replace('/', '-', $reg->no_rawat)) }}" target="_blank"
                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-[#4C5C2D]/10 text-[#4C5C2D] hover:bg-[#4C5C2D] hover:text-white transition-colors border border-[#4C5C2D]/20 hover:border-[#4C5C2D]"
                                    title="Resume (CASEMIX)">
                                     <flux:icon name="document-text" class="w-4 h-4" />
