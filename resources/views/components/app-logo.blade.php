@@ -3,7 +3,7 @@
 ])
 
 @if($sidebar)
-    <flux:sidebar.brand name="LaraLite" {{ $attributes }} />
+    <flux:sidebar.brand logo="{{ asset('logo.png') }}" name="Casemix Rawat Inap" {{ $attributes }} />
 @else
-    <flux:brand name="LaraLite" {{ $attributes }} />
+    <flux:brand logo="{{ asset('logo.png') }}" name="Casemix Rawat Inap" {{ $attributes }} />
 @endif
