@@ -11,8 +11,18 @@
         ['title' => 'Casemix Rawat Inap', 'icon' => 'clipboard-document-list', 'route' => route('modul.casemix-rawat-inap.index')]
     ];
     @endphp
+    @endphp
 
-    <div class="flex flex-col w-full h-full pb-8">
+    <div class="flex flex-col w-full h-full pb-8" 
+         x-data="{ 
+             searchQuery: '',
+             modules: @js(collect(array_merge($mainModules, $casemixModules))->pluck('title')->map(fn($t) => strtolower($t))),
+             get hasResults() {
+                 if (this.searchQuery === '') return true;
+                 const q = this.searchQuery.toLowerCase();
+                 return this.modules.some(m => m.includes(q));
+             }
+         }">
 
         {{-- Header / Breadcrumb --}}
         <div class="flex items-center gap-3 mb-6">
@@ -31,7 +41,7 @@
             </div>
             <input
                 type="text"
-                id="module-search"
+                x-model="searchQuery"
                 class="block w-full pl-9 pr-3 py-2.5 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
                        bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
                        placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#6A7E3F]/30 focus:border-[#6A7E3F] transition-colors"
@@ -46,7 +56,7 @@
                 @foreach($mainModules as $module)
                 <a href="{{ $module['route'] ?? '#' }}"
                    @if(isset($module['route']) && $module['route'] !== '#') wire:navigate @endif
-                   data-title="{{ strtolower($module['title']) }}"
+                   x-show="searchQuery === '' || '{{ strtolower($module['title']) }}'.includes(searchQuery.toLowerCase())"
                    class="module-card group flex flex-col items-center justify-center gap-2 p-4
                           rounded-xl border border-neutral-200 dark:border-neutral-700
                           bg-white dark:bg-neutral-800
@@ -74,7 +84,7 @@
                 @foreach($casemixModules as $module)
                 <a href="{{ $module['route'] ?? '#' }}"
                    @if(isset($module['route']) && $module['route'] !== '#') wire:navigate @endif
-                   data-title="{{ strtolower($module['title']) }}"
+                   x-show="searchQuery === '' || '{{ strtolower($module['title']) }}'.includes(searchQuery.toLowerCase())"
                    class="module-card group flex flex-col items-center justify-center gap-2 p-4
                           rounded-xl border border-neutral-200 dark:border-neutral-700
                           bg-white dark:bg-neutral-800
@@ -96,24 +106,9 @@
         </div>
 
         {{-- Empty state --}}
-        <div id="module-empty" class="hidden mt-8 text-center text-sm text-neutral-400">
+        <div x-show="!hasResults" x-cloak class="mt-8 text-center text-sm text-neutral-400">
             Modul tidak ditemukan.
         </div>
     </div>
 
-    @push('scripts')
-    <script>
-        document.getElementById('module-search').addEventListener('input', function () {
-            const q = this.value.toLowerCase();
-            const cards = document.querySelectorAll('.module-card');
-            let found = 0;
-            cards.forEach(card => {
-                const match = card.dataset.title.includes(q);
-                card.classList.toggle('hidden', !match);
-                if (match) found++;
-            });
-            document.getElementById('module-empty').classList.toggle('hidden', found > 0);
-        });
-    </script>
-    @endpush
 </x-layouts::app>
