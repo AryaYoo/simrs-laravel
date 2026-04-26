@@ -1,4 +1,35 @@
-<div class="flex flex-col gap-6 pb-24">
+<div class="flex flex-col gap-6 pb-24"
+    x-data="{ 
+        isDirty: false,
+        isSubmitting: false
+    }"
+    @input="isDirty = true"
+    @change="isDirty = true"
+    @click="let btn = $event.target.closest('button'); if(btn && (btn.title && btn.title.includes('Otomatis') || btn.innerText && btn.innerText.includes('Tambahkan'))) { isDirty = true }"
+    x-init="
+        window.addEventListener('beforeunload', (e) => {
+            if (isDirty && !isSubmitting) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+        document.addEventListener('livewire:navigating', (e) => {
+            if (isDirty && !isSubmitting) {
+                if (!confirm('Data belum tersimpan. Yakin ingin meninggalkan halaman?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+        Livewire.hook('commit', ({ succeed, fail }) => {
+            succeed(() => {
+                setTimeout(() => { isSubmitting = false; }, 500);
+            });
+            fail(() => {
+                isSubmitting = false;
+            });
+        });
+    "
+>
     {{-- Sticky Header --}}
     <div class="sticky top-0 z-40 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-700 -mx-4 px-4 py-3 mb-2 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-3">
@@ -15,7 +46,7 @@
             <flux:button href="{{ route('modul.casemix-rawat-jalan.resume', str_replace('/', '-', $no_rawat)) }}" wire:navigate variant="ghost" class="h-9 text-sm">
                 Batal
             </flux:button>
-            <flux:button wire:click="save" variant="primary" icon="check" class="bg-[#4C5C2D] hover:bg-[#3D4A24] h-9 px-6 text-sm">
+            <flux:button wire:click="save" @click="isSubmitting = true" variant="primary" icon="check" class="bg-[#4C5C2D] hover:bg-[#3D4A24] h-9 px-6 text-sm">
                 Simpan Resume
             </flux:button>
         </div>
