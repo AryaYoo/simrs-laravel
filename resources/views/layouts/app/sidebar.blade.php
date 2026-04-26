@@ -12,7 +12,10 @@
     </style>
 </head>
 
-<body class="min-h-screen antialiased" style="background-color: #FBF6F6;">
+<body class="min-h-screen antialiased relative overflow-x-hidden" style="background-color: #FBF6F6;">
+
+    <!-- Global Background Watermark -->
+    <img src="{{ asset('logo.png') }}" class="fixed -bottom-16 -right-16 w-[30rem] h-auto opacity-[0.05] pointer-events-none" style="z-index: 0;" alt="" />
 
     {{-- Wrapper dengan Alpine.js untuk toggle sidebar --}}
     <div x-data="{ 
