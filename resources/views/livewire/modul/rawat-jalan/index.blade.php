@@ -508,7 +508,7 @@
                         <flux:table.cell>
                             <div class="flex justify-center text-center">
                                 <flux:button icon="document-text" size="xs"
-                                    href="#"
+                                    :href="route('modul.rawat-jalan.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))" wire:navigate
                                     variant="ghost" />
                             </div>
                         </flux:table.cell>
