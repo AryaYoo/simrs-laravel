@@ -27,7 +27,10 @@
             let template = this.routeTemplates[url] || url;
             return template.replace(/(:noRawat|%3AnoRawat)/g, this.activePatient.noRawatSlug);
         },
-        routeTemplates: {},
+        routeTemplates: {
+            detail: '{{ route("modul.rawat-jalan.show", ":noRawat") }}',
+            action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
+        },
         chunk(items, size) {
             const chunks = [];
             for (let i = 0; i < items.length; i += size) {
@@ -194,6 +197,7 @@
             {
                 label: 'Akses Cepat',
                 items: [
+                    { label: 'Perawatan/Tindakan', url: 'action', target: '_blank' },
                     { label: 'Antrian Masuk Poli', url: '#' },
                     { label: 'Kamar Inap', url: '#' },
                 ]
@@ -508,12 +512,12 @@
                         <flux:table.cell>
                             <div class="flex justify-center text-center">
                                 <flux:button icon="document-text" size="xs"
-                                    :href="route('modul.rawat-jalan.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))" wire:navigate
-                                    variant="ghost" />
+                                    :href="route('modul.rawat-jalan.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))"
+                                    target="_blank" variant="ghost" />
                             </div>
                         </flux:table.cell>
                         <flux:table.cell>
-                            <flux:button icon="eye" size="xs" :href="route('modul.rawat-jalan.show', str_replace('/', '-', $reg->no_rawat))" wire:navigate variant="ghost" />
+                            <flux:button icon="eye" size="xs" :href="route('modul.rawat-jalan.show', str_replace('/', '-', $reg->no_rawat))" target="_blank" variant="ghost" />
                         </flux:table.cell>
                     </flux:table.row>
                 @empty

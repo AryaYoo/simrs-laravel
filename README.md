@@ -48,6 +48,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 
 ### 🏥 Modul Rawat Jalan (Ralan)
 - [x] **List Pasien Ralan**: Dashboard operasional poli.
+- [x] **Diagnosa & Prosedur (ICD-10 & ICD-9)**: Antarmuka terpadu dengan fitur *Multi-Select*, penomoran urut otomatis, dan tampilan *Top 10* diagnosa teratas (Refactored to Repository).
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
 ### 💵 Modul Casemix
