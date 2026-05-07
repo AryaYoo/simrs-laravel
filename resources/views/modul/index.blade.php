@@ -11,7 +11,6 @@
         ['title' => 'Casemix Rawat Inap', 'icon' => 'clipboard-document-list', 'route' => route('modul.casemix-rawat-inap.index')]
     ];
     @endphp
-    @endphp
 
     <div class="flex flex-col w-full h-full pb-8" 
          x-data="{ 

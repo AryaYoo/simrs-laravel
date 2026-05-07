@@ -30,6 +30,7 @@
         routeTemplates: {
             detail: '{{ route("modul.rawat-jalan.show", ":noRawat") }}',
             action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
+            'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -219,7 +220,7 @@
                 items: [
                     { label: 'Pemberian Obat', url: '#' },
                     { label: 'Input No.Resep', url: '#' },
-                    { label: 'Input Resep Dokter', url: '#' },
+                    { label: 'Input Resep Dokter', url: 'resep-dokter' },
                     { label: 'Total Tagihan Obat', url: '#' },
                     { label: 'Data Pemberian Obat', url: '#' },
                     { label: 'Penjualan Obat/Alkes/Barang', url: '#' },
