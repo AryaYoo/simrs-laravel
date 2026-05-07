@@ -19,6 +19,15 @@
                 <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Peresepan Obat Oleh Dokter</h1>
             </div>
         </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{{ route('modul.rawat-jalan.sub-rawat-jalan.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}" 
+               wire:navigate
+               class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all shadow-sm">
+                <flux:icon name="clock" class="w-4 h-4 text-[#4C5C2D]" />
+                Riwayat Pasien
+            </a>
+        </div>
     </div>
 
     {{-- Patient Info Banner --}}

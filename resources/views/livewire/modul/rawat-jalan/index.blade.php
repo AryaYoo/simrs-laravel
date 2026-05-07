@@ -31,6 +31,7 @@
             detail: '{{ route("modul.rawat-jalan.show", ":noRawat") }}',
             action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
             'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
+            'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -188,7 +189,7 @@
                 label: 'Permintaan',
                 items: [
                     { label: 'Jadwal Operasi', url: '#' },
-                    { label: 'Pemeriksaan Lab', url: '#' },
+                    { label: 'Pemeriksaan Lab', url: 'permintaan-lab' },
                     { label: 'Pemeriksaan Radiologi', url: '#' },
                     { label: 'Rawat Inap', url: '#' },
                     { label: 'Informasi Obat', url: '#' },

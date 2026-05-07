@@ -49,6 +49,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 ### 🏥 Modul Rawat Jalan (Ralan)
 - [x] **List Pasien Ralan**: Dashboard operasional poli.
 - [x] **Diagnosa & Prosedur (ICD-10 & ICD-9)**: Antarmuka terpadu dengan fitur *Multi-Select*, penomoran urut otomatis, dan tampilan *Top 10* diagnosa teratas (Refactored to Repository).
+- [x] **Riwayat Pasien**: Integrasi rekam medis lengkap (SOAPIE, Kunjungan, Hasil USG) dengan standar UI premium (New Component).
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
 ### 💵 Modul Casemix
@@ -204,6 +205,30 @@ Pastikan method di Livewire (misal `prepareAttach`) me-return value atau gunakan
 // BAIK (Modal hanya terbuka setelah server mengonfirmasi perubahan state)
 @click="$wire.prepareAttach('pemeriksaan').then(() => { showModal = true })"
 ```
+
+### 8. Penanganan Berkas & Media External (Khanza Integration)
+
+Laralite dirancang untuk berjalan berdampingan dengan sistem legacy (Khanza). Karena penyimpanan file media (seperti Foto USG, Berkas Digital) seringkali berada di server yang berbeda atau dikelola oleh web server Khanza (Apache), ikuti standar berikut:
+
+#### 8.1 Konfigurasi URL External
+Jangan melakukan *hardcode* IP atau domain server Khanza di dalam view. Gunakan variabel environment di `.env`:
+```env
+# .env
+KHANZA_USG_URL=http://192.168.100.2/webapps/hasilpemeriksaanusg/
+```
+
+#### 8.2 Cara Pemanggilan di View
+Gunakan helper `env()` atau `config()` untuk menggabungkan base URL dengan path yang tersimpan di database:
+```blade
+{{-- BAIK: Dinamis dan mudah dikelola --}}
+<img src="{{ env('KHANZA_USG_URL') . $img->photo }}">
+
+{{-- BURUK: Hardcode IP (Sulit dimaintain) --}}
+<img src="http://192.168.100.2/webapps/hasilpemeriksaanusg/{{ $img->photo }}">
+```
+
+#### 8.3 Sinkronisasi Folder (Opsi Offline)
+Jika ingin menjalankan file secara lokal tanpa jaringan ke server Khanza, salin folder berkas dari Khanza ke `storage/app/public` dan jalankan `php artisan storage:link`. Gunakan pengecekan `file_exists` jika diperlukan transisi antar metode.
 
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:

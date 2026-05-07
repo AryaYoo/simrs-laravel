@@ -816,7 +816,7 @@
                                                         </h5>
                                                         <div class="relative group aspect-video bg-neutral-100 dark:bg-neutral-900 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-inner flex items-center justify-center">
                                                             @if($kunjungan->hasilPemeriksaanUsg->gambar && $kunjungan->hasilPemeriksaanUsg->gambar->photo)
-                                                                <img src="{{ asset('storage/' . $kunjungan->hasilPemeriksaanUsg->gambar->photo) }}" 
+                                                                <img src="{{ env('KHANZA_USG_URL') . $kunjungan->hasilPemeriksaanUsg->gambar->photo }}" 
                                                                      alt="Photo USG" 
                                                                      class="object-contain w-full h-full transition-transform duration-500 group-hover:scale-105"
                                                                      onerror="this.onerror=null; this.src='/assets/images/placeholder-image.png';">

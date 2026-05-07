@@ -37,6 +37,7 @@
             detail: '{{ route("modul.rawat-jalan.show", ":noRawat") }}',
             action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
             'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
+            'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -194,7 +195,7 @@
                 label: 'Permintaan',
                 items: [
                     { label: 'Jadwal Operasi', url: '#' },
-                    { label: 'Pemeriksaan Lab', url: '#' },
+                    { label: 'Pemeriksaan Lab', url: 'permintaan-lab' },
                     { label: 'Pemeriksaan Radiologi', url: '#' },
                     { label: 'Rawat Inap', url: '#' },
                     { label: 'Informasi Obat', url: '#' },
@@ -440,6 +441,15 @@
                     <span class="font-bold text-neutral-800 dark:text-neutral-100 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded">{{ $regPeriksa->pasien->nm_pasien ?? '-' }}</span>
                 </div>
             </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a href="{{ route('modul.rawat-jalan.sub-rawat-jalan.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}" 
+               wire:navigate
+               class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all shadow-sm">
+                <flux:icon name="clock" class="w-4 h-4 text-[#4C5C2D]" />
+                Riwayat Pasien
+            </a>
         </div>
     </div>
 
