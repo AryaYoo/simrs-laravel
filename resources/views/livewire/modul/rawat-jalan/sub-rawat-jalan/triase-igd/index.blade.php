@@ -2,7 +2,7 @@
     {{-- Header --}}
     <div class="flex items-center justify-between bg-white dark:bg-neutral-800 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm">
         <div class="flex items-center gap-4">
-            <a href="{{ route('modul.rawat-jalan.index') }}" wire:navigate
+            <a href="{{ route('modul.rawat-jalan.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate
                class="flex items-center justify-center w-10 h-10 rounded-xl bg-neutral-100 dark:bg-neutral-700 hover:bg-[#4C5C2D] hover:text-white transition-all group">
                 <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500 group-hover:text-white" />
             </a>
@@ -11,6 +11,8 @@
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:text-[#4C5C2D]">Modul</a>
                     <flux:icon name="chevron-right" class="w-3 h-3" />
                     <a href="{{ route('modul.rawat-jalan.index') }}" wire:navigate class="hover:text-[#4C5C2D]">Rawat Jalan</a>
+                    <flux:icon name="chevron-right" class="w-3 h-3" />
+                    <a href="{{ route('modul.rawat-jalan.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate class="hover:text-[#4C5C2D]">Perawatan / Tindakan</a>
                     <flux:icon name="chevron-right" class="w-3 h-3" />
                     <span class="text-neutral-500">Triase IGD</span>
                 </nav>
@@ -331,7 +333,9 @@
                                 <flux:table.cell class="max-w-xs truncate">{{ $item->keterangan_kedatangan }}</flux:table.cell>
                                 <flux:table.cell>
                                     <div class="flex justify-center gap-1">
-                                        <flux:button icon="pencil-square" size="xs" variant="ghost" wire:click="edit('{{ $item->no_rawat }}')" />
+                                        <flux:button icon="pencil-square" size="xs" variant="ghost" 
+                                            href="{{ route('modul.rawat-jalan.sub-rawat-jalan.triase-igd.index', str_replace('/', '-', $item->no_rawat)) }}" 
+                                            wire:navigate />
                                         <flux:button icon="trash" size="xs" variant="ghost" class="text-red-500" />
                                     </div>
                                 </flux:table.cell>

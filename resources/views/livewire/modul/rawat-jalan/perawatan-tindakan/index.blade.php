@@ -38,6 +38,7 @@
             action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
             'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
             'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
+            'triase-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.triase-igd", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -74,7 +75,7 @@
                         { label: 'Skrining Frailty Syndrome', url: '#' },
                     ]},
                     { label: 'RM Gawat Darurat', children: [
-                        { label: 'Triase Gawat Darurat', url: '#' },
+                        { label: 'Triase Gawat Darurat', url: 'triase-igd' },
                         { label: 'Pengkajian Awal Keperawatan IGD', url: '#' },
                         { label: 'Pengkajian Awal Medis IGD', url: '#' },
                         { label: 'Pengkajian Awal Medis IGD Psikiatri', url: '#' },
