@@ -50,6 +50,8 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **List Pasien Ralan**: Dashboard operasional poli dengan filter lanjutan (Dokter, Poliklinik, & Periode).
 - [x] **Diagnosa & Prosedur (ICD-10 & ICD-9)**: Antarmuka terpadu dengan fitur *Multi-Select*, penomoran urut otomatis, dan tampilan *Top 10* diagnosa teratas (Refactored to Repository).
 - [x] **Riwayat Pasien**: Integrasi rekam medis lengkap (SOAPIE, Kunjungan, Hasil USG) dengan standar UI premium.
+- [x] **Permintaan Lab**: Modul permintaan pemeriksaan laboratorium (PK, PA, MB) dengan lookup pemeriksaan dinamis (Refactored to Repository).
+- [ ] **Permintaan Radiologi**: Modul permintaan pemeriksaan radiologi (Roadmap).
 - [x] **Triase IGD**: Modul triase gawat darurat lengkap (Skala 1-5, Primer & Sekunder) dengan antarmuka tabbed premium (Navigation, Edit, & Delete features fully implemented & stabilized).
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
