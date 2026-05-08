@@ -336,7 +336,23 @@
                                         <flux:button icon="pencil-square" size="xs" variant="ghost" 
                                             href="{{ route('modul.rawat-jalan.sub-rawat-jalan.triase-igd.index', str_replace('/', '-', $item->no_rawat)) }}" 
                                             wire:navigate />
-                                        <flux:button icon="trash" size="xs" variant="ghost" class="text-red-500" />
+                                        <flux:button icon="trash" size="xs" variant="ghost" class="text-red-500" 
+                                            @click="
+                                                Swal.fire({
+                                                    title: 'Hapus Data Triase?',
+                                                    text: 'Data yang dihapus tidak dapat dikembalikan!',
+                                                    icon: 'warning',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#4C5C2D',
+                                                    cancelButtonColor: '#d33',
+                                                    confirmButtonText: 'Ya, Hapus!',
+                                                    cancelButtonText: 'Batal'
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        $wire.delete('{{ $item->no_rawat }}');
+                                                    }
+                                                });
+                                            " />
                                     </div>
                                 </flux:table.cell>
                             </flux:table.row>

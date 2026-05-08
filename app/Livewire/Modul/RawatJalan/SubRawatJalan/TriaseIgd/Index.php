@@ -218,6 +218,35 @@ class Index extends Component
         }
     }
 
+    public function delete($no_rawat)
+    {
+        // 1. Validate lock (if it's the current record)
+        if ($this->no_rawat === $no_rawat) {
+            $this->validateLock($this->regPeriksa->fresh());
+        }
+
+        try {
+            TriaseIgdRepository::deleteTriase($no_rawat);
+            
+            $this->dispatch('swal', [
+                'title' => 'Berhasil', 
+                'text' => 'Data triase IGD berhasil dihapus.', 
+                'icon' => 'success'
+            ]);
+
+            // If we deleted the record we are currently viewing, reset data
+            if ($this->no_rawat === $no_rawat) {
+                $this->loadData();
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal', 
+                'text' => 'Gagal menghapus data: ' . $e->getMessage(), 
+                'icon' => 'error'
+            ]);
+        }
+    }
+
     public function render()
     {
         return view('livewire.modul.rawat-jalan.sub-rawat-jalan.triase-igd.index');

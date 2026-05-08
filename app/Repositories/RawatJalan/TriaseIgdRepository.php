@@ -77,6 +77,13 @@ class TriaseIgdRepository
     public static function deleteTriase(string $no_rawat)
     {
         return DB::transaction(function () use ($no_rawat) {
+            DataTriaseIgdPrimer::where('no_rawat', $no_rawat)->delete();
+            DataTriaseIgdSekunder::where('no_rawat', $no_rawat)->delete();
+            DataTriaseIgdDetailSkala1::where('no_rawat', $no_rawat)->delete();
+            DataTriaseIgdDetailSkala2::where('no_rawat', $no_rawat)->delete();
+            DataTriaseIgdDetailSkala3::where('no_rawat', $no_rawat)->delete();
+            DataTriaseIgdDetailSkala4::where('no_rawat', $no_rawat)->delete();
+            DataTriaseIgdDetailSkala5::where('no_rawat', $no_rawat)->delete();
             return DataTriaseIgd::where('no_rawat', $no_rawat)->delete();
         });
     }
