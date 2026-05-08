@@ -334,7 +334,7 @@
                                 <flux:table.cell>
                                     <div class="flex justify-center gap-1">
                                         <flux:button icon="pencil-square" size="xs" variant="ghost" 
-                                            href="{{ route('modul.rawat-jalan.sub-rawat-jalan.triase-igd.index', str_replace('/', '-', $item->no_rawat)) }}" 
+                                            href="{{ route('modul.rawat-jalan.sub-rawat-jalan.triase-igd', str_replace('/', '-', $item->no_rawat)) }}" 
                                             wire:navigate />
                                         <flux:button icon="trash" size="xs" variant="ghost" class="text-red-500" 
                                             @click="
