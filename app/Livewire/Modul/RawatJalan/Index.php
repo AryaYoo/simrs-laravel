@@ -16,6 +16,8 @@ class Index extends Component
     public string $dari = '';
     public string $sampai = '';
     public string $filterType = '';
+    public string $kd_dokter = '';
+    public string $kd_poli = '';
     public int $perPage = 20;
 
     public function mount()
@@ -24,10 +26,12 @@ class Index extends Component
         $this->sampai = now()->format('Y-m-d');
     }
 
-    public function updatedSearch()  { $this->resetPage(); }
-    public function updatedDari()    { $this->resetPage(); }
-    public function updatedSampai()  { $this->resetPage(); }
-    public function updatedPerPage() { $this->resetPage(); }
+    public function updatedSearch()   { $this->resetPage(); }
+    public function updatedDari()     { $this->resetPage(); }
+    public function updatedSampai()   { $this->resetPage(); }
+    public function updatedPerPage()  { $this->resetPage(); }
+    public function updatedKdDokter() { $this->resetPage(); }
+    public function updatedKdPoli()   { $this->resetPage(); }
 
     public function setFilter(string $type)
     {
@@ -43,6 +47,8 @@ class Index extends Component
             ->where('status_lanjut', 'Ralan')
             ->when($this->dari,    fn($q) => $q->whereDate('tgl_registrasi', '>=', $this->dari))
             ->when($this->sampai,  fn($q) => $q->whereDate('tgl_registrasi', '<=', $this->sampai))
+            ->when($this->kd_dokter, fn($q) => $q->where('kd_dokter', $this->kd_dokter))
+            ->when($this->kd_poli,   fn($q) => $q->where('kd_poli', $this->kd_poli))
             ->where(function ($query) use ($searchTerm) {
                 $query->where('no_rawat', 'like', $searchTerm)
                     ->orWhere('no_rkm_medis', 'like', $searchTerm)
@@ -85,7 +91,9 @@ class Index extends Component
                 'bpjs' => $counts->bpjs ?? 0,
                 'umum' => $counts->umum ?? 0,
                 'lainnya' => max(0, ($counts->total ?? 0) - ($counts->bpjs ?? 0) - ($counts->umum ?? 0)),
-            ]
+            ],
+            'dokters' => \App\Models\Dokter::where('status', '1')->orderBy('nm_dokter')->get(),
+            'polikliniks' => \App\Models\Poliklinik::where('status', '1')->orderBy('nm_poli')->get(),
         ]);
     }
 }

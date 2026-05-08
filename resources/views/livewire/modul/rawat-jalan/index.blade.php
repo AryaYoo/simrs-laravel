@@ -32,6 +32,7 @@
             action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
             'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
             'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
+            'triase-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.triase-igd", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -68,7 +69,7 @@
                         { label: 'Skrining Frailty Syndrome', url: '#' },
                     ]},
                     { label: 'RM Gawat Darurat', children: [
-                        { label: 'Triase Gawat Darurat', url: '#' },
+                        { label: 'Triase Gawat Darurat', url: 'triase-igd' },
                         { label: 'Pengkajian Awal Keperawatan IGD', url: '#' },
                         { label: 'Pengkajian Awal Medis IGD', url: '#' },
                         { label: 'Pengkajian Awal Medis IGD Psikiatri', url: '#' },
@@ -467,17 +468,37 @@
     </div>
 
     <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4">
-        <div class="flex flex-col sm:flex-row gap-3 mb-4">
-            <div class="flex-1">
-                <flux:input wire:model.live.debounce.300ms="search"
-                    placeholder="Cari No Rawat, No RM, atau Nama Pasien..."
-                    icon="magnifying-glass" />
+        <div class="flex flex-col gap-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1">
+                    <flux:input wire:model.live.debounce.300ms="search"
+                        placeholder="Cari No Rawat, No RM, atau Nama Pasien..."
+                        icon="magnifying-glass" />
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900/50 p-1 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                    <div class="flex items-center gap-2 px-2">
+                        <label class="text-[10px] font-black uppercase tracking-tighter text-neutral-400">Periode</label>
+                        <flux:input type="date" wire:model.live="dari" size="sm" class="w-36" />
+                        <span class="text-xs text-neutral-400 font-bold">-</span>
+                        <flux:input type="date" wire:model.live="sampai" size="sm" class="w-36" />
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <label class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 whitespace-nowrap">Dari</label>
-                <flux:input type="date" wire:model.live="dari" class="w-40" />
-                <span class="text-xs text-neutral-400">s/d</span>
-                <flux:input type="date" wire:model.live="sampai" class="w-40" />
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <flux:select wire:model.live="kd_poli" placeholder="Semua Poliklinik">
+                    <flux:select.option value="">-- Semua Poliklinik --</flux:select.option>
+                    @foreach($polikliniks as $poli)
+                        <flux:select.option value="{{ $poli->kd_poli }}">{{ $poli->nm_poli }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+
+                <flux:select wire:model.live="kd_dokter" placeholder="Semua Dokter">
+                    <flux:select.option value="">-- Semua Dokter --</flux:select.option>
+                    @foreach($dokters as $dr)
+                        <flux:select.option value="{{ $dr->kd_dokter }}">{{ $dr->nm_dokter }}</flux:select.option>
+                    @endforeach
+                </flux:select>
             </div>
         </div>
 

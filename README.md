@@ -47,9 +47,10 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) & Radiologi telah terintegrasi penuh dengan pola Repository.
 
 ### 🏥 Modul Rawat Jalan (Ralan)
-- [x] **List Pasien Ralan**: Dashboard operasional poli.
+- [x] **List Pasien Ralan**: Dashboard operasional poli dengan filter lanjutan (Dokter, Poliklinik, & Periode).
 - [x] **Diagnosa & Prosedur (ICD-10 & ICD-9)**: Antarmuka terpadu dengan fitur *Multi-Select*, penomoran urut otomatis, dan tampilan *Top 10* diagnosa teratas (Refactored to Repository).
-- [x] **Riwayat Pasien**: Integrasi rekam medis lengkap (SOAPIE, Kunjungan, Hasil USG) dengan standar UI premium (New Component).
+- [x] **Riwayat Pasien**: Integrasi rekam medis lengkap (SOAPIE, Kunjungan, Hasil USG) dengan standar UI premium.
+- [x] **Triase IGD**: Modul triase gawat darurat lengkap (Skala 1-5, Primer & Sekunder) dengan antarmuka tabbed premium.
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
 ### 💵 Modul Casemix
@@ -229,6 +230,23 @@ Gunakan helper `env()` atau `config()` untuk menggabungkan base URL dengan path 
 
 #### 8.3 Sinkronisasi Folder (Opsi Offline)
 Jika ingin menjalankan file secara lokal tanpa jaringan ke server Khanza, salin folder berkas dari Khanza ke `storage/app/public` dan jalankan `php artisan storage:link`. Gunakan pengecekan `file_exists` jika diperlukan transisi antar metode.
+
+### 9. Penanganan Specificity pada Flux UI (PENTING!)
+
+Komponen Flux UI seringkali memiliki *style* internal yang sangat spesifik. Hal ini sering menyebabkan utilitas Tailwind standar (seperti `padding`, `margin`, atau `width`) tidak berfungsi karena kalah dalam urutan prioritas CSS (*CSS Specificity*).
+
+**Masalah Umum:**
+Menambahkan `class="pl-6"` pada `<flux:table.column>` tidak memberikan efek karena tertimpa gaya bawaan Flux.
+
+**Solusi — Gunakan Modifier Important (!):**
+Selalu gunakan tanda seru `!` untuk memaksa *style* kita agar diprioritaskan oleh browser.
+```blade
+{{-- SALAH: Style mungkin tidak muncul --}}
+<flux:table.column class="pl-6">Nama</flux:table.column>
+
+{{-- BENAR: Menggunakan ! untuk memaksa prioritas --}}
+<flux:table.column class="!pl-6">Nama</flux:table.column>
+```
 
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
