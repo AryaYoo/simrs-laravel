@@ -55,6 +55,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [ ] **Permintaan Radiologi**: Modul permintaan pemeriksaan radiologi (Roadmap).
 - [x] **Triase IGD**: Modul triase gawat darurat lengkap (Skala 1-5, Primer & Sekunder) dengan antarmuka tabbed premium (Navigation, Edit, & Delete features fully implemented & stabilized).
 - [x] **Catatan Keperawatan Ralan**: Modul pencatatan asuhan keperawatan rawat jalan terintegrasi dengan legacy database.
+- [x] **Observasi IGD**: Modul pencatatan tanda-tanda vital pasien IGD (GCS, TD, HR, RR, Suhu, SpO2) dengan CRUD penuh, validasi ketat, dan sinkronisasi legacy database (Refactored to Repository).
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
 ### 💵 Modul Casemix

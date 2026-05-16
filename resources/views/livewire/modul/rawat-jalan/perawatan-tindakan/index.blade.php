@@ -40,6 +40,7 @@
             'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
             'triase-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.triase-igd", ":noRawat") }}',
             'catatan-keperawatan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.catatan-keperawatan", ":noRawat") }}',
+            'observasi-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.observasi-igd", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -164,7 +165,7 @@
                         { label: 'Catatan Keperawatan', url: 'catatan-keperawatan' },
                         { label: 'Catatan Persalinan', url: '#' },
                         { label: 'Keseimbangan Cairan', url: '#' },
-                        { label: 'Observasi IGD', url: '#' },
+                        { label: 'Observasi IGD', url: 'observasi-igd' },
                         { label: 'Observasi CHBP', url: '#' },
                         { label: 'Observasi Induksi Persalinan', url: '#' },
                         { label: 'Observasi Bayi', url: '#' },
