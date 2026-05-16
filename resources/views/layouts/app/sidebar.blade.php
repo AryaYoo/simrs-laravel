@@ -400,11 +400,13 @@
                 style="background-color: rgba(24, 24, 27, 0.8); color: white; text-decoration: none;"
                 title="Ticketing IT">
                 
-                <div class="flex items-center justify-center min-w-[3rem]">
-                    <flux:icon name="question-mark-circle" class="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
+                <div class="flex-shrink-0 flex items-center justify-center w-12 h-12">
+                    <svg class="w-6 h-6 text-white group-hover:text-white/80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                 </div>
                 
-                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap text-[0.7rem] font-bold tracking-tight text-white pr-4">
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap text-[0.7rem] font-bold tracking-tight text-white pr-5">
                     BANTUAN IT?
                 </span>
             </a>
