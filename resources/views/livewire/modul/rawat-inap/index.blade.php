@@ -35,7 +35,8 @@
             action: '{{ route("modul.rawat-inap.perawatan-tindakan", ":noRawat") }}',
             resepDokter: '{{ route("modul.rawat-inap.sub-rawat-inap.resep-dokter", ":noRawat") }}',
             radiologi: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-radiologi", ":noRawat") }}',
-            lab: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-laboratorium", ":noRawat") }}'
+            lab: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-laboratorium", ":noRawat") }}',
+            catatanKeperawatan: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-keperawatan", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -132,7 +133,7 @@
                     { label: 'Catatan & Dokumentasi', children: [
                         { label: 'Observasi', url: '#' },
                         { label: 'Follow Up DBD', url: '#' },
-                        { label: 'Catatan Keperawatan', url: '#' },
+                        { label: 'Catatan Keperawatan', url: 'catatanKeperawatan' },
                         { label: 'Cek GDS', url: '#' },
                         { label: 'Monitoring Reaksi Transfusi', url: '#' },
                         { label: 'Hasil USG', url: '#' },

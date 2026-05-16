@@ -39,6 +39,7 @@
             'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
             'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
             'triase-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.triase-igd", ":noRawat") }}',
+            'catatan-keperawatan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.catatan-keperawatan", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -160,7 +161,7 @@
                         { label: 'Catatan Cek GDS', url: '#' },
                         { label: 'Monitoring Reaksi Tranfusi', url: '#' },
                         { label: 'Pengkajian Ulang Nyeri', url: '#' },
-                        { label: 'Catatan Keperawatan', url: '#' },
+                        { label: 'Catatan Keperawatan', url: 'catatan-keperawatan' },
                         { label: 'Catatan Persalinan', url: '#' },
                         { label: 'Keseimbangan Cairan', url: '#' },
                         { label: 'Observasi IGD', url: '#' },

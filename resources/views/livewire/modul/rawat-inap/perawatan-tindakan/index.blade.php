@@ -118,7 +118,7 @@
                     { label: 'Catatan & Dokumentasi', children: [
                         { label: 'Observasi', url: '#' },
                         { label: 'Follow Up DBD', url: '#' },
-                        { label: 'Catatan Keperawatan', url: '#' },
+                        { label: 'Catatan Keperawatan', url: '{{ route('modul.rawat-inap.sub-rawat-inap.catatan-keperawatan', str_replace('/', '-', $no_rawat)) }}' },
                         { label: 'Cek GDS', url: '#' },
                         { label: 'Monitoring Reaksi Transfusi', url: '#' },
                         { label: 'Hasil USG', url: '#' },

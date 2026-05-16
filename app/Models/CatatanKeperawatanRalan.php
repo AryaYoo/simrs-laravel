@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CatatanKeperawatanRalan extends Model
+{
+    protected $table = 'catatan_keperawatan_ralan';
+
+    public $timestamps = false;
+    protected $primaryKey = 'no_rawat';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'tanggal',
+        'jam',
+        'no_rawat',
+        'uraian',
+        'nip',
+    ];
+
+    public function regPeriksa()
+    {
+        return $this->belongsTo(RegPeriksa::class, 'no_rawat', 'no_rawat');
+    }
+
+    public function petugas()
+    {
+        return $this->belongsTo(Petugas::class, 'nip', 'nip');
+    }
+}
