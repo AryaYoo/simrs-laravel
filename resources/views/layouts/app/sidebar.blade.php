@@ -396,19 +396,18 @@
         {{-- Floating Support Button (Ticketing IT) --}}
         <div class="fixed bottom-6 right-6 z-[9999] lg:bottom-8 lg:right-8">
             <a href="http://192.168.100.177/mastolongmas/public/login" target="_blank"
-                class="flex items-center justify-center w-14 h-14 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 group relative border-2 border-white/20"
-                style="background: linear-gradient(135deg, #E53935 0%, #C62828 100%); color: white; text-decoration: none;"
+                class="flex items-center gap-2 px-4 py-2.5 rounded-full shadow-lg transition-all duration-300 hover:scale-105 group border border-white/10"
+                style="background-color: #2F381C; color: white; text-decoration: none;"
                 title="Ticketing IT">
                 
-                {{-- Pulsing Effect --}}
-                <span class="absolute inset-0 rounded-full bg-red-500 opacity-20 animate-ping group-hover:hidden"></span>
-
-                <flux:icon name="lifebuoy" class="w-7 h-7 relative z-10" />
-
-                {{-- Tooltip Label --}}
-                <span class="absolute right-full mr-4 bg-zinc-900/95 text-white text-[0.7rem] font-bold py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0 whitespace-nowrap pointer-events-none shadow-2xl border border-white/10 backdrop-blur-sm">
-                    TICKETING IT
+                <flux:icon name="chat-bubble-left-right" class="w-5 h-5 text-white/80" />
+                
+                <span class="text-[0.75rem] font-bold tracking-wide uppercase text-white/90 group-hover:text-white">
+                    Bantuan IT?
                 </span>
+
+                {{-- Subtle Glow on Hover --}}
+                <div class="absolute inset-0 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
             </a>
         </div>
 
