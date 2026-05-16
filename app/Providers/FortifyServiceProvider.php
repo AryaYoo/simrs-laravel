@@ -28,10 +28,10 @@ class FortifyServiceProvider extends ServiceProvider
                     $role = auth()->user()->role;
 
                     if ($role === 'admin') {
-                        return redirect()->intended('/admin');
+                        return redirect()->intended(route('admin.dashboard'));
                     }
 
-                    return redirect()->intended('/user');
+                    return redirect()->intended(route('user.dashboard'));
                 }
             };
         });
