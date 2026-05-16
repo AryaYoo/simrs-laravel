@@ -35,6 +35,7 @@
             'triase-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.triase-igd", ":noRawat") }}',
             'catatan-keperawatan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.catatan-keperawatan", ":noRawat") }}',
             'observasi-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.observasi-igd", ":noRawat") }}',
+            'pengkajian-awal-keperawatan-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -72,7 +73,7 @@
                     ]},
                     { label: 'RM Gawat Darurat', children: [
                         { label: 'Triase Gawat Darurat', url: 'triase-igd' },
-                        { label: 'Pengkajian Awal Keperawatan IGD', url: '#' },
+                        { label: 'Pengkajian Awal Keperawatan IGD', url: 'pengkajian-awal-keperawatan-igd' },
                         { label: 'Pengkajian Awal Medis IGD', url: '#' },
                         { label: 'Pengkajian Awal Medis IGD Psikiatri', url: '#' },
                         { label: 'Pengkajian Pasien Keracunan', url: '#' },
