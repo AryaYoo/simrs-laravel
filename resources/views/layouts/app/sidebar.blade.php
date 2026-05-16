@@ -396,14 +396,16 @@
         {{-- Floating Support Button (Ticketing IT) --}}
         <div class="fixed bottom-6 right-6 z-[9999] lg:bottom-8 lg:right-8">
             <a href="http://192.168.100.177/mastolongmas/public/login" target="_blank"
-                class="flex items-center gap-2 px-4 py-2 rounded-full shadow-md transition-all duration-300 hover:scale-105 group border border-white/10 backdrop-blur-md"
+                class="flex items-center justify-center h-12 w-12 hover:w-36 rounded-full shadow-lg transition-all duration-300 ease-in-out group border border-white/10 backdrop-blur-md overflow-hidden"
                 style="background-color: rgba(24, 24, 27, 0.8); color: white; text-decoration: none;"
                 title="Ticketing IT">
                 
-                <flux:icon name="chat-bubble-left-right" class="w-4 h-4 text-white/60 group-hover:text-white" />
+                <div class="flex items-center justify-center min-w-[3rem]">
+                    <flux:icon name="chat-bubble-left-right" class="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
+                </div>
                 
-                <span class="text-[0.7rem] font-semibold tracking-tight text-white/70 group-hover:text-white">
-                    Bantuan IT?
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap text-[0.7rem] font-bold tracking-tight text-white pr-4">
+                    BANTUAN IT?
                 </span>
             </a>
         </div>
