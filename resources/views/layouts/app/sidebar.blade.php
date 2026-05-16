@@ -396,14 +396,12 @@
         {{-- Floating Support Button (Ticketing IT) --}}
         <div class="fixed bottom-6 right-6 z-[9999] lg:bottom-8 lg:right-8">
             <a href="http://192.168.100.177/mastolongmas/public/login" target="_blank"
-                class="flex items-center justify-center h-12 w-12 hover:w-36 rounded-full shadow-lg transition-all duration-300 ease-in-out group border border-white/10 backdrop-blur-md overflow-hidden"
+                class="flex items-center justify-start h-12 w-12 hover:w-36 rounded-full shadow-lg transition-all duration-300 ease-in-out group border border-white/10 backdrop-blur-md overflow-hidden"
                 style="background-color: rgba(24, 24, 27, 0.8); color: white; text-decoration: none;"
                 title="Ticketing IT">
                 
                 <div class="flex-shrink-0 flex items-center justify-center w-12 h-12">
-                    <svg class="w-6 h-6 text-white group-hover:text-white/80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <span class="text-xl font-bold text-white group-hover:text-white/80 transition-colors leading-none mt-1">?</span>
                 </div>
                 
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap text-[0.7rem] font-bold tracking-tight text-white pr-5">
