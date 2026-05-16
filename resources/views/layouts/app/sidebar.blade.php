@@ -401,7 +401,7 @@
                 title="Ticketing IT">
                 
                 <div class="flex items-center justify-center min-w-[3rem]">
-                    <flux:icon name="chat-bubble-left-right" class="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
+                    <flux:icon name="question-mark-circle" class="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
                 </div>
                 
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap text-[0.7rem] font-bold tracking-tight text-white pr-4">
