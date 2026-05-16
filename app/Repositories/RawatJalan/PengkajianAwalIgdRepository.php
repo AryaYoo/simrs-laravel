@@ -14,7 +14,7 @@ class PengkajianAwalIgdRepository
      */
     public function getByNoRawat(string $noRawat): ?PenilaianAwalKeperawatanIgd
     {
-        return PenilaianAwalKeperawatanIgd::with(['petugas', 'masalah', 'rencana'])
+        return PenilaianAwalKeperawatanIgd::with(['petugas', 'masalah', 'detailRencana'])
             ->where('no_rawat', $noRawat)
             ->first();
     }
@@ -93,6 +93,20 @@ class PengkajianAwalIgdRepository
                     'kode_rencana' => $kode,
                 ]);
             }
+        });
+    }
+
+    /**
+     * Delete pengkajian and its pivots
+     */
+    public function delete(string $noRawat)
+    {
+        return DB::transaction(function () use ($noRawat) {
+            DB::table('penilaian_awal_keperawatan_igd_masalah')
+                ->where('no_rawat', $noRawat)->delete();
+            DB::table('penilaian_awal_keperawatan_ralan_rencana_igd')
+                ->where('no_rawat', $noRawat)->delete();
+            PenilaianAwalKeperawatanIgd::where('no_rawat', $noRawat)->delete();
         });
     }
 }

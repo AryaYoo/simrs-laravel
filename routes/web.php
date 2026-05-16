@@ -55,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-jalan/{no_rawat}/catatan-keperawatan', \App\Livewire\Modul\RawatJalan\SubRawatJalan\CatatanKeperawatan\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.catatan-keperawatan')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/observasi-igd', \App\Livewire\Modul\RawatJalan\SubRawatJalan\ObservasiIgd\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.observasi-igd')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/pengkajian-awal-keperawatan-igd', \App\Livewire\Modul\RawatJalan\SubRawatJalan\PengkajianAwalIgd\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd')->where('no_rawat', '.*');
+    Route::get('modul/rawat-jalan/{no_rawat}/pengkajian-awal-keperawatan-igd/form', \App\Livewire\Modul\RawatJalan\SubRawatJalan\PengkajianAwalIgd\Form::class)->name('modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd.form')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}', \App\Livewire\Modul\RawatJalan\Show::class)->name('modul.rawat-jalan.show')->where('no_rawat', '.*');
 
     Route::get('modul/casemix-rawat-jalan', \App\Livewire\Modul\CasemixRawatJalan\Index::class)->name('modul.casemix-rawat-jalan.index');

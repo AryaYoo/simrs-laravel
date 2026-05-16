@@ -34,7 +34,7 @@ class PenilaianAwalKeperawatanIgd extends Model
         );
     }
 
-    public function rencana()
+    public function detailRencana()
     {
         return $this->belongsToMany(
             MasterRencanaKeperawatanIgd::class,
