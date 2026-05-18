@@ -32,7 +32,7 @@ return [
 
     'view_path' => resource_path('views/livewire'),
 
-    'asset_url' => null,
+    'asset_url' => env('LIVEWIRE_ASSET_URL', env('APP_URL') ? parse_url(env('APP_URL'), PHP_URL_PATH) : null),
 
     'temporary_file_upload' => [
         'disk' => env('LIVEWIRE_TEMPORARY_FILE_UPLOAD_DISK'),
