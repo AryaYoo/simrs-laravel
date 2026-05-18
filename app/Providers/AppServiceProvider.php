@@ -24,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        // Force HTTPS if APP_URL starts with https
+        if (str_starts_with(config('app.url', ''), 'https')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 
     /**
