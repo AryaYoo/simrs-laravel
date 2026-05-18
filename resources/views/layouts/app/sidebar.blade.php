@@ -135,7 +135,7 @@
             @endif
 
             {{-- SECTION: MAIN (Dark Olive) - USER MENU --}}
-            <div class="flex-1 flex flex-col" style="background-color: #4C5C2D; color: white; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
+            <div class="flex-1 flex flex-col pt-2" style="background-color: #4C5C2D; color: white;">
 
                 {{-- Main Menu Header --}}
                 <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
@@ -276,86 +276,65 @@
                         </div>
                     </div>
                 </nav>
-            </div>
 
-            {{-- SECONDARY ZONE: BRIDGING & FOOTER (Darker Olive Zone) --}}
-            <div class="flex-1 flex flex-col pt-4"
-                style="background-color: #3E4A25; border-top: 1px solid rgba(0,0,0,0.1);">
-                @if(auth()->user()->role === 'admin')
-                {{-- SECTION: BRIDGING (Integrated Style) --}}
-                <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
-                    <p
-                        style="color: rgba(255,255,255,0.4); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-                        {{ __('Bridging') }}
-                    </p>
-                </div>
-                <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
-
-                {{-- Bridging Navigation --}}
-                <nav class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
-                    <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate
-                        class="flex items-center rounded-md text-sm font-medium transition-colors"
-                        :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
-                        style="color: white; text-decoration: none; background-color: {{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }};"
-                        onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
-                        onmouseout="this.style.backgroundColor='{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }}'"
-                        title="{{ __('ERM BPJS') }}">
-                        <flux:icon name="document-text" class="w-4 h-4 flex-shrink-0" />
-                        <span x-show="sidebarOpen">{{ __('Rekam Medis (E-Claim)') }}</span>
-                    </a>
-                </nav>
-                @endif
-
-                <div class="flex-1"></div>
-
-                {{-- SECTION: FOOTER (Darker Olive) --}}
-                <div style="background-color: #2F381C; border-top: 1px solid rgba(255,255,255,0.05);">
-                    {{-- Language Switcher (Compact) --}}
-                    <div x-show="sidebarOpen" style="padding: 0.5rem 1rem 0.25rem 1rem;">
-                        <div class="flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
-                            <flux:icon name="language" class="size-3" style="color: white;" />
-                            <span
-                                style="color: white; font-size: 0.65rem; margin-right: 4px;">{{ __('Language') }}:</span>
-                            <a href="{{ route('lang.switch', 'id') }}"
-                                class="px-1.5 py-0.5 rounded text-[0.65rem] transition-colors hover:bg-white/10"
-                                style="{{ app()->getLocale() === 'id' ? 'background-color: rgba(255,255,255,0.2); color: white; font-weight:600;' : 'color: rgba(255,255,255,0.5);' }}">ID</a>
-                            <a href="{{ route('lang.switch', 'en') }}"
-                                class="px-1.5 py-0.5 rounded text-[0.65rem] transition-colors hover:bg-white/10"
-                                style="{{ app()->getLocale() === 'en' ? 'background-color: rgba(255,255,255,0.2); color: white; font-weight:600;' : 'color: rgba(255,255,255,0.5);' }}">EN</a>
+                {{-- BRIDGING & FOOTER --}}
+                <div class="flex-1 flex flex-col justify-end">
+                    @if(auth()->user()->role === 'admin')
+                    {{-- BRIDGING (Integrated Style) --}}
+                    <div style="background-color: #3E4A25; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 1rem;">
+                        <div x-show="sidebarOpen" style="padding: 0rem 1rem 0.25rem 1rem;">
+                            <p style="color: rgba(255,255,255,0.4); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+                                {{ __('Bridging') }}
+                            </p>
                         </div>
-                    </div>
+                        <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
 
-                    {{-- Bottom User Block --}}
-                    <div style="background-color: rgba(0,0,0,0.1);"
-                        :class="sidebarOpen ? 'p-3' : 'py-4 px-0 flex flex-col items-center gap-3'">
-                        <a href="{{ route('profile.edit') }}" wire:navigate class="flex items-center gap-2 mb-2"
-                            :class="!sidebarOpen ? 'justify-center mb-0' : ''" style="text-decoration: none;"
-                            title="{{ __('Settings') }}">
-                            <div class="flex items-center justify-center rounded-full flex-shrink-0 font-bold shadow-inner"
-                                style="background-color: rgba(255,255,255,0.2); width: 2.2rem; height: 2.2rem; color: white; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1);">
-                                {{ auth()->user()->initials() }}
+                        <nav class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                            <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate
+                                class="flex items-center rounded-md text-sm font-medium transition-colors"
+                                :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                                style="color: white; text-decoration: none; background-color: {{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }};"
+                                onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                                onmouseout="this.style.backgroundColor='{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }}'"
+                                title="{{ __('ERM BPJS') }}">
+                                <flux:icon name="document-text" class="w-4 h-4 flex-shrink-0" />
+                                <span x-show="sidebarOpen">{{ __('Rekam Medis (E-Claim)') }}</span>
+                            </a>
+                        </nav>
+                    </div>
+                    @endif
+
+                    {{-- SECTION: FOOTER (Darker Olive) --}}
+                    <div style="background-color: #2F381C; border-top: 1px solid rgba(255,255,255,0.05);">
+                        {{-- Language Switcher (Compact) --}}
+                        <div x-show="sidebarOpen" style="padding: 0.5rem 1rem 0.25rem 1rem;">
+                            <div class="flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                                <flux:icon name="language" class="size-3" style="color: white;" />
+                                <span style="color: white; font-size: 0.65rem; margin-right: 4px;">{{ __('Language') }}:</span>
+                                <a href="{{ route('lang.switch', 'id') }}" class="px-1.5 py-0.5 rounded text-[0.65rem] transition-colors hover:bg-white/10" style="{{ app()->getLocale() === 'id' ? 'background-color: rgba(255,255,255,0.2); color: white; font-weight:600;' : 'color: rgba(255,255,255,0.5);' }}">ID</a>
+                                <a href="{{ route('lang.switch', 'en') }}" class="px-1.5 py-0.5 rounded text-[0.65rem] transition-colors hover:bg-white/10" style="{{ app()->getLocale() === 'en' ? 'background-color: rgba(255,255,255,0.2); color: white; font-weight:600;' : 'color: rgba(255,255,255,0.5);' }}">EN</a>
                             </div>
-                            <div class="overflow-hidden" x-show="sidebarOpen">
-                                <p class="truncate font-semibold text-white"
-                                    style="font-size: 0.8rem; line-height: 1.2;">
-                                    {{ auth()->user()->fullname }}
-                                </p>
-                                <p class="truncate text-white/50"
-                                    style="font-size: 0.65rem; line-height: 1.2; text-transform: capitalize;">
-                                    {{ auth()->user()->role }}
-                                </p>
-                            </div>
-                        </a>
-                        <form method="POST" action="{{ route('logout') }}" :class="sidebarOpen ? 'w-full' : ''">
-                            @csrf
-                            <button type="submit" class="flex items-center justify-center transition-colors shadow-sm"
-                                :class="sidebarOpen ? 'w-full gap-1.5 rounded-lg text-[0.7rem] font-semibold py-2 hover:bg-white/20 bg-white/10' : 'w-9 h-9 rounded-full hover:bg-white/20 bg-white/10'"
-                                style="color: white; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;"
-                                title="{{ __('Log out') }}" data-test="logout-button">
-                                <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
-                                <span x-show="sidebarOpen" class="ml-1">{{ __('Log out') }}</span>
-                            </button>
-                        </form>
+                        </div>
+
+                        {{-- Bottom User Block --}}
+                        <div style="background-color: rgba(0,0,0,0.1);" :class="sidebarOpen ? 'p-3' : 'py-4 px-0 flex flex-col items-center gap-3'">
+                            <a href="{{ route('profile.edit') }}" wire:navigate class="flex items-center gap-2 mb-2" :class="!sidebarOpen ? 'justify-center mb-0' : ''" style="text-decoration: none;">
+                                <div class="flex items-center justify-center rounded-full flex-shrink-0 font-bold shadow-inner" style="background-color: rgba(255,255,255,0.2); width: 2.2rem; height: 2.2rem; color: white; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1);">
+                                    {{ auth()->user()->initials() }}
+                                </div>
+                                <div class="overflow-hidden" x-show="sidebarOpen">
+                                    <p class="truncate font-semibold text-white" style="font-size: 0.8rem; line-height: 1.2;">{{ auth()->user()->fullname }}</p>
+                                    <p class="truncate text-white/50" style="font-size: 0.65rem; line-height: 1.2; text-transform: capitalize;">{{ auth()->user()->role }}</p>
+                                </div>
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}" :class="sidebarOpen ? 'w-full' : ''">
+                                @csrf
+                                <button type="submit" class="flex items-center justify-center transition-colors shadow-sm" :class="sidebarOpen ? 'w-full gap-1.5 rounded-lg text-[0.7rem] font-semibold py-2 hover:bg-white/20 bg-white/10' : 'w-9 h-9 rounded-full hover:bg-white/20 bg-white/10'" style="color: white; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+                                    <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
+                                    <span x-show="sidebarOpen" class="ml-1">{{ __('Log out') }}</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
