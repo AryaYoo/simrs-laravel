@@ -10,6 +10,7 @@
         },
 
         menuModalOpen: false,
+        isAdmin: {{ auth()->user()->role === 'admin' ? 'true' : 'false' }},
         searchQuery: '',
         activeSubMenu: null,
         activePatient: { 
@@ -408,16 +409,26 @@
             }
         ],
         get filteredGroups() {
-
             const q = this.searchQuery.toLowerCase().trim();
-            if (!q) return this.menuGroups;
-            return this.menuGroups.map(g => {
-                const filteredItems = g.items.map(item => {
-                    if (!item.children) return item.label.toLowerCase().includes(q) ? item : null;
-                    const fc = item.children.filter(c => c.label.toLowerCase().includes(q));
-                    if (fc.length || item.label.toLowerCase().includes(q)) return { ...item, children: fc.length ? fc : item.children };
+            const isAdmin = this.isAdmin;
+            const filterItem = (item) => {
+                if (item.children && item.children.length > 0) {
+                    const fc = item.children.filter(c => {
+                        const matchQ = !q || c.label.toLowerCase().includes(q);
+                        const hasUrl = isAdmin || (c.url && c.url !== '#');
+                        return matchQ && hasUrl;
+                    });
+                    if (fc.length > 0) return { ...item, children: fc };
+                    if (!q && !isAdmin) return null;
+                    if (q && item.label.toLowerCase().includes(q)) return { ...item, children: fc.length ? fc : item.children };
                     return null;
-                }).filter(Boolean);
+                }
+                const matchQ = !q || item.label.toLowerCase().includes(q);
+                const hasUrl = isAdmin || (item.url && item.url !== '#');
+                return matchQ && hasUrl ? item : null;
+            };
+            return this.menuGroups.map(g => {
+                const filteredItems = g.items.map(filterItem).filter(Boolean);
                 return filteredItems.length ? { ...g, items: filteredItems } : null;
             }).filter(Boolean);
         }
