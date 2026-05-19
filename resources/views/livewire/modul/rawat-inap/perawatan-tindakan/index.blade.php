@@ -12,6 +12,7 @@
          menuModalOpen: false,
          searchQuery: '',
          activeSubMenu: null,
+         isAdmin: {{ auth()->user()->role === 'admin' ? 'true' : 'false' }},
          cols: 2,
          init() {
             this.updateCols();
@@ -268,14 +269,25 @@
         },
         get filteredGroups() {
             const q = this.searchQuery.toLowerCase().trim();
-            if (!q) return this.menuGroups;
-            return this.menuGroups.map(g => {
-                const filteredItems = g.items.map(item => {
-                    if (!item.children) return item.label.toLowerCase().includes(q) ? item : null;
-                    const fc = item.children.filter(c => c.label.toLowerCase().includes(q));
-                    if (fc.length || item.label.toLowerCase().includes(q)) return { ...item, children: fc.length ? fc : item.children };
+            const isAdmin = this.isAdmin;
+            const filterItem = (item) => {
+                if (item.children && item.children.length > 0) {
+                    const fc = item.children.filter(c => {
+                        const matchQ = !q || c.label.toLowerCase().includes(q);
+                        const hasUrl = isAdmin || (c.url && c.url !== '#');
+                        return matchQ && hasUrl;
+                    });
+                    if (fc.length > 0) return { ...item, children: fc };
+                    if (!q && !isAdmin) return null;
+                    if (q && item.label.toLowerCase().includes(q)) return { ...item, children: fc.length ? fc : item.children };
                     return null;
-                }).filter(Boolean);
+                }
+                const matchQ = !q || item.label.toLowerCase().includes(q);
+                const hasUrl = isAdmin || (item.url && item.url !== '#');
+                return matchQ && hasUrl ? item : null;
+            };
+            return this.menuGroups.map(g => {
+                const filteredItems = g.items.map(filterItem).filter(Boolean);
                 return filteredItems.length ? { ...g, items: filteredItems } : null;
             }).filter(Boolean);
         }
@@ -519,7 +531,7 @@
                                                     {{-- Item WITHOUT children = direct link --}}
                                                     <template x-if="!item.children || item.children.length === 0">
                                                         <div class="h-full flex flex-col">
-                                                            <a :href="item.url" :target="item.target || '_self'"
+                                                            <a :href="item.url" :target="(!item.url || item.url === '#') ? '_self' : '_blank'"
                                                                 class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm">
                                                                 <div
                                                                     class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
@@ -560,7 +572,7 @@
                                                         <template
                                                             x-for="(child, idx) in row.find(it => isSubMenuOpen(group.label + '_' + it.label))?.children"
                                                             :key="child.label">
-                                                            <a :href="child.url" :target="child.target || '_self'"
+                                                            <a :href="child.url" :target="(!child.url || child.url === '#') ? '_self' : '_blank'"
                                                                 class="flex items-center gap-3 p-3 h-[64px] rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
                                                                 <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
                                                                     x-text="idx + 1"></div>
