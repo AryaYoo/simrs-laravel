@@ -39,9 +39,12 @@ class Index extends Component
     
     public bool $tindakanLookupOpen = false;
     public string $lookupType = 'dr'; // 'dr' or 'pr'
-    public $kd_jenis_prw_selected, $nm_perawatan_selected;
     public $isEditTindakanMode = false;
     public $original_tindakan_type, $original_tgl_perawatan, $original_jam_rawat, $original_kd_jenis_prw;
+    
+    public string $tindakanMode = 'spesifik';
+    public $tgl_tindakan, $jam_tindakan;
+    public array $selectedTindakan = [];
 
     public function mount(string $no_rawat): void
     {
@@ -158,9 +161,12 @@ class Index extends Component
         $this->petugasSearch = '';
     }
 
-    public function openTindakanCreateModal()
+    public function openTindakanCreateModal($mode = 'spesifik')
     {
-        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'kd_jenis_prw_selected', 'nm_perawatan_selected', 'isEditTindakanMode', 'original_tindakan_type', 'original_tgl_perawatan', 'original_jam_rawat', 'original_kd_jenis_prw']);
+        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'isEditTindakanMode', 'original_tindakan_type', 'original_tgl_perawatan', 'original_jam_rawat', 'original_kd_jenis_prw', 'selectedTindakan']);
+        $this->tindakanMode = $mode;
+        $this->tgl_tindakan = now()->format('Y-m-d');
+        $this->jam_tindakan = now()->format('H:i:s');
         $this->tindakanCreateModalOpen = true;
     }
 
@@ -174,16 +180,22 @@ class Index extends Component
     public function editTindakan($data)
     {
         // Reset and populate
-        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'kd_jenis_prw_selected', 'nm_perawatan_selected']);
+        $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'selectedTindakan']);
         
         $this->isEditTindakanMode = true;
+        $this->tindakanMode = 'spesifik';
         $this->original_tindakan_type = $data['type']; // drpr, dr, pr
         $this->original_tgl_perawatan = $data['tgl_perawatan'];
         $this->original_jam_rawat = $data['jam_rawat'];
         $this->original_kd_jenis_prw = $data['kd_jenis_prw'];
 
-        $this->kd_jenis_prw_selected = $data['kd_jenis_prw'];
-        $this->nm_perawatan_selected = $data['nm_perawatan'];
+        $this->tgl_tindakan = $data['tgl_perawatan'];
+        $this->jam_tindakan = $data['jam_rawat'];
+
+        $this->selectedTindakan[$data['kd_jenis_prw']] = [
+            'nama' => $data['nm_perawatan'],
+            'checked' => true
+        ];
         
         $this->kd_dokter_tindakan = $data['kd_staff_dr'] != '-' ? $data['kd_staff_dr'] : null;
         $this->nm_dokter_tindakan = $data['staff_dr'] != '-' ? $data['staff_dr'] : null;
@@ -195,10 +207,41 @@ class Index extends Component
         $this->tindakanCreateModalOpen = true;
     }
 
-    public function previewTindakan($kd, $nm)
+    public function toggleTindakanSelection($kd_jenis_prw, $nm_perawatan, $shift = null)
     {
-        $this->kd_jenis_prw_selected = $kd;
-        $this->nm_perawatan_selected = $nm;
+        if ($this->tindakanMode == 'spesifik') {
+            if (isset($this->selectedTindakan[$kd_jenis_prw])) {
+                unset($this->selectedTindakan[$kd_jenis_prw]);
+            } else {
+                $this->selectedTindakan[$kd_jenis_prw] = [
+                    'nama' => $nm_perawatan,
+                    'checked' => true
+                ];
+            }
+        } else {
+            // Mode rutin
+            if (!isset($this->selectedTindakan[$kd_jenis_prw])) {
+                $this->selectedTindakan[$kd_jenis_prw] = [
+                    'nama' => $nm_perawatan,
+                    'pagi' => false,
+                    'siang' => false,
+                    'sore' => false,
+                    'malam' => false
+                ];
+            }
+            if ($shift) {
+                $this->selectedTindakan[$kd_jenis_prw][$shift] = !$this->selectedTindakan[$kd_jenis_prw][$shift];
+            }
+            
+            // Cleanup if none selected
+            if (!$this->selectedTindakan[$kd_jenis_prw]['pagi'] && !$this->selectedTindakan[$kd_jenis_prw]['siang'] && !$this->selectedTindakan[$kd_jenis_prw]['sore'] && !$this->selectedTindakan[$kd_jenis_prw]['malam']) {
+                unset($this->selectedTindakan[$kd_jenis_prw]);
+            }
+        }
+    }
+
+    public function applyTindakanSelection()
+    {
         $this->tindakanLookupOpen = false;
     }
 
@@ -210,7 +253,7 @@ class Index extends Component
             return;
         }
 
-        if (!$this->kd_jenis_prw_selected) {
+        if (empty($this->selectedTindakan)) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Tindakan belum dipilih.', 'icon' => 'error']);
             return;
         }
@@ -225,6 +268,16 @@ class Index extends Component
             return;
         }
 
+        if ($this->tindakanMode == 'spesifik' && (!$this->tgl_tindakan || !$this->jam_tindakan)) {
+            $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Tanggal dan jam tindakan harus diisi.', 'icon' => 'error']);
+            return;
+        }
+
+        if ($this->tindakanMode == 'rutin' && !$this->tgl_tindakan) {
+            $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Tanggal tindakan harus diisi.', 'icon' => 'error']);
+            return;
+        }
+
         // SOP #1: Validate concurrency lock (Force fresh fetch from DB for accurate identification)
         $freshRegPeriksa = $this->regPeriksa->fresh();
         $this->validateLock($freshRegPeriksa);
@@ -233,7 +286,10 @@ class Index extends Component
             $data = [
                 'isEditTindakanMode' => $this->isEditTindakanMode,
                 'no_rawat' => $this->no_rawat,
-                'kd_jenis_prw_selected' => $this->kd_jenis_prw_selected,
+                'tindakanMode' => $this->tindakanMode,
+                'tgl_tindakan' => $this->tgl_tindakan,
+                'jam_tindakan' => $this->jam_tindakan,
+                'selectedTindakan' => $this->selectedTindakan,
                 'kd_dokter_tindakan' => $this->kd_dokter_tindakan,
                 'nip_tindakan' => $this->nip_tindakan,
                 'original_tindakan_type' => $this->original_tindakan_type,
@@ -242,7 +298,7 @@ class Index extends Component
                 'original_jam_rawat' => $this->original_jam_rawat,
             ];
 
-            PerawatanTindakanRepository::saveTindakan($data);
+            PerawatanTindakanRepository::saveMultipleTindakan($data);
 
             $this->tindakanCreateModalOpen = false;
             $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Tindakan berhasil disimpan.', 'icon' => 'success']);

@@ -240,13 +240,10 @@ class PerawatanTindakanRepository
     /**
      * Core Data Modifying Action (Tindakan)
      */
-    public static function saveTindakan(array $data)
+    public static function saveMultipleTindakan(array $data)
     {
         DB::beginTransaction();
         try {
-            $tarif = JnsPerawatanInap::find($data['kd_jenis_prw_selected']);
-            if (!$tarif) throw new \Exception("Tarif tidak ditemukan.");
-
             if ($data['isEditTindakanMode']) {
                 if ($data['original_tindakan_type'] == 'drpr') {
                     RawatInapDrpr::where(['no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $data['original_kd_jenis_prw'], 'tgl_perawatan' => $data['original_tgl_perawatan'], 'jam_rawat' => $data['original_jam_rawat']])->delete();
@@ -255,29 +252,45 @@ class PerawatanTindakanRepository
                 } else {
                     RawatInapPr::where(['no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $data['original_kd_jenis_prw'], 'tgl_perawatan' => $data['original_tgl_perawatan'], 'jam_rawat' => $data['original_jam_rawat']])->delete();
                 }
-
-                $tgl = $data['original_tgl_perawatan'];
-                $jam = $data['original_jam_rawat'];
-            } else {
-                $tgl = now()->format('Y-m-d');
-                $jam = now()->format('H:i:s');
             }
 
-            if ($data['kd_dokter_tindakan'] && $data['nip_tindakan']) {
-                RawatInapDrpr::create([
-                    'no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $data['kd_jenis_prw_selected'], 'kd_dokter' => $data['kd_dokter_tindakan'], 'nip' => $data['nip_tindakan'], 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
-                    'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakandr' => $tarif->tarif_tindakandr, 'tarif_tindakanpr' => $tarif->tarif_tindakanpr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrdrpr
-                ]);
-            } elseif ($data['kd_dokter_tindakan']) {
-                RawatInapDr::create([
-                    'no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $data['kd_jenis_prw_selected'], 'kd_dokter' => $data['kd_dokter_tindakan'], 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
-                    'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakandr' => $tarif->tarif_tindakandr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrdr
-                ]);
-            } else {
-                RawatInapPr::create([
-                    'no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $data['kd_jenis_prw_selected'], 'nip' => $data['nip_tindakan'], 'tgl_perawatan' => $tgl, 'jam_rawat' => $jam,
-                    'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakanpr' => $tarif->tarif_tindakanpr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrpr
-                ]);
+            foreach ($data['selectedTindakan'] as $kd_jenis_prw => $item) {
+                $tarif = JnsPerawatanInap::find($kd_jenis_prw);
+                if (!$tarif) continue;
+
+                $timesToInsert = [];
+
+                if ($data['tindakanMode'] == 'spesifik') {
+                    $tgl = $data['isEditTindakanMode'] ? $data['original_tgl_perawatan'] : $data['tgl_tindakan'];
+                    $jam = $data['isEditTindakanMode'] ? $data['original_jam_rawat'] : $data['jam_tindakan'];
+                    $timesToInsert[] = ['tgl' => $tgl, 'jam' => $jam];
+                } else {
+                    // Mode rutin
+                    $tgl = $data['tgl_tindakan'];
+                    if (isset($item['pagi']) && $item['pagi']) $timesToInsert[] = ['tgl' => $tgl, 'jam' => '07:00:00'];
+                    if (isset($item['siang']) && $item['siang']) $timesToInsert[] = ['tgl' => $tgl, 'jam' => '12:00:00'];
+                    if (isset($item['sore']) && $item['sore']) $timesToInsert[] = ['tgl' => $tgl, 'jam' => '16:00:00'];
+                    if (isset($item['malam']) && $item['malam']) $timesToInsert[] = ['tgl' => $tgl, 'jam' => '20:00:00'];
+                }
+
+                foreach ($timesToInsert as $time) {
+                    if ($data['kd_dokter_tindakan'] && $data['nip_tindakan']) {
+                        RawatInapDrpr::create([
+                            'no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $kd_jenis_prw, 'kd_dokter' => $data['kd_dokter_tindakan'], 'nip' => $data['nip_tindakan'], 'tgl_perawatan' => $time['tgl'], 'jam_rawat' => $time['jam'],
+                            'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakandr' => $tarif->tarif_tindakandr, 'tarif_tindakanpr' => $tarif->tarif_tindakanpr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrdrpr
+                        ]);
+                    } elseif ($data['kd_dokter_tindakan']) {
+                        RawatInapDr::create([
+                            'no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $kd_jenis_prw, 'kd_dokter' => $data['kd_dokter_tindakan'], 'tgl_perawatan' => $time['tgl'], 'jam_rawat' => $time['jam'],
+                            'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakandr' => $tarif->tarif_tindakandr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrdr
+                        ]);
+                    } else {
+                        RawatInapPr::create([
+                            'no_rawat' => $data['no_rawat'], 'kd_jenis_prw' => $kd_jenis_prw, 'nip' => $data['nip_tindakan'], 'tgl_perawatan' => $time['tgl'], 'jam_rawat' => $time['jam'],
+                            'material' => $tarif->material, 'bhp' => $tarif->bhp, 'tarif_tindakanpr' => $tarif->tarif_tindakanpr, 'kso' => $tarif->kso, 'menejemen' => $tarif->menejemen, 'biaya_rawat' => $tarif->total_byrpr
+                        ]);
+                    }
+                }
             }
 
             DB::commit();

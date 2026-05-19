@@ -11,11 +11,17 @@
             <flux:icon name="identification" class="w-5 h-5 text-[#4C5C2D]" />
             <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Data Penanganan Dokter & Petugas</h3>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
             <span class="text-xs text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-full">{{ $allTindakan->count() }} catatan</span>
-            <flux:button wire:click="openTindakanCreateModal" icon="plus" size="sm" variant="primary">
-                Tambah Penanganan
-            </flux:button>
+            <div class="flex items-center gap-2 border-l border-neutral-200 dark:border-neutral-700 pl-3 ml-1">
+                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest hidden sm:inline-block">Tambah Penanganan:</span>
+                <flux:button wire:click="openTindakanCreateModal('spesifik')" icon="plus" size="sm" variant="primary">
+                    Waktu Spesifik
+                </flux:button>
+                <flux:button wire:click="openTindakanCreateModal('rutin')" icon="plus" size="sm" variant="primary">
+                    Per Shift
+                </flux:button>
+            </div>
         </div>
     </div>
 
@@ -110,7 +116,7 @@
                     <div class="p-2 rounded-lg bg-[#4C5C2D]/10 text-[#4C5C2D]">
                         <flux:icon name="plus-circle" class="w-5 h-5" />
                     </div>
-                    <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 uppercase">Input Penanganan</h2>
+                    <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 uppercase">Input Penanganan {{ $tindakanMode == 'spesifik' ? '(Spesifik)' : '(Rutin/Shift)' }}</h2>
                 </div>
 
             </div>
@@ -119,6 +125,19 @@
             <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
                 {{-- Staff Selection Section --}}
                 <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-neutral-50/50 p-4 rounded-xl border border-neutral-100">
+                        <div>
+                            <flux:label class="text-[10px] font-bold uppercase text-neutral-400 mb-2 block tracking-widest">Tanggal Tindakan :</flux:label>
+                            <flux:input type="date" wire:model="tgl_tindakan" />
+                        </div>
+                        @if($tindakanMode == 'spesifik')
+                        <div>
+                            <flux:label class="text-[10px] font-bold uppercase text-neutral-400 mb-2 block tracking-widest">Jam Tindakan :</flux:label>
+                            <flux:input type="time" step="1" wire:model="jam_tindakan" />
+                        </div>
+                        @endif
+                    </div>
+                    
                     {{-- Row: Dokter --}}
                     <div class="relative">
                         <flux:label class="text-xs font-bold uppercase text-neutral-400 mb-2 block tracking-wider">Dokter Pelaksana :</flux:label>
@@ -188,31 +207,38 @@
 
                 {{-- Treatment Selection Preview --}}
                 <div class="relative rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-800/30 p-5">
-                    <flux:label class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest mb-4 block">Pilih & Preview Tindakan :</flux:label>
+                    <div class="flex items-center justify-between mb-4">
+                        <flux:label class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest block">Tindakan Terpilih :</flux:label>
+                        <span class="text-xs font-bold bg-[#4C5C2D] text-white px-2 py-0.5 rounded-full">{{ count($selectedTindakan) }} Terpilih</span>
+                    </div>
                     
-                    <div class="flex items-center gap-2 mb-5">
-                        <div class="flex-1 flex items-center gap-2">
-                            <div class="w-20 h-10 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg flex items-center justify-center text-[11px] font-mono text-emerald-600 shadow-sm">
-                                {{ $kd_jenis_prw_selected ?: '-' }}
-                            </div>
-                            <div class="flex-1 h-10 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg flex items-center px-4 text-sm font-bold text-neutral-800 dark:text-neutral-100 shadow-sm">
-                                @if($nm_perawatan_selected)
-                                    <span class="truncate">{{ $nm_perawatan_selected }}</span>
-                                @else
-                                    <span class="text-neutral-400 font-medium italic text-xs">Belum ada tindakan dipilih...</span>
+                    <div class="mb-5 flex flex-col gap-2 max-h-40 overflow-y-auto pr-2">
+                        @forelse($selectedTindakan as $kd => $item)
+                            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-3 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between shadow-sm gap-2">
+                                <div>
+                                    <span class="text-xs font-bold text-neutral-800 dark:text-neutral-200 block uppercase">{{ $item['nama'] }}</span>
+                                    <span class="text-[10px] font-mono text-neutral-400">Kode: {{ $kd }}</span>
+                                </div>
+                                @if($tindakanMode == 'rutin')
+                                    <div class="flex items-center gap-1 flex-wrap">
+                                        @if($item['pagi'] ?? false) <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 text-[9px] font-bold uppercase">Pagi</span> @endif
+                                        @if($item['siang'] ?? false) <span class="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-700 text-[9px] font-bold uppercase">Siang</span> @endif
+                                        @if($item['sore'] ?? false) <span class="px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 text-[9px] font-bold uppercase">Sore</span> @endif
+                                        @if($item['malam'] ?? false) <span class="px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-700 text-[9px] font-bold uppercase">Malam</span> @endif
+                                    </div>
                                 @endif
                             </div>
-                        </div>
+                        @empty
+                            <div class="text-center py-4 bg-white dark:bg-neutral-900 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700">
+                                <span class="text-xs font-medium italic text-neutral-400">Belum ada tindakan dipilih...</span>
+                            </div>
+                        @endforelse
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 gap-3">
                         <button type="button" wire:click="openTindakanLookup('dr')"
                             class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-neutral-800 border border-[#4C5C2D]/20 hover:border-[#4C5C2D] hover:bg-[#F1F5E9] transition-all text-xs font-bold text-[#4C5C2D] shadow-sm active:scale-95">
-                            <flux:icon name="magnifying-glass" class="w-4 h-4" /> Cari Tindakan Medis
-                        </button>
-                        <button type="button" wire:click="openTindakanLookup('pr')"
-                            class="flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-neutral-800 border border-blue-600/20 hover:border-blue-600 hover:bg-blue-50 transition-all text-xs font-bold text-blue-600 shadow-sm active:scale-95">
-                            <flux:icon name="magnifying-glass" class="w-4 h-4" /> Cari Tindakan Paramedis
+                            <flux:icon name="magnifying-glass" class="w-4 h-4" /> Cari Tindakan
                         </button>
                     </div>
                 </div>
@@ -240,29 +266,70 @@
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2 uppercase tracking-wide">
                         <flux:icon name="magnifying-glass" class="w-5 h-5 text-[#4C5C2D]" />
-                        Cari {{ $lookupType == 'dr' ? 'Tindakan Medis' : 'Tindakan Paramedis' }}
+                        Cari Tindakan
                     </h2>
-                    <flux:modal.close>
-                        <flux:button variant="ghost" icon="x-mark" />
-                    </flux:modal.close>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold bg-[#4C5C2D] text-white px-3 py-1.5 rounded-lg shadow-sm hidden sm:block">{{ count($selectedTindakan) }} Terpilih</span>
+                        <flux:button wire:click="applyTindakanSelection" variant="primary" size="sm">Terapkan Pilihan</flux:button>
+                        <flux:modal.close>
+                            <flux:button variant="ghost" size="sm" icon="x-mark" />
+                        </flux:modal.close>
+                    </div>
                 </div>
                 
-                <flux:input wire:model.live.debounce.300ms="tindakanSearch" placeholder="Masukkan nama tindakan yang dicari..." icon="magnifying-glass" clearable />
+                <flux:input wire:model.live.debounce.300ms="tindakanSearch" wire:keydown.enter="applyTindakanSelection" placeholder="Masukkan nama tindakan... (Tekan Enter untuk menerapkan)" icon="magnifying-glass" clearable />
             </div>
 
             <div class="flex-1 overflow-y-auto p-0 min-h-[50vh]">
                 <table class="w-full text-left border-collapse">
                     <thead class="sticky top-0 z-10 bg-neutral-100 dark:bg-neutral-900 border-b border-neutral-200">
                         <tr>
+                            @if($tindakanMode == 'spesifik')
+                                <th class="p-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest pl-6 w-16 text-center">Pilih</th>
+                            @else
+                                <th class="p-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest pl-6 text-center border-r border-neutral-200" colspan="4">Shift</th>
+                            @endif
                             <th class="p-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest pl-6">Kode</th>
                             <th class="p-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Nama Perawatan</th>
                             <th class="p-4 text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-right pr-6">Tarif</th>
                         </tr>
+                        @if($tindakanMode == 'rutin')
+                        <tr class="bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 shadow-sm">
+                            <th class="p-2 text-[9px] font-bold text-neutral-500 uppercase tracking-widest text-center pl-6">Pagi</th>
+                            <th class="p-2 text-[9px] font-bold text-neutral-500 uppercase tracking-widest text-center">Siang</th>
+                            <th class="p-2 text-[9px] font-bold text-neutral-500 uppercase tracking-widest text-center">Sore</th>
+                            <th class="p-2 text-[9px] font-bold text-neutral-500 uppercase tracking-widest text-center border-r border-neutral-200">Malam</th>
+                            <th colspan="3" class="bg-neutral-50 dark:bg-neutral-800/50"></th>
+                        </tr>
+                        @endif
                     </thead>
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
                         @forelse($tindakanList as $t)
-                            <tr class="hover:bg-[#F1F5E9]/50 dark:hover:bg-neutral-800 transition-colors cursor-pointer group" wire:click="previewTindakan('{{ $t->kd_jenis_prw }}', '{{ addslashes($t->nm_perawatan) }}')">
-                                <td class="p-4 pl-6 text-xs font-mono text-neutral-500 group-hover:text-[#4C5C2D]">{{ $t->kd_jenis_prw }}</td>
+                            @php
+                                $kd = $t->kd_jenis_prw;
+                                $nm = addslashes($t->nm_perawatan);
+                                $isSelected = isset($selectedTindakan[$kd]);
+                            @endphp
+                            <tr class="{{ $isSelected ? 'bg-[#F1F5E9]/50 dark:bg-neutral-800' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50' }} transition-colors group">
+                                @if($tindakanMode == 'spesifik')
+                                    <td class="p-4 pl-6 text-center">
+                                        <flux:checkbox wire:click="toggleTindakanSelection('{{ $kd }}', '{{ $nm }}')" :checked="$isSelected" />
+                                    </td>
+                                @else
+                                    <td class="py-3 px-1 pl-6 text-center border-r border-neutral-100">
+                                        <flux:checkbox wire:click="toggleTindakanSelection('{{ $kd }}', '{{ $nm }}', 'pagi')" :checked="isset($selectedTindakan[$kd]['pagi']) && $selectedTindakan[$kd]['pagi']" />
+                                    </td>
+                                    <td class="py-3 px-1 text-center border-r border-neutral-100">
+                                        <flux:checkbox wire:click="toggleTindakanSelection('{{ $kd }}', '{{ $nm }}', 'siang')" :checked="isset($selectedTindakan[$kd]['siang']) && $selectedTindakan[$kd]['siang']" />
+                                    </td>
+                                    <td class="py-3 px-1 text-center border-r border-neutral-100">
+                                        <flux:checkbox wire:click="toggleTindakanSelection('{{ $kd }}', '{{ $nm }}', 'sore')" :checked="isset($selectedTindakan[$kd]['sore']) && $selectedTindakan[$kd]['sore']" />
+                                    </td>
+                                    <td class="py-3 px-1 text-center border-r border-neutral-200">
+                                        <flux:checkbox wire:click="toggleTindakanSelection('{{ $kd }}', '{{ $nm }}', 'malam')" :checked="isset($selectedTindakan[$kd]['malam']) && $selectedTindakan[$kd]['malam']" />
+                                    </td>
+                                @endif
+                                <td class="p-4 pl-6 text-xs font-mono text-neutral-500 group-hover:text-[#4C5C2D]">{{ $kd }}</td>
                                 <td class="p-4">
                                     <span class="text-sm font-bold text-neutral-700 dark:text-neutral-200 uppercase group-hover:text-[#4C5C2D]">{{ $t->nm_perawatan }}</span>
                                 </td>
@@ -284,9 +351,7 @@
                 </table>
             </div>
             
-            <div class="p-4 bg-neutral-50/50 dark:bg-neutral-800 border-t border-neutral-100 flex items-center justify-center">
-                <p class="text-[10px] text-neutral-400 uppercase tracking-[.3em] font-medium">Klik pada baris untuk memilih tindakan</p>
-            </div>
+
         </div>
     </flux:modal>
 
