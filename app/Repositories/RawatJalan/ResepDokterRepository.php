@@ -105,15 +105,15 @@ class ResepDokterRepository
                 // Create Header
                 ResepObat::create([
                     'no_resep' => $generatedNo,
-                    'tgl_perawatan' => $tgl_peresepan,
-                    'jam' => $jamF,
+                    'tgl_perawatan' => '0000-00-00',
+                    'jam' => '00:00:00',
                     'no_rawat' => $no_rawat,
                     'kd_dokter' => $kd_dokter_peresep,
                     'tgl_peresepan' => $tgl_peresepan,
                     'jam_peresepan' => $jamF,
                     'status' => 'ralan',
-                    'tgl_penyerahan' => $tgl_peresepan,
-                    'jam_penyerahan' => $jamF,
+                    'tgl_penyerahan' => '0000-00-00',
+                    'jam_penyerahan' => '00:00:00',
                 ]);
 
                 // Save details
