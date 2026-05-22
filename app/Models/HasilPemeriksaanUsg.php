@@ -1,17 +1,26 @@
 <?php
- 
+
 namespace App\Models;
- 
+
+use App\Models\Traits\HasCompositeKey;
+use App\Models\Traits\HasCompositeKeyQuery;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
- 
+
 class HasilPemeriksaanUsg extends Model
 {
+    use HasFactory, HasCompositeKey, HasCompositeKeyQuery;
+
     protected $table = 'hasil_pemeriksaan_usg';
+    
+    // PK is only no_rawat
     protected $primaryKey = 'no_rawat';
     public $incrementing = false;
     protected $keyType = 'string';
+
+    // Disable timestamps since legacy tables don't use created_at/updated_at
     public $timestamps = false;
- 
+
     protected $fillable = [
         'no_rawat',
         'tanggal',
@@ -35,19 +44,24 @@ class HasilPemeriksaanUsg extends Model
         'peluang_sex',
         'kesimpulan',
     ];
- 
-    public function regPeriksa()
-    {
-        return $this->belongsTo(RegPeriksa::class, 'no_rawat', 'no_rawat');
-    }
- 
+
+    protected $casts = [
+        'tanggal' => 'datetime',
+    ];
+
+    /**
+     * Relasi ke dokter
+     */
     public function dokter()
     {
         return $this->belongsTo(Dokter::class, 'kd_dokter', 'kd_dokter');
     }
- 
-    public function gambar()
+
+    /**
+     * Relasi ke reg_periksa
+     */
+    public function regPeriksa()
     {
-        return $this->hasOne(HasilPemeriksaanUsgGambar::class, 'no_rawat', 'no_rawat');
+        return $this->belongsTo(RegPeriksa::class, 'no_rawat', 'no_rawat');
     }
 }

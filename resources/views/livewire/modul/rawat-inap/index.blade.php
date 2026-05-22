@@ -43,7 +43,8 @@
             observasiRanapPostpartum: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap-postpartum", ":noRawat") }}',
             observasiCHBP: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-chbp", ":noRawat") }}',
             observasiInduksiPersalinan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-induksi-persalinan", ":noRawat") }}',
-            catatanAdimeGizi: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-adime-gizi", ":noRawat") }}'
+            catatanAdimeGizi: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-adime-gizi", ":noRawat") }}',
+            hasilUsgKandungan: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -154,7 +155,7 @@
                         { label: 'Cek GDS', url: '#' },
                         { label: 'Monitoring Reaksi Transfusi', url: '#' },
                         { label: 'Hasil USG', children: [
-                            { label: 'Hasil USG Kandungan', url: '#' },
+                            { label: 'Hasil USG Kandungan', url: 'hasilUsgKandungan' },
                             { label: 'Hasil USG Urologi', url: '#' },
                             { label: 'Hasil USG Neonatus', url: '#' },
                             { label: 'Hasil USG Gynecologi', url: '#' },

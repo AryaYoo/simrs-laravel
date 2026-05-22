@@ -133,7 +133,7 @@
                         { label: 'Cek GDS', url: '#' },
                         { label: 'Monitoring Reaksi Transfusi', url: '#' },
                         { label: 'Hasil USG', children: [
-                            { label: 'Hasil USG Kandungan', url: '#' },
+                            { label: 'Hasil USG Kandungan', url: '{{ route('modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                             { label: 'Hasil USG Urologi', url: '#' },
                             { label: 'Hasil USG Neonatus', url: '#' },
                             { label: 'Hasil USG Gynecologi', url: '#' },
