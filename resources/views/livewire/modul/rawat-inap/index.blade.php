@@ -153,7 +153,12 @@
                         { label: 'Catatan Keperawatan', url: 'catatanKeperawatan' },
                         { label: 'Cek GDS', url: '#' },
                         { label: 'Monitoring Reaksi Transfusi', url: '#' },
-                        { label: 'Hasil USG', url: '#' },
+                        { label: 'Hasil USG', children: [
+                            { label: 'Hasil USG Kandungan', url: '#' },
+                            { label: 'Hasil USG Urologi', url: '#' },
+                            { label: 'Hasil USG Neonatus', url: '#' },
+                            { label: 'Hasil USG Gynecologi', url: '#' },
+                        ]},
                         { label: 'Hasil Pemeriksaan', url: '#' },
                         { label: 'Hasil Endoskopi', url: '#' },
                         { label: 'Dokumentasi Tindakan ESWL', url: '#' },

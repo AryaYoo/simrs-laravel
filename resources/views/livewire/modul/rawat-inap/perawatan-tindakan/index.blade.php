@@ -132,7 +132,12 @@
                         { label: 'Catatan Keperawatan', url: '{{ route('modul.rawat-inap.sub-rawat-inap.catatan-keperawatan', str_replace('/', '-', $no_rawat)) }}' },
                         { label: 'Cek GDS', url: '#' },
                         { label: 'Monitoring Reaksi Transfusi', url: '#' },
-                        { label: 'Hasil USG', url: '#' },
+                        { label: 'Hasil USG', children: [
+                            { label: 'Hasil USG Kandungan', url: '#' },
+                            { label: 'Hasil USG Urologi', url: '#' },
+                            { label: 'Hasil USG Neonatus', url: '#' },
+                            { label: 'Hasil USG Gynecologi', url: '#' },
+                        ]},
                         { label: 'Hasil Pemeriksaan', url: '#' },
                         { label: 'Hasil Endoskopi', url: '#' },
                         { label: 'Dokumentasi Tindakan ESWL', url: '#' },
