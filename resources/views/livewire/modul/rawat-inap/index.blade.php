@@ -41,7 +41,8 @@
             observasiRanap: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap", ":noRawat") }}',
             observasiRanapKebidanan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap-kebidanan", ":noRawat") }}',
             observasiRanapPostpartum: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap-postpartum", ":noRawat") }}',
-            observasiCHBP: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-chbp", ":noRawat") }}'
+            observasiCHBP: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-chbp", ":noRawat") }}',
+            observasiInduksiPersalinan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-induksi-persalinan", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -140,7 +141,7 @@
                         { label: 'Observasi Rawat Inap Kebidanan', url: 'observasiRanapKebidanan' },
                         { label: 'Observasi Rawat Inap Post Partum', url: 'observasiRanapPostpartum' },
                         { label: 'Observasi CHBP', url: 'observasiCHBP' },
-                        { label: 'Observasi Induksi Persalinan', url: '#' },
+                        { label: 'Observasi Induksi Persalinan', url: 'observasiInduksiPersalinan' },
                         { label: 'Observasi Bayi', url: '#' },
                         { label: 'Observasi Restrain Nonfarmakologi', url: '#' },
                         { label: 'Observasi Ventilatori', url: '#' },
