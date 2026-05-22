@@ -575,7 +575,7 @@
                                                     'rounded-tl-none': row[0] && isSubMenuOpen(group.label + '_' + row[0].label),
                                                     'rounded-tr-none': row[row.length-1] && isSubMenuOpen(group.label + '_' + row[row.length-1].label)
                                                 }"
-                                                class="relative mt-4 mb-4 bg-[#F1F5E9] dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 z-20 w-full overflow-hidden">
+                                                class="relative mt-4 mb-4 bg-[#F1F5E9] dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-2xl p-6 z-20 w-full overflow-visible">
 
                                                 {{-- Keyed Wrapper for Content (Transition Removed for snappiness) --}}
                                                 <div :key="activeSubMenu">
@@ -587,13 +587,45 @@
                                                         <template
                                                             x-for="(child, idx) in row.find(it => isSubMenuOpen(group.label + '_' + it.label))?.children"
                                                             :key="child.label">
-                                                            <a :href="child.url" :target="child.target ? child.target : ((!child.url || child.url === '#') ? '_self' : '_blank')"
-                                                                class="flex items-center gap-3 p-3 h-[64px] rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
-                                                                <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
-                                                                    x-text="idx + 1"></div>
-                                                                <span x-text="child.label"
-                                                                    class="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 group-hover/child:text-[#4C5C2D] dark:group-hover/child:text-[#8CC7C4] leading-tight line-clamp-2"></span>
-                                                            </a>
+                                                            <div class="relative w-full h-[64px]" x-data="{ openDropdown: false }" @click.away="openDropdown = false">
+                                                                {{-- Item without subchildren --}}
+                                                                <template x-if="!child.children || child.children.length === 0">
+                                                                    <a :href="child.url" :target="child.target ? child.target : ((!child.url || child.url === '#') ? '_self' : '_blank')"
+                                                                        class="flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
+                                                                        <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
+                                                                            x-text="idx + 1"></div>
+                                                                        <span x-text="child.label"
+                                                                            class="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 group-hover/child:text-[#4C5C2D] dark:group-hover/child:text-[#8CC7C4] leading-tight line-clamp-2 flex-1"></span>
+                                                                    </a>
+                                                                </template>
+
+                                                                {{-- Item with subchildren (Dropdown) --}}
+                                                                <template x-if="child.children && child.children.length > 0">
+                                                                    <div class="h-full">
+                                                                        <button @click="openDropdown = !openDropdown"
+                                                                            class="w-full flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child text-left">
+                                                                            <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
+                                                                                x-text="idx + 1"></div>
+                                                                            <span x-text="child.label"
+                                                                                class="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 group-hover/child:text-[#4C5C2D] dark:group-hover/child:text-[#8CC7C4] leading-tight line-clamp-2 flex-1"></span>
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-400 transition-transform" :class="openDropdown ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                                                        </button>
+                                                                        
+                                                                        <div x-show="openDropdown" x-transition.opacity
+                                                                            class="absolute top-[68px] left-0 z-50 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl overflow-hidden min-w-[220px]">
+                                                                            <div class="flex flex-col py-2">
+                                                                                <template x-for="subChild in child.children" :key="subChild.label">
+                                                                                    <a :href="subChild.url" :target="subChild.target ? subChild.target : ((!subChild.url || subChild.url === '#') ? '_self' : '_blank')"
+                                                                                        class="px-4 py-2.5 text-[11px] font-medium text-neutral-600 dark:text-neutral-300 hover:bg-[#4C5C2D]/10 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-colors flex items-center gap-2">
+                                                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#4C5C2D]/40"></span>
+                                                                                        <span x-text="subChild.label"></span>
+                                                                                    </a>
+                                                                                </template>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                            </div>
                                                         </template>
                                                     </div>
                                                 </div>
