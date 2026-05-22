@@ -151,7 +151,7 @@
                         { label: 'Skrining Gizi Lanjut', url: '#' },
                         { label: 'Asuhan Gizi', url: '#' },
                         { label: 'Monitoring Gizi', url: '#' },
-                        { label: 'Catatan ADIME Gizi', url: '#' },
+                        { label: 'Catatan ADIME Gizi', url: '{{ route('modul.rawat-inap.sub-rawat-inap.catatan-adime-gizi', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                     ]},
                     { label: 'Transfer Antar Ruang', url: '#' },
                     { label: 'Perencanaan Pemulangan', url: '#' },

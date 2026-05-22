@@ -42,7 +42,8 @@
             observasiRanapKebidanan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap-kebidanan", ":noRawat") }}',
             observasiRanapPostpartum: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap-postpartum", ":noRawat") }}',
             observasiCHBP: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-chbp", ":noRawat") }}',
-            observasiInduksiPersalinan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-induksi-persalinan", ":noRawat") }}'
+            observasiInduksiPersalinan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-induksi-persalinan", ":noRawat") }}',
+            catatanAdimeGizi: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-adime-gizi", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -171,7 +172,7 @@
                         { label: 'Skrining Gizi Lanjut', url: '#' },
                         { label: 'Asuhan Gizi', url: '#' },
                         { label: 'Monitoring Gizi', url: '#' },
-                        { label: 'Catatan ADIME Gizi', url: '#' },
+                        { label: 'Catatan ADIME Gizi', url: 'catatanAdimeGizi' },
                     ]},
                     { label: 'Transfer Antar Ruang', url: '#' },
                     { label: 'Perencanaan Pemulangan', url: '#' },

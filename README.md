@@ -51,6 +51,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Observasi Rawat Inap Post Partum**: Modul pencatatan vital signs & post partum (TFU, Kontraksi, Perdarahan, Keterangan) dengan Alpine.js Modal dan pola Repository.
 - [x] **Observasi CHBP**: Modul pencatatan harian bayi dan partus (DJJ, HIS, PPV) dengan Alpine.js Modal dan pola Repository.
 - [x] **Observasi Induksi Persalinan**: Modul pencatatan pemberian obat induksi (Obat, Cairan, Dosis, HIS, DJJ, Keterangan) dengan Alpine.js Modal dan pola Repository.
+- [x] **Catatan ADIME Gizi**: Modul pencatatan asuhan gizi ADIME (Asesmen, Diagnosis, Intervensi, Monitoring, Evaluasi, Instruksi) dengan *Left Slide-In Panel* Alpine.js dan pola Repository.
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) & Radiologi telah terintegrated penuh dengan pola Repository.
 
 ### 🏥 Modul Rawat Jalan (Ralan)
