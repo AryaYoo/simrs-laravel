@@ -55,7 +55,7 @@
                 label: 'Data Rekam Medis',
                 items: [
                     { label: 'Pengkajian Awal', children: [
-                        { label: 'Keperawatan Umum', url: '#' },
+                        { label: 'Keperawatan Umum', url: '{{ route("modul.rawat-inap.sub-rawat-inap.pengkajian-awal-keperawatan-umum", ":noRawat") }}' },
                         { label: 'Keperawatan Kebidanan & Kandungan', url: '#' },
                         { label: 'Keperawatan Neonatus', url: '#' },
                         { label: 'Keperawatan Bayi/Anak', url: '#' },

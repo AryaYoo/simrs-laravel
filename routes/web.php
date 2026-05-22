@@ -38,6 +38,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-inap/{no_rawat}/permintaan-radiologi', \App\Livewire\Modul\RawatInap\SubRawatInap\PermintaanRadiologi\Index::class)->name('modul.rawat-inap.sub-rawat-inap.permintaan-radiologi')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/pulang', \App\Livewire\Modul\RawatInap\SubRawatInap\CheckOut\Index::class)->name('modul.rawat-inap.sub-rawat-inap.pulang')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/catatan-keperawatan', \App\Livewire\Modul\RawatInap\SubRawatInap\CatatanKeperawatan\Index::class)->name('modul.rawat-inap.sub-rawat-inap.catatan-keperawatan')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/pengkajian-awal-keperawatan-umum', \App\Livewire\Modul\RawatInap\SubRawatInap\PengkajianAwalKeperawatanUmum\Index::class)->name('modul.rawat-inap.sub-rawat-inap.pengkajian-awal-keperawatan-umum')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/pengkajian-awal-keperawatan-umum/form', \App\Livewire\Modul\RawatInap\SubRawatInap\PengkajianAwalKeperawatanUmum\Form::class)->name('modul.rawat-inap.sub-rawat-inap.pengkajian-awal-keperawatan-umum.form')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}', \App\Livewire\Modul\RawatInap\Show::class)->name('modul.rawat-inap.show')->where('no_rawat', '.*');
 
     Route::get('modul/rawat-jalan', \App\Livewire\Modul\RawatJalan\Index::class)->name('modul.rawat-jalan.index');

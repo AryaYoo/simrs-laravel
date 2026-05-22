@@ -40,7 +40,7 @@
                 label: 'Data Rekam Medis',
                 items: [
                     { label: 'Pengkajian Awal', children: [
-                        { label: 'Keperawatan Umum', url: '#' },
+                        { label: 'Keperawatan Umum', url: '{{ route("modul.rawat-inap.sub-rawat-inap.pengkajian-awal-keperawatan-umum", str_replace("/", "-", $no_rawat)) }}', target: '_self' },
                         { label: 'Keperawatan Kebidanan & Kandungan', url: '#' },
                         { label: 'Keperawatan Neonatus', url: '#' },
                         { label: 'Keperawatan Bayi/Anak', url: '#' },
@@ -531,7 +531,7 @@
                                                     {{-- Item WITHOUT children = direct link --}}
                                                     <template x-if="!item.children || item.children.length === 0">
                                                         <div class="h-full flex flex-col">
-                                                            <a :href="item.url" :target="(!item.url || item.url === '#') ? '_self' : '_blank'"
+                                                            <a :href="item.url" :target="item.target ? item.target : ((!item.url || item.url === '#') ? '_self' : '_blank')"
                                                                 class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm">
                                                                 <div
                                                                     class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
@@ -572,7 +572,7 @@
                                                         <template
                                                             x-for="(child, idx) in row.find(it => isSubMenuOpen(group.label + '_' + it.label))?.children"
                                                             :key="child.label">
-                                                            <a :href="child.url" :target="(!child.url || child.url === '#') ? '_self' : '_blank'"
+                                                            <a :href="child.url" :target="child.target ? child.target : ((!child.url || child.url === '#') ? '_self' : '_blank')"
                                                                 class="flex items-center gap-3 p-3 h-[64px] rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
                                                                 <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
                                                                     x-text="idx + 1"></div>
