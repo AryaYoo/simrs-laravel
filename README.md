@@ -46,6 +46,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **E-Resep Ranap**: Digitalisasi resep obat Rawat Inap & Antarmuka Cepat (Split View) (Refactored to Repository).
 - [x] **Catatan Keperawatan Ranap**: Modul pencatatan asuhan keperawatan rawat inap dengan sinkronisasi waktu dan UI premium.
 - [x] **Pengkajian Awal Keperawatan Umum (Ranap)**: Form vertikal 10 tahap interaktif lengkap dengan navigasi scrollspy, auto-kalkulasi Risiko Jatuh (Morse & Sydney), dan integrasi checklist masalah/rencana keperawatan.
+- [x] **Observasi Rawat Inap**: Halaman khusus untuk pemantauan tanda-tanda vital pasien dengan *modal form* berbasis Alpine.js yang ditenagai oleh pola Repository.
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) & Radiologi telah terintegrated penuh dengan pola Repository.
 
 ### 🏥 Modul Rawat Jalan (Ralan)

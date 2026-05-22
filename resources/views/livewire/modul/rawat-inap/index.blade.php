@@ -37,7 +37,8 @@
             resepDokter: '{{ route("modul.rawat-inap.sub-rawat-inap.resep-dokter", ":noRawat") }}',
             radiologi: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-radiologi", ":noRawat") }}',
             lab: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-laboratorium", ":noRawat") }}',
-            catatanKeperawatan: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-keperawatan", ":noRawat") }}'
+            catatanKeperawatan: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-keperawatan", ":noRawat") }}',
+            observasiRanap: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -131,8 +132,18 @@
                         { label: 'Konseling Farmasi', url: '#' },
                         { label: 'Rekonsiliasi Obat', url: '#' },
                     ]},
+                    { label: 'Observasi', children: [
+                        { label: 'Observasi Rawat Inap', url: 'observasiRanap' },
+                        { label: 'Observasi Rawat Inap Kebidanan', url: '#' },
+                        { label: 'Observasi Rawat Inap Post Partum', url: '#' },
+                        { label: 'Observasi CHBP', url: '#' },
+                        { label: 'Observasi Induksi Persalinan', url: '#' },
+                        { label: 'Observasi Bayi', url: '#' },
+                        { label: 'Observasi Restrain Nonfarmakologi', url: '#' },
+                        { label: 'Observasi Ventilatori', url: '#' },
+                        { label: 'Observasi Hemodialisa', url: '#' },
+                    ]},
                     { label: 'Catatan & Dokumentasi', children: [
-                        { label: 'Observasi', url: '#' },
                         { label: 'Follow Up DBD', url: '#' },
                         { label: 'Catatan Keperawatan', url: 'catatanKeperawatan' },
                         { label: 'Cek GDS', url: '#' },
