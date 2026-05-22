@@ -136,7 +136,7 @@
                             { label: 'Hasil USG Kandungan', url: '{{ route('modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                             { label: 'Hasil USG Urologi', url: '#' },
                             { label: 'Hasil USG Neonatus', url: '#' },
-                            { label: 'Hasil USG Gynecologi', url: '#' },
+                            { label: 'Hasil USG Gynecologi', url: '{{ route('modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                         ]},
                         { label: 'Hasil Pemeriksaan', url: '#' },
                         { label: 'Hasil Endoskopi', url: '#' },
