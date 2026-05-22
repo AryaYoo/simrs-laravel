@@ -261,6 +261,24 @@ Selalu gunakan tanda seru `!` untuk memaksa *style* kita agar diprioritaskan ole
 <flux:table.column class="!pl-6">Nama</flux:table.column>
 ```
 
+### 10. Pembuatan Sub-Menu (Tingkat 3) pada Mega Menu Panel
+
+Untuk menjaga kerapian *Mega Menu*, fitur dropdown tingkat 3 (Sub-Menu di dalam Sub-Menu) telah didukung oleh sistem Alpine.js bawaan.
+
+**Cara Penggunaan di Konfigurasi Array Menu:**
+Tambahkan properti `children` pada sebuah *item* menu. Komponen UI akan otomatis merendernya sebagai tombol *dropdown* yang melayang saat diklik, bukan *link* biasa.
+
+```javascript
+// Contoh pada file index.blade.php (Rawat Inap)
+{ label: 'Catatan & Dokumentasi', children: [
+    { label: 'Follow Up DBD', url: '#' },
+    { label: 'Hasil USG', children: [ // <-- Level 3 Dropdown
+        { label: 'Hasil USG Kandungan', url: '#' },
+        { label: 'Hasil USG Urologi', url: '#' },
+    ]},
+]},
+```
+
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
 1. Masuk ke **Master Data -> Pengaturan Aplikasi**.
