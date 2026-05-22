@@ -118,7 +118,7 @@
                     ]},
                     { label: 'Observasi', children: [
                         { label: 'Observasi Rawat Inap', url: '{{ route('modul.rawat-inap.sub-rawat-inap.observasi-ranap', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
-                        { label: 'Observasi Rawat Inap Kebidanan', url: '#' },
+                        { label: 'Observasi Rawat Inap Kebidanan', url: '{{ route('modul.rawat-inap.sub-rawat-inap.observasi-ranap-kebidanan', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                         { label: 'Observasi Rawat Inap Post Partum', url: '#' },
                         { label: 'Observasi CHBP', url: '#' },
                         { label: 'Observasi Induksi Persalinan', url: '#' },

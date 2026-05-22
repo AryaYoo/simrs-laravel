@@ -38,7 +38,8 @@
             radiologi: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-radiologi", ":noRawat") }}',
             lab: '{{ route("modul.rawat-inap.sub-rawat-inap.permintaan-laboratorium", ":noRawat") }}',
             catatanKeperawatan: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-keperawatan", ":noRawat") }}',
-            observasiRanap: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap", ":noRawat") }}'
+            observasiRanap: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap", ":noRawat") }}',
+            observasiRanapKebidanan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-ranap-kebidanan", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -134,7 +135,7 @@
                     ]},
                     { label: 'Observasi', children: [
                         { label: 'Observasi Rawat Inap', url: 'observasiRanap' },
-                        { label: 'Observasi Rawat Inap Kebidanan', url: '#' },
+                        { label: 'Observasi Rawat Inap Kebidanan', url: 'observasiRanapKebidanan' },
                         { label: 'Observasi Rawat Inap Post Partum', url: '#' },
                         { label: 'Observasi CHBP', url: '#' },
                         { label: 'Observasi Induksi Persalinan', url: '#' },
