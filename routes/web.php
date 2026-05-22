@@ -43,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-inap/{no_rawat}/observasi-ranap', \App\Livewire\Modul\RawatInap\SubRawatInap\ObservasiRanap\Index::class)->name('modul.rawat-inap.sub-rawat-inap.observasi-ranap')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/observasi-ranap-kebidanan', \App\Livewire\Modul\RawatInap\SubRawatInap\ObservasiRanapKebidanan\Index::class)->name('modul.rawat-inap.sub-rawat-inap.observasi-ranap-kebidanan')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/observasi-ranap-postpartum', \App\Livewire\Modul\RawatInap\SubRawatInap\ObservasiRanapPostpartum\Index::class)->name('modul.rawat-inap.sub-rawat-inap.observasi-ranap-postpartum')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/observasi-chbp', \App\Livewire\Modul\RawatInap\SubRawatInap\ObservasiCHBP\Index::class)->name('modul.rawat-inap.sub-rawat-inap.observasi-chbp')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}', \App\Livewire\Modul\RawatInap\Show::class)->name('modul.rawat-inap.show')->where('no_rawat', '.*');
 
     Route::get('modul/rawat-jalan', \App\Livewire\Modul\RawatJalan\Index::class)->name('modul.rawat-jalan.index');
