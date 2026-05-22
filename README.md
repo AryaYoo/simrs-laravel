@@ -48,6 +48,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Pengkajian Awal Keperawatan Umum (Ranap)**: Form vertikal 10 tahap interaktif lengkap dengan navigasi scrollspy, auto-kalkulasi Risiko Jatuh (Morse & Sydney), dan integrasi checklist masalah/rencana keperawatan.
 - [x] **Observasi Rawat Inap**: Halaman khusus untuk pemantauan tanda-tanda vital pasien dengan *modal form* berbasis Alpine.js yang ditenagai oleh pola Repository.
 - [x] **Observasi Rawat Inap Kebidanan**: Modul pencatatan vital signs & kebidanan (Kontraksi, BJJ, PPV, VT) dengan Alpine.js Modal dan pola Repository.
+- [x] **Observasi Rawat Inap Post Partum**: Modul pencatatan vital signs & post partum (TFU, Kontraksi, Perdarahan, Keterangan) dengan Alpine.js Modal dan pola Repository.
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) & Radiologi telah terintegrated penuh dengan pola Repository.
 
 ### 🏥 Modul Rawat Jalan (Ralan)
