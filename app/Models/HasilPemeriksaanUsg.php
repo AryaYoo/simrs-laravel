@@ -62,4 +62,12 @@ class HasilPemeriksaanUsg extends Model
     {
         return $this->belongsTo(RegPeriksa::class, 'no_rawat', 'no_rawat');
     }
+
+    /**
+     * Relasi ke gambar USG
+     */
+    public function gambar()
+    {
+        return $this->hasOne(HasilPemeriksaanUsgGambar::class, 'no_rawat', 'no_rawat');
+    }
 }
