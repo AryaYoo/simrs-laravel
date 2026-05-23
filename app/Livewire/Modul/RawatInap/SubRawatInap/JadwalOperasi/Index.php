@@ -35,6 +35,7 @@ class Index extends Component
 
     public $originalKeys = []; // To store original keys during edit
     public $isEdit = false;
+    public $detailOperasi = null;
 
     // Properties for Lookups
     public $searchDokter = '';
