@@ -181,32 +181,38 @@
                                         </h3>
                                         <div class="space-y-4">
                                             {{-- Ruang OK Lookup --}}
-                                            <div>
-                                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Ruang OK <span class="text-red-500">*</span></label>
+                                            <div class="space-y-3">
+                                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">Ruang OK <span class="text-red-500">*</span></label>
                                                 <div class="flex gap-2">
                                                     <flux:input wire:model="form.kd_ruang_ok" readonly placeholder="Kode" class="w-1/4 bg-neutral-50" />
-                                                    <flux:input wire:model="form.nm_ruang_ok" readonly placeholder="Nama Ruang" class="flex-1 bg-neutral-50" />
-                                                    <flux:button icon="magnifying-glass" @click="showRuangModal = true" />
+                                                    <div class="relative w-full">
+                                                        <flux:input wire:model="form.nm_ruang_ok" readonly placeholder="Pilih Ruang OK" class="w-full bg-neutral-50" />
+                                                        <flux:button variant="primary" size="sm" icon="magnifying-glass" class="absolute right-1.5 top-1.5 px-2" @click="showRuangModal = true" />
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             {{-- Operator Lookup --}}
-                                            <div>
-                                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Operator (Dokter) <span class="text-red-500">*</span></label>
+                                            <div class="space-y-3">
+                                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">Operator (Dokter) <span class="text-red-500">*</span></label>
                                                 <div class="flex gap-2">
                                                     <flux:input wire:model="form.kd_dokter" readonly placeholder="Kode" class="w-1/4 bg-neutral-50" />
-                                                    <flux:input wire:model="form.nm_dokter" readonly placeholder="Nama Operator" class="flex-1 bg-neutral-50" />
-                                                    <flux:button icon="magnifying-glass" @click="showDokterModal = true" />
+                                                    <div class="relative w-full">
+                                                        <flux:input wire:model="form.nm_dokter" readonly placeholder="Pilih Operator" class="w-full bg-neutral-50" />
+                                                        <flux:button variant="primary" size="sm" icon="magnifying-glass" class="absolute right-1.5 top-1.5 px-2" @click="showDokterModal = true" />
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             {{-- Operasi (Paket) Lookup --}}
-                                            <div>
-                                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">Operasi (Paket) <span class="text-red-500">*</span></label>
+                                            <div class="space-y-3">
+                                                <label class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">Operasi (Paket) <span class="text-red-500">*</span></label>
                                                 <div class="flex gap-2">
                                                     <flux:input wire:model="form.kode_paket" readonly placeholder="Kode" class="w-1/4 bg-neutral-50" />
-                                                    <flux:input wire:model="form.nm_perawatan" readonly placeholder="Nama Operasi" class="flex-1 bg-neutral-50" />
-                                                    <flux:button icon="magnifying-glass" @click="showPaketModal = true" />
+                                                    <div class="relative w-full">
+                                                        <flux:input wire:model="form.nm_perawatan" readonly placeholder="Pilih Operasi" class="w-full bg-neutral-50" />
+                                                        <flux:button variant="primary" size="sm" icon="magnifying-glass" class="absolute right-1.5 top-1.5 px-2" @click="showPaketModal = true" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
