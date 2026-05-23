@@ -51,7 +51,7 @@ class Index extends Component
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
-        $this->pasien   = RegPeriksa::with(['pasien', 'dokter', 'kamarInap.kamar.bangsal'])->where('no_rawat', $this->no_rawat)->firstOrFail();
+        $this->pasien   = RegPeriksa::with(['pasien', 'dokter', 'kamarInap.kamar.bangsal', 'penjab'])->where('no_rawat', $this->no_rawat)->firstOrFail();
         $this->resetForm();
     }
 
