@@ -57,11 +57,7 @@
         </div>
         <div class="text-left md:text-right text-sm border-t md:border-t-0 md:border-l border-white/20 pt-3 md:pt-0 md:pl-4">
             <p class="text-white/80 text-xs mb-1">Dokter DPJP Pasien</p>
-            <p class="font-semibold mb-2">{{ $pasien->dokter->nm_dokter ?? '-' }}</p>
-            
-            <flux:modal.trigger name="modal-detail-pasien">
-                <flux:button size="sm" class="!bg-white/10 !border-white/20 !text-white hover:!bg-white/20 !text-xs !px-3 !py-1 !h-auto">Lihat Detail</flux:button>
-            </flux:modal.trigger>
+            <p class="font-semibold">{{ $pasien->dokter->nm_dokter ?? '-' }}</p>
         </div>
     </div>
 
@@ -107,6 +103,9 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
+                                    <flux:modal.trigger name="modal-detail-pasien">
+                                        <flux:button variant="ghost" size="sm" icon="eye" class="text-blue-500 hover:bg-blue-50" />
+                                    </flux:modal.trigger>
                                     <flux:button variant="ghost" size="sm" icon="pencil-square" 
                                         @click="$wire.prepareEdit('{{ $item->kode_paket }}', '{{ $item->tanggal }}', '{{ $item->jam_mulai }}').then((success) => { if(success) showModal = true })"
                                         class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10" />
