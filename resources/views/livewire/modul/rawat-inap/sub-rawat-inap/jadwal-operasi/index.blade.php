@@ -104,22 +104,28 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <flux:button variant="ghost" size="sm" icon="eye" class="text-blue-500 hover:bg-blue-50" @click="showDetailModal = true" />
+                                    <flux:button variant="ghost" size="sm" icon="eye" class="text-blue-500 hover:bg-blue-50" @click="$wire.showDetail('{{ $item->kode_paket }}', '{{ $item->tanggal }}', '{{ $item->jam_mulai }}').then((success) => { if(success) showDetailModal = true })" />
                                     <flux:button variant="ghost" size="sm" icon="pencil-square" 
                                         @click="$wire.prepareEdit('{{ $item->kode_paket }}', '{{ $item->tanggal }}', '{{ $item->jam_mulai }}').then((success) => { if(success) showModal = true })"
                                         class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10" />
-                                    <div x-data="{ showConfirm: false }" class="relative">
-                                        <flux:button variant="ghost" size="sm" icon="trash" @click="showConfirm = true"
-                                            class="text-red-500 hover:bg-red-50" />
-                                        <div x-show="showConfirm" x-cloak @click.away="showConfirm = false"
-                                            class="absolute right-0 bottom-full mb-2 w-64 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 p-4 z-50">
-                                            <p class="text-sm text-neutral-600 dark:text-neutral-300 mb-3 text-left whitespace-normal">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
-                                            <div class="flex gap-2 justify-end">
-                                                <flux:button size="sm" variant="ghost" @click="showConfirm = false">Batal</flux:button>
-                                                <flux:button size="sm" variant="danger" wire:click="delete('{{ $item->kode_paket }}', '{{ $item->tanggal }}', '{{ $item->jam_mulai }}')" @click="showConfirm = false">Hapus</flux:button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <flux:button variant="ghost" size="sm" icon="trash"
+                                        @click="
+                                            Swal.fire({
+                                                title: 'Hapus Jadwal Operasi?',
+                                                text: 'Data yang dihapus tidak dapat dikembalikan!',
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#4C5C2D',
+                                                cancelButtonColor: '#d33',
+                                                confirmButtonText: 'Ya, Hapus!',
+                                                cancelButtonText: 'Batal'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    $wire.delete('{{ $item->kode_paket }}', '{{ $item->tanggal }}', '{{ $item->jam_mulai }}');
+                                                }
+                                            });
+                                        "
+                                        class="text-red-500 hover:bg-red-50" />
                                 </div>
                             </td>
                         </tr>
@@ -395,40 +401,43 @@
                 <div x-show="showDetailModal" x-transition class="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl p-6" @click.stop>
                     <h3 class="text-lg font-bold text-[#4C5C2D] dark:text-[#8CC7C4] mb-4 flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-700 pb-3">
                         <flux:icon name="identification" class="w-5 h-5" />
-                        Detail Informasi Pasien
+                        Detail Jadwal Operasi
                     </h3>
                     
+                    @if($detailOperasi)
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
-                        @php $kamar = $pasien->kamarInap->first(); @endphp
+                        @php 
+                            $kamarInap = $detailOperasi->regPeriksa->kamarInap->first();
+                            $diagnosa = $kamarInap ? ($kamarInap->diagnosa_awal ?: $kamarInap->diagnosa_akhir) : '-';
+                            $rujukanDari = optional($detailOperasi->regPeriksa->rujukMasuk)->perujuk ?? '-';
+                        @endphp
                         
                         {{-- Kiri: Biodata & Reg --}}
                         <div class="space-y-3">
-                            <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Registrasi & Pasien</h4>
-                            <div><span class="text-neutral-500 block text-xs">No. Rawat</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->no_rawat }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">No. RM</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->no_rkm_medis }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Nama Pasien</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->nm_pasien ?? '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Alamat Pasien</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->alamat ?? '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Agama</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->agama ?? '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Penanggung Jawab</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->p_jawab }} ({{ $pasien->hubunganpj }})</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Jenis Bayar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->penjab->png_jawab ?? '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Status Bayar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->status_bayar }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Dokter Penanggung Jawab</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->dokter->nm_dokter ?? '-' }}</span></div>
+                            <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Pasien</h4>
+                            <div><span class="text-neutral-500 block text-xs">No. Rawat</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->no_rawat }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Nama Pasien</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->regPeriksa->pasien->nm_pasien ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Umur</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->regPeriksa->umurdaftar ?? '-' }} {{ $detailOperasi->regPeriksa->sttsumur ?? '' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Jenis Kelamin</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ ($detailOperasi->regPeriksa->pasien->jk ?? '') == 'L' ? 'Laki-laki' : (($detailOperasi->regPeriksa->pasien->jk ?? '') == 'P' ? 'Perempuan' : '-') }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Rujukan Dari</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $rujukanDari }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Diagnosa</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $diagnosa }}</span></div>
                         </div>
                         
                         {{-- Kanan: Rawat Inap --}}
                         <div class="space-y-3">
-                            <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Rawat Inap</h4>
-                            <div><span class="text-neutral-500 block text-xs">Kamar / Bangsal</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional(optional($kamar)->kamar)->bangsal->nm_bangsal ?? '-' }} ({{ optional($kamar)->kd_kamar ?? '-' }})</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Tarif Kamar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">Rp {{ number_format(optional($kamar)->trf_kamar ?? 0, 0, ',', '.') }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Diagnosa Awal</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->diagnosa_awal ?? '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Diagnosa Akhir</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->diagnosa_akhir ?? '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Waktu Masuk</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $kamar ? \Carbon\Carbon::parse($kamar->tgl_masuk)->format('d/m/Y') . ' ' . $kamar->jam_masuk : '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Waktu Keluar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ ($kamar && $kamar->tgl_keluar != '0000-00-00') ? \Carbon\Carbon::parse($kamar->tgl_keluar)->format('d/m/Y') . ' ' . $kamar->jam_keluar : '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Lama Inap</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->lama ?? '-' }} hari</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Status Pulang</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->stts_pulang ?? '-' }}</span></div>
-                            <div><span class="text-neutral-500 block text-xs">Total Biaya Kamar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">Rp {{ number_format(optional($kamar)->ttl_biaya ?? 0, 0, ',', '.') }}</span></div>
+                            <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Jadwal Operasi</h4>
+                            <div><span class="text-neutral-500 block text-xs">Tanggal</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ \Carbon\Carbon::parse($detailOperasi->tanggal)->format('d/m/Y') }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Mulai</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->jam_mulai }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Selesai</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->jam_selesai ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Status</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->status }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Operasi</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->paketOperasi->nm_perawatan ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Operator</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->dokter->nm_dokter ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Ruang Operasi</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $detailOperasi->ruangOk->nm_ruang_ok ?? '-' }} (Kode: {{ $detailOperasi->kd_ruang_ok }})</span></div>
                         </div>
                     </div>
+                    @else
+                    <div class="text-center py-8 text-neutral-500">Memuat data detail...</div>
+                    @endif
 
                     <div class="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
                         <flux:button variant="ghost" @click="showDetailModal = false">Tutup</flux:button>

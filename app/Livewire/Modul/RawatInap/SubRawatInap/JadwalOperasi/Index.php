@@ -80,6 +80,24 @@ class Index extends Component
         return true;
     }
 
+    public function showDetail($kode_paket, $tanggal, $jam_mulai)
+    {
+        $this->detailOperasi = BookingOperasi::with([
+            'regPeriksa.pasien',
+            'regPeriksa.rujukMasuk',
+            'regPeriksa.kamarInap.kamar.bangsal',
+            'paketOperasi',
+            'dokter',
+            'ruangOk'
+        ])->where('no_rawat', $this->no_rawat)
+          ->where('kode_paket', $kode_paket)
+          ->where('tanggal', $tanggal)
+          ->where('jam_mulai', $jam_mulai)
+          ->first();
+
+        return true;
+    }
+
     public function prepareEdit($kode_paket, $tanggal, $jam_mulai)
     {
         $keys = [
@@ -115,7 +133,7 @@ class Index extends Component
             $this->initializeLock($record);
             return true;
         } else {
-            $this->dispatch('sweet-alert', ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Data tidak ditemukan.']);
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Data tidak ditemukan.']);
             return false;
         }
     }
@@ -206,7 +224,7 @@ class Index extends Component
                     $this->repository->update($this->originalKeys, $data);
                 }
 
-                $this->dispatch('sweet-alert', ['icon' => 'success', 'title' => 'Berhasil', 'text' => 'Data Jadwal Operasi berhasil diupdate!']);
+                $this->dispatch('swal', ['icon' => 'success', 'title' => 'Berhasil', 'text' => 'Data Jadwal Operasi berhasil diupdate!']);
             } else {
                 if ($this->repository->exists([
                     'no_rawat' => $this->no_rawat,
@@ -217,14 +235,14 @@ class Index extends Component
                     throw new Exception('Jadwal operasi dengan paket, tanggal, dan jam tersebut sudah ada.');
                 }
                 $this->repository->create($data);
-                $this->dispatch('sweet-alert', ['icon' => 'success', 'title' => 'Berhasil', 'text' => 'Data Jadwal Operasi berhasil ditambahkan!']);
+                $this->dispatch('swal', ['icon' => 'success', 'title' => 'Berhasil', 'text' => 'Data Jadwal Operasi berhasil ditambahkan!']);
             }
 
             $this->dispatch('close-modal');
             $this->resetForm();
 
         } catch (Exception $e) {
-            $this->dispatch('sweet-alert', ['icon' => 'error', 'title' => 'Gagal', 'text' => $e->getMessage()]);
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'Gagal', 'text' => $e->getMessage()]);
         }
     }
 
@@ -238,9 +256,9 @@ class Index extends Component
                 'jam_mulai' => $jam_mulai
             ];
             $this->repository->delete($keys);
-            $this->dispatch('sweet-alert', ['icon' => 'success', 'title' => 'Berhasil', 'text' => 'Data Jadwal Operasi berhasil dihapus!']);
+            $this->dispatch('swal', ['icon' => 'success', 'title' => 'Berhasil', 'text' => 'Data Jadwal Operasi berhasil dihapus!']);
         } catch (Exception $e) {
-            $this->dispatch('sweet-alert', ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->dispatch('swal', ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
