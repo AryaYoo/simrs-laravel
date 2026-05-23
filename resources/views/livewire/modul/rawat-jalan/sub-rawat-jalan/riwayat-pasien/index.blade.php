@@ -810,12 +810,12 @@
                                                         @if($kunjungan->hasilPemeriksaanUsg->gambar && $kunjungan->hasilPemeriksaanUsg->gambar->photo)
                                                             <div class="grid grid-cols-1 gap-3">
                                                                 <div class="relative group aspect-[4/3] rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-700 bg-black shadow-sm">
-                                                                    <img src="{{ env('KHANZA_USG_URL') . $kunjungan->hasilPemeriksaanUsg->gambar->photo }}" 
+                                                                    <img src="{{ config('app.khanza_usg_url') . $kunjungan->hasilPemeriksaanUsg->gambar->photo }}" 
                                                                          class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" 
                                                                          alt="Hasil USG"
                                                                          onerror="this.onerror=null; this.src='/assets/images/placeholder-image.png';">
                                                                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                                        <flux:button variant="ghost" size="sm" class="!text-white" icon="magnifying-glass-plus" onclick="window.open('{{ env('KHANZA_USG_URL') . $kunjungan->hasilPemeriksaanUsg->gambar->photo }}', '_blank')">Zoom</flux:button>
+                                                                        <flux:button variant="ghost" size="sm" class="!text-white" icon="magnifying-glass-plus" onclick="window.open('{{ config('app.khanza_usg_url') . $kunjungan->hasilPemeriksaanUsg->gambar->photo }}', '_blank')">Zoom</flux:button>
                                                                     </div>
                                                                 </div>
                                                             </div>

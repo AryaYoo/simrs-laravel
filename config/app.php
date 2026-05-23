@@ -123,4 +123,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | External Integrations
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for legacy external URL integrations (e.g., Khanza)
+    |
+    */
+
+    'khanza_usg_url' => env('KHANZA_USG_URL', 'http://localhost/webapps/hasilpemeriksaanusg/'),
+
 ];
