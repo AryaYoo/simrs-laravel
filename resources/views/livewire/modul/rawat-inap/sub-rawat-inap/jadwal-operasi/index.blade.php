@@ -3,6 +3,7 @@
     showDokterModal: false,
     showPaketModal: false,
     showRuangModal: false,
+    showDetailModal: false,
     init() {
         Livewire.on('open-modal', () => { this.showModal = true; });
         Livewire.on('close-modal', () => { this.showModal = false; });
@@ -103,9 +104,7 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <flux:modal.trigger name="modal-detail-pasien">
-                                        <flux:button variant="ghost" size="sm" icon="eye" class="text-blue-500 hover:bg-blue-50" />
-                                    </flux:modal.trigger>
+                                    <flux:button variant="ghost" size="sm" icon="eye" class="text-blue-500 hover:bg-blue-50" @click="showDetailModal = true" />
                                     <flux:button variant="ghost" size="sm" icon="pencil-square" 
                                         @click="$wire.prepareEdit('{{ $item->kode_paket }}', '{{ $item->tanggal }}', '{{ $item->jam_mulai }}').then((success) => { if(success) showModal = true })"
                                         class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10" />
@@ -388,51 +387,54 @@
         </div>
     </div>
 
-    {{-- MODAL DETAIL PASIEN --}}
-    <flux:modal name="modal-detail-pasien" class="w-full max-w-2xl">
-        <div class="p-2">
-            <h3 class="text-lg font-bold text-[#4C5C2D] dark:text-[#8CC7C4] mb-4 flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-700 pb-3">
-                <flux:icon name="identification" class="w-5 h-5" />
-                Detail Informasi Pasien
-            </h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
-                @php $kamar = $pasien->kamarInap->first(); @endphp
-                
-                {{-- Kiri: Biodata & Reg --}}
-                <div class="space-y-3">
-                    <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Registrasi & Pasien</h4>
-                    <div><span class="text-neutral-500 block text-xs">No. Rawat</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->no_rawat }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">No. RM</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->no_rkm_medis }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Nama Pasien</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->nm_pasien ?? '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Alamat Pasien</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->alamat ?? '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Agama</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->agama ?? '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Penanggung Jawab</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->p_jawab }} ({{ $pasien->hubunganpj }})</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Jenis Bayar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->penjab->png_jawab ?? '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Status Bayar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->status_bayar }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Dokter Penanggung Jawab</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->dokter->nm_dokter ?? '-' }}</span></div>
-                </div>
-                
-                {{-- Kanan: Rawat Inap --}}
-                <div class="space-y-3">
-                    <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Rawat Inap</h4>
-                    <div><span class="text-neutral-500 block text-xs">Kamar / Bangsal</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional(optional($kamar)->kamar)->bangsal->nm_bangsal ?? '-' }} ({{ optional($kamar)->kd_kamar ?? '-' }})</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Tarif Kamar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">Rp {{ number_format(optional($kamar)->trf_kamar ?? 0, 0, ',', '.') }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Diagnosa Awal</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->diagnosa_awal ?? '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Diagnosa Akhir</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->diagnosa_akhir ?? '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Waktu Masuk</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $kamar ? \Carbon\Carbon::parse($kamar->tgl_masuk)->format('d/m/Y') . ' ' . $kamar->jam_masuk : '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Waktu Keluar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ ($kamar && $kamar->tgl_keluar != '0000-00-00') ? \Carbon\Carbon::parse($kamar->tgl_keluar)->format('d/m/Y') . ' ' . $kamar->jam_keluar : '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Lama Inap</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->lama ?? '-' }} hari</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Status Pulang</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->stts_pulang ?? '-' }}</span></div>
-                    <div><span class="text-neutral-500 block text-xs">Total Biaya Kamar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">Rp {{ number_format(optional($kamar)->ttl_biaya ?? 0, 0, ',', '.') }}</span></div>
-                </div>
-            </div>
+    {{-- MODAL DETAIL PASIEN (Alpine Modal) --}}
+    <div x-show="showDetailModal" x-cloak class="relative z-[100]" role="dialog" aria-modal="true">
+        <div x-show="showDetailModal" x-transition.opacity class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showDetailModal = false"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="showDetailModal" x-transition class="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl p-6" @click.stop>
+                    <h3 class="text-lg font-bold text-[#4C5C2D] dark:text-[#8CC7C4] mb-4 flex items-center gap-2 border-b border-neutral-200 dark:border-neutral-700 pb-3">
+                        <flux:icon name="identification" class="w-5 h-5" />
+                        Detail Informasi Pasien
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        @php $kamar = $pasien->kamarInap->first(); @endphp
+                        
+                        {{-- Kiri: Biodata & Reg --}}
+                        <div class="space-y-3">
+                            <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Registrasi & Pasien</h4>
+                            <div><span class="text-neutral-500 block text-xs">No. Rawat</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->no_rawat }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">No. RM</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->no_rkm_medis }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Nama Pasien</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->nm_pasien ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Alamat Pasien</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->alamat ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Agama</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->pasien->agama ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Penanggung Jawab</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->p_jawab }} ({{ $pasien->hubunganpj }})</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Jenis Bayar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->penjab->png_jawab ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Status Bayar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->status_bayar }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Dokter Penanggung Jawab</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $pasien->dokter->nm_dokter ?? '-' }}</span></div>
+                        </div>
+                        
+                        {{-- Kanan: Rawat Inap --}}
+                        <div class="space-y-3">
+                            <h4 class="font-bold text-neutral-700 dark:text-neutral-300 text-xs uppercase tracking-wider bg-neutral-50 dark:bg-neutral-800 p-2 rounded">Data Rawat Inap</h4>
+                            <div><span class="text-neutral-500 block text-xs">Kamar / Bangsal</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional(optional($kamar)->kamar)->bangsal->nm_bangsal ?? '-' }} ({{ optional($kamar)->kd_kamar ?? '-' }})</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Tarif Kamar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">Rp {{ number_format(optional($kamar)->trf_kamar ?? 0, 0, ',', '.') }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Diagnosa Awal</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->diagnosa_awal ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Diagnosa Akhir</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->diagnosa_akhir ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Waktu Masuk</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $kamar ? \Carbon\Carbon::parse($kamar->tgl_masuk)->format('d/m/Y') . ' ' . $kamar->jam_masuk : '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Waktu Keluar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ ($kamar && $kamar->tgl_keluar != '0000-00-00') ? \Carbon\Carbon::parse($kamar->tgl_keluar)->format('d/m/Y') . ' ' . $kamar->jam_keluar : '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Lama Inap</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->lama ?? '-' }} hari</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Status Pulang</span><span class="font-medium text-neutral-800 dark:text-neutral-200">{{ optional($kamar)->stts_pulang ?? '-' }}</span></div>
+                            <div><span class="text-neutral-500 block text-xs">Total Biaya Kamar</span><span class="font-medium text-neutral-800 dark:text-neutral-200">Rp {{ number_format(optional($kamar)->ttl_biaya ?? 0, 0, ',', '.') }}</span></div>
+                        </div>
+                    </div>
 
-            <div class="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
-                <flux:modal.close>
-                    <flux:button variant="ghost">Tutup</flux:button>
-                </flux:modal.close>
+                    <div class="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
+                        <flux:button variant="ghost" @click="showDetailModal = false">Tutup</flux:button>
+                    </div>
+                </div>
             </div>
         </div>
-    </flux:modal>
+    </div>
 </div>
