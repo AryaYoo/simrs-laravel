@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Traits\HasCompositeKey;
-use App\Models\Traits\HasCompositeKeyQuery;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class HasilPemeriksaanUsg extends Model
 {
-    use HasFactory, HasCompositeKey, HasCompositeKeyQuery;
+    use HasFactory;
 
     protected $table = 'hasil_pemeriksaan_usg';
     
