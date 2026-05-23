@@ -11,17 +11,53 @@
         Livewire.on('close-modal-ruang', () => { this.showRuangModal = false; });
     }
 }">
-    {{-- Page Header --}}
+    {{-- Main Header --}}
     <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-neutral-800 dark:text-white">Jadwal Operasi</h1>
-            <p class="text-sm text-neutral-500 mt-1">Pencatatan penjadwalan operasi (booking) pasien rawat inap.</p>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate
+               class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
+            </a>
+            <div>
+                <nav class="text-xs text-neutral-400 mb-0.5">
+                    <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
+                    <span class="mx-1">/</span>
+                    <a href="{{ route('modul.rawat-inap.index') }}" wire:navigate class="hover:underline">Rawat Inap</a>
+                    <span class="mx-1">/</span>
+                    <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate class="hover:underline">Tindakan</a>
+                    <span class="mx-1">/</span>
+                    <span>Jadwal Operasi</span>
+                </nav>
+                <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Jadwal Operasi</h1>
+            </div>
         </div>
         <div class="flex gap-2">
-            <flux:button href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}"
-                wire:navigate variant="ghost" icon="arrow-left">Kembali</flux:button>
             <flux:button variant="primary" icon="plus" @click="$wire.prepareAttach().then(() => { showModal = true })"
                 class="!bg-[#4C5C2D] hover:!bg-[#3f4d25] !text-white !border-none">Buat Baru</flux:button>
+        </div>
+    </div>
+
+    {{-- Patient Info Banner --}}
+    <div class="bg-[#4C5C2D] text-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <flux:icon name="user" class="w-6 h-6 text-white" />
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="font-mono text-xs bg-white/20 px-2 py-0.5 rounded">{{ $pasien->no_rawat }}</span>
+                    <span class="font-mono text-xs bg-white/20 px-2 py-0.5 rounded">{{ $pasien->no_rkm_medis }}</span>
+                </div>
+                <h2 class="text-lg font-bold">{{ $pasien->pasien->nm_pasien ?? '-' }}</h2>
+                <div class="text-xs text-white/80 mt-1 flex flex-wrap items-center gap-3">
+                    <span class="flex items-center gap-1"><flux:icon name="identification" class="w-3 h-3"/> {{ $pasien->pasien->no_ktp ?? '-' }}</span>
+                    <span class="flex items-center gap-1"><flux:icon name="home" class="w-3 h-3"/> {{ $pasien->kamarInap->first()->kamar->bangsal->nm_bangsal ?? 'Belum ada kamar' }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="text-left md:text-right text-sm border-t md:border-t-0 md:border-l border-white/20 pt-3 md:pt-0 md:pl-4">
+            <p class="text-white/80 text-xs mb-1">Dokter DPJP Pasien</p>
+            <p class="font-semibold">{{ $pasien->dokter->nm_dokter ?? '-' }}</p>
         </div>
     </div>
 
