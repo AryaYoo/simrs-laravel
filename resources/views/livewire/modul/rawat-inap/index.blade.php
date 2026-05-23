@@ -45,7 +45,8 @@
             observasiInduksiPersalinan: '{{ route("modul.rawat-inap.sub-rawat-inap.observasi-induksi-persalinan", ":noRawat") }}',
             catatanAdimeGizi: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-adime-gizi", ":noRawat") }}',
             hasilUsgKandungan: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan", ":noRawat") }}',
-            hasilUsgGynecologi: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}'
+            hasilUsgGynecologi: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}',
+            jadwalOperasi: '{{ route("modul.rawat-inap.sub-rawat-inap.jadwal-operasi", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -191,7 +192,7 @@
             {
                 label: 'Permintaan',
                 items: [
-                    { label: 'Jadwal Operasi', url: '#' },
+                    { label: 'Jadwal Operasi', url: 'jadwalOperasi' },
                     { label: 'Pemeriksaan Lab', url: 'lab', target: '_blank' },
                     { label: 'Pemeriksaan Radiologi', url: 'radiologi', target: '_blank' },
                     { label: 'Informasi Obat', url: '#' },

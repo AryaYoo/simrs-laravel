@@ -168,7 +168,7 @@
             {
                 label: 'Permintaan',
                 items: [
-                    { label: 'Jadwal Operasi', url: '#' },
+                    { label: 'Jadwal Operasi', url: '{{ route('modul.rawat-inap.sub-rawat-inap.jadwal-operasi', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                     { label: 'Pemeriksaan Lab', url: '{{ route('modul.rawat-inap.sub-rawat-inap.permintaan-laboratorium', str_replace('/', '-', $no_rawat)) }}' },
                     { label: 'Pemeriksaan Radiologi', url: '{{ route('modul.rawat-inap.sub-rawat-inap.permintaan-radiologi', str_replace('/', '-', $no_rawat)) }}' },
                     { label: 'Informasi Obat', url: '#' },
