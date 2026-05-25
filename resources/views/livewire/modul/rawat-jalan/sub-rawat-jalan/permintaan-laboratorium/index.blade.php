@@ -559,7 +559,13 @@
                                 <span class="font-medium text-neutral-700 dark:text-neutral-300">{{ $hasil['petugas'] }}</span>
                             </div>
                         </div>
-                        <div class="text-neutral-400">
+                        <div class="flex items-center gap-3 text-neutral-400">
+                            <a href="{{ route('modul.rawat-jalan.hasil-lab.cetak', ['no_rawat' => str_replace('/', '-', $no_rawat), 'tgl_periksa' => $hasil['tgl_periksa'], 'jam' => $hasil['jam']]) }}" 
+                               target="_blank"
+                               class="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                               title="Cetak Hasil Lab">
+                                <flux:icon name="printer" class="w-5 h-5" />
+                            </a>
                             <flux:icon name="chevron-down" class="w-5 h-5 transition-transform duration-300 group-open:rotate-180" />
                         </div>
                     </summary>
