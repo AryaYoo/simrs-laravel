@@ -215,11 +215,13 @@
                 margin: 0 !important;
                 width: 100% !important;
                 min-height: auto !important;
-                padding: 0 !important; /* Let @page margin handle the padding */
+                padding: 1.5cm !important; /* Internal padding so text doesn't touch the edge */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 page-break-after: always;
                 break-after: page;
+                box-sizing: border-box !important;
+                overflow: hidden !important; /* Prevent ANY spill-over to next page */
             }
             .document-page:last-child {
                 page-break-after: auto;
@@ -231,7 +233,8 @@
     <!-- Dynamic Style for Print Page Size -->
     <style id="print-page-style">
         @media print {
-            @page { size: A4 portrait; margin: 1.5cm; }
+            @page { size: A4 portrait; margin: 0; }
+            .document-page { width: 210mm !important; height: 297mm !important; }
         }
     </style>
 </head>
@@ -446,10 +449,10 @@
             
             if (selector.value === 'a4') {
                 // Mengubah CSS untuk cetak fisik (A4)
-                printStyle.innerHTML = '@media print { @page { size: A4 portrait; margin: 1.5cm; } }';
+                printStyle.innerHTML = '@media print { @page { size: A4 portrait; margin: 0; } .document-page { width: 210mm !important; height: 297mm !important; } }';
             } else if (selector.value === 'f4') {
                 // Mengubah CSS untuk cetak fisik (F4 = 215mm x 330mm)
-                printStyle.innerHTML = '@media print { @page { size: 215mm 330mm portrait; margin: 1.5cm; } }';
+                printStyle.innerHTML = '@media print { @page { size: 215mm 330mm portrait; margin: 0; } .document-page { width: 215mm !important; height: 330mm !important; } }';
             }
         }
     </script>
