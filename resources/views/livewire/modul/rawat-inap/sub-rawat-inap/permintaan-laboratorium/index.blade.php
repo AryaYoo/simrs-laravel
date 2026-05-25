@@ -216,7 +216,7 @@
                                     {{-- Group Header --}}
                                     @php
                                         $groupIds = $group->pluck('id_template')->map(fn($id) => (string)$id)->toArray();
-                                        $isGroupSelected = collect($groupIds)->every(fn($id) => in_array($id, $selectedDetails));
+                                        $isGroupSelected = collect($groupIds)->every(fn($id) => in_array($id, $this->selectedDetails));
                                     @endphp
                                     <tr class="bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/20 border-y border-[#4C5C2D]/10">
                                         <td class="px-4 py-2 text-center">
@@ -447,7 +447,7 @@
                                     {{-- Group Header --}}
                                     @php
                                         $groupIds = $group->pluck('id_template')->map(fn($id) => (string)$id)->toArray();
-                                        $isGroupSelected = collect($groupIds)->every(fn($id) => in_array($id, $selectedDetails));
+                                        $isGroupSelected = collect($groupIds)->every(fn($id) => in_array($id, $this->selectedDetails));
                                     @endphp
                                     <tr class="bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/20 border-y border-[#4C5C2D]/10">
                                         <td class="px-4 py-2 text-center">
