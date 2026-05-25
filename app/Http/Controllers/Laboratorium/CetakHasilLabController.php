@@ -108,16 +108,29 @@ class CetakHasilLabController extends Controller
             ->first();
 
         // 6. Print Settings
-        $settingCetak = SettingCetakWeb::first();
-        $settingDefault = AppSetting::first();
+        $webSetting = SettingCetakWeb::first();
+        if ($webSetting && !empty($webSetting->nama_instansi)) {
+            $settingCetak = $webSetting->toArray();
+            if (!empty($settingCetak['logo'])) {
+                $settingCetak['logo'] = base64_decode($settingCetak['logo']);
+            }
+            if (!empty($settingCetak['background'])) {
+                $settingCetak['wallpaper'] = base64_decode($settingCetak['background']);
+            }
+        } else {
+            $legacySetting = DB::table('setting')->where('nama_instansi', 'Rumah Sakit Ibu dan Anak IBI Surabaya')->first();
+            if (!$legacySetting) {
+                $legacySetting = DB::table('setting')->first();
+            }
+            $settingCetak = $legacySetting ? (array) $legacySetting : [];
+        }
 
         return view('modul.laboratorium.cetak-hasil', compact(
             'regPeriksa',
             'masterPeriksa',
             'pages',
             'saranKesan',
-            'settingCetak',
-            'settingDefault'
+            'settingCetak'
         ));
     }
 }

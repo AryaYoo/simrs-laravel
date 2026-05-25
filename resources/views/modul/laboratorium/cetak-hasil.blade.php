@@ -269,8 +269,8 @@
         @forelse($pages as $pageIndex => $pageData)
             <!-- VIRTUAL PAPER -->
             <div class="document-page size-a4" 
-                @if(!empty($settingCetak->wallpaper)) 
-                    style="background-image: url('data:image/jpeg;base64,{{ base64_encode($settingCetak->wallpaper) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
+                @if(!empty($settingCetak['wallpaper'])) 
+                    style="background-image: url('data:image/jpeg;base64,{{ base64_encode($settingCetak['wallpaper']) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
                 @endif
             >
                 
@@ -282,17 +282,17 @@
 
                 @if($pageIndex == 0)
                     <div class="header">
-                        @if(!empty($settingCetak->logo))
-                            <img src="data:image/jpeg;base64,{{ base64_encode($settingCetak->logo) }}" class="header-logo" alt="Logo">
+                        @if(!empty($settingCetak['logo']))
+                            <img src="data:image/jpeg;base64,{{ base64_encode($settingCetak['logo']) }}" class="header-logo" alt="Logo">
                         @else
                             <div class="header-logo" style="background:#eee; display:flex; align-items:center; justify-content:center; text-align:center; font-size:10px;">LOGO</div>
                         @endif
                         
                         <div class="header-text">
-                            <h1>{{ $settingCetak->nama_instansi ?? 'RUMAH SAKIT' }}</h1>
-                            <p>{{ $settingCetak->alamat_instansi ?? '' }}, {{ $settingCetak->kabupaten ?? '' }}, {{ $settingCetak->propinsi ?? '' }}</p>
-                            <p>{{ $settingCetak->kontak ?? '' }}</p>
-                            <p>E-mail : {{ $settingCetak->email ?? '' }}</p>
+                            <h1>{{ $settingCetak['nama_instansi'] ?? 'RUMAH SAKIT' }}</h1>
+                            <p>{{ $settingCetak['alamat_instansi'] ?? '' }}, {{ $settingCetak['kabupaten'] ?? '' }}, {{ $settingCetak['propinsi'] ?? '' }}</p>
+                            <p>{{ $settingCetak['kontak'] ?? '' }}</p>
+                            <p>E-mail : {{ $settingCetak['email'] ?? '' }}</p>
                         </div>
                     </div>
                 @else
