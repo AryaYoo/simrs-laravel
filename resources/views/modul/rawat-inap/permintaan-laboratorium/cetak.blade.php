@@ -203,6 +203,8 @@
             }
             body {
                 background-color: transparent !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             .preview-container {
                 margin: 0 !important;
@@ -214,6 +216,14 @@
                 width: 100% !important;
                 min-height: auto !important;
                 padding: 0 !important; /* Let @page margin handle the padding */
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                page-break-after: always;
+                break-after: page;
+            }
+            .document-page:last-child {
+                page-break-after: auto;
+                break-after: auto;
             }
         }
     </style>

@@ -65,7 +65,10 @@ class CetakPermintaanLabController extends Controller
             // Smart Chunking for Pagination
             $currentPage = [];
             $lineCount = 0;
-            $maxLines = 25; // max lines per page
+            $pages = [];
+            
+            // First page has Kop Surat, so it holds less items
+            $isFirstPage = true;
 
             foreach ($detailPemeriksaan as $detail) {
                 if ($detail->pemeriksaan && $detail->template) {
@@ -74,11 +77,14 @@ class CetakPermintaanLabController extends Controller
                     if (!isset($detailLab[$nm_perawatan])) {
                         $detailLab[$nm_perawatan] = [];
                         
+                        $maxLines = $isFirstPage ? 16 : 25;
+                        
                         // Break page before header if near the bottom to avoid orphans
                         if ($lineCount > $maxLines - 3) {
                             $pages[] = $currentPage;
                             $currentPage = [];
                             $lineCount = 0;
+                            $isFirstPage = false;
                         }
                         
                         $currentPage[] = ['type' => 'header', 'name' => $nm_perawatan];
@@ -89,10 +95,12 @@ class CetakPermintaanLabController extends Controller
                     $currentPage[] = ['type' => 'detail', 'data' => $detail->template];
                     $lineCount++;
                     
+                    $maxLines = $isFirstPage ? 16 : 25;
                     if ($lineCount >= $maxLines) {
                         $pages[] = $currentPage;
                         $currentPage = [];
                         $lineCount = 0;
+                        $isFirstPage = false;
                     }
                 }
             }
