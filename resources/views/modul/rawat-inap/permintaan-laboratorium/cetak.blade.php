@@ -201,7 +201,9 @@
             .preview-toolbar {
                 display: none !important;
             }
-            body {
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
                 background-color: transparent !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -213,8 +215,9 @@
             .document-page {
                 box-shadow: none !important;
                 margin: 0 !important;
-                width: 100% !important;
-                min-height: auto !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
                 padding: 1.5cm !important; /* Internal padding so text doesn't touch the edge */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -234,7 +237,6 @@
     <style id="print-page-style">
         @media print {
             @page { size: A4 portrait; margin: 0; }
-            .document-page { width: 210mm !important; height: 297mm !important; }
         }
     </style>
 </head>
@@ -449,10 +451,10 @@
             
             if (selector.value === 'a4') {
                 // Mengubah CSS untuk cetak fisik (A4)
-                printStyle.innerHTML = '@media print { @page { size: A4 portrait; margin: 0; } .document-page { width: 210mm !important; height: 297mm !important; } }';
+                printStyle.innerHTML = '@media print { @page { size: A4 portrait; margin: 0; } }';
             } else if (selector.value === 'f4') {
                 // Mengubah CSS untuk cetak fisik (F4 = 215mm x 330mm)
-                printStyle.innerHTML = '@media print { @page { size: 215mm 330mm portrait; margin: 0; } .document-page { width: 215mm !important; height: 330mm !important; } }';
+                printStyle.innerHTML = '@media print { @page { size: 215mm 330mm portrait; margin: 0; } }';
             }
         }
     </script>
