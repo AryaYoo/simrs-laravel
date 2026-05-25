@@ -213,11 +213,13 @@ Saat mengembangkan halaman pratinjau dan cetak dokumen (seperti Permintaan Labor
    Sematkan indikator penomoran halaman (contoh: `Halaman 1 / 2`) di pojok kertas (misal: kiri bawah) menggunakan `position: absolute` dengan warna abu-abu muda (`#999; opacity: 0.7`) agar tidak mendistraksi data medis.
 5. **Posisi Tanda Tangan (QR):** 
    Blok tanda tangan elektronik (QR Code) dokter/petugas serta waktu cetak harus diletakkan murni hanya pada halaman yang paling terakhir (`@if($loop->last)`). Gunakan API publik ringan seperti `api.qrserver.com` (contoh: `<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=TEXT">`) untuk melakukan *generate* Barcode secara *on-the-fly* di sisi *View* tanpa perlu menginstall *library* PHP yang berat.
-6. **Desain Cetak Penuh (*True Full-Bleed Print CSS*):** 
-   Agar gambar *background* dapat menyentuh ujung pinggir kertas secara absolut tanpa terpotong (baik di pratinjau layar maupun pratinjau cetak browser), gunakan trik berikut:
-   - Buat satu kelas `.document-page` (misal ukuran A4: `width: 210mm; min-height: 297mm; padding: 1.5cm; box-sizing: border-box;`).
-   - Di dalam `@media print`, **jangan pernah** mengubah lebar/tinggi `.document-page`. Cukup biarkan ia mewarisi ukuran layar (1:1 Ratio).
-   - Di dalam `@media print`, pastikan `@page { margin: 0; }` dan `.document-page` diberi `page-break-after: always;` serta `-webkit-print-color-adjust: exact !important;`. Kombinasi ini menjamin dokumen tidak tumpah dan tidak ada margin putih mengganggu di sekeliling kertas.
+6. **Desain Cetak Penuh & Anti Halaman Kosong (*True Full-Bleed Print CSS*):** 
+   Agar gambar *background* dapat menyentuh ujung kertas secara absolut tanpa terpotong, dan mencegah *browser* merender halaman ke-3 yang kosong akibat "Fractional Spill-over Bug", gunakan aturan ketat berikut:
+   - Untuk pratinjau layar, buat ukuran presisi (misal A4: `width: 210mm; min-height: 297mm; padding: 1.5cm; box-sizing: border-box;`).
+   - Di dalam `@media print`, pastikan margin kertas fisik di-nol-kan (`@page { margin: 0; }`).
+   - Di dalam `@media print`, **susutkan tinggi kertas 1 milimeter** (misal A4: `height: 296mm !important; min-height: 296mm; max-height: 296mm; overflow: hidden;`). Ini sangat krusial agar sisa desimal *scaling* Chrome tidak menyentuh ujung bawah yang akan memicu halaman kosong baru.
+   - Tambahkan paksaan `-webkit-print-color-adjust: exact !important;` pada body.
+   - Akhiri dengan paksaan pemutus halaman: `.document-page { page-break-after: always !important; }` dan batalkan di elemen terakhir: `.document-page:last-of-type { page-break-after: auto !important; }`.
 **Kenapa Alpine Modal lebih reliable:**
 | | Flux Modal | Alpine Modal |
 |---|---|---|
