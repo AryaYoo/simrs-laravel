@@ -215,16 +215,11 @@
             .document-page {
                 box-shadow: none !important;
                 margin: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                max-height: 100vh !important;
-                padding: 1.5cm !important; /* Internal padding so text doesn't touch the edge */
+                /* Inherit all width/height/padding from screen mode so it prints EXACTLY as seen on screen */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 page-break-after: always;
                 break-after: page;
-                box-sizing: border-box !important;
-                overflow: hidden !important; /* Prevent ANY spill-over to next page */
             }
             .document-page:last-child {
                 page-break-after: auto;
