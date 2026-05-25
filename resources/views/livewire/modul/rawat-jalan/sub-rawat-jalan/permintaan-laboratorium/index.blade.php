@@ -504,13 +504,20 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center">
-                                @if($history->tgl_sampel == '1000-01-01' || $history->tgl_sampel == '0000-00-00')
-                                    <button type="button" onclick="confirm('Apakah Anda yakin ingin membatalkan permintaan ini?') || event.stopImmediatePropagation()" wire:click="batalPermintaan('{{ $history->noorder }}')" class="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
-                                        <flux:icon name="trash" class="w-4 h-4" />
-                                    </button>
-                                @else
-                                    <span class="text-[10px] text-neutral-300 italic">Tidak dapat dibatalkan</span>
-                                @endif
+                                <div class="flex items-center justify-center gap-2">
+                                    <a href="{{ route('modul.rawat-jalan.permintaan-lab.cetak', ['no_rawat' => str_replace('/', '-', $no_rawat), 'noorder' => $history->noorder]) }}" 
+                                       wire:navigate
+                                       class="p-2 text-blue-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all"
+                                       title="Cetak Permintaan">
+                                        <flux:icon name="printer" class="w-4 h-4" />
+                                    </a>
+                                    
+                                    @if($history->tgl_sampel == '1000-01-01' || $history->tgl_sampel == '0000-00-00')
+                                        <button type="button" onclick="confirm('Apakah Anda yakin ingin membatalkan permintaan ini?') || event.stopImmediatePropagation()" wire:click="batalPermintaan('{{ $history->noorder }}')" class="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all" title="Batal Permintaan">
+                                            <flux:icon name="trash" class="w-4 h-4" />
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

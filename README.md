@@ -200,6 +200,20 @@ Dilarang menumpuk proses query database berskala besar, `DB::transaction`, atau 
 </div>
 ```
 
+### 7. Standar Halaman Cetak Dokumen (Web Print)
+Saat mengembangkan halaman pratinjau dan cetak dokumen (seperti Permintaan Laboratorium, Resep, dll), ikuti panduan tata letak fisik A4/F4 ini:
+
+1. **Pengaturan Kop Surat Mandiri:** 
+   Selalu gunakan data dari tabel `setting_cetak_web` sebagai prioritas utama (memungkinkan kustomisasi Kop Surat, Logo Base64, dan Background/Watermark khusus cetak Web tanpa merusak data Legacy Khanza). Jika data mandiri kosong, buatlah logika *fallback* ke tabel `setting` standar.
+2. **Paginasi Cerdas (*Smart Chunking*):** 
+   Dilarang membiarkan `div` halaman meregang/memanjang tak terbatas jika datanya panjang (misal tabel banyak baris). Ini akan merusak rasio gambar *background/watermark*. Lakukan pemotongan array (sekitar 20-25 baris per halaman) di sisi Controller dan kirimkan variabel `$pages` ke Blade untuk di-looping menjadi beberapa `.document-page`.
+3. **Penyembunyian Kop Surat:** 
+   Untuk menghemat ruang kertas, elemen Kop Surat lengkap (Logo, Alamat RS) secara eksklusif hanya ditampilkan di halaman pertama (`$pageIndex == 0`). Halaman selanjutnya cukup melanjutkan judul dokumen dan tabel datanya.
+4. **Penomoran & Watermark:** 
+   Sematkan indikator penomoran halaman (contoh: `Halaman 1 / 2`) di pojok kertas (misal: kiri bawah) menggunakan `position: absolute` dengan warna abu-abu muda (`#999; opacity: 0.7`) agar tidak mendistraksi data medis.
+5. **Posisi Tanda Tangan (QR):** 
+   Blok tanda tangan elektronik (QR Code) dokter/petugas serta waktu cetak harus diletakkan murni hanya pada halaman yang paling terakhir (`@if($loop->last)`). Gunakan API publik ringan seperti `api.qrserver.com` (contoh: `<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=TEXT">`) untuk melakukan *generate* Barcode secara *on-the-fly* di sisi *View* tanpa perlu menginstall *library* PHP yang berat.
+
 **Kenapa Alpine Modal lebih reliable:**
 | | Flux Modal | Alpine Modal |
 |---|---|---|
