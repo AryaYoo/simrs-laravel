@@ -218,12 +218,25 @@
                 /* Inherit all width/height/padding from screen mode so it prints EXACTLY as seen on screen */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                page-break-after: always;
-                break-after: page;
+                page-break-after: always !important;
+                break-after: page !important;
             }
-            .document-page:last-child {
-                page-break-after: auto;
-                break-after: auto;
+            .document-page:last-child, .document-page:last-of-type {
+                page-break-after: auto !important;
+                break-after: auto !important;
+            }
+            /* Make printed pages exactly 1mm shorter than physical paper to prevent fractional spill-over blank pages */
+            .size-a4 {
+                height: 296mm !important;
+                min-height: 296mm !important;
+                max-height: 296mm !important;
+                overflow: hidden !important;
+            }
+            .size-f4 {
+                height: 329mm !important;
+                min-height: 329mm !important;
+                max-height: 329mm !important;
+                overflow: hidden !important;
             }
         }
     </style>
