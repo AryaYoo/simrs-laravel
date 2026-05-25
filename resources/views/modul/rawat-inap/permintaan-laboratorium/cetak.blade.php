@@ -136,6 +136,7 @@
             text-align: center;
             flex-grow: 1;
         }
+
         .header-text h1 {
             margin: 0;
             font-size: 18px;

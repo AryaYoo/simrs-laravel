@@ -123,6 +123,10 @@
             object-fit: contain;
             margin-right: 15px;
         }
+        .header-text {
+            flex-grow: 1;
+            text-align: center;
+        }
         .header-text h1 {
             font-size: 16px;
             font-weight: bold;
