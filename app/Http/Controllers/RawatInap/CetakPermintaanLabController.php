@@ -77,7 +77,7 @@ class CetakPermintaanLabController extends Controller
                     if (!isset($detailLab[$nm_perawatan])) {
                         $detailLab[$nm_perawatan] = [];
                         
-                        $maxLines = $isFirstPage ? 16 : 25;
+                        $maxLines = $isFirstPage ? 22 : 32;
                         
                         // Break page before header if near the bottom to avoid orphans
                         if ($lineCount > $maxLines - 3) {
@@ -95,7 +95,7 @@ class CetakPermintaanLabController extends Controller
                     $currentPage[] = ['type' => 'detail', 'data' => $detail->template];
                     $lineCount++;
                     
-                    $maxLines = $isFirstPage ? 16 : 25;
+                    $maxLines = $isFirstPage ? 22 : 32;
                     if ($lineCount >= $maxLines) {
                         $pages[] = $currentPage;
                         $currentPage = [];
