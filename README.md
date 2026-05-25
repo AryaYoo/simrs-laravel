@@ -54,13 +54,13 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Catatan ADIME Gizi**: Modul pencatatan asuhan gizi ADIME (Asesmen, Diagnosis, Intervensi, Monitoring, Evaluasi, Instruksi) dengan *Left Slide-In Panel* Alpine.js dan pola Repository.
 - [x] **Hasil USG Kandungan**: Modul pencatatan hasil pemeriksaan USG kandungan (Biometri Janin, Plasenta, Cairan Ketuban, Kelainan Kongenital) dengan *Right Slide-In Panel* Alpine.js dan pola Repository.
 - [x] **Hasil USG Gynecologi**: Modul pencatatan hasil pemeriksaan USG Gynecologi (Uterus, Parametrium, Ovarium, Doppler, Kesimpulan) dengan *Right Slide-In Panel* Alpine.js dan pola Repository.
-- [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) & Radiologi telah terintegrated penuh dengan pola Repository.
+- [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) terintegrasi penuh dengan pola Repository, termasuk rekap riwayat Tab Hasil (Master-Detail).
 
 ### 🏥 Modul Rawat Jalan (Ralan)
 - [x] **List Pasien Ralan**: Dashboard operasional poli dengan filter lanjutan (Dokter, Poliklinik, & Periode).
 - [x] **Diagnosa & Prosedur (ICD-10 & ICD-9)**: Antarmuka terpadu dengan fitur *Multi-Select*, penomoran urut otomatis, dan tampilan *Top 10* diagnosa teratas (Refactored to Repository).
 - [x] **Riwayat Pasien**: Integrasi rekam medis lengkap (SOAPIE, Kunjungan, Hasil USG) dengan standar UI premium.
-- [x] **Permintaan Lab**: Modul permintaan pemeriksaan laboratorium (PK, PA, MB) dengan lookup pemeriksaan dinamis (Refactored to Repository).
+- [x] **Permintaan Lab**: Modul permintaan pemeriksaan laboratorium (PK, PA, MB) dengan lookup pemeriksaan dinamis serta rekap riwayat Tab Hasil (Master-Detail) (Refactored to Repository).
 - [ ] **Permintaan Radiologi**: Modul permintaan pemeriksaan radiologi (Roadmap).
 - [x] **Triase IGD**: Modul triase gawat darurat lengkap (Skala 1-5, Primer & Sekunder) dengan antarmuka tabbed premium (Navigation, Edit, & Delete features fully implemented & stabilized).
 - [x] **Pengkajian Awal Keperawatan IGD**: Form vertikal 6 tahap lengkap dengan floating minimap, panduan skala nyeri visual, integrasi tabel masalah/rencana keperawatan, dan View Modal Alpine.js (Refactored to Repository, Optimistic Locking).

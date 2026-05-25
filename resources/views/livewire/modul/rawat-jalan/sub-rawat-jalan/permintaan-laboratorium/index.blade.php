@@ -128,6 +128,9 @@
                 <span class="w-2 h-2 rounded-full bg-[#4C5C2D] animate-pulse"></span>
             @endif
         </button>
+        <button wire:click="$set('kategori', 'HASIL')" class="px-6 py-3 text-sm font-bold transition-all border-b-2 {{ $kategori === 'HASIL' ? 'border-[#4C5C2D] text-[#4C5C2D]' : 'border-transparent text-neutral-400 hover:text-neutral-600' }} flex items-center gap-2">
+            Hasil
+        </button>
     </div>
 
     @if($kategori === 'PK')
@@ -527,6 +530,100 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+    @elseif($kategori === 'HASIL')
+        {{-- Hasil Table --}}
+        <div class="space-y-6">
+            @forelse($this->hasilLaboratorium as $index => $hasil)
+                <details class="group bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    {{-- Header / Trigger Collapse --}}
+                    <summary class="list-none p-4 border-b border-neutral-100 dark:border-neutral-700 bg-[#4C5C2D]/5 flex items-center justify-between gap-4 cursor-pointer hover:bg-[#4C5C2D]/10 transition-colors">
+                        <div class="flex flex-wrap items-center gap-4 text-sm">
+                            <div>
+                                <span class="text-[10px] text-neutral-400 font-bold uppercase block">Tgl. Periksa</span>
+                                <span class="font-bold text-[#4C5C2D]">{{ date('d/m/Y', strtotime($hasil['tgl_periksa'])) }} {{ $hasil['jam'] }}</span>
+                            </div>
+                            <div class="w-px h-8 bg-neutral-200 dark:bg-neutral-700 hidden md:block"></div>
+                            <div>
+                                <span class="text-[10px] text-neutral-400 font-bold uppercase block">Dokter Perujuk</span>
+                                <span class="font-medium text-neutral-700 dark:text-neutral-300">{{ $hasil['perujuk'] }}</span>
+                            </div>
+                            <div class="w-px h-8 bg-neutral-200 dark:bg-neutral-700 hidden md:block"></div>
+                            <div>
+                                <span class="text-[10px] text-neutral-400 font-bold uppercase block">Penanggung Jawab</span>
+                                <span class="font-medium text-neutral-700 dark:text-neutral-300">{{ $hasil['penanggung_jawab'] }}</span>
+                            </div>
+                            <div class="w-px h-8 bg-neutral-200 dark:bg-neutral-700 hidden md:block"></div>
+                            <div>
+                                <span class="text-[10px] text-neutral-400 font-bold uppercase block">Petugas</span>
+                                <span class="font-medium text-neutral-700 dark:text-neutral-300">{{ $hasil['petugas'] }}</span>
+                            </div>
+                        </div>
+                        <div class="text-neutral-400">
+                            <flux:icon name="chevron-down" class="w-5 h-5 transition-transform duration-300 group-open:rotate-180" />
+                        </div>
+                    </summary>
+                    
+                    {{-- Collapsible Content --}}
+                    <div>
+                        <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-neutral-50 dark:bg-neutral-800/50 text-[10px] uppercase font-bold text-neutral-500 tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3 w-48">Pemeriksaan</th>
+                                    <th class="px-4 py-3 w-1/4">Hasil</th>
+                                    <th class="px-4 py-3 w-32 text-center">Satuan</th>
+                                    <th class="px-4 py-3 w-1/4 text-center">Nilai Rujukan</th>
+                                    <th class="px-4 py-3 text-center">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
+                                @foreach($hasil['pemeriksaan'] as $px)
+                                    <tr class="bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/20">
+                                        <td colspan="5" class="px-4 py-2 font-bold text-[#4C5C2D] text-xs uppercase tracking-wide">
+                                            {{ $px['nm_perawatan'] }} 
+                                        </td>
+                                    </tr>
+                                    @forelse($px['details'] as $det)
+                                        <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-900/30">
+                                            <td class="px-4 py-2 pl-8 text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                                                {{ $det->urut }}_{{ $det->nama_pemeriksaan }}
+                                            </td>
+                                            <td class="px-4 py-2 text-xs {{ !empty($det->keterangan) && $det->keterangan != '-' ? 'text-red-500 font-bold' : 'text-neutral-600 dark:text-neutral-400' }}">
+                                                {{ $det->nilai }}
+                                            </td>
+                                            <td class="px-4 py-2 text-center text-xs text-neutral-500">{{ $det->satuan ?: '-' }}</td>
+                                            <td class="px-4 py-2 text-center text-xs text-neutral-500">{{ $det->nilai_rujukan ?: '-' }}</td>
+                                            <td class="px-4 py-2 text-center text-xs font-bold text-red-500">{{ $det->keterangan }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="px-4 py-2 text-center text-xs italic text-neutral-400">Tidak ada detail</td>
+                                        </tr>
+                                    @endforelse
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="p-4 border-t border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/30 flex flex-col md:flex-row gap-6">
+                        <div class="flex-1">
+                            <span class="text-[10px] text-neutral-400 font-bold uppercase block mb-1">Kesan</span>
+                            <div class="text-xs text-neutral-600 dark:text-neutral-300 whitespace-pre-line">{{ $hasil['kesan'] }}</div>
+                        </div>
+                        <div class="flex-1">
+                            <span class="text-[10px] text-neutral-400 font-bold uppercase block mb-1">Saran</span>
+                            <div class="text-xs text-neutral-600 dark:text-neutral-300 whitespace-pre-line">{{ $hasil['saran'] }}</div>
+                        </div>
+                    </div>
+                    </div> {{-- End Collapsible Content --}}
+                </details>
+            @empty
+                <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-200 dark:border-neutral-700 p-12 text-center">
+                    <flux:icon name="document-magnifying-glass" class="w-12 h-12 mx-auto mb-4 text-neutral-300 dark:text-neutral-600" />
+                    <p class="text-neutral-500 dark:text-neutral-400 font-medium">Belum ada hasil pemeriksaan laboratorium.</p>
+                </div>
+            @endforelse
         </div>
     @endif
 

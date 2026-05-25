@@ -272,6 +272,11 @@ class Index extends Component
         return PermintaanLabRepository::getHistory($this->no_rawat);
     }
 
+    public function getHasilLaboratoriumProperty()
+    {
+        return PermintaanLabRepository::getHasilLaboratorium($this->no_rawat);
+    }
+
     public function batalPermintaan($noorder)
     {
         try {

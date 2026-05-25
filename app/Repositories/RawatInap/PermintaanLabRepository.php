@@ -109,6 +109,85 @@ class PermintaanLabRepository
     }
 
     /**
+     * Get Hasil Laboratorium
+     */
+    public static function getHasilLaboratorium(string $no_rawat)
+    {
+        // 1. Ambil data master periksa_lab
+        $masterPeriksa = DB::table('periksa_lab as p')
+            ->join('jns_perawatan_lab as j', 'p.kd_jenis_prw', '=', 'j.kd_jenis_prw')
+            ->leftJoin('petugas as ptg', 'p.nip', '=', 'ptg.nip')
+            ->leftJoin('dokter as dr_perujuk', 'p.dokter_perujuk', '=', 'dr_perujuk.kd_dokter')
+            ->leftJoin('dokter as dr_pj', 'p.kd_dokter', '=', 'dr_pj.kd_dokter')
+            ->where('p.no_rawat', $no_rawat)
+            ->select(
+                'p.no_rawat', 'p.kd_jenis_prw', 'p.tgl_periksa', 'p.jam', 'p.biaya',
+                'j.nm_perawatan',
+                'ptg.nama as petugas',
+                'dr_perujuk.nm_dokter as perujuk',
+                'dr_pj.nm_dokter as penanggung_jawab'
+            )
+            ->orderBy('p.tgl_periksa', 'desc')
+            ->orderBy('p.jam', 'desc')
+            ->get();
+
+        if ($masterPeriksa->isEmpty()) {
+            return collect([]);
+        }
+
+        // 2. Ambil detail
+        $details = DB::table('detail_periksa_lab as d')
+            ->join('template_laboratorium as t', 'd.id_template', '=', 't.id_template')
+            ->where('d.no_rawat', $no_rawat)
+            ->select(
+                'd.kd_jenis_prw', 'd.tgl_periksa', 'd.jam',
+                't.Pemeriksaan as nama_pemeriksaan', 'd.nilai', 't.satuan', 'd.nilai_rujukan', 'd.keterangan', 't.urut'
+            )
+            ->orderBy('t.urut')
+            ->get();
+
+        // 3. Ambil saran kesan
+        $saranKesan = DB::table('saran_kesan_lab')
+            ->where('no_rawat', $no_rawat)
+            ->get();
+
+        // 4. Group data by tgl_periksa and jam
+        $grouped = [];
+        foreach ($masterPeriksa as $master) {
+            $key = $master->tgl_periksa . '_' . $master->jam;
+            
+            if (!isset($grouped[$key])) {
+                $sk = $saranKesan->where('tgl_periksa', $master->tgl_periksa)->where('jam', $master->jam)->first();
+                $grouped[$key] = [
+                    'tgl_periksa' => $master->tgl_periksa,
+                    'jam' => $master->jam,
+                    'petugas' => $master->petugas ?: '-',
+                    'perujuk' => $master->perujuk ?: '-',
+                    'penanggung_jawab' => $master->penanggung_jawab ?: '-',
+                    'saran' => $sk ? $sk->saran : '-',
+                    'kesan' => $sk ? $sk->kesan : '-',
+                    'pemeriksaan' => []
+                ];
+            }
+
+            $filteredDetails = $details->filter(function($d) use ($master) {
+                return $d->kd_jenis_prw === $master->kd_jenis_prw && 
+                       $d->tgl_periksa === $master->tgl_periksa && 
+                       $d->jam === $master->jam;
+            })->values()->all();
+
+            $grouped[$key]['pemeriksaan'][] = [
+                'kd_jenis_prw' => $master->kd_jenis_prw,
+                'nm_perawatan' => $master->nm_perawatan,
+                'biaya' => $master->biaya,
+                'details' => $filteredDetails
+            ];
+        }
+
+        return collect(array_values($grouped));
+    }
+
+    /**
      * Get Doctor List
      */
     public static function getListDokter(string $search = '', int $limit = 20)
