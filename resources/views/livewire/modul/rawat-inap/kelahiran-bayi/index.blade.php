@@ -57,7 +57,6 @@
                 <flux:table.column>Umur</flux:table.column>
                 <flux:table.column>Tgl. Daftar</flux:table.column>
                 <flux:table.column>Nama Ibu</flux:table.column>
-                <flux:table.column>Nama Ayah</flux:table.column>
                 <flux:table.column>Action</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>
@@ -82,7 +81,6 @@
                         <flux:table.cell>{{ $bayi->pasien->umur ?? '-' }}</flux:table.cell>
                         <flux:table.cell>{{ $bayi->pasien ? \Carbon\Carbon::parse($bayi->pasien->tgl_daftar)->format('d-m-Y') : '-' }}</flux:table.cell>
                         <flux:table.cell>{{ $bayi->pasien->nm_ibu ?? '-' }}</flux:table.cell>
-                        <flux:table.cell>{{ $bayi->nama_ayah ?? '-' }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex items-center gap-1">
                                 {{-- Detail --}}
