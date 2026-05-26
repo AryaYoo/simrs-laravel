@@ -265,6 +265,7 @@
                 items: [
                     { label: 'Berkas Digital', url: '#' },
                     { label: 'Surat Kontrol', url: '#' },
+                    { label: 'Surat Keterangan Rawat Inap', url: '#' },
                 ]
             },
         ],
