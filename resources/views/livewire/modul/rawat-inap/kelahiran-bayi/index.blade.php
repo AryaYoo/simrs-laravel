@@ -84,15 +84,15 @@
                         <flux:table.cell>
                             <div class="flex items-center gap-1">
                                 {{-- Detail --}}
-                                <flux:button wire:click="showDetail('{{ $bayi->no_rkm_medis }}')" icon="eye" size="xs" variant="ghost" title="Lihat Detail" />
+                                <flux:button wire:click="showDetail('{{ $bayi->no_rkm_medis }}')" wire:target="showDetail('{{ $bayi->no_rkm_medis }}')" icon="eye" size="xs" variant="ghost" title="Lihat Detail" />
 
                                 {{-- Cetak SKL --}}
                                 <a href="{{ route('modul.rawat-inap.kelahiran-bayi.cetak-skl', $bayi->no_rkm_medis) }}" target="_blank">
-                                    <flux:button icon="printer" size="xs" variant="ghost" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10" title="Cetak SKL" />
+                                    <flux:button wire:target="none" icon="printer" size="xs" variant="ghost" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10" title="Cetak SKL" />
                                 </a>
 
                                 {{-- Edit --}}
-                                <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.edit', $bayi->no_rkm_medis)" wire:navigate icon="pencil-square" size="xs" variant="ghost" title="Edit Data Bayi" />
+                                <flux:button wire:target="none" :href="route('modul.rawat-inap.kelahiran-bayi.edit', $bayi->no_rkm_medis)" wire:navigate icon="pencil-square" size="xs" variant="ghost" title="Edit Data Bayi" />
 
                                 {{-- Delete --}}
                                 <div x-data="{
@@ -111,7 +111,7 @@
                                         });
                                     }
                                 }">
-                                    <flux:button @click="confirmDelete" icon="trash" size="xs" variant="ghost" class="text-red-500 hover:text-red-700 hover:bg-red-50" title="Hapus Bayi" />
+                                    <flux:button @click="confirmDelete" wire:target="deleteData('{{ $bayi->no_rkm_medis }}')" icon="trash" size="xs" variant="ghost" class="text-red-500 hover:text-red-700 hover:bg-red-50" title="Hapus Bayi" />
                                 </div>
                             </div>
                         </flux:table.cell>
