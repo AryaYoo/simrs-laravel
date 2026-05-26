@@ -181,24 +181,31 @@
 
         .signature-block {
             margin-top: 30px;
-            text-align: right;
+            overflow: hidden; /* clearfix */
+        }
+        .signature-inner {
+            float: right;
+            text-align: center;
+            width: 220px;
         }
         .signature-city-date {
             font-size: 11.5px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .signature-title {
             font-size: 11.5px;
-            margin-bottom: 12px;
+            margin-bottom: 4px;
         }
-        .signature-qr {
-            display: inline-block;
-            text-align: center;
+        .signature-qr img {
+            display: block;
+            margin: 6px auto;
+            width: 90px;
+            height: 90px;
         }
         .signature-name {
             font-size: 11.5px;
             font-weight: bold;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         /* Page number watermark */
@@ -446,12 +453,13 @@
             @endphp
 
             <div class="signature-block">
-                <div class="signature-city-date">{{ $kotaCetak }}, {{ $tglFormatted }}</div>
-                <div class="signature-title">Dokter Yang Menangani,</div>
-                <div class="signature-qr">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($qrData) }}"
-                         alt="QR Code Verifikasi"
-                         style="width:90px;height:90px;display:block;margin:8px auto;">
+                <div class="signature-inner">
+                    <div class="signature-city-date">{{ $kotaCetak }}, {{ $tglFormatted }}</div>
+                    <div class="signature-title">Dokter Yang Menangani,</div>
+                    <div class="signature-qr">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($qrData) }}"
+                             alt="QR Code Verifikasi">
+                    </div>
                     <div class="signature-name">{{ $penolongNama }}</div>
                 </div>
             </div>
