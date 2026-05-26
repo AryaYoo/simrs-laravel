@@ -52,7 +52,6 @@
             <flux:table.columns>
                 <flux:table.column>No. RM</flux:table.column>
                 <flux:table.column>Nama Anak/Bayi</flux:table.column>
-                <flux:table.column>Jenis Kelamin</flux:table.column>
                 <flux:table.column>Tgl. Lahir</flux:table.column>
                 <flux:table.column>Jam Lahir</flux:table.column>
                 <flux:table.column>Umur</flux:table.column>
@@ -65,18 +64,17 @@
                 @forelse ($bayis as $bayi)
                     <flux:table.row :key="$bayi->no_rkm_medis">
                         <flux:table.cell class="font-medium tracking-tight font-mono text-xs">{{ $bayi->no_rkm_medis }}</flux:table.cell>
-                        <flux:table.cell>{{ $bayi->pasien->nm_pasien ?? '-' }}</flux:table.cell>
                         <flux:table.cell>
                             @if($bayi->pasien?->jk === 'L')
-                                <span class="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 rounded-full">
-                                    <flux:icon name="user" class="w-3 h-3" /> Laki-Laki
+                                <span class="inline-flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
+                                    <flux:icon name="user" class="w-3.5 h-3.5 opacity-70" /> {{ $bayi->pasien->nm_pasien ?? '-' }}
                                 </span>
                             @elseif($bayi->pasien?->jk === 'P')
-                                <span class="inline-flex items-center gap-1 text-xs font-semibold text-pink-600 bg-pink-50 dark:bg-pink-950/30 px-2 py-0.5 rounded-full">
-                                    <flux:icon name="user" class="w-3 h-3" /> Perempuan
+                                <span class="inline-flex items-center gap-1.5 font-semibold text-pink-600 dark:text-pink-400">
+                                    <flux:icon name="user" class="w-3.5 h-3.5 opacity-70" /> {{ $bayi->pasien->nm_pasien ?? '-' }}
                                 </span>
                             @else
-                                <span class="text-neutral-400">-</span>
+                                <span class="text-neutral-700 dark:text-neutral-300">{{ $bayi->pasien->nm_pasien ?? '-' }}</span>
                             @endif
                         </flux:table.cell>
                         <flux:table.cell>{{ $bayi->pasien ? \Carbon\Carbon::parse($bayi->pasien->tgl_lahir)->format('d-m-Y') : '-' }}</flux:table.cell>

@@ -74,6 +74,10 @@ class Create extends Component
     public array $pasienList = [];
     public string $searchPenolong = '';
     public array $penolongList = [];
+    
+    // Search Ibu
+    public string $searchIbu = '';
+    public array $ibuList = [];
 
     public function mount()
     {
@@ -132,6 +136,35 @@ class Create extends Component
         $this->nm_penolong = $nama;
         $this->searchPenolong = '';
         $this->penolongList = [];
+    }
+
+    public function updatedSearchIbu()
+    {
+        if (strlen($this->searchIbu) >= 3) {
+            $this->ibuList = \App\Models\Pasien::query()
+                ->where('jk', 'P') // Pastikan jenis kelamin perempuan
+                ->where(function($q) {
+                    $q->where('no_rkm_medis', 'like', "%{$this->searchIbu}%")
+                      ->orWhere('nm_pasien', 'like', "%{$this->searchIbu}%");
+                })
+                ->limit(5)
+                ->get()
+                ->toArray();
+        } else {
+            $this->ibuList = [];
+        }
+    }
+
+    public function selectIbu(string $noRkmMedis)
+    {
+        $ibu = \App\Models\Pasien::find($noRkmMedis);
+        if ($ibu) {
+            $this->nm_ibu = $ibu->nm_pasien;
+            $this->umur_ibu = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
+            $this->alamat = $ibu->alamat;
+        }
+        $this->searchIbu = '';
+        $this->ibuList = [];
     }
 
     public function save()
