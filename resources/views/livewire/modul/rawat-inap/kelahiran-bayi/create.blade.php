@@ -225,9 +225,7 @@
                     <div class="md:col-span-2">
                         <flux:input label="Penyulit Kehamilan" wire:model="penyulit_kehamilan" placeholder="Masukan jika ada penyulit/komplikasi selama hamil..." />
                     </div>
-                    <div class="grid grid-cols-5 gap-2">
-                        <flux:input label="Anak Ke" wire:model="anakke" placeholder="Ke" />
-                        <flux:input label="Kel. Ke" wire:model="kelahiran_ke" placeholder="Ke" />
+                    <div class="grid grid-cols-3 gap-2">
                         <flux:input label="G" wire:model="g" placeholder="G" />
                         <flux:input label="P" wire:model="p" placeholder="P" />
                         <flux:input label="A" wire:model="a" placeholder="A" />
@@ -236,9 +234,15 @@
 
                 {{-- Proses & Penolong --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <flux:input label="Proses Kelahiran" wire:model="proses_lahir" placeholder="Normal, Sectio Caesarea, Vakum, dll..." />
-                        @error('proses_lahir') <span class="text-xs text-red-500 font-medium">{{ $message }}</span> @enderror
+                    <div class="space-y-6">
+                        <div>
+                            <flux:input label="Proses Kelahiran" wire:model="proses_lahir" placeholder="Normal, Sectio Caesarea, Vakum, dll..." />
+                            @error('proses_lahir') <span class="text-xs text-red-500 font-medium">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <flux:input label="Anak Ke" wire:model="anakke" placeholder="Contoh: 1" />
+                            <flux:input label="Kelahiran Ke" wire:model="kelahiran_ke" placeholder="Contoh: 1" />
+                        </div>
                     </div>
 
                     {{-- Informasi Penolong --}}
