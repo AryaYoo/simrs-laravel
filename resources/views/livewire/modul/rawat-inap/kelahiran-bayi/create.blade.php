@@ -225,8 +225,9 @@
                     <div class="md:col-span-2">
                         <flux:input label="Penyulit Kehamilan" wire:model="penyulit_kehamilan" placeholder="Masukan jika ada penyulit/komplikasi selama hamil..." />
                     </div>
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="grid grid-cols-5 gap-2">
                         <flux:input label="Anak Ke" wire:model="anakke" placeholder="Ke" />
+                        <flux:input label="Kel. Ke" wire:model="kelahiran_ke" placeholder="Ke" />
                         <flux:input label="G" wire:model="g" placeholder="G" />
                         <flux:input label="P" wire:model="p" placeholder="P" />
                         <flux:input label="A" wire:model="a" placeholder="A" />

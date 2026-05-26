@@ -35,7 +35,8 @@ class Edit extends Component
     // Persalinan
     public string $penyulit_kehamilan = '';
     public string $proses_lahir = '';
-    public string $anakke = '1';
+    public string $anakke = '';
+    public string $kelahiran_ke = '';
     public string $g = '';
     public string $p = '';
     public string $a = '';
@@ -107,9 +108,10 @@ class Edit extends Component
         $this->lingkar_perut = $bayi->lingkar_perut;
         $this->jam_lahir = $bayi->jam_lahir;
         
-        $this->penyulit_kehamilan = $bayi->penyulit_kehamilan;
+        $this->penyulit_kehamilan = $bayi->penyulit_kehamilan ?? '';
         $this->proses_lahir = $bayi->proses_lahir;
         $this->anakke = $bayi->anakke;
+        $this->kelahiran_ke = $bayi->kelahiran_ke ?? '';
         $this->g = $bayi->g;
         $this->p = $bayi->p;
         $this->a = $bayi->a;
@@ -236,9 +238,12 @@ class Edit extends Component
             'umur_ayah' => 'required',
             'panjang_badan' => 'required|numeric',
             'berat_badan' => 'required|numeric',
-            'lingkar_kepala' => 'required|numeric',
-            'proses_lahir' => 'required',
-            'anakke' => 'required|numeric',
+            'lingkar_kepala' => 'required|max:10',
+            'proses_lahir' => 'required|max:60',
+            'anakke' => 'required|max:2',
+            'kelahiran_ke' => 'nullable|max:5',
+            'g' => 'required|max:10',
+            'p' => 'required|max:10',
             'jam_lahir' => 'required',
             'penolong' => 'required|exists:pegawai,nik',
         ], [
@@ -272,6 +277,7 @@ class Edit extends Component
                 'lingkar_kepala' => $this->lingkar_kepala,
                 'proses_lahir' => $this->proses_lahir,
                 'anakke' => $this->anakke,
+                'kelahiran_ke' => $this->kelahiran_ke,
                 'jam_lahir' => $this->jam_lahir,
                 'keterangan' => $this->keterangan ?: '-',
                 'diagnosa' => $this->diagnosa ?: '-',
