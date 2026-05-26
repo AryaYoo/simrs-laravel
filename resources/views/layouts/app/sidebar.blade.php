@@ -21,6 +21,7 @@
     <div x-data="{ 
             sidebarOpen: {{ isset($hideSidebar) && $hideSidebar ? 'false' : "localStorage.getItem('sidebarOpen') !== 'false'" }},
             frontOfficeOpen: {{ request()->routeIs('modul.registrasi-pasien*') || request()->routeIs('modul.pasien*') ? 'true' : 'false' }},
+            rawatInapOpen: {{ request()->routeIs('modul.rawat-inap*') ? 'true' : 'false' }},
             casemixOpen: {{ request()->is('modul/casemix*') ? 'true' : 'false' }}
          }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))" class="flex min-h-screen relative z-10">
 
@@ -218,17 +219,51 @@
                         <span x-show="sidebarOpen">Rawat Jalan</span>
                     </a>
 
-                    {{-- Rawat Inap (Standalone) --}}
-                    <a href="{{ route('modul.rawat-inap.index') }}" wire:navigate
-                        class="flex items-center rounded-md text-sm font-medium transition-colors mb-1"
-                        :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
-                        style="color: white; text-decoration: none; background-color: {{ request()->routeIs('modul.rawat-inap*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};"
-                        onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
-                        onmouseout="this.style.backgroundColor='{{ request()->routeIs('modul.rawat-inap*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
-                        title="Rawat Inap">
-                        <flux:icon name="home" class="w-4 h-4 flex-shrink-0" />
-                        <span x-show="sidebarOpen">Rawat Inap</span>
-                    </a>
+                    {{-- Rawat Inap with Dropdown --}}
+                    <div class="flex flex-col mb-1" :class="sidebarOpen ? 'w-full' : 'w-full items-center'">
+                        <div class="flex items-center rounded-md text-sm font-medium transition-colors group"
+                            :class="sidebarOpen ? 'w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                            style="background-color: {{ request()->routeIs('modul.rawat-inap*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};">
+
+                            <a href="#" class="flex items-center grow"
+                                @click.prevent="rawatInapOpen = !rawatInapOpen; if(!sidebarOpen) sidebarOpen = true;"
+                                :class="sidebarOpen ? 'gap-2 px-3 py-2' : 'justify-center w-full h-full'"
+                                style="color: white; text-decoration: none;"
+                                onmouseover="this.parentElement.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                                onmouseout="this.parentElement.style.backgroundColor='{{ request()->routeIs('modul.rawat-inap*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
+                                title="Rawat Inap">
+                                <flux:icon name="home" class="w-4 h-4 flex-shrink-0" />
+                                <span x-show="sidebarOpen">Rawat Inap</span>
+                            </a>
+
+                            <button x-show="sidebarOpen" @click.prevent="rawatInapOpen = !rawatInapOpen"
+                                class="p-2 mr-1 rounded-md hover:bg-white/10 transition-all text-white/50 hover:text-white"
+                                :class="rawatInapOpen ? 'rotate-180 text-white' : ''">
+                                <flux:icon name="chevron-down" class="w-3 h-3" />
+                            </button>
+                        </div>
+
+                        {{-- Sub-menus Rawat Inap --}}
+                        <div x-show="sidebarOpen && rawatInapOpen" x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="ml-6 space-y-1 mt-1 mb-2 border-l border-white/10 pl-2">
+
+                            <a href="{{ route('modul.rawat-inap.index') }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.rawat-inap.index') || request()->routeIs('modul.rawat-inap.show') || request()->routeIs('modul.rawat-inap.sub-rawat-inap*') || request()->routeIs('modul.rawat-inap.perawatan-tindakan') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.rawat-inap.index') || request()->routeIs('modul.rawat-inap.show') || request()->routeIs('modul.rawat-inap.sub-rawat-inap*') || request()->routeIs('modul.rawat-inap.perawatan-tindakan') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="users" class="w-3.5 h-3.5" />
+                                <span>Pasien Ranap</span>
+                            </a>
+
+                            <a href="{{ route('modul.rawat-inap.kelahiran-bayi') }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.rawat-inap.kelahiran-bayi') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.rawat-inap.kelahiran-bayi') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="face-smile" class="w-3.5 h-3.5" />
+                                <span>Kelahiran Bayi</span>
+                            </a>
+                        </div>
+                    </div>
 
                     {{-- Casemix with Dropdown --}}
                     <div class="flex flex-col mb-1" :class="sidebarOpen ? 'w-full' : 'w-full items-center'">

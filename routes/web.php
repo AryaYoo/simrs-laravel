@@ -26,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/registrasi-pasien/{no_rawat}', \App\Livewire\Modul\RegistrasiPasien\Show::class)->name('modul.registrasi-pasien.show')->where('no_rawat', '.*');
 
     Route::get('modul/rawat-inap', \App\Livewire\Modul\RawatInap\Index::class)->name('modul.rawat-inap.index');
+    Route::get('modul/rawat-inap/kelahiran-bayi', \App\Livewire\Modul\RawatInap\KelahiranBayi\Index::class)->name('modul.rawat-inap.kelahiran-bayi');
     Route::get('modul/rawat-inap/{no_rawat}/perawatan-tindakan', \App\Livewire\Modul\RawatInap\PerawatanTindakan\Index::class)->name('modul.rawat-inap.perawatan-tindakan')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/riwayat-pasien', \App\Livewire\Modul\RawatInap\SubRawatInap\RiwayatPasien\Index::class)->name('modul.rawat-inap.sub-rawat-inap.riwayat-pasien')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/resume', \App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasien\Index::class)->name('modul.rawat-inap.sub-rawat-inap.resume')->where('no_rawat', '.*');
