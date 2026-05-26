@@ -233,33 +233,52 @@
                     </div>
                 </div>
 
-                {{-- Proses --}}
+                {{-- Proses & Penolong --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <flux:input label="Proses Kelahiran" wire:model="proses_lahir" placeholder="Normal, Sectio Caesarea, Vakum, dll..." />
                         @error('proses_lahir') <span class="text-xs text-red-500 font-medium">{{ $message }}</span> @enderror
                     </div>
-                    <div class="space-y-2 relative">
-                        <flux:input label="Cari Penolong Persalinan (NIK / Nama)" wire:model.live.debounce.300ms="searchPenolong" placeholder="Ketik minimal 3 karakter..." icon="magnifying-glass" />
-                        @if(!empty($penolongList))
-                            <div class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto">
-                                @foreach($penolongList as $peg)
-                                    <button type="button" 
-                                        wire:click="selectPenolong('{{ $peg['nik'] }}', '{{ $peg['nama'] }}')"
-                                        class="w-full text-left px-4 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100 dark:border-neutral-800">
-                                        <p class="text-xs font-bold text-neutral-800 dark:text-neutral-100">{{ $peg['nama'] }}</p>
-                                        <p class="text-[10px] text-neutral-500">NIK: {{ $peg['nik'] }} | {{ $peg['jbtn'] }}</p>
-                                    </button>
-                                @endforeach
+
+                    {{-- Informasi Penolong --}}
+                    <div class="space-y-4 bg-neutral-50/50 dark:bg-neutral-900/10 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-bold text-[#4C5C2D] uppercase tracking-wider">Penolong Persalinan</h3>
+                            <div x-data="{ openSearch: false }" class="relative">
+                                <flux:button size="xs" variant="ghost" icon="link" class="h-6 text-[10px] px-2 text-[#4C5C2D] bg-[#4C5C2D]/10 hover:bg-[#4C5C2D]/20" @click="openSearch = !openSearch">
+                                    Attach Pegawai
+                                </flux:button>
+                                
+                                <div x-show="openSearch" @click.away="openSearch = false" x-cloak
+                                     class="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 p-2">
+                                    <flux:input wire:model.live.debounce.300ms="searchPenolong" placeholder="Cari NIK / Nama Pegawai..." icon="magnifying-glass" class="mb-2" />
+                                    
+                                    @if(!empty($penolongList))
+                                        <div class="max-h-48 overflow-y-auto rounded-lg border border-neutral-100 dark:border-neutral-700">
+                                            @foreach($penolongList as $peg)
+                                                <button type="button" @click="openSearch = false; $wire.selectPenolong('{{ $peg['nik'] }}', '{{ $peg['nama'] }}')"
+                                                    class="w-full text-left px-3 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100">
+                                                    <p class="text-xs font-bold text-neutral-800 dark:text-neutral-200">{{ $peg['nama'] }}</p>
+                                                    <p class="text-[10px] text-neutral-500">NIK: {{ $peg['nik'] }} | {{ $peg['jbtn'] }}</p>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @elseif(strlen($searchPenolong) >= 3)
+                                        <div class="p-3 text-center text-xs text-neutral-500">Data pegawai tidak ditemukan.</div>
+                                    @endif
+                                </div>
                             </div>
-                        @endif
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="col-span-1">
+                                <flux:input label="NIK" wire:model="penolong" readonly placeholder="-" class="bg-white dark:bg-neutral-800" />
+                            </div>
+                            <div class="col-span-2">
+                                <flux:input label="Nama Penolong" wire:model="nm_penolong" readonly placeholder="Pilih dari attach..." class="bg-white dark:bg-neutral-800" />
+                            </div>
+                        </div>
                         @error('penolong') <span class="text-xs text-red-500 font-medium">{{ $message }}</span> @enderror
                     </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <flux:input label="Selected Penolong NIK" wire:model="penolong" readonly placeholder="Selected NIK" class="bg-neutral-50" />
-                    <flux:input label="Selected Penolong Nama" wire:model="nm_penolong" readonly placeholder="Selected Nama" class="bg-neutral-50 col-span-2" />
                 </div>
 
                 <hr class="border-neutral-100 dark:border-neutral-700" />
