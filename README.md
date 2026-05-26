@@ -55,6 +55,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Hasil USG Kandungan**: Modul pencatatan hasil pemeriksaan USG kandungan (Biometri Janin, Plasenta, Cairan Ketuban, Kelainan Kongenital) dengan *Right Slide-In Panel* Alpine.js dan pola Repository.
 - [x] **Hasil USG Gynecologi**: Modul pencatatan hasil pemeriksaan USG Gynecologi (Uterus, Parametrium, Ovarium, Doppler, Kesimpulan) dengan *Right Slide-In Panel* Alpine.js dan pola Repository.
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) terintegrasi penuh dengan pola Repository, termasuk rekap riwayat Tab Hasil (Master-Detail).
+- [x] **Kelahiran Bayi**: Modul pencatatan data kelahiran bayi (Antropometri, Skor APGAR interaktif, Data Orang Tua, Proses Persalinan) dengan form vertikal 4 card, floating minimap, modal detail premium, serta halaman CRUD (Create, Edit, View Modal) berbasis Repository Pattern dan Flux UI.
 
 ### 🏥 Modul Rawat Jalan (Ralan)
 - [x] **List Pasien Ralan**: Dashboard operasional poli dengan filter lanjutan (Dokter, Poliklinik, & Periode).
