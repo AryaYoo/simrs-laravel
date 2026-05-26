@@ -130,6 +130,7 @@
     </div>
 
     {{-- MODAL DETAIL (Pure Alpine.js - SOP #6) --}}
+    @if($detailBayi)
     <div
         x-data="{ open: false }"
         x-on:open-detail-modal.window="open = true"
