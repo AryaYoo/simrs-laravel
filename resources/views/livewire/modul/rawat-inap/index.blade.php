@@ -295,12 +295,20 @@
         get filteredGroups() {
             const q = this.searchQuery.toLowerCase().trim();
             const isAdmin = this.isAdmin;
+            // Helper: cek apakah item (atau turunannya) punya URL valid
+            const hasValidUrl = (item) => {
+                if (item.children && item.children.length > 0) {
+                    return item.children.some(c => hasValidUrl(c));
+                }
+                return item.url && item.url !== '#';
+            };
             const filterItem = (item) => {
                 if (item.children && item.children.length > 0) {
                     const fc = item.children.filter(c => {
-                        const matchQ = !q || c.label.toLowerCase().includes(q);
-                        const hasUrl = isAdmin || (c.url && c.url !== '#');
-                        return matchQ && hasUrl;
+                        const matchQ = !q || c.label.toLowerCase().includes(q) ||
+                            (c.children && c.children.some(gc => gc.label.toLowerCase().includes(q)));
+                        const visible = isAdmin || hasValidUrl(c);
+                        return matchQ && visible;
                     });
                     if (fc.length > 0) return { ...item, children: fc };
                     if (!q && !isAdmin) return null;
@@ -308,8 +316,8 @@
                     return null;
                 }
                 const matchQ = !q || item.label.toLowerCase().includes(q);
-                const hasUrl = isAdmin || (item.url && item.url !== '#');
-                return matchQ && hasUrl ? item : null;
+                const visible = isAdmin || hasValidUrl(item);
+                return matchQ && visible ? item : null;
             };
             return this.menuGroups.map(g => {
                 const filteredItems = g.items.map(filterItem).filter(Boolean);
