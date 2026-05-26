@@ -88,6 +88,11 @@
                                 {{-- Detail --}}
                                 <flux:button wire:click="showDetail('{{ $bayi->no_rkm_medis }}')" icon="eye" size="xs" variant="ghost" title="Lihat Detail" />
 
+                                {{-- Cetak SKL --}}
+                                <a href="{{ route('modul.rawat-inap.kelahiran-bayi.cetak-skl', $bayi->no_rkm_medis) }}" target="_blank">
+                                    <flux:button icon="printer" size="xs" variant="ghost" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10" title="Cetak SKL" />
+                                </a>
+
                                 {{-- Edit --}}
                                 <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.edit', $bayi->no_rkm_medis)" wire:navigate icon="pencil-square" size="xs" variant="ghost" title="Edit Data Bayi" />
 

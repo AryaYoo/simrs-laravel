@@ -28,7 +28,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-inap', \App\Livewire\Modul\RawatInap\Index::class)->name('modul.rawat-inap.index');
     Route::get('modul/rawat-inap/kelahiran-bayi', \App\Livewire\Modul\RawatInap\KelahiranBayi\Index::class)->name('modul.rawat-inap.kelahiran-bayi');
     Route::get('modul/rawat-inap/kelahiran-bayi/create', \App\Livewire\Modul\RawatInap\KelahiranBayi\Create::class)->name('modul.rawat-inap.kelahiran-bayi.create');
-    Route::get('modul/rawat-inap/kelahiran-bayi/{no_rkm_medis}/edit', \App\Livewire\Modul\RawatInap\KelahiranBayi\Edit::class)->name('modul.rawat-inap.kelahiran-bayi.edit');
+    Route::get('modul/rawat-inap/kelahiran-bayi/{no_rkm_medis}/edit', \App\Livewire\Modul\RawatInap\KelahiranBayi\Edit::class)->name('modul.rawat-inap.kelahiran-bayi.edit')->where('no_rkm_medis', '.*');
+    Route::get('modul/rawat-inap/kelahiran-bayi/{no_rkm_medis}/cetak-skl', [\App\Http\Controllers\RawatInap\CetakSklController::class, 'cetak'])->name('modul.rawat-inap.kelahiran-bayi.cetak-skl')->where('no_rkm_medis', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/perawatan-tindakan', \App\Livewire\Modul\RawatInap\PerawatanTindakan\Index::class)->name('modul.rawat-inap.perawatan-tindakan')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/riwayat-pasien', \App\Livewire\Modul\RawatInap\SubRawatInap\RiwayatPasien\Index::class)->name('modul.rawat-inap.sub-rawat-inap.riwayat-pasien')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/resume', \App\Livewire\Modul\RawatInap\SubRawatInap\ResumePasien\Index::class)->name('modul.rawat-inap.sub-rawat-inap.resume')->where('no_rawat', '.*');
