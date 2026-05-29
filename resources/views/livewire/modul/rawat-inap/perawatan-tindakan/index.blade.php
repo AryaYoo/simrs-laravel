@@ -385,17 +385,29 @@
         {{-- Tab Panels --}}
         <div class="mt-4">
             @if($activeTab === 'penanganan_dokter')
-                @include('livewire.modul.rawat-inap.perawatan-tindakan.penanganan-dokter')
+                <div wire:key="tab-penanganan_dokter">
+                    @include('livewire.modul.rawat-inap.perawatan-tindakan.penanganan-dokter')
+                </div>
             @elseif($activeTab === 'penanganan_petugas')
-                @include('livewire.modul.rawat-inap.perawatan-tindakan.penanganan-petugas')
+                <div wire:key="tab-penanganan_petugas">
+                    @include('livewire.modul.rawat-inap.perawatan-tindakan.penanganan-petugas')
+                </div>
             @elseif($activeTab === 'penanganan_dokter_petugas')
-                @include('livewire.modul.rawat-inap.perawatan-tindakan.penanganan-dokter-dan-petugas')
+                <div wire:key="tab-penanganan_dokter_petugas">
+                    @include('livewire.modul.rawat-inap.perawatan-tindakan.penanganan-dokter-dan-petugas')
+                </div>
             @elseif($activeTab === 'pemeriksaan')
-                @include('livewire.modul.rawat-inap.perawatan-tindakan.pemeriksaan')
+                <div wire:key="tab-pemeriksaan">
+                    @include('livewire.modul.rawat-inap.perawatan-tindakan.pemeriksaan')
+                </div>
             @elseif($activeTab === 'pemeriksaan_obstetri')
-                @include('livewire.modul.rawat-inap.perawatan-tindakan.pemeriksaan-obstetri')
+                <div wire:key="tab-pemeriksaan_obstetri">
+                    @include('livewire.modul.rawat-inap.perawatan-tindakan.pemeriksaan-obstetri')
+                </div>
             @elseif($activeTab === 'pemeriksaan_ginekologi')
-                @include('livewire.modul.rawat-inap.perawatan-tindakan.pemeriksaan-ginekologi')
+                <div wire:key="tab-pemeriksaan_ginekologi">
+                    @include('livewire.modul.rawat-inap.perawatan-tindakan.pemeriksaan-ginekologi')
+                </div>
             @endif
         </div>
     </div>
