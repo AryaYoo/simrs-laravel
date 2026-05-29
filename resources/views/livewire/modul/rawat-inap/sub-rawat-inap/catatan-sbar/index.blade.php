@@ -465,78 +465,79 @@
                 {{-- 2-Column SBAR Textareas --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- LEFT COLUMN --}}
-                    <div class="space-y-5">
-                        <div>
-                            <flux:label>Situation (S) *</flux:label>
-                            <textarea wire:model="situation"
-                                      rows="4"
-                                      placeholder="Tuliskan situasi pasien saat ini..."
-                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
-                            ></textarea>
+                    <div class="space-y-6">
+                        <div class="bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10 rounded-xl p-4 transition-colors focus-within:bg-amber-50 dark:focus-within:bg-amber-500/10 focus-within:border-amber-200 dark:focus-within:border-amber-500/20">
+                            <flux:label class="flex items-center gap-2 !mb-3">
+                                <flux:icon name="information-circle" class="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                <span class="text-amber-800 dark:text-amber-300 font-bold uppercase tracking-wider text-xs">Situation (S) *</span>
+                            </flux:label>
+                            <textarea wire:model="situation" rows="4" placeholder="Tuliskan situasi pasien saat ini..." class="w-full rounded-lg border border-amber-200/60 dark:border-amber-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition resize-y shadow-sm"></textarea>
                             @error('situation') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         </div>
-                        <div>
-                            <flux:label>Background (B) *</flux:label>
-                            <textarea wire:model="background"
-                                      rows="4"
-                                      placeholder="Tuliskan latar belakang medis yang relevan..."
-                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
-                            ></textarea>
+
+                        <div class="bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 rounded-xl p-4 transition-colors focus-within:bg-blue-50 dark:focus-within:bg-blue-500/10 focus-within:border-blue-200 dark:focus-within:border-blue-500/20">
+                            <flux:label class="flex items-center gap-2 !mb-3">
+                                <flux:icon name="clock" class="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                <span class="text-blue-800 dark:text-blue-300 font-bold uppercase tracking-wider text-xs">Background (B) *</span>
+                            </flux:label>
+                            <textarea wire:model="background" rows="4" placeholder="Tuliskan latar belakang medis yang relevan..." class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y shadow-sm"></textarea>
                             @error('background') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
                     {{-- RIGHT COLUMN --}}
-                    <div class="space-y-5">
-                        <div>
-                            <flux:label>Assessment (A) *</flux:label>
-                            <textarea wire:model="assessment"
-                                      rows="4"
-                                      placeholder="Tuliskan hasil asesmen kesimpulan klinis..."
-                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
-                            ></textarea>
+                    <div class="space-y-6">
+                        <div class="bg-purple-50/50 dark:bg-purple-500/5 border border-purple-100 dark:border-purple-500/10 rounded-xl p-4 transition-colors focus-within:bg-purple-50 dark:focus-within:bg-purple-500/10 focus-within:border-purple-200 dark:focus-within:border-purple-500/20">
+                            <flux:label class="flex items-center gap-2 !mb-3">
+                                <flux:icon name="clipboard-document-check" class="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                <span class="text-purple-800 dark:text-purple-300 font-bold uppercase tracking-wider text-xs">Assessment (A) *</span>
+                            </flux:label>
+                            <textarea wire:model="assessment" rows="4" placeholder="Tuliskan hasil asesmen kesimpulan klinis..." class="w-full rounded-lg border border-purple-200/60 dark:border-purple-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 transition resize-y shadow-sm"></textarea>
                             @error('assessment') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         </div>
-                        <div>
-                            <flux:label>Recommendation (R) *</flux:label>
-                            <textarea wire:model="recommendation"
-                                      rows="4"
-                                      placeholder="Tuliskan rekomendasi asuhan atau intervensi..."
-                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
-                            ></textarea>
+
+                        <div class="bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 rounded-xl p-4 transition-colors focus-within:bg-emerald-50 dark:focus-within:bg-emerald-500/10 focus-within:border-emerald-200 dark:focus-within:border-emerald-500/20">
+                            <flux:label class="flex items-center gap-2 !mb-3">
+                                <flux:icon name="light-bulb" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                <span class="text-emerald-800 dark:text-emerald-300 font-bold uppercase tracking-wider text-xs">Recommendation (R) *</span>
+                            </flux:label>
+                            <textarea wire:model="recommendation" rows="4" placeholder="Tuliskan rekomendasi asuhan atau intervensi..." class="w-full rounded-lg border border-emerald-200/60 dark:border-emerald-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition resize-y shadow-sm"></textarea>
                             @error('recommendation') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
                 </div>
 
                 {{-- Full width Advice & Status --}}
-                <div class="space-y-5 border-t border-neutral-100 dark:border-neutral-800 pt-6">
-                    <div>
-                        <flux:label>Advice Dokter</flux:label>
-                        <textarea wire:model="advice"
-                                  rows="3"
-                                  placeholder="Tuliskan saran/instruksi balasan dari dokter..."
-                                  class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-blue-50/50 dark:bg-blue-900/10 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y"
-                        ></textarea>
+                <div class="space-y-6 border-t border-neutral-100 dark:border-neutral-800 pt-6">
+                    <div class="bg-sky-50/50 dark:bg-sky-500/5 border border-sky-100 dark:border-sky-500/10 rounded-xl p-4 transition-colors focus-within:bg-sky-50 dark:focus-within:bg-sky-500/10 focus-within:border-sky-200 dark:focus-within:border-sky-500/20">
+                        <flux:label class="flex items-center gap-2 !mb-3">
+                            <flux:icon name="chat-bubble-left-ellipsis" class="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                            <span class="text-sky-800 dark:text-sky-300 font-bold uppercase tracking-wider text-xs">Advice Dokter</span>
+                        </flux:label>
+                        <textarea wire:model="advice" rows="3" placeholder="Tuliskan saran/instruksi balasan dari dokter..." class="w-full rounded-lg border border-sky-200/60 dark:border-sky-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500 transition resize-y shadow-sm"></textarea>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-6">
-                        <div>
-                        <flux:label class="!mb-1">Status Baca</flux:label>
-                        <select wire:model="status_baca"
-                                class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition">
-                            <option value="Belum">Belum dibaca</option>
-                            <option value="Sudah">Sudah dibaca</option>
-                        </select>
-                    </div>
-                    <div>
-                        <flux:label class="!mb-1">Status Konfirmasi</flux:label>
-                        <select wire:model="status_konfirmasi"
-                                class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition">
-                            <option value="Belum">Belum dikonfirmasi</option>
-                            <option value="Sudah">Sudah dikonfirmasi</option>
-                        </select>
-                    </div>
+                    <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700 rounded-xl p-5">
+                        <h4 class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <flux:icon name="adjustments-horizontal" class="w-4 h-4 text-neutral-400" />
+                            Pengaturan Status
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <flux:label class="!mb-2">Status Baca</flux:label>
+                                <select wire:model="status_baca" class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition shadow-sm">
+                                    <option value="Belum">Belum dibaca</option>
+                                    <option value="Sudah">Sudah dibaca</option>
+                                </select>
+                            </div>
+                            <div>
+                                <flux:label class="!mb-2">Status Konfirmasi</flux:label>
+                                <select wire:model="status_konfirmasi" class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition shadow-sm">
+                                    <option value="Belum">Belum dikonfirmasi</option>
+                                    <option value="Sudah">Sudah dikonfirmasi</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
