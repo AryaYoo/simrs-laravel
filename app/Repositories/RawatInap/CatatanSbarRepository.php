@@ -29,6 +29,7 @@ class CatatanSbarRepository
                     'advice'            => $item->advice,
                     'status_baca'       => $item->status_baca,
                     'status_konfirmasi' => $item->status_konfirmasi,
+                    'status_verifikasi' => $item->status_verifikasi,
                     'petugas'           => [
                         'nama' => $item->petugas->nama ?? '-',
                     ],

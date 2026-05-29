@@ -115,10 +115,19 @@
                                             <flux:badge size="sm" color="zinc" class="!px-1.5 !py-0">Belum</flux:badge>
                                         @endif
                                     </div>
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-neutral-500 w-16">Verif:</span>
+                                        @if($catatan['status_verifikasi'] === 'Sudah')
+                                            <flux:badge size="sm" color="lime" class="!px-1.5 !py-0">✓ DPJP</flux:badge>
+                                        @else
+                                            <flux:badge size="sm" color="zinc" class="!px-1.5 !py-0">Belum</flux:badge>
+                                        @endif
+                                    </div>
                                 </div>
                             </flux:table.cell>
                             <flux:table.cell>
                                 <div class="flex justify-center gap-2">
+                                    <flux:button wire:click="showDetail('{{ $catatan['tanggal'] }}')" icon="eye" size="xs" variant="ghost" class="!text-blue-500 hover:!bg-blue-50 dark:hover:!bg-blue-500/10" />
                                     <flux:button wire:click="edit('{{ $catatan['tanggal'] }}')" icon="pencil-square" size="xs" variant="ghost" />
                                     <flux:button
                                         @click="
@@ -154,6 +163,134 @@
                     @endforelse
                 </flux:table.rows>
             </flux:table>
+        </div>
+    </div>
+
+    {{-- DETAIL MODAL --}}
+    <div x-data="{ open: @entangle('detailSbar').live !== null }"
+         x-init="$watch('$wire.detailSbar', v => { open = v !== null })"
+         x-show="$wire.detailSbar !== null"
+         class="fixed inset-0 z-[60] flex items-center justify-center"
+         style="display: none;">
+
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm"
+             @click="$wire.detailSbar = null"></div>
+
+        {{-- Modal Box --}}
+        <div class="relative z-10 w-full max-w-2xl mx-4 bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+             @click.stop>
+
+            @if($detailSbar)
+            {{-- Modal Header --}}
+            <div class="px-6 py-4 border-b border-neutral-100 dark:border-neutral-700 flex items-center justify-between bg-neutral-50 dark:bg-neutral-900">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#4C5C2D]/10 flex items-center justify-center">
+                        <flux:icon name="chat-bubble-bottom-center-text" class="w-5 h-5 text-[#4C5C2D]" />
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-neutral-800 dark:text-neutral-100 text-base">Detail Catatan SBAR</h3>
+                        <p class="text-xs text-neutral-500">{{ \Carbon\Carbon::parse($detailSbar['tanggal'])->format('d/m/Y H:i') }}</p>
+                    </div>
+                </div>
+                <button wire:click="$set('detailSbar', null)" class="text-neutral-400 hover:text-neutral-600 transition-colors">
+                    <flux:icon name="x-mark" class="w-5 h-5" />
+                </button>
+            </div>
+
+            {{-- Meta Info --}}
+            <div class="px-6 py-3 bg-neutral-50/80 dark:bg-neutral-900/60 flex flex-wrap gap-x-6 gap-y-1 text-sm border-b border-neutral-100 dark:border-neutral-800">
+                <div class="flex items-center gap-2">
+                    <flux:icon name="user" class="w-4 h-4 text-[#4C5C2D]" />
+                    <span class="text-neutral-500">Petugas:</span>
+                    <span class="font-semibold text-neutral-700 dark:text-neutral-300">{{ $detailSbar['petugas']['nama'] ?? '-' }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <flux:icon name="star" class="w-4 h-4 text-blue-500" />
+                    <span class="text-neutral-500">DPJP:</span>
+                    <span class="font-semibold text-neutral-700 dark:text-neutral-300">{{ $detailSbar['dokter']['nama'] ?? '-' }}</span>
+                </div>
+            </div>
+
+            {{-- SBAR Content --}}
+            <div class="px-6 py-5 space-y-4 max-h-[55vh] overflow-y-auto">
+                @foreach([
+                    ['label' => 'Situation (S)',      'value' => $detailSbar['situation'],      'color' => 'amber'],
+                    ['label' => 'Background (B)',     'value' => $detailSbar['background'],     'color' => 'blue'],
+                    ['label' => 'Assessment (A)',     'value' => $detailSbar['assessment'],     'color' => 'purple'],
+                    ['label' => 'Recommendation (R)', 'value' => $detailSbar['recommendation'], 'color' => 'green'],
+                ] as $row)
+                <div class="flex gap-3">
+                    <div class="w-36 flex-shrink-0">
+                        <span class="text-xs font-bold uppercase tracking-wider text-neutral-500">{{ $row['label'] }}</span>
+                    </div>
+                    <div class="flex-1 bg-neutral-50 dark:bg-neutral-900 rounded-lg px-3 py-2 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border border-neutral-100 dark:border-neutral-800">
+                        {{ $row['value'] ?: '-' }}
+                    </div>
+                </div>
+                @endforeach
+
+                @if($detailSbar['advice'])
+                <div class="flex gap-3">
+                    <div class="w-36 flex-shrink-0">
+                        <span class="text-xs font-bold uppercase tracking-wider text-neutral-500">Advice Dokter</span>
+                    </div>
+                    <div class="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3 py-2 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border border-blue-100 dark:border-blue-800">
+                        {{ $detailSbar['advice'] }}
+                    </div>
+                </div>
+                @endif
+            </div>
+
+            {{-- Footer --}}
+            <div class="px-6 py-4 border-t border-neutral-100 dark:border-neutral-700 flex items-center justify-between bg-neutral-50/70 dark:bg-neutral-900/60">
+                <div class="flex items-center gap-4 text-sm">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-neutral-500">Baca:</span>
+                        @if($detailSbar['status_baca'] === 'Sudah')
+                            <flux:badge size="sm" color="green">Sudah</flux:badge>
+                        @else
+                            <flux:badge size="sm" color="zinc">Belum</flux:badge>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-neutral-500">Konfirmasi:</span>
+                        @if($detailSbar['status_konfirmasi'] === 'Sudah')
+                            <flux:badge size="sm" color="green">Sudah</flux:badge>
+                        @else
+                            <flux:badge size="sm" color="zinc">Belum</flux:badge>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-neutral-500">Verifikasi DPJP:</span>
+                        @if($detailSbar['status_verifikasi'] === 'Sudah')
+                            <flux:badge size="sm" color="lime">✓ Terverifikasi</flux:badge>
+                        @else
+                            <flux:badge size="sm" color="zinc">Belum</flux:badge>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <flux:button wire:click="$set('detailSbar', null)" variant="ghost" size="sm">Tutup</flux:button>
+                    @if($detailSbar['status_verifikasi'] !== 'Sudah')
+                        <flux:button
+                            wire:click="verifikasi"
+                            wire:confirm="Verifikasi catatan SBAR ini sebagai DPJP?"
+                            variant="filled"
+                            size="sm"
+                            icon="check-circle"
+                            class="!bg-[#4C5C2D] !text-white hover:!bg-[#3d4a24]">
+                            Verifikasi DPJP
+                        </flux:button>
+                    @else
+                        <flux:button variant="filled" size="sm" icon="check-circle" disabled class="!bg-green-600 !text-white opacity-60 cursor-not-allowed">
+                            Sudah Diverifikasi
+                        </flux:button>
+                    @endif
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 

@@ -25,6 +25,7 @@ class CatatanSbar extends Model
         'advice',
         'status_baca',
         'status_konfirmasi',
+        'status_verifikasi',
     ];
 
     protected $casts = [

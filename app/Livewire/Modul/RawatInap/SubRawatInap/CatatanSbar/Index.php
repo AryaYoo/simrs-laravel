@@ -15,6 +15,7 @@ class Index extends Component
     public $regPeriksa;
     public $catatans = [];
     public bool $isEmbedded = false;
+    public ?array $detailSbar = null;
 
     // Form State
     public $tanggal, $tanggal_date, $tanggal_time;
@@ -23,6 +24,7 @@ class Index extends Component
     public $situation, $background, $assessment, $recommendation, $advice;
     public $status_baca = 'Belum';
     public $status_konfirmasi = 'Belum';
+    public $status_verifikasi = 'Belum';
     
     public $petugasSearch = '';
     public $dokterSearch = '';
@@ -73,6 +75,7 @@ class Index extends Component
         $this->tanggal_time = now()->format('H:i');
         $this->status_baca = 'Belum';
         $this->status_konfirmasi = 'Belum';
+        $this->status_verifikasi = 'Belum';
         $this->isPanelOpen = true;
         $this->dispatch('set-autotime', ['status' => true]);
     }
@@ -100,6 +103,7 @@ class Index extends Component
             $this->advice            = $catatan['advice'];
             $this->status_baca       = $catatan['status_baca'];
             $this->status_konfirmasi = $catatan['status_konfirmasi'];
+            $this->status_verifikasi = $catatan['status_verifikasi'];
 
             $this->isEditMode = true;
             $this->autoTime   = false;
@@ -164,6 +168,7 @@ class Index extends Component
                 'advice'            => $this->advice ?? '',
                 'status_baca'       => $this->status_baca,
                 'status_konfirmasi' => $this->status_konfirmasi,
+                'status_verifikasi' => $this->status_verifikasi,
             ];
 
             if ($this->isEditMode) {
@@ -194,6 +199,26 @@ class Index extends Component
             $this->dispatch('swal', ['title' => 'Terhapus!', 'text' => 'Catatan SBAR berhasil dihapus.', 'icon' => 'success']);
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal Menghapus!', 'text' => 'Terjadi kesalahan: ' . $e->getMessage(), 'icon' => 'error']);
+        }
+    }
+
+    public function showDetail(string $tanggal)
+    {
+        $this->detailSbar = collect($this->catatans)->first(fn($item) => $item['tanggal'] === $tanggal);
+    }
+
+    public function verifikasi(CatatanSbarRepository $repository)
+    {
+        if (!$this->detailSbar) return;
+        try {
+            $repository->update($this->noRawat, $this->detailSbar['tanggal'], [
+                'status_verifikasi' => 'Sudah',
+            ]);
+            $this->loadCatatans();
+            $this->detailSbar = collect($this->catatans)->first(fn($item) => $item['tanggal'] === $this->detailSbar['tanggal']);
+            $this->dispatch('swal', ['title' => 'Terverifikasi!', 'text' => 'SBAR berhasil diverifikasi oleh DPJP.', 'icon' => 'success']);
+        } catch (\Exception $e) {
+            $this->dispatch('swal', ['title' => 'Gagal!', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
     }
 
