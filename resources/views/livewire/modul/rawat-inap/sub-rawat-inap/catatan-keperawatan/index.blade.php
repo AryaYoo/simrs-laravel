@@ -241,7 +241,23 @@
                     @endif
                 </div>
 
-                <flux:textarea wire:model="uraian" label="Uraian Catatan" rows="4" placeholder="Tuliskan catatan keperawatan di sini..." required />
+                <div class="mb-2">
+                    <div class="flex items-center justify-between mb-2">
+                        <flux:label class="!mb-0">Uraian Catatan</flux:label>
+                        @if($isEditMode)
+                            <div title="Fitur tidak tersedia ketika mengedit">
+                                <flux:button size="xs" variant="subtle" icon="bolt" disabled class="opacity-50 cursor-not-allowed">
+                                    Isi Otomatis
+                                </flux:button>
+                            </div>
+                        @else
+                            <flux:button wire:click="fillLatestVitals" size="xs" variant="subtle" icon="bolt" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10">
+                                Isi Otomatis
+                            </flux:button>
+                        @endif
+                    </div>
+                    <flux:textarea wire:model="uraian" rows="4" placeholder="Tuliskan catatan keperawatan di sini..." required />
+                </div>
             </div>
 
             {{-- Footer --}}

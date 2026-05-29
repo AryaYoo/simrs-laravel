@@ -20,7 +20,8 @@ class Show extends Component
             'penjab', 
             'dokter',
             'kamarInap.kamar', 
-            'permintaanRanap.kamar'
+            'permintaanRanap.kamar',
+            'resumePasienRanap',
         ])
         ->where('no_rawat', $this->no_rawat)
         ->firstOrFail();
@@ -28,6 +29,10 @@ class Show extends Component
 
     public function render()
     {
-        return view('livewire.modul.rawat-inap.show');
+        $hasResume = $this->regPeriksa->resumePasienRanap !== null;
+
+        return view('livewire.modul.rawat-inap.show', [
+            'hasResume' => $hasResume,
+        ]);
     }
 }

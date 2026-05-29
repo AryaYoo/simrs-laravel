@@ -174,11 +174,7 @@
 
     {{-- SBAR Content --}}
     <div x-show="activeSubTab === 'sbar'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
-        <div class="text-center py-16 border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl bg-neutral-50/50 dark:bg-neutral-800/30 mt-2">
-            <flux:icon name="chat-bubble-bottom-center-text" class="w-12 h-12 mx-auto mb-4 text-neutral-300 dark:text-neutral-600" />
-            <h4 class="text-base font-semibold text-neutral-700 dark:text-neutral-300 mb-1">Catatan SBAR</h4>
-            <p class="text-sm text-neutral-500 dark:text-neutral-400">Modul Komunikasi SBAR sedang dalam tahap pengembangan.</p>
-        </div>
+        <livewire:modul.rawat-inap.sub-rawat-inap.catatan-sbar.index :no_rawat="$regPeriksa->no_rawat" :isEmbedded="true" />
     </div>
 </div>
 

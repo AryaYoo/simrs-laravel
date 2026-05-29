@@ -18,11 +18,40 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3"
+             x-data="{
+                hasResume: {{ $hasResume ? 'true' : 'false' }},
+                resumeUrl: '{{ route('modul.rawat-inap.sub-rawat-inap.resume', str_replace('/', '-', $no_rawat)) }}',
+                pulangUrl: '{{ route('modul.rawat-inap.sub-rawat-inap.pulang', str_replace('/', '-', $no_rawat)) }}'
+             }">
             <flux:button icon="arrow-path" :href="route('modul.rawat-inap.sub-rawat-inap.pindah', str_replace('/', '-', $no_rawat))" wire:navigate
                 style="background-color: #4C5C2D; color: white; border: none; font-weight: 700; padding-left: 1.25rem; padding-right: 1.25rem;">Pindah</flux:button>
-            <flux:button icon="arrow-right-start-on-rectangle" :href="route('modul.rawat-inap.sub-rawat-inap.pulang', str_replace('/', '-', $no_rawat))" wire:navigate
-                style="background-color: #6A7E3F; color: white; border: none; font-weight: 700; padding-left: 1.25rem; padding-right: 1.25rem;">Pulang</flux:button>
+
+            <flux:button icon="arrow-right-start-on-rectangle"
+                @click="
+                    if (!hasResume) {
+                        Swal.fire({
+                            title: 'Perhatian!',
+                            text: 'Harap mengisi resume terlebih dahulu sebelum memulangkan pasien.',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#4C5C2D',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'Isi Resume',
+                            cancelButtonText: 'Batal',
+                            reverseButtons: true,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.open(resumeUrl, '_blank');
+                            }
+                        });
+                    } else {
+                        window.location.href = pulangUrl;
+                    }
+                "
+                style="background-color: #6A7E3F; color: white; border: none; font-weight: 700; padding-left: 1.25rem; padding-right: 1.25rem;">
+                Pulang
+            </flux:button>
         </div>
     </div>
 

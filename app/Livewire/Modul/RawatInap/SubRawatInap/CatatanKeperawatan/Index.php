@@ -121,6 +121,30 @@ class Index extends Component
         }
     }
 
+    public function fillLatestVitals()
+    {
+        $latestPemeriksaan = \App\Models\PemeriksaanRanap::where('no_rawat', $this->noRawat)
+            ->orderBy('tgl_perawatan', 'desc')
+            ->orderBy('jam_rawat', 'desc')
+            ->first();
+
+        if ($latestPemeriksaan) {
+            $suhu = $latestPemeriksaan->suhu_tubuh ?: '-';
+            $nadi = $latestPemeriksaan->nadi ?: '-';
+            $spo2 = $latestPemeriksaan->spo2 ?: '-';
+
+            $text = "Suhu : {$suhu} C, Nadi :{$nadi}/Menit , SPO2 :{$spo2}%";
+
+            if (!empty($this->uraian)) {
+                $this->uraian .= "\n" . $text;
+            } else {
+                $this->uraian = $text;
+            }
+        } else {
+            $this->dispatch('swal', ['title' => 'Informasi', 'text' => 'Data pemeriksaan (Suhu, Nadi, SPO2) belum tersedia untuk pasien ini.', 'icon' => 'info']);
+        }
+    }
+
     public function delete(string $tanggal, string $jam, \App\Repositories\RawatInap\CatatanKeperawatanRepository $repository)
     {
         try {

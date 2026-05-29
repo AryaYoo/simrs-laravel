@@ -6,6 +6,7 @@ use App\Models\Kamar;
 use App\Models\KamarInap;
 use App\Models\RegPeriksa;
 use App\Models\Penyakit;
+use App\Models\ResumePasienRanap;
 use App\Repositories\RawatInap\CheckOutRepository;
 use App\Livewire\Concerns\WithOptimisticLocking;
 use Illuminate\Support\Carbon;
@@ -46,6 +47,13 @@ class Index extends Component
         $activeStay = $this->regPeriksa->kamarInap->first();
         if (!$activeStay) {
             return $this->redirect(route('modul.rawat-inap.show', $no_rawat), navigate: true);
+        }
+
+        // Guard: Wajib resume terisi sebelum bisa check out
+        $hasResume = ResumePasienRanap::where('no_rawat', $this->no_rawat)->exists();
+        if (!$hasResume) {
+            session()->flash('checkout_blocked', 'Proses Pulang tidak dapat dilakukan. Harap lengkapi Data Resume Medis pasien terlebih dahulu.');
+            return $this->redirect(route('modul.rawat-inap.sub-rawat-inap.resume', $no_rawat), navigate: true);
         }
 
         $this->currentKamarInapArray = $activeStay->toArray();
