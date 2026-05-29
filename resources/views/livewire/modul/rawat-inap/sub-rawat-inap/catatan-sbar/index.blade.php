@@ -215,14 +215,14 @@
             {{-- SBAR Content --}}
             <div class="px-6 py-5 space-y-5 max-h-[55vh] overflow-y-auto">
                 @foreach([
-                    ['label' => 'Situation (S)',      'value' => $detailSbar['situation'],      'bg' => 'bg-amber-50 dark:bg-amber-500/10', 'text' => 'text-amber-700 dark:text-amber-400', 'border' => 'border-amber-200 dark:border-amber-500/20'],
-                    ['label' => 'Background (B)',     'value' => $detailSbar['background'],     'bg' => 'bg-blue-50 dark:bg-blue-500/10', 'text' => 'text-blue-700 dark:text-blue-400', 'border' => 'border-blue-200 dark:border-blue-500/20'],
-                    ['label' => 'Assessment (A)',     'value' => $detailSbar['assessment'],     'bg' => 'bg-purple-50 dark:bg-purple-500/10', 'text' => 'text-purple-700 dark:text-purple-400', 'border' => 'border-purple-200 dark:border-purple-500/20'],
-                    ['label' => 'Recommendation (R)', 'value' => $detailSbar['recommendation'], 'bg' => 'bg-emerald-50 dark:bg-emerald-500/10', 'text' => 'text-emerald-700 dark:text-emerald-400', 'border' => 'border-emerald-200 dark:border-emerald-500/20'],
+                    ['label' => 'Situation (S)',      'value' => $detailSbar['situation'],      'bg' => 'bg-amber-50 dark:bg-amber-500/10', 'text' => 'text-amber-700 dark:text-amber-400', 'border' => 'border-amber-200 dark:border-amber-500/20', 'icon' => 'information-circle'],
+                    ['label' => 'Background (B)',     'value' => $detailSbar['background'],     'bg' => 'bg-blue-50 dark:bg-blue-500/10', 'text' => 'text-blue-700 dark:text-blue-400', 'border' => 'border-blue-200 dark:border-blue-500/20', 'icon' => 'clock'],
+                    ['label' => 'Assessment (A)',     'value' => $detailSbar['assessment'],     'bg' => 'bg-purple-50 dark:bg-purple-500/10', 'text' => 'text-purple-700 dark:text-purple-400', 'border' => 'border-purple-200 dark:border-purple-500/20', 'icon' => 'clipboard-document-check'],
+                    ['label' => 'Recommendation (R)', 'value' => $detailSbar['recommendation'], 'bg' => 'bg-emerald-50 dark:bg-emerald-500/10', 'text' => 'text-emerald-700 dark:text-emerald-400', 'border' => 'border-emerald-200 dark:border-emerald-500/20', 'icon' => 'light-bulb'],
                 ] as $row)
                 <div class="flex flex-col gap-1.5">
                     <div class="flex items-center gap-2">
-                        <div class="w-1.5 h-1.5 rounded-full {{ str_replace('text-', 'bg-', $row['text']) }}"></div>
+                        <flux:icon name="{{ $row['icon'] }}" class="w-4 h-4 {{ $row['text'] }}" />
                         <span class="text-xs font-bold uppercase tracking-wider {{ $row['text'] }}">{{ $row['label'] }}</span>
                     </div>
                     <div class="{{ $row['bg'] }} rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border {{ $row['border'] }} leading-relaxed">
