@@ -385,15 +385,22 @@
                     </div>
                     
                     <div class="grid grid-cols-2 gap-6">
-                        <flux:select wire:model="status_baca" label="Status Baca" variant="listbox">
-                            <flux:select.option value="Belum">Belum dibaca</flux:select.option>
-                            <flux:select.option value="Sudah">Sudah dibaca</flux:select.option>
-                        </flux:select>
-                        
-                        <flux:select wire:model="status_konfirmasi" label="Status Konfirmasi" variant="listbox">
-                            <flux:select.option value="Belum">Belum dikonfirmasi</flux:select.option>
-                            <flux:select.option value="Sudah">Sudah dikonfirmasi</flux:select.option>
-                        </flux:select>
+                        <div>
+                        <flux:label class="!mb-1">Status Baca</flux:label>
+                        <select wire:model="status_baca"
+                                class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition">
+                            <option value="Belum">Belum dibaca</option>
+                            <option value="Sudah">Sudah dibaca</option>
+                        </select>
+                    </div>
+                    <div>
+                        <flux:label class="!mb-1">Status Konfirmasi</flux:label>
+                        <select wire:model="status_konfirmasi"
+                                class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition">
+                            <option value="Belum">Belum dikonfirmasi</option>
+                            <option value="Sudah">Sudah dikonfirmasi</option>
+                        </select>
+                    </div>
                     </div>
                 </div>
             </div>
