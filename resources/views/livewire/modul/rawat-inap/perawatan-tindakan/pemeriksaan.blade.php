@@ -1,5 +1,29 @@
-<div class="animate-in fade-in duration-300">
-    <div class="flex items-center justify-between mb-4">
+<div class="animate-in fade-in duration-300" x-data="{ activeSubTab: 'soapie' }">
+    {{-- Sub-tabs Navigation --}}
+    <div class="flex items-center gap-2 mb-6 border-b border-neutral-200 dark:border-neutral-700">
+        <button @click="activeSubTab = 'soapie'"
+            :class="activeSubTab === 'soapie' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600'"
+            class="px-4 py-2 border-b-2 font-medium text-sm transition-colors flex items-center gap-2">
+            <flux:icon name="clipboard-document-check" class="w-4 h-4" />
+            SOAPIE
+        </button>
+        <button @click="activeSubTab = 'adime'"
+            :class="activeSubTab === 'adime' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600'"
+            class="px-4 py-2 border-b-2 font-medium text-sm transition-colors flex items-center gap-2">
+            <flux:icon name="document-text" class="w-4 h-4" />
+            ADIME
+        </button>
+        <button @click="activeSubTab = 'sbar'"
+            :class="activeSubTab === 'sbar' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600'"
+            class="px-4 py-2 border-b-2 font-medium text-sm transition-colors flex items-center gap-2">
+            <flux:icon name="chat-bubble-bottom-center-text" class="w-4 h-4" />
+            SBAR
+        </button>
+    </div>
+
+    {{-- SOAPIE Content --}}
+    <div x-show="activeSubTab === 'soapie'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+        <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
             <flux:icon name="clipboard-document-check" class="w-5 h-5 text-[#4C5C2D]" />
             <h3 class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">Data Pemeriksaan Rawat Inap</h3>
@@ -141,6 +165,21 @@
             @endforelse
         </flux:table.rows>
     </flux:table>
+    </div>
+
+    {{-- ADIME Content --}}
+    <div x-show="activeSubTab === 'adime'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+        <livewire:modul.rawat-inap.sub-rawat-inap.catatan-adime-gizi.index :no_rawat="$regPeriksa->no_rawat" :isEmbedded="true" />
+    </div>
+
+    {{-- SBAR Content --}}
+    <div x-show="activeSubTab === 'sbar'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+        <div class="text-center py-16 border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl bg-neutral-50/50 dark:bg-neutral-800/30 mt-2">
+            <flux:icon name="chat-bubble-bottom-center-text" class="w-12 h-12 mx-auto mb-4 text-neutral-300 dark:text-neutral-600" />
+            <h4 class="text-base font-semibold text-neutral-700 dark:text-neutral-300 mb-1">Catatan SBAR</h4>
+            <p class="text-sm text-neutral-500 dark:text-neutral-400">Modul Komunikasi SBAR sedang dalam tahap pengembangan.</p>
+        </div>
+    </div>
 </div>
 
 {{-- ===== CREATE MODAL (Livewire + Flux) ===== --}}

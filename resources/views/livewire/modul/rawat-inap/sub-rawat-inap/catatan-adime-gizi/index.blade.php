@@ -1,4 +1,5 @@
-<div class="flex flex-col gap-6 pb-8">
+<div class="flex flex-col gap-6 {{ $isEmbedded ? '' : 'pb-8' }}">
+    @if(!$isEmbedded)
     {{-- Header / Breadcrumb --}}
     <div class="flex flex-col gap-1">
         <div class="flex items-center gap-3">
@@ -41,6 +42,7 @@
             <div class="font-mono font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ $regPeriksa->no_rawat }}</div>
         </div>
     </div>
+    @endif
 
     {{-- Data Table --}}
     <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden flex flex-col mt-2 relative p-4">
@@ -154,7 +156,7 @@
         }"
         @set-autotime.window="autoTime = $event.detail[0].status"
         x-show="open"
-        class="fixed inset-0 z-50 flex"
+        class="fixed inset-0 z-50 flex justify-end"
         style="display: none;">
 
         {{-- Backdrop --}}
@@ -168,15 +170,15 @@
              class="absolute inset-0 bg-neutral-900/50 backdrop-blur-sm"
              @click="open = false"></div>
 
-        {{-- Left Panel --}}
+        {{-- Right Panel --}}
         <div x-show="open"
              x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="-translate-x-full opacity-0"
+             x-transition:enter-start="translate-x-full opacity-0"
              x-transition:enter-end="translate-x-0 opacity-100"
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="translate-x-0 opacity-100"
-             x-transition:leave-end="-translate-x-full opacity-0"
-             class="relative z-10 w-full max-w-4xl bg-white dark:bg-neutral-800 h-full flex flex-col shadow-2xl border-r border-neutral-200 dark:border-neutral-700 overflow-hidden">
+             x-transition:leave-end="translate-x-full opacity-0"
+             class="relative z-10 w-full max-w-4xl bg-white dark:bg-neutral-800 h-full flex flex-col shadow-2xl border-l border-neutral-200 dark:border-neutral-700 overflow-hidden">
 
             {{-- Panel Header --}}
             <div class="px-8 py-5 border-b border-neutral-100 dark:border-neutral-700 flex items-center justify-between bg-neutral-50/70 dark:bg-neutral-900/60 flex-shrink-0">

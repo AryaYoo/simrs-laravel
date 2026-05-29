@@ -41,7 +41,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Pemeriksaan (SOAPIE)**: Grafik Vital Signs & pencatatan riwayat medis terstruktur (Refactored to Repository).
 - [x] **Perawatan & Tindakan**: Input tindakan medis, petugas, dan BHP secara terpadu (Refactored to Repository).
 - [x] **Riwayat Pasien**: Timeline riwayat pemeriksaan dan kunjungan pasien (Refactored to Repository).
-- [x] **Resume Medis**: Form pembuatan resume otomatis dengan sinkronisasi data SOAP/Pemeriksaan, lookup ICD-10 & ICD-9 CM, serta riwayat kontrol (Refactored to Feature-Based).
+- [x] **Resume Medis (Ranap)**: Form pembuatan resume otomatis dengan tata letak *continuous scroll*, navigasi *minimap/scrollspy*, integrasi riwayat klinis otomatis (*auto-fill*), fitur *attachment* (Tindakan, Obat, Lab) via Alpine Modal, serta penguncian status *checkout* (Refactored to Feature-Based & Repository).
 - [x] **Pindah & Pulang**: Modul perpindahan kamar pasien (4 opsi logika) dan proses check-out pasien terintegrasi (Refactored to Repository).
 - [x] **E-Resep Ranap**: Digitalisasi resep obat Rawat Inap & Antarmuka Cepat (Split View) (Refactored to Repository).
 - [x] **Catatan Keperawatan Ranap**: Modul pencatatan asuhan keperawatan rawat inap dengan sinkronisasi waktu dan UI premium.
@@ -51,7 +51,8 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Observasi Rawat Inap Post Partum**: Modul pencatatan vital signs & post partum (TFU, Kontraksi, Perdarahan, Keterangan) dengan Alpine.js Modal dan pola Repository.
 - [x] **Observasi CHBP**: Modul pencatatan harian bayi dan partus (DJJ, HIS, PPV) dengan Alpine.js Modal dan pola Repository.
 - [x] **Observasi Induksi Persalinan**: Modul pencatatan pemberian obat induksi (Obat, Cairan, Dosis, HIS, DJJ, Keterangan) dengan Alpine.js Modal dan pola Repository.
-- [x] **Catatan ADIME Gizi**: Modul pencatatan asuhan gizi ADIME (Asesmen, Diagnosis, Intervensi, Monitoring, Evaluasi, Instruksi) dengan *Left Slide-In Panel* Alpine.js dan pola Repository.
+- [x] **Catatan ADIME Gizi**: Modul pencatatan asuhan gizi ADIME (Asesmen, Diagnosis, Intervensi, Monitoring, Evaluasi, Instruksi) dengan *Left/Right Slide-In Panel* Alpine.js dan pola Repository.
+- [ ] **Komunikasi SBAR**: Modul pencatatan serah terima pasien SBAR (Situation, Background, Assessment, Recommendation) (In Progress).
 - [x] **Hasil USG Kandungan**: Modul pencatatan hasil pemeriksaan USG kandungan (Biometri Janin, Plasenta, Cairan Ketuban, Kelainan Kongenital) dengan *Right Slide-In Panel* Alpine.js dan pola Repository.
 - [x] **Hasil USG Gynecologi**: Modul pencatatan hasil pemeriksaan USG Gynecologi (Uterus, Parametrium, Ovarium, Doppler, Kesimpulan) dengan *Right Slide-In Panel* Alpine.js dan pola Repository.
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) terintegrasi penuh dengan pola Repository, termasuk rekap riwayat Tab Hasil (Master-Detail).
@@ -267,7 +268,30 @@ Gunakan helper `env()` atau `config()` untuk menggabungkan base URL dengan path 
 #### 8.3 Sinkronisasi Folder (Opsi Offline)
 Jika ingin menjalankan file secara lokal tanpa jaringan ke server Khanza, salin folder berkas dari Khanza ke `storage/app/public` dan jalankan `php artisan storage:link`. Gunakan pengecekan `file_exists` jika diperlukan transisi antar metode.
 
-### 9. Penanganan Specificity pada Flux UI (PENTING!)
+### 10. Konfirmasi Aksi & Perlindungan Navigasi (SweetAlert2)
+
+Dilarang keras menggunakan fungsi bawaan browser `confirm()` untuk meminta persetujuan pengguna (seperti menghapus data atau keluar dari form yang belum disimpan). Selalu gunakan **SweetAlert2** agar tampilan tetap profesional dan konsisten dengan *branding* proyek.
+
+**Kasus 1: Hapus Data**
+Pastikan warna tombol selaras (Merah untuk peringatan).
+```javascript
+Swal.fire({
+    title: 'Hapus Data?',
+    text: 'Data ini akan dihapus permanen.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#6b7280',
+    confirmButtonText: 'Ya, Hapus!'
+}).then((result) => {
+    if (result.isConfirmed) { $wire.delete(id); }
+});
+```
+
+**Kasus 2: Dirty Form Guard (Cegah Navigasi)**
+Gunakan SweetAlert2 pada event `livewire:navigating` untuk mencegah pasien kehilangan data yang belum disimpan (*isDirty*). Jika pengguna memaksa pindah, navigasi dilakukan secara manual menggunakan `window.location.href`.
+
+### 11. Penanganan Specificity pada Flux UI (PENTING!)
 
 Komponen Flux UI seringkali memiliki *style* internal yang sangat spesifik. Hal ini sering menyebabkan utilitas Tailwind standar (seperti `padding`, `margin`, atau `width`) tidak berfungsi karena kalah dalam urutan prioritas CSS (*CSS Specificity*).
 
@@ -284,7 +308,7 @@ Selalu gunakan tanda seru `!` untuk memaksa *style* kita agar diprioritaskan ole
 <flux:table.column class="!pl-6">Nama</flux:table.column>
 ```
 
-### 10. Pembuatan Sub-Menu (Tingkat 3) pada Mega Menu Panel
+### 12. Pembuatan Sub-Menu (Tingkat 3) pada Mega Menu Panel
 
 Untuk menjaga kerapian *Mega Menu*, fitur dropdown tingkat 3 (Sub-Menu di dalam Sub-Menu) telah didukung oleh sistem Alpine.js bawaan.
 

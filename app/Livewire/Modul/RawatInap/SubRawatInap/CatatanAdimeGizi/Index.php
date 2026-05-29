@@ -14,6 +14,7 @@ class Index extends Component
     public $noRawat;
     public $regPeriksa;
     public $catatans = [];
+    public bool $isEmbedded = false;
 
     // Form State
     public $tanggal, $tanggal_date, $tanggal_time;
