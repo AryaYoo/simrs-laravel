@@ -326,6 +326,26 @@ Tambahkan properti `children` pada sebuah *item* menu. Komponen UI akan otomatis
 ]},
 ```
 
+### 13. Manajemen State pada Tab Dinamis & Include (Livewire Morphdom)
+
+Saat membuat sistem *tab* atau menu dinamis yang melakukan *swap* antar tampilan menggunakan `@include` berdasarkan variabel Livewire (misalnya pola `@if($activeTab === ...)`), **WAJIB** membungkus setiap *include* dengan `<div wire:key="...">` yang unik. 
+
+**Masalah:** Tanpa `wire:key`, algoritma *morphdom* Livewire akan mengira elemen dari tab lama adalah elemen yang sama dengan tab baru. Ini dapat menyebabkan *Morphdom State Leakage*, di mana atribut seperti `wire:ignore` atau state Alpine.js dari tab sebelumnya tertinggal dan merusak tampilan (elemen hilang/tumpang tindih).
+
+**Solusi:**
+```blade
+{{-- BENAR: Livewire akan menghancurkan DOM lama dan merender ulang DOM baru --}}
+@if($activeTab === 'pemeriksaan')
+    <div wire:key="tab-pemeriksaan">
+        @include('livewire.modul.rawat-inap.perawatan-tindakan.pemeriksaan')
+    </div>
+@elseif($activeTab === 'penanganan')
+    <div wire:key="tab-penanganan">
+        @include('livewire.modul.rawat-inap.perawatan-tindakan.penanganan')
+    </div>
+@endif
+```
+
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
 1. Masuk ke **Master Data -> Pengaturan Aplikasi**.
