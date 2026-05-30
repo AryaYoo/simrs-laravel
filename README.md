@@ -86,6 +86,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Optimistic Locking**: Pencegahan *lost update* pada pengeditan bersama.
 - [x] **Olive Green Branding**: UI/UX standar premium yang konsisten.
 - [x] **Legacy Compatibility**: Bridge aman untuk database sistem lama.
+- [x] **Login Split-Screen Modern**: Halaman login *split-screen* (kiri: gambar showcase yang dapat dikelola admin via Pengaturan Aplikasi, kanan: form login). Mendukung format WebP/JPG/PNG (maks 500KB) dengan *fallback* gradient Olive Green otomatis.
 
 ---
 

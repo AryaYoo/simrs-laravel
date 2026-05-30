@@ -1,9 +1,8 @@
 <div class="flex flex-col gap-6 pb-8">
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center gap-3">
-        <a href="{{ route('dashboard') }}" wire:navigate
-           class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
-            <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
+        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+            <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
         </a>
         <div>
             <nav class="text-xs text-neutral-400 mb-0.5">
@@ -46,6 +45,98 @@
                     </div>
                 </div>
                 
+            </div>
+
+            {{-- Panel Tampilan Halaman Login --}}
+            <div class="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-700">
+                <div class="mb-6">
+                    <h2 class="text-base font-semibold text-neutral-800 dark:text-neutral-200">Tampilan Halaman Login</h2>
+                    <p class="text-sm text-neutral-500 mt-1">Upload gambar yang akan ditampilkan di sisi kiri halaman login. Jika tidak ada gambar, sistem akan menampilkan gradient default.</p>
+                </div>
+                
+                <div class="bg-neutral-50 dark:bg-neutral-900/50 p-6 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                        {{-- Preview Area --}}
+                        <div class="space-y-3">
+                            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Preview Gambar Login</label>
+                            
+                            @if ($login_background)
+                                <div class="w-full aspect-[16/10] rounded-xl border border-neutral-200 overflow-hidden bg-neutral-900 flex items-center justify-center">
+                                    <img src="{{ $login_background->temporaryUrl() }}" class="w-full h-full object-cover">
+                                </div>
+                                <p class="text-xs text-green-600 font-medium flex items-center gap-1">
+                                    <flux:icon name="check-circle" class="w-3.5 h-3.5" />
+                                    Gambar baru siap disimpan
+                                </p>
+                            @elseif ($login_background_preview)
+                                <div class="w-full aspect-[16/10] rounded-xl border border-neutral-200 overflow-hidden bg-neutral-900 flex items-center justify-center relative group">
+                                    <img src="data:image/webp;base64,{{ $login_background_preview }}" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <button type="button" wire:click="removeLoginBackground" wire:confirm="Yakin ingin menghapus gambar login? Halaman login akan kembali ke tampilan default."
+                                            class="px-4 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1.5">
+                                            <flux:icon name="trash" class="w-3.5 h-3.5" />
+                                            Hapus Gambar
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-neutral-400">Hover gambar untuk opsi hapus</p>
+                            @else
+                                <div class="w-full aspect-[16/10] rounded-xl border-2 border-dashed border-neutral-300 overflow-hidden bg-neutral-100 dark:bg-neutral-800 flex flex-col items-center justify-center text-neutral-400 gap-2">
+                                    <flux:icon name="photo" class="w-10 h-10 opacity-40" />
+                                    <span class="text-xs font-medium">Belum ada gambar</span>
+                                    <span class="text-[0.65rem] text-neutral-300">Tampilan default (gradient) akan digunakan</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Upload & Info Area --}}
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 block">Upload Gambar Baru</label>
+                                <input type="file" wire:model="login_background" class="block w-full text-sm text-neutral-500
+                                    file:mr-4 file:py-2.5 file:px-4
+                                    file:rounded-lg file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-emerald-50 file:text-emerald-700
+                                    hover:file:bg-emerald-100
+                                    dark:file:bg-emerald-900/30 dark:file:text-emerald-400
+                                    cursor-pointer
+                                " accept="image/webp,image/jpeg,image/png" />
+                                <div wire:loading wire:target="login_background" class="text-xs text-blue-500 mt-2 flex items-center gap-1">
+                                    <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                    Mengunggah gambar...
+                                </div>
+                                @error('login_background') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-neutral-100 dark:border-neutral-700 space-y-2">
+                                <p class="text-xs font-semibold text-neutral-600 dark:text-neutral-300 uppercase tracking-wide">Panduan Upload</p>
+                                <ul class="text-xs text-neutral-500 space-y-1.5">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-500 mt-0.5">✦</span>
+                                        <span><strong>Format terbaik:</strong> WebP (paling ringan)</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-500 mt-0.5">✦</span>
+                                        <span><strong>Format lain:</strong> JPG, PNG juga diterima</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-500 mt-0.5">✦</span>
+                                        <span><strong>Ukuran maks:</strong> 500 KB</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-emerald-500 mt-0.5">✦</span>
+                                        <span><strong>Resolusi ideal:</strong> 1920×1080 px (landscape)</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-amber-500 mt-0.5">⚡</span>
+                                        <span>Gambar akan tampil di sisi kiri halaman login</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {{-- Panel Konfigurasi Cetak Web Independen --}}

@@ -15,10 +15,9 @@
     {{-- Main Header --}}
     <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate
-               class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700">
-                <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
-            </a>
+            <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}" wire:navigate class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+            <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
+        </a>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>

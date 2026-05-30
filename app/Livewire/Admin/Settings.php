@@ -15,6 +15,10 @@ class Settings extends Component
     public $google_vision_api_key;
     public $nama_instansi;
 
+    // Fields for Login Background
+    public $login_background; // for upload
+    public $login_background_preview; // for existing base64 preview
+
     // Fields for Cetak Web
     public $cetak_nama_instansi;
     public $cetak_alamat_instansi;
@@ -46,6 +50,12 @@ class Settings extends Component
             $this->nama_instansi = $instansi->setting_value;
         }
 
+        // Load Login Background
+        $loginBg = AppSetting::where('setting_key', 'LOGIN_BACKGROUND_IMAGE')->first();
+        if ($loginBg && !empty($loginBg->setting_value)) {
+            $this->login_background_preview = $loginBg->setting_value;
+        }
+
         // Load Cetak Web Settings
         $cetakSetting = SettingCetakWeb::first();
         if ($cetakSetting) {
@@ -73,6 +83,10 @@ class Settings extends Component
             'cetak_email' => 'nullable|email',
             'cetak_logo' => 'nullable|image|max:2048', // max 2MB
             'cetak_background' => 'nullable|image|max:2048', // max 2MB
+            'login_background' => 'nullable|image|mimes:webp,jpg,jpeg,png|max:512', // max ~500KB
+        ], [
+            'login_background.max' => 'Ukuran gambar login maksimal 500KB.',
+            'login_background.mimes' => 'Format gambar login harus WebP, JPG, atau PNG.',
         ]);
 
         // Simpan API Key
@@ -124,9 +138,43 @@ class Settings extends Component
 
         $cetakSetting->save();
 
+        // Simpan Login Background
+        if ($this->login_background) {
+            $bgContent = file_get_contents($this->login_background->getRealPath());
+            $base64 = base64_encode($bgContent);
+            AppSetting::updateOrCreate(
+                ['setting_key' => 'LOGIN_BACKGROUND_IMAGE'],
+                [
+                    'setting_value' => $base64,
+                    'description'   => 'Gambar latar halaman login (Base64 encoded, format WebP/JPG/PNG, maks 500KB)'
+                ]
+            );
+            $this->login_background_preview = $base64;
+            $this->login_background = null;
+        }
+
         $this->dispatch('swal', [
             'title' => 'Tersimpan!',
             'text'  => 'Pengaturan aplikasi berhasil disimpan.',
+            'icon'  => 'success',
+        ]);
+    }
+
+    public function removeLoginBackground()
+    {
+        AppSetting::updateOrCreate(
+            ['setting_key' => 'LOGIN_BACKGROUND_IMAGE'],
+            [
+                'setting_value' => '',
+                'description'   => 'Gambar latar halaman login (Base64 encoded, format WebP/JPG/PNG, maks 500KB)'
+            ]
+        );
+        $this->login_background_preview = null;
+        $this->login_background = null;
+
+        $this->dispatch('swal', [
+            'title' => 'Dihapus!',
+            'text'  => 'Gambar login telah dihapus. Halaman login akan kembali ke tampilan default.',
             'icon'  => 'success',
         ]);
     }
