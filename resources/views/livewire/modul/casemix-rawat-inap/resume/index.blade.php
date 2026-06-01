@@ -2,9 +2,8 @@
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.casemix-rawat-inap.index') }}" wire:navigate
-               class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
+            <a href="{{ route('modul.casemix-rawat-inap.index') }}" wire:navigate class="bg-[#4C5C2D] hover:bg-[#3a4722] flex items-center justify-center w-8 h-8 rounded-lg transition-colors ">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
             </a>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">

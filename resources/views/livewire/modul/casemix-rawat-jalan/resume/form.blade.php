@@ -34,8 +34,8 @@
     <div class="sticky top-0 z-40 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-700 -mx-4 px-4 py-3 mb-2 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-3">
             <a href="{{ route('modul.casemix-rawat-jalan.resume', str_replace('/', '-', $no_rawat)) }}" wire:navigate
-               class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-                <flux:icon name="chevron-left" class="w-5 h-5 text-neutral-500" />
+               class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#4C5C2D] hover:bg-[#3d4b24] transition-colors shadow-sm">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
             </a>
             <div>
                 <h1 class="text-base font-bold text-neutral-800 dark:text-neutral-100">Buat/Edit Resume Casemix</h1>
