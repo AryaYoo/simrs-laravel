@@ -285,6 +285,16 @@
                 </div>
 
                 {{-- Vital Signs --}}
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-bold text-sm text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-wider flex items-center gap-2">
+                        <flux:icon name="heart" class="w-4 h-4" />
+                        Tanda-Tanda Vital
+                    </h4>
+                    <flux:button wire:click="fillLatestPemeriksaan" size="sm" variant="ghost" class="text-xs" title="Data diambil dari pemeriksaan SOAP terakhir">
+                        <flux:icon name="arrow-path" class="w-3.5 h-3.5 mr-1" />
+                        Isi Otomatis
+                    </flux:button>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
                     <flux:input wire:model="gcs" label="GCS (E,V,M)" placeholder="Ex: 15" />
                     <flux:input wire:model="td" label="TD (mmHg) *" placeholder="Ex: 120/80" required />

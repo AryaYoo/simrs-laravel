@@ -161,6 +161,25 @@ class Index extends Component
         }
     }
 
+    public function fillLatestPemeriksaan()
+    {
+        $latestPemeriksaan = \App\Models\PemeriksaanRanap::where('no_rawat', $this->noRawat)
+            ->orderBy('tgl_perawatan', 'desc')
+            ->orderBy('jam_rawat', 'desc')
+            ->first();
+
+        if ($latestPemeriksaan) {
+            $this->gcs = $latestPemeriksaan->gcs;
+            $this->td = $latestPemeriksaan->tensi;
+            $this->hr = $latestPemeriksaan->nadi;
+            $this->rr = $latestPemeriksaan->respirasi;
+            $this->suhu = $latestPemeriksaan->suhu_tubuh;
+            $this->spo2 = $latestPemeriksaan->spo2;
+        } else {
+            $this->dispatch('swal', ['title' => 'Informasi', 'text' => 'Data pemeriksaan SOAP belum tersedia untuk pasien ini.', 'icon' => 'info']);
+        }
+    }
+
     public function render()
     {
         $petugasList = [];
