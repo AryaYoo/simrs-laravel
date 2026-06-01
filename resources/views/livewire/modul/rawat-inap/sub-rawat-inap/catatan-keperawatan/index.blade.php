@@ -250,9 +250,11 @@
                                 </flux:button>
                             </div>
                         @else
-                            <flux:button wire:click="fillLatestVitals" size="xs" variant="subtle" icon="bolt" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10">
-                                Isi Otomatis
-                            </flux:button>
+                            <div title="Data diambil dari TTV terakhir (Suhu, Nadi, SPO2) di form Pemeriksaan">
+                                <flux:button wire:click="fillLatestVitals" size="xs" variant="subtle" icon="bolt" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10">
+                                    Isi Otomatis
+                                </flux:button>
+                            </div>
                         @endif
                     </div>
                     <flux:textarea wire:model="uraian" rows="4" placeholder="Tuliskan catatan keperawatan di sini..." required />
