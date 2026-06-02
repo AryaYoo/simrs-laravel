@@ -396,6 +396,10 @@
                         Aktif (Belum Pulang)
                     </div>
                 </button>
+                <button wire:click="$set('statusFilter', 'sudah_pulang')"
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $statusFilter === 'sudah_pulang' ? 'bg-white dark:bg-neutral-800 text-[#4C5C2D] shadow-sm' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200' }}">
+                    Sudah Pulang
+                </button>
                 <button wire:click="$set('statusFilter', 'semua')"
                     class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $statusFilter === 'semua' ? 'bg-white dark:bg-neutral-800 text-[#4C5C2D] shadow-sm' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200' }}">
                     Semua Pasien
@@ -403,7 +407,7 @@
             </div>
             <div class="hidden md:block h-4 w-px bg-neutral-200 dark:bg-neutral-700"></div>
             <p class="hidden md:block text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                {{ $statusFilter === 'belum_pulang' ? 'Menampilkan pasien yang saat ini masih dirawat' : 'Menampilkan seluruh riwayat pasien dalam periode tanggal' }}
+                {{ $statusFilter === 'belum_pulang' ? 'Menampilkan pasien yang saat ini masih dirawat' : ($statusFilter === 'sudah_pulang' ? 'Menampilkan pasien yang sudah pulang dalam periode tanggal' : 'Menampilkan seluruh riwayat pasien dalam periode tanggal') }}
             </p>
         </div>
 

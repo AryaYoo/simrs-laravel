@@ -43,9 +43,12 @@ class Index extends Component
 
         $baseQuery = RegPeriksa::query()
             ->where('status_lanjut', 'Ranap')
-            // Apply Status Filter (Inhouse vs All)
             ->when($this->statusFilter === 'belum_pulang', function($q) {
                 $q->whereHas('kamarInap', fn($sq) => $sq->where('tgl_keluar', '0000-00-00'));
+            })
+            ->when($this->statusFilter === 'sudah_pulang', function($q) {
+                $q->whereHas('kamarInap')
+                  ->whereDoesntHave('kamarInap', fn($sq) => $sq->where('tgl_keluar', '0000-00-00'));
             })
             // Date Filter only applies strictly when status is 'semua', 
             // or as an additional filter if status is 'belum_pulang' (filter by registration date)
