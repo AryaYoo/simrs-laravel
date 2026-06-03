@@ -145,6 +145,16 @@ class Index extends Component
             $this->lingkar_perut = $this->lastPemeriksaan->lingkar_perut;
         }
 
+        // Default auto-fill petugas from logged-in user
+        $loggedInUsername = auth()->user()->username ?? null;
+        if ($loggedInUsername) {
+            $pegawai = \App\Models\Pegawai::find($loggedInUsername);
+            if ($pegawai) {
+                $this->nip = $pegawai->nik;
+                $this->currentJabatan = $pegawai->jbtn ?? '-';
+            }
+        }
+
         $this->createModalOpen = true;
     }
 
@@ -298,6 +308,17 @@ class Index extends Component
     public function openTindakanCreateModal()
     {
         $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'kd_jenis_prw_selected', 'nm_perawatan_selected', 'isEditTindakanMode', 'original_tindakan_type', 'original_tgl_perawatan', 'original_jam_rawat', 'original_kd_jenis_prw']);
+
+        // Auto-fill petugas from logged-in user
+        $loggedInUsername = auth()->user()->username ?? null;
+        if ($loggedInUsername) {
+            $pegawai = \App\Models\Pegawai::find($loggedInUsername);
+            if ($pegawai) {
+                $this->nip_tindakan = $pegawai->nik;
+                $this->nm_petugas_tindakan = $pegawai->nama;
+            }
+        }
+
         $this->tindakanCreateModalOpen = true;
     }
 

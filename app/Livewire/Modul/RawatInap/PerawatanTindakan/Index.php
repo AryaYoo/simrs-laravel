@@ -213,6 +213,17 @@ class Index extends Component
         $this->tindakanMode = $mode;
         $this->tgl_tindakan = now()->format('Y-m-d');
         $this->jam_tindakan = now()->format('H:i:s');
+
+        // Auto-fill petugas from logged-in user
+        $loggedInUsername = auth()->user()->username ?? null;
+        if ($loggedInUsername) {
+            $pegawai = \App\Models\Pegawai::find($loggedInUsername);
+            if ($pegawai) {
+                $this->nip_tindakan = $pegawai->nik;
+                $this->nm_petugas_tindakan = $pegawai->nama;
+            }
+        }
+
         $this->tindakanCreateModalOpen = true;
     }
 

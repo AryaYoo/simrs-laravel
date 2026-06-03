@@ -114,6 +114,16 @@ class Form extends Component
         // Load master data
         $this->masterMasalah = $repository->getMasterMasalah()->toArray();
 
+        // Default auto-fill petugas 1 from logged-in user
+        $loggedInUsername = auth()->user()->username ?? null;
+        if ($loggedInUsername) {
+            $pegawai = \App\Models\Pegawai::find($loggedInUsername);
+            if ($pegawai) {
+                $this->nip1 = $pegawai->nik;
+                $this->nmPetugas1 = $pegawai->nama;
+            }
+        }
+
         // Load existing data if exists
         $existing = $repository->getByNoRawat($this->noRawat);
         if ($existing) {

@@ -58,6 +58,17 @@ class Index extends Component
         $this->autoTime = true;
         $this->tanggal_date = now()->format('Y-m-d');
         $this->tanggal_time = now()->format('H:i');
+
+        // Auto-fill petugas from logged-in user
+        $loggedInUsername = auth()->user()->username ?? null;
+        if ($loggedInUsername) {
+            $pegawai = \App\Models\Pegawai::find($loggedInUsername);
+            if ($pegawai) {
+                $this->nip = $pegawai->nik;
+                $this->nmPetugas = $pegawai->nama;
+            }
+        }
+
         $this->isPanelOpen = true;
         $this->dispatch('set-autotime', ['status' => true]);
     }
