@@ -56,11 +56,17 @@ class Form extends Component
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
+    // Dokter Search State
+    public $searchDokter = '';
+    public $dokterResults = [];
+    public $nmDokter = '';
+
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
         $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 'pemeriksaanRalan', 'permintaanResepPulang.detailPermintaan.barang'])->findOrFail($this->no_rawat);
         $this->kd_dokter = $this->regPeriksa->kd_dokter;
+        $this->nmDokter  = $this->regPeriksa->dokter->nm_dokter ?? '';
         
         $resume = ResumePasien::find($this->no_rawat);
         if ($resume) {
@@ -92,6 +98,7 @@ class Form extends Component
             $this->kondisi_pulang = $resume->kondisi_pulang;
             $this->obat_pulang = $resume->obat_pulang;
             
+            $this->nmDokter = $resume->dokter->nm_dokter ?? $this->regPeriksa->dokter->nm_dokter ?? '';
             // SOP 1: Initialize lock for legacy data
             $this->initializeLock($resume);
         } else {
@@ -152,7 +159,21 @@ class Form extends Component
             } else {
                 $this->autocompleteResults = [];
             }
+        } elseif ($propertyName === 'searchDokter') {
+            $this->dokterResults = strlen($this->searchDokter) >= 2
+                ? \App\Models\Dokter::where('kd_dokter', 'like', "%{$this->searchDokter}%")
+                    ->orWhere('nm_dokter', 'like', "%{$this->searchDokter}%")
+                    ->limit(10)->get()->toArray()
+                : [];
         }
+    }
+
+    public function selectDokter($kd, $nm)
+    {
+        $this->kd_dokter    = $kd;
+        $this->nmDokter     = $nm;
+        $this->searchDokter = '';
+        $this->dokterResults = [];
     }
 
     public function selectAutocompleteItem($code, $name)

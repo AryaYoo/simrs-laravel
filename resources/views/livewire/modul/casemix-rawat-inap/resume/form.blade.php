@@ -77,7 +77,36 @@
                 <div class="space-y-4">
                     <flux:input label="No. Rawat" value="{{ $no_rawat }}" disabled />
                     <flux:input label="Pasien" value="{{ $regPeriksa->pasien->nm_pasien }}" disabled />
-                    <flux:input label="Dokter P.J. (DPJP)" value="{{ $regPeriksa->dokter->nm_dokter }}" disabled />
+                    {{-- Dokter DPJP (editable with autocomplete) --}}
+                    <div class="relative" x-data>
+                        <flux:label>Dokter P.J. (DPJP)</flux:label>
+                        <div class="relative mt-1">
+                            <input
+                                type="text"
+                                wire:model.live="searchDokter"
+                                placeholder="{{ $nmDokter ?: 'Cari nama dokter...' }}"
+                                class="w-full px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-600 rounded-lg bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D] placeholder-neutral-400"
+                                autocomplete="off"
+                            />
+                            @if($nmDokter)
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#4C5C2D] bg-[#4C5C2D]/10 px-2 py-0.5 rounded-full">{{ $kd_dokter }}</span>
+                            @endif
+                        </div>
+                        @if(!empty($dokterResults))
+                            <ul class="absolute z-50 w-full mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl max-h-56 overflow-y-auto text-sm">
+                                @foreach($dokterResults as $d)
+                                    <li wire:click="selectDokter('{{ $d['kd_dokter'] }}', '{{ $d['nm_dokter'] }}')"
+                                        class="px-4 py-2.5 hover:bg-[#4C5C2D]/10 cursor-pointer flex items-center justify-between gap-2">
+                                        <span class="font-medium text-neutral-800 dark:text-neutral-100">{{ $d['nm_dokter'] }}</span>
+                                        <span class="text-[10px] text-neutral-400">{{ $d['kd_dokter'] }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                        @if($nmDokter && empty($dokterResults) && empty($searchDokter))
+                            <p class="mt-1 text-xs text-neutral-500">Terpilih: <span class="font-semibold text-[#4C5C2D]">{{ $nmDokter }}</span></p>
+                        @endif
+                    </div>
                     <flux:input label="Kamar/Bangsal" value="{{ $regPeriksa->kamarInap->last()->kamar->kd_kamar ?? '-' }} / {{ $regPeriksa->kamarInap->last()->kamar->bangsal->nm_bangsal ?? '-' }}" disabled />
                 </div>
                 <div class="space-y-4">

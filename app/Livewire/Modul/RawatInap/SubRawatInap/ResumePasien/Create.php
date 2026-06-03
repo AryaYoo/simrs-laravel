@@ -63,6 +63,11 @@ class Create extends Component
     public $autocompleteResults = [];
     protected $isSelecting = false;
 
+    // Dokter Search State
+    public $searchDokter = '';
+    public $dokterResults = [];
+    public $nmDokter = '';
+
     // Attach/Select State (Alpine.js Modal)
     public $selectedKeluhan = [];
     public $selectedLab = [];
@@ -86,7 +91,8 @@ class Create extends Component
             'detailPemberianObat.barang',
         ])->findOrFail($this->no_rawat);
 
-        $this->kd_dokter = $this->regPeriksa->kd_dokter;
+        $this->kd_dokter  = $this->regPeriksa->kd_dokter;
+        $this->nmDokter   = $this->regPeriksa->dokter->nm_dokter ?? '';
         
         $resume = ResumePasienRanap::find($this->no_rawat);
         if ($resume) {
@@ -435,7 +441,21 @@ class Create extends Component
             $this->autocompleteResults = strlen($value) >= 3
                 ? Icd9::where('kode', 'like', "%$value%")->orWhere('deskripsi_panjang', 'like', "%$value%")->limit(10)->get()->toArray()
                 : [];
+        } elseif ($propertyName === 'searchDokter') {
+            $this->dokterResults = strlen($this->searchDokter) >= 2
+                ? \App\Models\Dokter::where('kd_dokter', 'like', "%{$this->searchDokter}%")
+                    ->orWhere('nm_dokter', 'like', "%{$this->searchDokter}%")
+                    ->limit(10)->get()->toArray()
+                : [];
         }
+    }
+
+    public function selectDokter($kd, $nm)
+    {
+        $this->kd_dokter    = $kd;
+        $this->nmDokter     = $nm;
+        $this->searchDokter = '';
+        $this->dokterResults = [];
     }
 
     public function selectAutocompleteItem($code, $name)
