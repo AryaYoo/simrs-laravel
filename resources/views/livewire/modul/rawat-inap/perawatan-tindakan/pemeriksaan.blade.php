@@ -208,7 +208,7 @@
             <div class="px-6 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/50 flex items-center gap-3 animate-in slide-in-from-top-1 duration-300">
                 <flux:icon name="information-circle" class="w-5 h-5 text-amber-500 flex-shrink-0" />
                 <p class="text-[11px] text-amber-800 dark:text-amber-300 leading-tight">
-                    <span class="font-bold">Mode Patokan Aktif:</span> Menampilkan rujukan dari pemeriksaan terakhir tanggal <span class="font-bold">{{ $lastPemeriksaan->tgl_perawatan }}</span> jam <span class="font-bold">{{ $lastPemeriksaan->jam_rawat }}</span>. 
+                    <span class="font-bold">Mode Patokan Aktif:</span> Menampilkan rujukan dari pemeriksaan terakhir tanggal <span class="font-bold">{{ $lastPemeriksaan['tgl_perawatan'] }}</span> jam <span class="font-bold">{{ $lastPemeriksaan['jam_rawat'] }}</span>. 
                     Input yang berwarna <span class="text-amber-600 dark:text-amber-400 font-bold italic">kuning gading</span> adalah data rujukan, silakan sesuaikan dengan kondisi terbaru.
                 </p>
             </div>

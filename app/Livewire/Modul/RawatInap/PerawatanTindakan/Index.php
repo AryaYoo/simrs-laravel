@@ -74,23 +74,26 @@ class Index extends Component
         $this->jam_rawat     = now()->format('H:i:s');
         $this->isEditMode    = false;
 
-        // Fetch last data as reference
-        $this->lastPemeriksaan = \App\Models\PemeriksaanRanap::where('no_rawat', $this->no_rawat)
+        // Fetch last data as reference and store as Array to prevent Livewire model hydration bug with composite keys
+        $lastRecord = \App\Models\PemeriksaanRanap::where('no_rawat', $this->no_rawat)
             ->orderBy('tgl_perawatan', 'desc')
             ->orderBy('jam_rawat', 'desc')
             ->first();
 
-        if ($this->lastPemeriksaan) {
-            $this->suhu_tubuh  = $this->lastPemeriksaan->suhu_tubuh;
-            $this->tensi       = $this->lastPemeriksaan->tensi;
-            $this->nadi        = $this->lastPemeriksaan->nadi;
-            $this->respirasi   = $this->lastPemeriksaan->respirasi;
-            $this->tinggi      = $this->lastPemeriksaan->tinggi;
-            $this->berat       = $this->lastPemeriksaan->berat;
-            $this->spo2        = $this->lastPemeriksaan->spo2;
-            $this->gcs         = $this->lastPemeriksaan->gcs;
-            $this->kesadaran   = $this->lastPemeriksaan->kesadaran;
-            $this->alergi      = $this->lastPemeriksaan->alergi;
+        if ($lastRecord) {
+            $this->lastPemeriksaan = $lastRecord->toArray();
+            $this->suhu_tubuh  = $lastRecord->suhu_tubuh;
+            $this->tensi       = $lastRecord->tensi;
+            $this->nadi        = $lastRecord->nadi;
+            $this->respirasi   = $lastRecord->respirasi;
+            $this->tinggi      = $lastRecord->tinggi;
+            $this->berat       = $lastRecord->berat;
+            $this->spo2        = $lastRecord->spo2;
+            $this->gcs         = $lastRecord->gcs;
+            $this->kesadaran   = $lastRecord->kesadaran;
+            $this->alergi      = $lastRecord->alergi;
+        } else {
+            $this->lastPemeriksaan = null;
         }
 
         $this->createModalOpen = true;
@@ -98,24 +101,24 @@ class Index extends Component
 
     public function fillAutoData()
     {
-        // Auto-fill SOAPIE text fields if reference exists
+        // Auto-fill SOAPIE text fields if reference exists (from Array)
         if ($this->lastPemeriksaan) {
-            $this->suhu_tubuh  = $this->lastPemeriksaan->suhu_tubuh;
-            $this->tensi       = $this->lastPemeriksaan->tensi;
-            $this->nadi        = $this->lastPemeriksaan->nadi;
-            $this->respirasi   = $this->lastPemeriksaan->respirasi;
-            $this->tinggi      = $this->lastPemeriksaan->tinggi;
-            $this->berat       = $this->lastPemeriksaan->berat;
-            $this->spo2        = $this->lastPemeriksaan->spo2;
-            $this->gcs         = $this->lastPemeriksaan->gcs;
-            $this->kesadaran   = $this->lastPemeriksaan->kesadaran;
-            $this->alergi      = $this->lastPemeriksaan->alergi;
-            $this->keluhan     = $this->lastPemeriksaan->keluhan;
-            $this->pemeriksaan = $this->lastPemeriksaan->pemeriksaan;
-            $this->penilaian   = $this->lastPemeriksaan->penilaian;
-            $this->rtl         = $this->lastPemeriksaan->rtl;
-            $this->instruksi   = $this->lastPemeriksaan->instruksi;
-            $this->evaluasi    = $this->lastPemeriksaan->evaluasi;
+            $this->suhu_tubuh  = $this->lastPemeriksaan['suhu_tubuh'] ?? '-';
+            $this->tensi       = $this->lastPemeriksaan['tensi'] ?? '-';
+            $this->nadi        = $this->lastPemeriksaan['nadi'] ?? '-';
+            $this->respirasi   = $this->lastPemeriksaan['respirasi'] ?? '-';
+            $this->tinggi      = $this->lastPemeriksaan['tinggi'] ?? '-';
+            $this->berat       = $this->lastPemeriksaan['berat'] ?? '-';
+            $this->spo2        = $this->lastPemeriksaan['spo2'] ?? '-';
+            $this->gcs         = $this->lastPemeriksaan['gcs'] ?? '-';
+            $this->kesadaran   = $this->lastPemeriksaan['kesadaran'] ?? '-';
+            $this->alergi      = $this->lastPemeriksaan['alergi'] ?? '-';
+            $this->keluhan     = $this->lastPemeriksaan['keluhan'] ?? '-';
+            $this->pemeriksaan = $this->lastPemeriksaan['pemeriksaan'] ?? '-';
+            $this->penilaian   = $this->lastPemeriksaan['penilaian'] ?? '-';
+            $this->rtl         = $this->lastPemeriksaan['rtl'] ?? '-';
+            $this->instruksi   = $this->lastPemeriksaan['instruksi'] ?? '-';
+            $this->evaluasi    = $this->lastPemeriksaan['evaluasi'] ?? '-';
         }
 
         // Auto-fill petugas from logged-in user
