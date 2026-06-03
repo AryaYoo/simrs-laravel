@@ -1,13 +1,23 @@
-﻿<div class="flex flex-col gap-6 pb-24" 
+<div class="flex flex-col gap-6 pb-24" 
     x-data="{ 
         showKeluhanModal: false, 
         isDirty: false,
-        isSubmitting: false
+        isSubmitting: false,
+        autoResizeTextareas() {
+            $el.querySelectorAll('textarea').forEach(t => {
+                t.style.height = 'auto';
+                t.style.height = (t.scrollHeight) + 'px';
+            });
+        }
     }"
-    @input="isDirty = true"
+    @input="if($event.target.tagName === 'TEXTAREA') { $event.target.style.height = 'auto'; $event.target.style.height = ($event.target.scrollHeight) + 'px'; } isDirty = true"
     @change="isDirty = true"
     @click="let btn = $event.target.closest('button'); if(btn && (btn.title.includes('Otomatis') || btn.innerText.includes('Tambahkan'))) { isDirty = true }"
     x-init="
+        setTimeout(() => autoResizeTextareas(), 100);
+        Livewire.hook('morph.updated', ({ el, component }) => {
+            setTimeout(() => autoResizeTextareas(), 50);
+        });
         window.addEventListener('beforeunload', (e) => {
             if (isDirty && !isSubmitting) {
                 e.preventDefault();
@@ -409,7 +419,20 @@
 
                 <div class="grid grid-cols-1 gap-6 pt-4">
                     <flux:input type="datetime-local" label="Tanggal & Jam Kontrol" wire:model="kontrol" />
-                    <flux:textarea label="Obat Pulang" wire:model="obat_pulang" rows="3" placeholder="Daftar obat yang dibawa pulang..." />
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <flux:label>Obat Pulang</flux:label>
+                            <div class="flex items-center gap-2">
+                                <button type="button" wire:click="autoFillObatPulang()" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Obat Pulang">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                </button>
+                                <button type="button" @click="$wire.prepareAttach('obat_pulang', 'OBAT_PULANG').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition shadow-sm border border-white/10" title="Pilih Obat Pulang">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <flux:textarea wire:model="obat_pulang" rows="3" placeholder="Daftar obat yang dibawa pulang..." />
+                    </div>
                 </div>
             </div>
         </div>
@@ -619,9 +642,25 @@
                             <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-neutral-500 uppercase text-[10px] font-bold tracking-widest border-b border-neutral-200 sticky top-0">
                                 <tr>
                                     <th class="px-4 py-3 w-12 text-center">
+                                        @php
+                                            $isAllSelected = false;
+                                            if ($targetAttachColumn == 'lab_hasil') {
+                                                $isAllSelected = count($selectedLab) === count($regPeriksa->detailPeriksaLab) && count($selectedLab) > 0;
+                                            } elseif ($targetAttachColumn == 'tindakan') {
+                                                $allTindakanCount = collect($regPeriksa->rawatInapDr)->concat($regPeriksa->rawatInapPr)->concat($regPeriksa->rawatInapDrpr)->count();
+                                                $isAllSelected = count($selectedTindakan) === $allTindakanCount && count($selectedTindakan) > 0;
+                                            } elseif ($targetAttachColumn == 'obat') {
+                                                $isAllSelected = count($selectedObat) === count($regPeriksa->detailPemberianObat) && count($selectedObat) > 0;
+                                            } elseif ($targetAttachColumn == 'OBAT_PULANG') {
+                                                $obatPulang = collect($regPeriksa->permintaanResepPulang)->flatMap(fn($p) => $p->detailPermintaan);
+                                                $isAllSelected = count($selectedObatPulang) === $obatPulang->count() && count($selectedObatPulang) > 0;
+                                            } else {
+                                                $isAllSelected = count($selectedKeluhan) === count($regPeriksa->pemeriksaanRanap) && count($selectedKeluhan) > 0;
+                                            }
+                                        @endphp
                                         <input type="checkbox" wire:click="toggleSelectAll" 
                                             class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" 
-                                            {{ ($targetAttachColumn == 'lab_hasil' ? (count($selectedLab) === count($regPeriksa->detailPeriksaLab) && count($selectedLab) > 0) : (count($selectedKeluhan) === count($regPeriksa->pemeriksaanRanap) && count($selectedKeluhan) > 0)) ? 'checked' : '' }}
+                                            {{ $isAllSelected ? 'checked' : '' }}
                                         />
                                     </th>
                                     <th class="px-4 py-3">Tanggal/Jam</th>
@@ -714,6 +753,32 @@
                                             </td>
                                         </tr>
                                     @endforelse
+                                @elseif($targetAttachColumn == 'OBAT_PULANG')
+                                    @php
+                                        $allObatPulang = collect($regPeriksa->permintaanResepPulang)
+                                            ->flatMap(fn($p) => $p->detailPermintaan)
+                                            ->sortByDesc(fn($o) => $o->no_permintaan);
+                                    @endphp
+                                    @forelse($allObatPulang as $obat)
+                                        <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                            <td class="px-4 py-3 text-center">
+                                                <input type="checkbox" wire:model="selectedObatPulang" value="{{ $obat->no_permintaan . '|' . $obat->kode_brng }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $obat->no_permintaan }}</p>
+                                            </td>
+                                            <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                                <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $obat->barang->nama_brng ?? '-' }}</span>
+                                                <span class="text-[#4C5C2D] font-bold">({{ $obat->jml }} {{ $obat->barang->kode_sat ?? '' }}, Dosis: {{ $obat->dosis }})</span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
+                                                Data permintaan resep pulang belum tersedia untuk pasien ini.
+                                            </td>
+                                        </tr>
+                                    @endforelse
                                 @else
                                     @forelse($regPeriksa->pemeriksaanRanap as $pemeriksaan)
                                         <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
@@ -753,7 +818,7 @@
 
                     <div class="flex justify-between items-center pt-2">
                         <button type="button" @click="showKeluhanModal = false" class="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 transition">Batal</button>
-                        <button type="button" wire:click="{{ $targetAttachColumn == 'lab_hasil' ? 'attachLab' : ($targetAttachColumn == 'tindakan' ? 'attachTindakan' : ($targetAttachColumn == 'obat' ? 'attachObat' : 'attachKeluhan')) }}" @click="showKeluhanModal = false" class="px-4 py-2 text-sm font-medium text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-lg transition">
+                        <button type="button" wire:click="{{ $targetAttachColumn == 'lab_hasil' ? 'attachLab' : ($targetAttachColumn == 'tindakan' ? 'attachTindakan' : ($targetAttachColumn == 'obat' ? 'attachObat' : ($targetAttachColumn == 'OBAT_PULANG' ? 'attachObatPulang' : 'attachKeluhan'))) }}" @click="showKeluhanModal = false" class="px-4 py-2 text-sm font-medium text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-lg transition">
                             Tambahkan yang Dipilih
                         </button>
                     </div>

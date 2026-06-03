@@ -66,6 +66,7 @@ class Form extends Component
     public $selectedLab = []; 
     public $selectedTindakan = []; 
     public $selectedObat = []; // New for obat
+    public $selectedObatPulang = [];
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
@@ -78,7 +79,9 @@ class Form extends Component
             'rawatInapDr.jnsPerawatan', 
             'rawatInapPr.jnsPerawatan', 
             'rawatInapDrpr.jnsPerawatan',
-            'detailPemberianObat.barang'
+            'pemeriksaanRanap',
+            'detailPemberianObat.barang',
+            'permintaanResepPulang.detailPermintaan.barang',
         ])->findOrFail($this->no_rawat);
         $this->kd_dokter = $this->regPeriksa->kd_dokter;
         
@@ -283,6 +286,7 @@ class Form extends Component
         $this->selectedLab = [];
         $this->selectedTindakan = [];
         $this->selectedObat = [];
+        $this->selectedObatPulang = [];
     }
 
     public function toggleSelectAll()
@@ -313,6 +317,15 @@ class Form extends Component
             } else {
                 $this->selectedObat = $this->regPeriksa->detailPemberianObat->map(fn($o) => 
                     "{$o->tgl_perawatan}|{$o->jam}|{$o->kode_brng}"
+                )->toArray();
+            }
+        } elseif ($this->targetAttachColumn == 'OBAT_PULANG') {
+            $obatPulang = collect($this->regPeriksa->permintaanResepPulang)->flatMap(fn($p) => $p->detailPermintaan);
+            if (count($this->selectedObatPulang) === $obatPulang->count()) {
+                $this->selectedObatPulang = [];
+            } else {
+                $this->selectedObatPulang = $obatPulang->map(fn($o) => 
+                    "{$o->no_permintaan}|{$o->kode_brng}"
                 )->toArray();
             }
         } else {
@@ -374,6 +387,30 @@ class Form extends Component
         }
 
         $this->selectedObat = [];
+    }
+
+    public function attachObatPulang()
+    {
+        if (empty($this->selectedObatPulang)) return;
+
+        $texts = [];
+        foreach ($this->selectedObatPulang as $id) {
+            [$no_permintaan, $kode_brng] = explode('|', $id);
+            $obat = \App\Models\DetailPermintaanResepPulang::with('barang')
+                ->where('no_permintaan', $no_permintaan)
+                ->where('kode_brng', $kode_brng)
+                ->first();
+            
+            if ($obat && $obat->barang) {
+                $texts[] = $obat->barang->nama_brng . ' (' . $obat->jml . ' ' . $obat->barang->kode_sat . ', Dosis: ' . $obat->dosis . ')';
+            }
+        }
+
+        if (!empty($texts)) {
+            $this->applyAttachments(implode(', ', array_unique($texts)));
+        }
+
+        $this->selectedObatPulang = [];
     }
 
     public function autoFillObat()
@@ -454,6 +491,23 @@ class Form extends Component
         }
     }
 
+    public function autoFillObatPulang()
+    {
+        $allObatPulang = collect($this->regPeriksa->permintaanResepPulang)
+            ->flatMap(fn($p) => $p->detailPermintaan)
+            ->sortByDesc(fn($o) => $o->no_permintaan)
+            ->map(fn($o) => ($o->barang->nama_brng ?? '-') . ' (' . $o->jml . ' ' . ($o->barang->kode_sat ?? '') . ', Dosis: ' . $o->dosis . ')')
+            ->unique()
+            ->implode(', ');
+
+        if ($allObatPulang) {
+            $this->obat_pulang = $allObatPulang;
+            $this->dispatch('swal', ['title' => 'Otomatis Terisi', 'text' => 'Semua riwayat permintaan resep pulang telah dimasukkan.', 'icon' => 'success', 'timer' => 1000]);
+        } else {
+            $this->dispatch('swal', ['title' => 'Data Kosong', 'text' => 'Tidak ada riwayat permintaan resep pulang ditemukan.', 'icon' => 'info']);
+        }
+    }
+
     public function refreshData()
     {
         $this->regPeriksa = RegPeriksa::with([
@@ -461,7 +515,8 @@ class Form extends Component
             'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 
             'pemeriksaanRanap', 'rawatInapDr.jnsPerawatan', 
             'rawatInapPr.jnsPerawatan', 'rawatInapDrpr.jnsPerawatan',
-            'detailPemberianObat.barang'
+            'detailPemberianObat.barang',
+            'permintaanResepPulang.detailPermintaan.barang',
         ])->findOrFail($this->no_rawat);
         $this->dispatch('swal', [
             'title' => 'Data Diperbarui',

@@ -139,6 +139,11 @@ class RegPeriksa extends Model
         return $this->hasOne(ResumePasien::class, 'no_rawat', 'no_rawat');
     }
 
+    public function permintaanResepPulang()
+    {
+        return $this->hasMany(PermintaanResepPulang::class, 'no_rawat', 'no_rawat');
+    }
+
     public function resumePasienRanap()
     {
         return $this->hasOne(ResumePasienRanap::class, 'no_rawat', 'no_rawat');

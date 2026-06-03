@@ -52,13 +52,14 @@ class Form extends Component
     // Modal Select State
     public $selectedKeluhan = [];
     public $selectedLab = []; // New property for lab selection
+    public $selectedObatPulang = [];
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template'])->findOrFail($this->no_rawat);
+        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 'pemeriksaanRalan', 'permintaanResepPulang.detailPermintaan.barang'])->findOrFail($this->no_rawat);
         $this->kd_dokter = $this->regPeriksa->kd_dokter;
         
         $resume = ResumePasien::find($this->no_rawat);
@@ -224,6 +225,31 @@ class Form extends Component
         }
     }
 
+    public function attachObatPulang()
+    {
+        if (empty($this->selectedObatPulang)) return;
+
+        $texts = [];
+        foreach ($this->selectedObatPulang as $id) {
+            [$no_permintaan, $kode_brng] = explode('|', $id);
+            $obat = \App\Models\DetailPermintaanResepPulang::with('barang')
+                ->where('no_permintaan', $no_permintaan)
+                ->where('kode_brng', $kode_brng)
+                ->first();
+            
+            if ($obat && $obat->barang) {
+                $texts[] = $obat->barang->nama_brng . ' (' . $obat->jml . ' ' . $obat->barang->kode_sat . ', Dosis: ' . $obat->dosis . ')';
+            }
+        }
+
+        if (!empty($texts)) {
+            $this->applyAttachments(implode(', ', array_unique($texts)));
+        }
+
+        $this->selectedObatPulang = [];
+        $this->dispatch('close-modal', 'modal-keluhan-rajal');
+    }
+
     private function applyAttachments($texts)
     {
         if (!empty($texts)) {
@@ -244,6 +270,7 @@ class Form extends Component
         $this->targetAttachColumn = $column;
         $this->selectedKeluhan = [];
         $this->selectedLab = [];
+        $this->selectedObatPulang = [];
     }
 
     public function toggleSelectAll()
@@ -254,6 +281,15 @@ class Form extends Component
             } else {
                 $this->selectedLab = $this->regPeriksa->detailPeriksaLab->map(fn($lab) => 
                     "{$lab->tgl_periksa}|{$lab->jam}|{$lab->kd_jenis_prw}|{$lab->id_template}"
+                )->toArray();
+            }
+        } elseif ($this->targetAttachColumn == 'OBAT_PULANG') {
+            $obatPulang = collect($this->regPeriksa->permintaanResepPulang)->flatMap(fn($p) => $p->detailPermintaan);
+            if (count($this->selectedObatPulang) === $obatPulang->count()) {
+                $this->selectedObatPulang = [];
+            } else {
+                $this->selectedObatPulang = $obatPulang->map(fn($o) => 
+                    "{$o->no_permintaan}|{$o->kode_brng}"
                 )->toArray();
             }
         } else {
@@ -269,7 +305,7 @@ class Form extends Component
 
     public function refreshData()
     {
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 'pemeriksaanRalan'])->findOrFail($this->no_rawat);
+        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik', 'diagnosaPasien.penyakit', 'detailPeriksaLab.template', 'pemeriksaanRalan', 'permintaanResepPulang.detailPermintaan.barang'])->findOrFail($this->no_rawat);
         $this->dispatch('swal', [
             'title' => 'Data Diperbarui',
             'icon' => 'success',
@@ -362,10 +398,27 @@ class Form extends Component
             
         } catch (\Exception $e) {
             $this->dispatch('swal', [
-                'title' => 'Gagal Menyimpan',
-                'text' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
-                'icon' => 'error'
+                'title' => 'Data Kosong',
+                'text' => 'Tidak ada data riwayat SOAP ditemukan.',
+                'icon' => 'info'
             ]);
+        }
+    }
+
+    public function autoFillObatPulang()
+    {
+        $allObatPulang = collect($this->regPeriksa->permintaanResepPulang)
+            ->flatMap(fn($p) => $p->detailPermintaan)
+            ->sortByDesc(fn($o) => $o->no_permintaan)
+            ->map(fn($o) => ($o->barang->nama_brng ?? '-') . ' (' . $o->jml . ' ' . ($o->barang->kode_sat ?? '') . ', Dosis: ' . $o->dosis . ')')
+            ->unique()
+            ->implode(', ');
+
+        if ($allObatPulang) {
+            $this->obat_pulang = $allObatPulang;
+            $this->dispatch('swal', ['title' => 'Otomatis Terisi', 'text' => 'Semua riwayat permintaan resep pulang telah dimasukkan.', 'icon' => 'success', 'timer' => 1000]);
+        } else {
+            $this->dispatch('swal', ['title' => 'Data Kosong', 'text' => 'Tidak ada riwayat permintaan resep pulang ditemukan.', 'icon' => 'info']);
         }
     }
 

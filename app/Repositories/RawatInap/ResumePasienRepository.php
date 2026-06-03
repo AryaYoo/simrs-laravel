@@ -33,6 +33,7 @@ class ResumePasienRepository
             'diagnosa_sekunder2' => '', 'kd_diagnosa_sekunder2' => '',
             'diagnosa_sekunder3' => '', 'kd_diagnosa_sekunder3' => '',
             'diagnosa_sekunder4' => '', 'kd_diagnosa_sekunder4' => '',
+            'obat_pulang' => '',
         ];
 
         // 1. Fetch Latest Clinical Record (Pemeriksaan Ranap)
@@ -74,11 +75,32 @@ class ResumePasienRepository
             }
         }
 
+        // 4. Fetch Latest Permintaan Resep Pulang
+        $latestResepPulang = \App\Models\PermintaanResepPulang::with('detailPermintaan.barang')
+            ->where('no_rawat', $no_rawat)
+            ->orderBy('tgl_permintaan', 'desc')
+            ->orderBy('jam', 'desc')
+            ->first();
+
+        if ($latestResepPulang && $latestResepPulang->detailPermintaan) {
+            $obatList = $latestResepPulang->detailPermintaan->map(function ($detail) {
+                $nama = $detail->barang->nama_brng ?? '-';
+                $jml = $detail->jml ?? '-';
+                $satuan = $detail->barang->kode_sat ?? '';
+                $dosis = $detail->dosis ?? '-';
+                return "{$nama} ({$jml} {$satuan}, Dosis: {$dosis})";
+            })->filter()->implode("\n");
+            
+            $data['obat_pulang'] = $obatList;
+        }
+
         return $data;
     }
 
     /**
      * Memanggil riwayat medis pasien beserta relasinya.
+     * 
+     * @return array<int, array<string, mixed>>
      */
     public static function getHistoryItems(string $type, string $no_rawat): array
     {
@@ -163,7 +185,7 @@ class ResumePasienRepository
                 ->where('no_rawat', $no_rawat)
                 ->get()
                 ->groupBy('kode_brng')
-                ->map(fn(\Illuminate\Support\Collection $groups, $kode) => [
+                ->map(fn(Collection $groups, string $kode) => [
                     'id' => $kode,
                     'label' => ($groups->first()->barang?->nama_brng ?? '-') . ' (Total: ' . $groups->sum('jml') . ' ' . ($groups->first()->barang?->kode_sat ?? '') . ')',
                     'name' => $groups->first()->barang?->nama_brng ?? '-'
@@ -191,16 +213,19 @@ class ResumePasienRepository
                     'date' => $item->tgl_permintaan . ' ' . $item->jam_permintaan
                 ])->values()->toArray();
         } elseif ($type === 'OBAT_PULANG') {
-            $items = ResepPulang::with('barang')
+            $items = \App\Models\PermintaanResepPulang::with('detailPermintaan.barang')
                 ->where('no_rawat', $no_rawat)
-                ->orderBy('tanggal', 'desc')
+                ->orderBy('tgl_permintaan', 'desc')
+                ->orderBy('jam', 'desc')
                 ->get()
-                ->map(fn($item) => [
-                    'id' => $item->kode_brng . '_' . $item->tanggal . '_' . $item->jam,
-                    'label' => ($item->barang?->nama_brng ?? '-') . ' (' . $item->dosis . ')',
-                    'text' => ($item->barang?->nama_brng ?? '-') . ' (' . $item->dosis . ')',
-                    'date' => $item->tanggal . ' ' . $item->jam
-                ])->values()->toArray();
+                ->flatMap(function ($permintaan) {
+                    return $permintaan->detailPermintaan->map(fn($item) => [
+                        'id' => $item->kode_brng . '_' . $permintaan->tgl_permintaan . '_' . $permintaan->jam,
+                        'label' => ($item->barang?->nama_brng ?? '-') . ' (' . $item->jml . ' ' . ($item->barang?->kode_sat ?? '') . ', Dosis: ' . $item->dosis . ')',
+                        'text' => ($item->barang?->nama_brng ?? '-') . ' (' . $item->jml . ' ' . ($item->barang?->kode_sat ?? '') . ', Dosis: ' . $item->dosis . ')',
+                        'date' => $permintaan->tgl_permintaan . ' ' . $permintaan->jam
+                    ]);
+                })->values()->toArray();
         }
 
         return $items;

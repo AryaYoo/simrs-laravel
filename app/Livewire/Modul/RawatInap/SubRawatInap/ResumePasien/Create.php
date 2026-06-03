@@ -11,12 +11,11 @@ use App\Models\Icd9;
 use App\Livewire\Concerns\WithOptimisticLocking;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 #[Layout('layouts.app', ['title' => 'Buat Resume Medis'])]
 class Create extends Component
 {
-    use WithPagination, WithOptimisticLocking;
+    use WithOptimisticLocking;
 
     public string $no_rawat;
     public $regPeriksa;
@@ -69,6 +68,7 @@ class Create extends Component
     public $selectedLab = [];
     public $selectedTindakan = [];
     public $selectedObat = [];
+    public $selectedObatPulang = [];
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
@@ -185,11 +185,28 @@ class Create extends Component
         }
     }
 
+    public function autoFillObatPulang()
+    {
+        $allObatPulang = collect($this->regPeriksa->permintaanResepPulang)
+            ->flatMap(fn($p) => $p->detailPermintaan)
+            ->sortByDesc(fn($o) => $o->no_permintaan)
+            ->map(fn($o) => ($o->barang->nama_brng ?? '-') . ' (' . $o->jml . ' ' . ($o->barang->kode_sat ?? '') . ', Dosis: ' . $o->dosis . ')')
+            ->unique()
+            ->implode(', ');
+
+        if ($allObatPulang) {
+            $this->obat_pulang = $allObatPulang;
+            $this->dispatch('swal', ['title' => 'Otomatis Terisi', 'text' => 'Semua riwayat permintaan resep pulang telah dimasukkan.', 'icon' => 'success', 'timer' => 1000]);
+        } else {
+            $this->dispatch('swal', ['title' => 'Data Kosong', 'text' => 'Tidak ada riwayat permintaan resep pulang ditemukan.', 'icon' => 'info']);
+        }
+    }
+
     public function autoFillTindakan()
     {
         $allTindakan = collect($this->regPeriksa->rawatInapDr)
-            ->concat($this->regPeriksa->rawatInapPr)
-            ->concat($this->regPeriksa->rawatInapDrpr)
+            ->concat(collect($this->regPeriksa->rawatInapPr))
+            ->concat(collect($this->regPeriksa->rawatInapDrpr))
             ->map(fn($t) => $t->jnsPerawatan->nm_perawatan ?? null)
             ->filter()
             ->unique()
@@ -231,45 +248,31 @@ class Create extends Component
         $this->selectedLab        = [];
         $this->selectedTindakan   = [];
         $this->selectedObat       = [];
+        $this->selectedObatPulang = [];
     }
 
     public function toggleSelectAll()
     {
         if ($this->targetAttachColumn == 'lab_hasil') {
-            if (count($this->selectedLab) === count($this->regPeriksa->detailPeriksaLab)) {
-                $this->selectedLab = [];
-            } else {
-                $this->selectedLab = $this->regPeriksa->detailPeriksaLab->map(fn($lab) =>
-                    "{$lab->tgl_periksa}|{$lab->jam}|{$lab->kd_jenis_prw}|{$lab->id_template}"
-                )->toArray();
-            }
+            $lab = collect($this->regPeriksa->detailPeriksaLab);
+            $this->selectedLab = count($this->selectedLab) === $lab->count()
+                ? [] : $lab->map(fn($l) => "{$l->tgl_periksa}|{$l->jam}|{$l->kd_jenis_prw}|{$l->id_template}")->toArray();
         } elseif ($this->targetAttachColumn == 'tindakan') {
-            $allTindakan = collect($this->regPeriksa->rawatInapDr)
-                ->concat($this->regPeriksa->rawatInapPr)
-                ->concat($this->regPeriksa->rawatInapDrpr);
-            if (count($this->selectedTindakan) === $allTindakan->count()) {
-                $this->selectedTindakan = [];
-            } else {
-                $this->selectedTindakan = $allTindakan->map(fn($t) =>
-                    "{$t->tgl_perawatan}|{$t->jam_rawat}|{$t->kd_jenis_prw}"
-                )->toArray();
-            }
+            $all = collect($this->regPeriksa->rawatInapDr)->concat(collect($this->regPeriksa->rawatInapPr))->concat(collect($this->regPeriksa->rawatInapDrpr));
+            $this->selectedTindakan = count($this->selectedTindakan) === $all->count()
+                ? [] : $all->map(fn($t) => "{$t->tgl_perawatan}|{$t->jam_rawat}|{$t->kd_jenis_prw}")->toArray();
         } elseif ($this->targetAttachColumn == 'obat') {
-            if (count($this->selectedObat) === count($this->regPeriksa->detailPemberianObat)) {
-                $this->selectedObat = [];
-            } else {
-                $this->selectedObat = $this->regPeriksa->detailPemberianObat->map(fn($o) =>
-                    "{$o->tgl_perawatan}|{$o->jam}|{$o->kode_brng}"
-                )->toArray();
-            }
+            $obat = collect($this->regPeriksa->detailPemberianObat);
+            $this->selectedObat = count($this->selectedObat) === $obat->count()
+                ? [] : $obat->map(fn($o) => "{$o->tgl_perawatan}|{$o->jam}|{$o->kode_brng}")->toArray();
+        } elseif ($this->targetAttachColumn == 'OBAT_PULANG') {
+            $obatPulang = collect($this->regPeriksa->permintaanResepPulang)->flatMap(fn($p) => $p->detailPermintaan);
+            $this->selectedObatPulang = count($this->selectedObatPulang) === $obatPulang->count()
+                ? [] : $obatPulang->map(fn($o) => "{$o->no_permintaan}|{$o->kode_brng}")->toArray();
         } else {
-            if (count($this->selectedKeluhan) === count($this->regPeriksa->pemeriksaanRanap)) {
-                $this->selectedKeluhan = [];
-            } else {
-                $this->selectedKeluhan = $this->regPeriksa->pemeriksaanRanap->map(fn($p) =>
-                    "{$p->tgl_perawatan}|{$p->jam_rawat}"
-                )->toArray();
-            }
+            $keluhan = collect($this->regPeriksa->pemeriksaanRanap);
+            $this->selectedKeluhan = count($this->selectedKeluhan) === $keluhan->count()
+                ? [] : $keluhan->map(fn($p) => "{$p->tgl_perawatan}|{$p->jam_rawat}")->toArray();
         }
     }
 
@@ -346,6 +349,25 @@ class Create extends Component
         }
         $this->applyAttachments($texts);
         $this->selectedObat = [];
+    }
+
+    public function attachObatPulang()
+    {
+        if (empty($this->selectedObatPulang)) return;
+
+        $texts = [];
+        foreach ($this->selectedObatPulang as $id) {
+            [$no_permintaan, $kode_brng] = explode('|', $id);
+            $obat = \App\Models\DetailPermintaanResepPulang::with('barang')
+                ->where('no_permintaan', $no_permintaan)
+                ->where('kode_brng', $kode_brng)
+                ->first();
+            if ($obat && $obat->barang) {
+                $texts[] = $obat->barang->nama_brng . ' (' . $obat->jml . ' ' . $obat->barang->kode_sat . ', Dosis: ' . $obat->dosis . ')';
+            }
+        }
+        $this->applyAttachments($texts);
+        $this->selectedObatPulang = [];
     }
 
     private function applyAttachments($texts)
@@ -509,6 +531,20 @@ class Create extends Component
 
     public function render()
     {
+        // Reload regPeriksa dengan semua relasi pada setiap render
+        // agar data tidak hilang setelah Livewire request (prepareAttach, dll.)
+        $this->regPeriksa = RegPeriksa::with([
+            'pasien', 'dokter', 'kamarInap.kamar.bangsal',
+            'diagnosaPasien.penyakit',
+            'detailPeriksaLab.template',
+            'pemeriksaanRanap',
+            'rawatInapDr.jnsPerawatan',
+            'rawatInapPr.jnsPerawatan',
+            'rawatInapDrpr.jnsPerawatan',
+            'detailPemberianObat.barang',
+            'permintaanResepPulang.detailPermintaan.barang',
+        ])->findOrFail($this->no_rawat);
+
         $icd10List = [];
         if (strlen($this->searchIcd10) >= 3) {
             $icd10List = Penyakit::where('kd_penyakit', 'like', '%' . $this->searchIcd10 . '%')
