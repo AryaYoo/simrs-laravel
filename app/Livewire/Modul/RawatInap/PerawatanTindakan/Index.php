@@ -96,20 +96,9 @@ class Index extends Component
         $this->createModalOpen = true;
     }
 
-    public function openCreateModalAutoFill()
+    public function fillAutoData()
     {
-        $this->reset(['suhu_tubuh', 'tensi', 'nadi', 'respirasi', 'tinggi', 'berat', 'spo2', 'gcs', 'kesadaran', 'keluhan', 'pemeriksaan', 'alergi', 'penilaian', 'rtl', 'instruksi', 'evaluasi', 'nip', 'isEditMode']);
-
-        $this->tgl_perawatan = now()->format('Y-m-d');
-        $this->jam_rawat     = now()->format('H:i:s');
-        $this->isEditMode    = false;
-
-        // Fetch last SOAPIE as reference AND auto-fill all fields
-        $this->lastPemeriksaan = \App\Models\PemeriksaanRanap::where('no_rawat', $this->no_rawat)
-            ->orderBy('tgl_perawatan', 'desc')
-            ->orderBy('jam_rawat', 'desc')
-            ->first();
-
+        // Auto-fill SOAPIE text fields if reference exists
         if ($this->lastPemeriksaan) {
             $this->suhu_tubuh  = $this->lastPemeriksaan->suhu_tubuh;
             $this->tensi       = $this->lastPemeriksaan->tensi;
@@ -121,7 +110,6 @@ class Index extends Component
             $this->gcs         = $this->lastPemeriksaan->gcs;
             $this->kesadaran   = $this->lastPemeriksaan->kesadaran;
             $this->alergi      = $this->lastPemeriksaan->alergi;
-            // Auto-fill SOAPIE text fields
             $this->keluhan     = $this->lastPemeriksaan->keluhan;
             $this->pemeriksaan = $this->lastPemeriksaan->pemeriksaan;
             $this->penilaian   = $this->lastPemeriksaan->penilaian;
@@ -130,7 +118,7 @@ class Index extends Component
             $this->evaluasi    = $this->lastPemeriksaan->evaluasi;
         }
 
-        // Auto-fill petugas from logged-in user (SOP: mlite_users.username = pegawai.nik)
+        // Auto-fill petugas from logged-in user
         $loggedInUsername = auth()->user()->username ?? null;
         if ($loggedInUsername) {
             $pegawai = \App\Models\Pegawai::find($loggedInUsername);
@@ -139,8 +127,6 @@ class Index extends Component
                 $this->currentJabatan = $pegawai->jbtn ?? '-';
             }
         }
-
-        $this->createModalOpen = true;
     }
 
     public function editPemeriksaan($data)

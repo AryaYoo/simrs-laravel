@@ -30,9 +30,6 @@
         </div>
         <div class="flex items-center gap-3">
             <span class="text-xs text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-full">{{ $pemeriksaanRanap->count() }} catatan</span>
-            <flux:button wire:click="openCreateModalAutoFill" icon="bolt" size="sm" variant="filled" class="!bg-amber-500 hover:!bg-amber-600 !text-white !border-amber-500">
-                Isi Otomatis
-            </flux:button>
             <flux:button wire:click="openCreateModal" icon="plus" size="sm" variant="primary">
                 Tambah Pemeriksaan
             </flux:button>
@@ -192,7 +189,12 @@
                 </div>
                 <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100" x-text="$wire.isEditMode ? 'Edit Pemeriksaan Rawat Inap' : 'Tambah Pemeriksaan Rawat Inap'"></h2>
             </div>
-
+            <div class="flex items-center gap-3" x-show="!$wire.isEditMode">
+                <flux:button wire:click="fillAutoData" size="sm" variant="ghost" class="text-xs" title="Isi otomatis data dari pemeriksaan terakhir & petugas yang login">
+                    <flux:icon name="arrow-path" class="w-3.5 h-3.5 mr-1" />
+                    Isi Otomatis
+                </flux:button>
+            </div>
         </div>
 
         {{-- Reference Alert --}}
