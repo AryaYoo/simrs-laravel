@@ -189,11 +189,17 @@
                 </div>
                 <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100" x-text="$wire.isEditMode ? 'Edit Pemeriksaan Rawat Inap' : 'Tambah Pemeriksaan Rawat Inap'"></h2>
             </div>
-            <div class="flex items-center gap-3" x-show="!$wire.isEditMode">
-                <flux:button wire:click="fillAutoData" size="sm" variant="ghost" class="text-xs" title="Isi otomatis data dari pemeriksaan terakhir & petugas yang login">
-                    <flux:icon name="arrow-path" class="w-3.5 h-3.5 mr-1" />
-                    Isi Otomatis
-                </flux:button>
+            <div class="flex items-center gap-3">
+                <div x-show="$wire.isEditMode" title="Fitur tidak tersedia ketika mengedit" x-cloak>
+                    <flux:button size="xs" variant="subtle" icon="bolt" disabled class="opacity-50 cursor-not-allowed">
+                        Isi Otomatis
+                    </flux:button>
+                </div>
+                <div x-show="!$wire.isEditMode" title="Isi otomatis data dari pemeriksaan terakhir & petugas yang login" x-cloak>
+                    <flux:button wire:click="fillAutoData" size="xs" variant="subtle" icon="bolt" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10">
+                        Isi Otomatis
+                    </flux:button>
+                </div>
             </div>
         </div>
 
