@@ -356,46 +356,46 @@ class Edit extends Component
 
         try {
             $this->resume->update([
-                'kd_dokter'             => $this->kd_dokter ?? '',
-                'diagnosa_awal'         => $this->diagnosa_awal ?? '',
-                'alasan'                => $this->alasan ?? '',
-                'keluhan_utama'         => $this->keluhan_utama ?? '',
-                'pemeriksaan_fisik'     => $this->pemeriksaan_fisik ?? '',
-                'jalannya_penyakit'     => $this->jalannya_penyakit ?? '',
-                'pemeriksaan_penunjang' => $this->pemeriksaan_penunjang ?? '',
-                'hasil_laborat'         => $this->hasil_laborat ?? '',
-                'tindakan_dan_operasi'  => $this->tindakan_dan_operasi ?? '',
-                'obat_di_rs'            => $this->obat_di_rs ?? '',
-                'diagnosa_utama'        => $this->diagnosa_utama ?? '',
-                'kd_diagnosa_utama'     => $this->kd_diagnosa_utama ?? '',
-                'diagnosa_sekunder'     => $this->diagnosa_sekunder ?? '',
-                'kd_diagnosa_sekunder'  => $this->kd_diagnosa_sekunder ?? '',
-                'diagnosa_sekunder2'    => $this->diagnosa_sekunder2 ?? '',
-                'kd_diagnosa_sekunder2' => $this->kd_diagnosa_sekunder2 ?? '',
-                'diagnosa_sekunder3'    => $this->diagnosa_sekunder3 ?? '',
-                'kd_diagnosa_sekunder3' => $this->kd_diagnosa_sekunder3 ?? '',
-                'diagnosa_sekunder4'    => $this->diagnosa_sekunder4 ?? '',
-                'kd_diagnosa_sekunder4' => $this->kd_diagnosa_sekunder4 ?? '',
-                'prosedur_utama'        => $this->prosedur_utama ?? '',
-                'kd_prosedur_utama'     => $this->kd_prosedur_utama ?? '',
-                'prosedur_sekunder'     => $this->prosedur_sekunder ?? '',
-                'kd_prosedur_sekunder'  => $this->kd_prosedur_sekunder ?? '',
-                'prosedur_sekunder2'    => $this->prosedur_sekunder2 ?? '',
-                'kd_prosedur_sekunder2' => $this->kd_prosedur_sekunder2 ?? '',
-                'prosedur_sekunder3'    => $this->prosedur_sekunder3 ?? '',
-                'kd_prosedur_sekunder3' => $this->kd_prosedur_sekunder3 ?? '',
-                'alergi'                => $this->alergi ?? '',
-                'diet'                  => $this->diet ?? '',
-                'lab_belum'             => $this->lab_belum ?? '',
-                'edukasi'               => $this->edukasi ?? '',
-                'cara_keluar'           => $this->cara_keluar ?? '',
-                'ket_keluar'            => $this->ket_keluar ?? '',
-                'keadaan'               => $this->keadaan ?? '',
-                'ket_keadaan'           => $this->ket_keadaan ?? '',
-                'dilanjutkan'           => $this->dilanjutkan ?? '',
-                'ket_dilanjutkan'       => $this->ket_dilanjutkan ?? '',
-                'kontrol'               => $this->kontrol ?? '',
-                'obat_pulang'           => $this->obat_pulang ?? '',
+                'kd_dokter'             => $this->kd_dokter ?? '-',
+                'diagnosa_awal'         => $this->defaultEmpty($this->diagnosa_awal),
+                'alasan'                => $this->defaultEmpty($this->alasan),
+                'keluhan_utama'         => $this->defaultEmpty($this->keluhan_utama),
+                'pemeriksaan_fisik'     => $this->defaultEmpty($this->pemeriksaan_fisik),
+                'jalannya_penyakit'     => $this->defaultEmpty($this->jalannya_penyakit),
+                'pemeriksaan_penunjang' => $this->defaultEmpty($this->pemeriksaan_penunjang),
+                'hasil_laborat'         => $this->defaultEmpty($this->hasil_laborat),
+                'tindakan_dan_operasi'  => $this->defaultEmpty($this->tindakan_dan_operasi),
+                'obat_di_rs'            => $this->defaultEmpty($this->obat_di_rs),
+                'diagnosa_utama'        => $this->defaultEmpty($this->diagnosa_utama),
+                'kd_diagnosa_utama'     => $this->defaultEmpty($this->kd_diagnosa_utama),
+                'diagnosa_sekunder'     => $this->defaultEmpty($this->diagnosa_sekunder),
+                'kd_diagnosa_sekunder'  => $this->defaultEmpty($this->kd_diagnosa_sekunder),
+                'diagnosa_sekunder2'    => $this->defaultEmpty($this->diagnosa_sekunder2),
+                'kd_diagnosa_sekunder2' => $this->defaultEmpty($this->kd_diagnosa_sekunder2),
+                'diagnosa_sekunder3'    => $this->defaultEmpty($this->diagnosa_sekunder3),
+                'kd_diagnosa_sekunder3' => $this->defaultEmpty($this->kd_diagnosa_sekunder3),
+                'diagnosa_sekunder4'    => $this->defaultEmpty($this->diagnosa_sekunder4),
+                'kd_diagnosa_sekunder4' => $this->defaultEmpty($this->kd_diagnosa_sekunder4),
+                'prosedur_utama'        => $this->defaultEmpty($this->prosedur_utama),
+                'kd_prosedur_utama'     => $this->defaultEmpty($this->kd_prosedur_utama),
+                'prosedur_sekunder'     => $this->defaultEmpty($this->prosedur_sekunder),
+                'kd_prosedur_sekunder'  => $this->defaultEmpty($this->kd_prosedur_sekunder),
+                'prosedur_sekunder2'    => $this->defaultEmpty($this->prosedur_sekunder2),
+                'kd_prosedur_sekunder2' => $this->defaultEmpty($this->kd_prosedur_sekunder2),
+                'prosedur_sekunder3'    => $this->defaultEmpty($this->prosedur_sekunder3),
+                'kd_prosedur_sekunder3' => $this->defaultEmpty($this->kd_prosedur_sekunder3),
+                'alergi'                => $this->defaultEmpty($this->alergi),
+                'diet'                  => $this->defaultEmpty($this->diet),
+                'lab_belum'             => $this->defaultEmpty($this->lab_belum),
+                'edukasi'               => $this->defaultEmpty($this->edukasi),
+                'cara_keluar'           => $this->defaultEmpty($this->cara_keluar),
+                'ket_keluar'            => $this->defaultEmpty($this->ket_keluar),
+                'keadaan'               => $this->defaultEmpty($this->keadaan),
+                'ket_keadaan'           => $this->defaultEmpty($this->ket_keadaan),
+                'dilanjutkan'           => $this->defaultEmpty($this->dilanjutkan),
+                'ket_dilanjutkan'       => $this->defaultEmpty($this->ket_dilanjutkan),
+                'kontrol'               => $this->kontrol ?? null,
+                'obat_pulang'           => $this->defaultEmpty($this->obat_pulang),
             ]);
 
             $this->dispatch('swal', ['title' => 'Sukses!', 'text' => 'Resume medis berhasil diupdate.', 'icon' => 'success']);
@@ -403,6 +403,11 @@ class Edit extends Component
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal Menyimpan', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
+    }
+
+    private function defaultEmpty($value)
+    {
+        return empty($value) ? '-' : $value;
     }
 
     public function delete()
