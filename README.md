@@ -347,6 +347,28 @@ Saat membuat sistem *tab* atau menu dinamis yang melakukan *swap* antar tampilan
 @endif
 ```
 
+### 14. Konvensi Identitas Pengguna (mlite_users ↔ pegawai)
+
+> [!IMPORTANT]
+> **`mlite_users.username` WAJIB diisi sama persis dengan `pegawai.nik`.**
+
+Sistem menggunakan konvensi ini untuk melakukan *cross-table identity resolution* antara tabel autentikasi (`mlite_users`) dan tabel kepegawaian (`pegawai`). Fitur-fitur yang bergantung pada konvensi ini antara lain:
+
+* **Isi Otomatis Pemeriksaan Rawat Inap**: Secara otomatis mendeteksi petugas yang sedang login dan mengisi kolom NIP/Petugas tanpa pencarian manual.
+* **Audit Trail & Logging**: Mencocokkan identitas login dengan data pegawai yang tercatat di rekam medis.
+
+**Cara Kerja:**
+```php
+// Di Livewire Component
+$loggedInUsername = auth()->user()->username; // dari mlite_users
+$pegawai = Pegawai::find($loggedInUsername);  // lookup ke tabel pegawai via nik
+$this->nip = $pegawai->nik;
+$this->currentJabatan = $pegawai->jbtn;
+```
+
+**Saat Membuat User Baru:**
+Pastikan field `username` diisi dengan NIK pegawai yang bersangkutan (bukan email, bukan nama, bukan ID lain).
+
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
 1. Masuk ke **Master Data -> Pengaturan Aplikasi**.

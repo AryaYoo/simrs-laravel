@@ -96,6 +96,53 @@ class Index extends Component
         $this->createModalOpen = true;
     }
 
+    public function openCreateModalAutoFill()
+    {
+        $this->reset(['suhu_tubuh', 'tensi', 'nadi', 'respirasi', 'tinggi', 'berat', 'spo2', 'gcs', 'kesadaran', 'keluhan', 'pemeriksaan', 'alergi', 'penilaian', 'rtl', 'instruksi', 'evaluasi', 'nip', 'isEditMode']);
+
+        $this->tgl_perawatan = now()->format('Y-m-d');
+        $this->jam_rawat     = now()->format('H:i:s');
+        $this->isEditMode    = false;
+
+        // Fetch last SOAPIE as reference AND auto-fill all fields
+        $this->lastPemeriksaan = \App\Models\PemeriksaanRanap::where('no_rawat', $this->no_rawat)
+            ->orderBy('tgl_perawatan', 'desc')
+            ->orderBy('jam_rawat', 'desc')
+            ->first();
+
+        if ($this->lastPemeriksaan) {
+            $this->suhu_tubuh  = $this->lastPemeriksaan->suhu_tubuh;
+            $this->tensi       = $this->lastPemeriksaan->tensi;
+            $this->nadi        = $this->lastPemeriksaan->nadi;
+            $this->respirasi   = $this->lastPemeriksaan->respirasi;
+            $this->tinggi      = $this->lastPemeriksaan->tinggi;
+            $this->berat       = $this->lastPemeriksaan->berat;
+            $this->spo2        = $this->lastPemeriksaan->spo2;
+            $this->gcs         = $this->lastPemeriksaan->gcs;
+            $this->kesadaran   = $this->lastPemeriksaan->kesadaran;
+            $this->alergi      = $this->lastPemeriksaan->alergi;
+            // Auto-fill SOAPIE text fields
+            $this->keluhan     = $this->lastPemeriksaan->keluhan;
+            $this->pemeriksaan = $this->lastPemeriksaan->pemeriksaan;
+            $this->penilaian   = $this->lastPemeriksaan->penilaian;
+            $this->rtl         = $this->lastPemeriksaan->rtl;
+            $this->instruksi   = $this->lastPemeriksaan->instruksi;
+            $this->evaluasi    = $this->lastPemeriksaan->evaluasi;
+        }
+
+        // Auto-fill petugas from logged-in user (SOP: mlite_users.username = pegawai.nik)
+        $loggedInUsername = auth()->user()->username ?? null;
+        if ($loggedInUsername) {
+            $pegawai = \App\Models\Pegawai::find($loggedInUsername);
+            if ($pegawai) {
+                $this->nip = $pegawai->nik;
+                $this->currentJabatan = $pegawai->jbtn ?? '-';
+            }
+        }
+
+        $this->createModalOpen = true;
+    }
+
     public function editPemeriksaan($data)
     {
         // $data is an array from the JSON in the view

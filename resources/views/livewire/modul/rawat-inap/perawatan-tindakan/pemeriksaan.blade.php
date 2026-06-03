@@ -30,6 +30,9 @@
         </div>
         <div class="flex items-center gap-3">
             <span class="text-xs text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-full">{{ $pemeriksaanRanap->count() }} catatan</span>
+            <flux:button wire:click="openCreateModalAutoFill" icon="bolt" size="sm" variant="filled" class="!bg-amber-500 hover:!bg-amber-600 !text-white !border-amber-500">
+                Isi Otomatis
+            </flux:button>
             <flux:button wire:click="openCreateModal" icon="plus" size="sm" variant="primary">
                 Tambah Pemeriksaan
             </flux:button>
