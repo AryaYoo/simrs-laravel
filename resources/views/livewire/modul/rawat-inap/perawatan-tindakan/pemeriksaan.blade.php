@@ -290,72 +290,72 @@
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">Suhu (C)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->suhu_tubuh }}</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['suhu_tubuh'] }}</span>@endif
                                 </div>
-                                <flux:input wire:model="suhu_tubuh" size="sm" placeholder="36,1" class="{{ $lastPemeriksaan && $suhu_tubuh == $lastPemeriksaan->suhu_tubuh ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="suhu_tubuh" size="sm" placeholder="36,1" class="{{ $lastPemeriksaan && $suhu_tubuh == $lastPemeriksaan['suhu_tubuh'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
 
                             {{-- Tensi --}}
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">Tensi (mmHg)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->tensi }}</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['tensi'] }}</span>@endif
                                 </div>
-                                <flux:input wire:model="tensi" size="sm" placeholder="120/80" class="{{ $lastPemeriksaan && $tensi == $lastPemeriksaan->tensi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="tensi" size="sm" placeholder="120/80" class="{{ $lastPemeriksaan && $tensi == $lastPemeriksaan['tensi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
 
                             {{-- Berat --}}
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">Berat (Kg)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->berat }}</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['berat'] }}</span>@endif
                                 </div>
-                                <flux:input wire:model="berat" size="sm" placeholder="65" class="{{ $lastPemeriksaan && $berat == $lastPemeriksaan->berat ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="berat" size="sm" placeholder="65" class="{{ $lastPemeriksaan && $berat == $lastPemeriksaan['berat'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
 
                             {{-- TB --}}
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">TB (Cm)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->tinggi }}</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['tinggi'] }}</span>@endif
                                 </div>
-                                <flux:input wire:model="tinggi" size="sm" placeholder="170" class="{{ $lastPemeriksaan && $tinggi == $lastPemeriksaan->tinggi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="tinggi" size="sm" placeholder="170" class="{{ $lastPemeriksaan && $tinggi == $lastPemeriksaan['tinggi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
 
                             {{-- RR --}}
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">RR (/mnt)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->respirasi }}</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['respirasi'] }}</span>@endif
                                 </div>
-                                <flux:input wire:model="respirasi" size="sm" placeholder="18" class="{{ $lastPemeriksaan && $respirasi == $lastPemeriksaan->respirasi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="respirasi" size="sm" placeholder="18" class="{{ $lastPemeriksaan && $respirasi == $lastPemeriksaan['respirasi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
 
                             {{-- Nadi --}}
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">Nadi (/mnt)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->nadi }}</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['nadi'] }}</span>@endif
                                 </div>
-                                <flux:input wire:model="nadi" size="sm" placeholder="75" class="{{ $lastPemeriksaan && $nadi == $lastPemeriksaan->nadi ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="nadi" size="sm" placeholder="75" class="{{ $lastPemeriksaan && $nadi == $lastPemeriksaan['nadi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
 
                             {{-- SpO2 --}}
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">SpO2 (%)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->spo2 }}%</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['spo2'] }}%</span>@endif
                                 </div>
-                                <flux:input wire:model="spo2" size="sm" placeholder="98" class="{{ $lastPemeriksaan && $spo2 == $lastPemeriksaan->spo2 ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="spo2" size="sm" placeholder="98" class="{{ $lastPemeriksaan && $spo2 == $lastPemeriksaan['spo2'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
 
                             {{-- GCS --}}
                             <flux:field>
                                 <div class="flex items-center justify-between mb-1.5">
                                     <flux:label class="!mb-0">GCS (E,V,M)</flux:label>
-                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan->gcs }}</span>@endif
+                                    @if($lastPemeriksaan)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastPemeriksaan['gcs'] }}</span>@endif
                                 </div>
-                                <flux:input wire:model="gcs" size="sm" placeholder="15" class="{{ $lastPemeriksaan && $gcs == $lastPemeriksaan->gcs ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                <flux:input wire:model="gcs" size="sm" placeholder="15" class="{{ $lastPemeriksaan && $gcs == $lastPemeriksaan['gcs'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
                             </flux:field>
                         </div>
 
