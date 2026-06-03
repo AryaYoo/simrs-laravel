@@ -96,6 +96,16 @@ class Index extends Component
             $this->lastPemeriksaan = null;
         }
 
+        // Default auto-fill petugas from logged-in user
+        $loggedInUsername = auth()->user()->username ?? null;
+        if ($loggedInUsername) {
+            $pegawai = \App\Models\Pegawai::find($loggedInUsername);
+            if ($pegawai) {
+                $this->nip = $pegawai->nik;
+                $this->currentJabatan = $pegawai->jbtn ?? '-';
+            }
+        }
+
         $this->createModalOpen = true;
     }
 
