@@ -19,7 +19,7 @@
 
             @if($hasImage)
                 {{-- Admin-uploaded image --}}
-                <img src="data:image/webp;base64,{{ $loginBg->setting_value }}" alt="Login Background"
+                <img src="{{ $loginBg->setting_value }}" alt="Login Background"
                     class="login-bg-image absolute inset-0 w-full h-full object-cover" />
                 {{-- Dark overlay for text readability --}}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/10 z-[1]"></div>

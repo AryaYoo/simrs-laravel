@@ -70,7 +70,7 @@
                                 </p>
                             @elseif ($login_background_preview)
                                 <div class="w-full aspect-[16/10] rounded-xl border border-neutral-200 overflow-hidden bg-neutral-900 flex items-center justify-center relative group">
-                                    <img src="data:image/webp;base64,{{ $login_background_preview }}" class="w-full h-full object-cover">
+                                    <img src="{{ $login_background_preview }}" class="w-full h-full object-cover">
                                     <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <button type="button" wire:click="removeLoginBackground" wire:confirm="Yakin ingin menghapus gambar login? Halaman login akan kembali ke tampilan default."
                                             class="px-4 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1.5">

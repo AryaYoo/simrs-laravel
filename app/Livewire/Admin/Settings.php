@@ -53,7 +53,14 @@ class Settings extends Component
         // Load Login Background
         $loginBg = AppSetting::where('setting_key', 'LOGIN_BACKGROUND_IMAGE')->first();
         if ($loginBg && !empty($loginBg->setting_value)) {
-            $this->login_background_preview = $loginBg->setting_value;
+            $value = $loginBg->setting_value;
+            // Support both new format (full data URI) and old format (raw base64)
+            if (str_starts_with($value, 'data:')) {
+                $this->login_background_preview = $value;
+            } else {
+                // Old format: raw base64 — wrap with default webp MIME for compat
+                $this->login_background_preview = 'data:image/webp;base64,' . $value;
+            }
         }
 
         // Load Cetak Web Settings
@@ -140,16 +147,17 @@ class Settings extends Component
 
         // Simpan Login Background
         if ($this->login_background) {
+            $mime = $this->login_background->getMimeType() ?? 'image/webp';
             $bgContent = file_get_contents($this->login_background->getRealPath());
-            $base64 = base64_encode($bgContent);
+            $dataUri = 'data:' . $mime . ';base64,' . base64_encode($bgContent);
             AppSetting::updateOrCreate(
                 ['setting_key' => 'LOGIN_BACKGROUND_IMAGE'],
                 [
-                    'setting_value' => $base64,
-                    'description'   => 'Gambar latar halaman login (Base64 encoded, format WebP/JPG/PNG, maks 500KB)'
+                    'setting_value' => $dataUri,
+                    'description'   => 'Gambar latar halaman login (Data URI, format WebP/JPG/PNG, maks 500KB)'
                 ]
             );
-            $this->login_background_preview = $base64;
+            $this->login_background_preview = $dataUri;
             $this->login_background = null;
         }
 
