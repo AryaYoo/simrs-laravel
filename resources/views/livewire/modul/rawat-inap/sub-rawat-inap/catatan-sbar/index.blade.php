@@ -114,14 +114,7 @@
                                             <flux:badge size="sm" color="zinc" class="!px-1.5 !py-0">Belum</flux:badge>
                                         @endif
                                     </div>
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-neutral-500 w-16">Verif:</span>
-                                        @if($catatan['status_verifikasi'] === 'Sudah')
-                                            <flux:badge size="sm" color="lime" class="!px-1.5 !py-0">✓ DPJP</flux:badge>
-                                        @else
-                                            <flux:badge size="sm" color="zinc" class="!px-1.5 !py-0">Belum</flux:badge>
-                                        @endif
-                                    </div>
+                                    {{-- Verif row hidden per request --}}
                                 </div>
                             </flux:table.cell>
                             <flux:table.cell>
@@ -271,21 +264,7 @@
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
                     <flux:button wire:click="$set('detailSbar', null)" variant="ghost" class="w-full sm:w-auto">Tutup</flux:button>
                     
-                    @if($detailSbar['status_verifikasi'] !== 'Sudah')
-                        <flux:button
-                            wire:click="verifikasi"
-                            wire:confirm="Verifikasi catatan SBAR ini sebagai DPJP?"
-                            variant="filled"
-                            icon="check-badge"
-                            class="!bg-[#4C5C2D] !text-white hover:!bg-[#3d4a24] w-full sm:w-auto">
-                            Verifikasi DPJP
-                        </flux:button>
-                    @else
-                        <div class="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-sm font-bold shadow-sm">
-                            <flux:icon name="check-badge" class="w-5 h-5" />
-                            Telah Diverifikasi
-                        </div>
-                    @endif
+                    {{-- Verifikasi DPJP button hidden per request --}}
                 </div>
             </div>
             @endif
