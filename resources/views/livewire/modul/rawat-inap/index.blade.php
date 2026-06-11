@@ -442,7 +442,7 @@
             <flux:table.rows>
                 @forelse ($regPeriksas as $reg)
                     @php $isBpjs = str_contains(strtoupper($reg->penjab->png_jawab ?? ''), 'BPJS'); @endphp
-                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-[#4C5C2D]/5 dark:bg-[#4C5C2D]/10' : ''">
+                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''">
                         <flux:table.cell>
                             <button type="button"
                                 @click="openMenu('{{ $reg->no_rawat }}', '{{ $reg->pasien->nm_pasien ?? '' }}')"
@@ -452,10 +452,31 @@
                         </flux:table.cell>
                         <flux:table.cell class="font-medium tracking-tight">{{ $reg->no_rawat }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->no_rkm_medis }}</flux:table.cell>
-                        <flux:table.cell>{{ $reg->pasien->nm_pasien ?? '-' }}</flux:table.cell>
+                        <flux:table.cell>
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $reg->pasien->nm_pasien ?? '-' }}</span>
+                                @if(($reg->pasien->jk ?? '') === 'L')
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40" title="Laki-laki">
+                                        <span class="w-1 h-1 rounded-full bg-blue-500"></span> L
+                                    </span>
+                                @elseif(($reg->pasien->jk ?? '') === 'P')
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-900/40" title="Perempuan">
+                                        <span class="w-1 h-1 rounded-full bg-pink-500"></span> P
+                                    </span>
+                                @endif
+                            </div>
+                        </flux:table.cell>
                         <flux:table.cell class="max-w-xs truncate">{{ $reg->pasien->alamat ?? '-' }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->p_jawab }}</flux:table.cell>
-                        <flux:table.cell>{{ $reg->penjab->png_jawab ?? '-' }}</flux:table.cell>
+                        <flux:table.cell>
+                            @if($isBpjs)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                                    {{ $reg->penjab->png_jawab ?? '-' }}
+                                </span>
+                            @else
+                                {{ $reg->penjab->png_jawab ?? '-' }}
+                            @endif
+                        </flux:table.cell>
                         <flux:table.cell>{{ $reg->permintaanRanap->kd_kamar ?? '-' }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex justify-center text-center">

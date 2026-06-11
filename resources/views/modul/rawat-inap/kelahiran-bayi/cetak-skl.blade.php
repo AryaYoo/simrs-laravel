@@ -256,6 +256,69 @@
             }
             @page { size: A4 portrait; margin: 0; }
         }
+
+        /* Hide background option styling */
+        .no-bg {
+            background-image: none !important;
+        }
+
+        /* Toggle Switch styling */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            color: #e8eaed;
+            font-size: 13px;
+        }
+        .toggle-container:hover {
+            color: white;
+        }
+        .toggle-container input {
+            display: none;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 34px;
+            height: 18px;
+            background-color: #5f6368;
+            border-radius: 9px;
+            transition: background-color 0.2s;
+        }
+        .toggle-switch::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        .toggle-container input:checked + .toggle-switch {
+            background-color: #8ab4f8;
+        }
+        .toggle-container input:checked + .toggle-switch::after {
+            transform: translateX(16px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #8ab4f8;
+            border: 1px solid #8ab4f8;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: rgba(138, 180, 248, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -271,6 +334,19 @@
             </span>
         </div>
         <div class="toolbar-group">
+            @if(!empty($setting['wallpaper']))
+                <label class="toggle-container">
+                    <input type="checkbox" id="toggle-bg" onchange="toggleBg(this.checked)">
+                    <div class="toggle-switch"></div>
+                    <span>Sembunyikan Background</span>
+                </label>
+                <button class="btn-secondary" onclick="printWithoutBg()">
+                    <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    Cetak Tanpa Background
+                </button>
+            @endif
             <button class="btn-action" onclick="window.print()">
                 <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
@@ -283,7 +359,7 @@
 
     {{-- PAPER WRAPPER --}}
     <div class="preview-container">
-        <div class="document-page size-a4"
+        <div class="document-page size-a4" id="documentPage"
             @if(!empty($setting['wallpaper']))
                 style="background-image: url('data:image/jpeg;base64,{{ base64_encode($setting['wallpaper']) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
             @endif
@@ -467,5 +543,35 @@
         </div>{{-- .document-page --}}
     </div>{{-- .preview-container --}}
 
+    <script>
+        function toggleBg(checked) {
+            const page = document.getElementById('documentPage');
+            if (page) {
+                if (checked) {
+                    page.classList.add('no-bg');
+                } else {
+                    page.classList.remove('no-bg');
+                }
+            }
+        }
+
+        function printWithoutBg() {
+            const page = document.getElementById('documentPage');
+            if (page) {
+                page.classList.add('no-bg');
+            }
+            window.print();
+        }
+
+        window.onafterprint = function() {
+            const checkbox = document.getElementById('toggle-bg');
+            if (checkbox && !checkbox.checked) {
+                const page = document.getElementById('documentPage');
+                if (page) {
+                    page.classList.remove('no-bg');
+                }
+            }
+        };
+    </script>
 </body>
 </html>
