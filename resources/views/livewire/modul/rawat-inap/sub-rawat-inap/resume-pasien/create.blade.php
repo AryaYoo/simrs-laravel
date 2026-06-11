@@ -674,17 +674,15 @@
                                         @php
                                             $isAllSelected = false;
                                             if ($targetAttachColumn == 'lab_hasil') {
-                                                $isAllSelected = count($selectedLab) === count($regPeriksa->detailPeriksaLab) && count($selectedLab) > 0;
+                                                $isAllSelected = count($selectedLab) === $this->labHasilData->count() && count($selectedLab) > 0;
                                             } elseif ($targetAttachColumn == 'tindakan') {
-                                                $allTindakanCount = collect($regPeriksa->rawatInapDr)->concat($regPeriksa->rawatInapPr)->concat($regPeriksa->rawatInapDrpr)->count();
-                                                $isAllSelected = count($selectedTindakan) === $allTindakanCount && count($selectedTindakan) > 0;
+                                                $isAllSelected = count($selectedTindakan) === $this->tindakanData->count() && count($selectedTindakan) > 0;
                                             } elseif ($targetAttachColumn == 'obat') {
-                                                $isAllSelected = count($selectedObat) === count($regPeriksa->detailPemberianObat) && count($selectedObat) > 0;
+                                                $isAllSelected = count($selectedObat) === $this->obatData->count() && count($selectedObat) > 0;
                                             } elseif ($targetAttachColumn == 'OBAT_PULANG') {
-                                                $obatPulang = collect($regPeriksa->permintaanResepPulang)->flatMap(fn($p) => $p->detailPermintaan);
-                                                $isAllSelected = count($selectedObatPulang) === $obatPulang->count() && count($selectedObatPulang) > 0;
+                                                $isAllSelected = count($selectedObatPulang) === $this->obatPulangData->count() && count($selectedObatPulang) > 0;
                                             } else {
-                                                $isAllSelected = count($selectedKeluhan) === count($regPeriksa->pemeriksaanRanap) && count($selectedKeluhan) > 0;
+                                                $isAllSelected = count($selectedKeluhan) === $this->keluhanData->count() && count($selectedKeluhan) > 0;
                                             }
                                         @endphp
                                         <input type="checkbox" wire:click="toggleSelectAll" 
@@ -701,7 +699,7 @@
                             </thead>
                             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
                                 @if($targetAttachColumn == 'lab_hasil')
-                                    @forelse($regPeriksa->detailPeriksaLab->sortByDesc(fn($lab) => $lab->tgl_periksa . ' ' . $lab->jam) as $lab)
+                                    @forelse($this->labHasilData as $lab)
                                         <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
                                             <td class="px-4 py-3 text-center">
                                                 <input type="checkbox" wire:model="selectedLab" value="{{ $lab->tgl_periksa . '|' . $lab->jam . '|' . $lab->kd_jenis_prw . '|' . $lab->id_template }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
@@ -726,10 +724,7 @@
                                     @endforelse
                                 @elseif($targetAttachColumn == 'tindakan')
                                     @php
-                                        $allTindakan = collect($regPeriksa->rawatInapDr)
-                                            ->concat($regPeriksa->rawatInapPr)
-                                            ->concat($regPeriksa->rawatInapDrpr)
-                                            ->sortByDesc(fn($t) => $t->tgl_perawatan . ' ' . $t->jam_rawat);
+                                        $allTindakan = $this->tindakanData;
                                     @endphp
                                     @forelse($allTindakan as $t)
                                         <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
@@ -761,7 +756,7 @@
                                         </tr>
                                     @endforelse
                                 @elseif($targetAttachColumn == 'obat')
-                                    @forelse($regPeriksa->detailPemberianObat->sortByDesc(fn($o) => $o->tgl_perawatan . ' ' . $o->jam) as $o)
+                                    @forelse($this->obatData as $o)
                                         <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
                                             <td class="px-4 py-3 text-center">
                                                 <input type="checkbox" wire:model="selectedObat" value="{{ $o->tgl_perawatan . '|' . $o->jam . '|' . $o->kode_brng }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
@@ -784,9 +779,7 @@
                                     @endforelse
                                 @elseif($targetAttachColumn == 'OBAT_PULANG')
                                     @php
-                                        $allObatPulang = collect($regPeriksa->permintaanResepPulang)
-                                            ->flatMap(fn($p) => $p->detailPermintaan)
-                                            ->sortByDesc(fn($o) => $o->no_permintaan);
+                                        $allObatPulang = $this->obatPulangData;
                                     @endphp
                                     @forelse($allObatPulang as $obat)
                                         <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
@@ -809,7 +802,7 @@
                                         </tr>
                                     @endforelse
                                 @else
-                                    @forelse($regPeriksa->pemeriksaanRanap as $pemeriksaan)
+                                    @forelse($this->keluhanData as $pemeriksaan)
                                         <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
                                             <td class="px-4 py-3 text-center">
                                                 <input type="checkbox" wire:model="selectedKeluhan" value="{{ $pemeriksaan->tgl_perawatan . '|' . $pemeriksaan->jam_rawat }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />

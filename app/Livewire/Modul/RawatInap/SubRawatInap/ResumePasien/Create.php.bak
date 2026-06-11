@@ -9,7 +9,6 @@ use App\Repositories\RawatInap\ResumePasienRepository;
 use App\Models\Penyakit;
 use App\Models\Icd9;
 use App\Livewire\Concerns\WithOptimisticLocking;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -75,14 +74,21 @@ class Create extends Component
     public $selectedTindakan = [];
     public $selectedObat = [];
     public $selectedObatPulang = [];
-    public $targetAttachField = '';
-    public $targetAttachColumn = '';
+    public $targetAttachField = 'keluhan_utama';
+    public $targetAttachColumn = 'keluhan';
 
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
         $this->regPeriksa = RegPeriksa::with([
             'pasien', 'dokter', 'kamarInap.kamar.bangsal',
+            'diagnosaPasien.penyakit',
+            'detailPeriksaLab.template',
+            'pemeriksaanRanap',
+            'rawatInapDr.jnsPerawatan',
+            'rawatInapPr.jnsPerawatan',
+            'rawatInapDrpr.jnsPerawatan',
+            'detailPemberianObat.barang',
         ])->findOrFail($this->no_rawat);
 
         $this->kd_dokter  = $this->regPeriksa->kd_dokter;
@@ -156,15 +162,14 @@ class Create extends Component
     }
 
     // ─────────────────────────────────────────────
-    // Auto-Fill Methods (Optimized)
+    // Auto-Fill Methods (porting dari Casemix Form)
     // ─────────────────────────────────────────────
 
     public function autoFillSOAP($field, $column)
     {
-        $allData = \App\Models\PemeriksaanRanap::where('no_rawat', $this->no_rawat)
-            ->orderBy('tgl_perawatan', 'asc')
-            ->orderBy('jam_rawat', 'asc')
-            ->pluck($column)
+        $allData = collect($this->regPeriksa->pemeriksaanRanap)
+            ->sortBy('tgl_perawatan')
+            ->map(fn($p) => $p->$column ?? null)
             ->filter(fn($val) => !empty($val) && $val !== '-')
             ->unique()
             ->implode(', ');
@@ -188,12 +193,9 @@ class Create extends Component
 
     public function autoFillObatPulang()
     {
-        $allObatPulang = \App\Models\DetailPermintaanResepPulang::with('barang')
-            ->whereHas('permintaanResepPulang', function($q) {
-                $q->where('no_rawat', $this->no_rawat);
-            })
-            ->orderBy('no_permintaan', 'desc')
-            ->get()
+        $allObatPulang = collect($this->regPeriksa->permintaanResepPulang)
+            ->flatMap(fn($p) => $p->detailPermintaan)
+            ->sortByDesc(fn($o) => $o->no_permintaan)
             ->map(fn($o) => ($o->barang->nama_brng ?? '-') . ' (' . $o->jml . ' ' . ($o->barang->kode_sat ?? '') . ', Dosis: ' . $o->dosis . ')')
             ->unique()
             ->implode(', ');
@@ -208,11 +210,9 @@ class Create extends Component
 
     public function autoFillTindakan()
     {
-        $dr = \App\Models\RawatInapDr::with('jnsPerawatan')->where('no_rawat', $this->no_rawat)->get();
-        $pr = \App\Models\RawatInapPr::with('jnsPerawatan')->where('no_rawat', $this->no_rawat)->get();
-        $drpr = \App\Models\RawatInapDrpr::with('jnsPerawatan')->where('no_rawat', $this->no_rawat)->get();
-
-        $allTindakan = $dr->concat($pr)->concat($drpr)
+        $allTindakan = collect($this->regPeriksa->rawatInapDr)
+            ->concat(collect($this->regPeriksa->rawatInapPr))
+            ->concat(collect($this->regPeriksa->rawatInapDrpr))
             ->map(fn($t) => $t->jnsPerawatan->nm_perawatan ?? null)
             ->filter()
             ->unique()
@@ -228,9 +228,7 @@ class Create extends Component
 
     public function autoFillObat()
     {
-        $allObat = \App\Models\DetailPemberianObat::with('barang')
-            ->where('no_rawat', $this->no_rawat)
-            ->get()
+        $allObat = collect($this->regPeriksa->detailPemberianObat)
             ->map(fn($o) => $o->barang->nama_brng ?? null)
             ->filter()
             ->unique()
@@ -262,23 +260,23 @@ class Create extends Component
     public function toggleSelectAll()
     {
         if ($this->targetAttachColumn == 'lab_hasil') {
-            $lab = $this->labHasilData();
+            $lab = collect($this->regPeriksa->detailPeriksaLab);
             $this->selectedLab = count($this->selectedLab) === $lab->count()
                 ? [] : $lab->map(fn($l) => "{$l->tgl_periksa}|{$l->jam}|{$l->kd_jenis_prw}|{$l->id_template}")->toArray();
         } elseif ($this->targetAttachColumn == 'tindakan') {
-            $all = $this->tindakanData();
+            $all = collect($this->regPeriksa->rawatInapDr)->concat(collect($this->regPeriksa->rawatInapPr))->concat(collect($this->regPeriksa->rawatInapDrpr));
             $this->selectedTindakan = count($this->selectedTindakan) === $all->count()
                 ? [] : $all->map(fn($t) => "{$t->tgl_perawatan}|{$t->jam_rawat}|{$t->kd_jenis_prw}")->toArray();
         } elseif ($this->targetAttachColumn == 'obat') {
-            $obat = $this->obatData();
+            $obat = collect($this->regPeriksa->detailPemberianObat);
             $this->selectedObat = count($this->selectedObat) === $obat->count()
                 ? [] : $obat->map(fn($o) => "{$o->tgl_perawatan}|{$o->jam}|{$o->kode_brng}")->toArray();
         } elseif ($this->targetAttachColumn == 'OBAT_PULANG') {
-            $obatPulang = $this->obatPulangData();
+            $obatPulang = collect($this->regPeriksa->permintaanResepPulang)->flatMap(fn($p) => $p->detailPermintaan);
             $this->selectedObatPulang = count($this->selectedObatPulang) === $obatPulang->count()
                 ? [] : $obatPulang->map(fn($o) => "{$o->no_permintaan}|{$o->kode_brng}")->toArray();
         } else {
-            $keluhan = $this->keluhanData();
+            $keluhan = collect($this->regPeriksa->pemeriksaanRanap);
             $this->selectedKeluhan = count($this->selectedKeluhan) === $keluhan->count()
                 ? [] : $keluhan->map(fn($p) => "{$p->tgl_perawatan}|{$p->jam_rawat}")->toArray();
         }
@@ -394,63 +392,16 @@ class Create extends Component
     public function refreshData()
     {
         $this->regPeriksa = RegPeriksa::with([
-            'pasien', 'dokter', 'kamarInap.kamar.bangsal'
+            'pasien', 'dokter', 'kamarInap.kamar.bangsal',
+            'diagnosaPasien.penyakit',
+            'detailPeriksaLab.template',
+            'pemeriksaanRanap',
+            'rawatInapDr.jnsPerawatan',
+            'rawatInapPr.jnsPerawatan',
+            'rawatInapDrpr.jnsPerawatan',
+            'detailPemberianObat.barang',
         ])->findOrFail($this->no_rawat);
         $this->dispatch('swal', ['title' => 'Data Diperbarui', 'icon' => 'success', 'timer' => 1000, 'showConfirmButton' => false]);
-    }
-
-    // ─────────────────────────────────────────────
-    // Computed Properties for Modals (Lazy Load)
-    // ─────────────────────────────────────────────
-
-    #[Computed]
-    public function labHasilData()
-    {
-        return \App\Models\DetailPeriksaLab::with('template')
-            ->where('no_rawat', $this->no_rawat)
-            ->orderBy('tgl_periksa', 'desc')
-            ->orderBy('jam', 'desc')
-            ->get();
-    }
-
-    #[Computed]
-    public function tindakanData()
-    {
-        $dr = \App\Models\RawatInapDr::with(['jnsPerawatan', 'dokter', 'petugas'])->where('no_rawat', $this->no_rawat)->get();
-        $pr = \App\Models\RawatInapPr::with(['jnsPerawatan', 'dokter', 'petugas'])->where('no_rawat', $this->no_rawat)->get();
-        $drpr = \App\Models\RawatInapDrpr::with(['jnsPerawatan', 'dokter', 'petugas'])->where('no_rawat', $this->no_rawat)->get();
-        
-        return $dr->concat($pr)->concat($drpr)->sortByDesc(fn($t) => $t->tgl_perawatan . ' ' . $t->jam_rawat);
-    }
-
-    #[Computed]
-    public function obatData()
-    {
-        return \App\Models\DetailPemberianObat::with('barang')
-            ->where('no_rawat', $this->no_rawat)
-            ->orderBy('tgl_perawatan', 'desc')
-            ->orderBy('jam', 'desc')
-            ->get();
-    }
-
-    #[Computed]
-    public function obatPulangData()
-    {
-        return \App\Models\DetailPermintaanResepPulang::with('barang')
-            ->whereHas('permintaanResepPulang', function($q) {
-                $q->where('no_rawat', $this->no_rawat);
-            })
-            ->orderBy('no_permintaan', 'desc')
-            ->get();
-    }
-
-    #[Computed]
-    public function keluhanData()
-    {
-        return \App\Models\PemeriksaanRanap::where('no_rawat', $this->no_rawat)
-            ->orderBy('tgl_perawatan', 'desc')
-            ->orderBy('jam_rawat', 'desc')
-            ->get();
     }
 
     // ─────────────────────────────────────────────
@@ -600,9 +551,18 @@ class Create extends Component
 
     public function render()
     {
-        // Reload basic regPeriksa relations without heavy eager loading
+        // Reload regPeriksa dengan semua relasi pada setiap render
+        // agar data tidak hilang setelah Livewire request (prepareAttach, dll.)
         $this->regPeriksa = RegPeriksa::with([
-            'pasien', 'dokter', 'kamarInap.kamar.bangsal'
+            'pasien', 'dokter', 'kamarInap.kamar.bangsal',
+            'diagnosaPasien.penyakit',
+            'detailPeriksaLab.template',
+            'pemeriksaanRanap',
+            'rawatInapDr.jnsPerawatan',
+            'rawatInapPr.jnsPerawatan',
+            'rawatInapDrpr.jnsPerawatan',
+            'detailPemberianObat.barang',
+            'permintaanResepPulang.detailPermintaan.barang',
         ])->findOrFail($this->no_rawat);
 
         $icd10List = [];
