@@ -189,7 +189,7 @@ class Create extends Component
     public function autoFillObatPulang()
     {
         $allObatPulang = \App\Models\DetailPermintaanResepPulang::with('barang')
-            ->whereHas('permintaanResepPulang', function($q) {
+            ->whereHas('permintaan', function($q) {
                 $q->where('no_rawat', $this->no_rawat);
             })
             ->orderBy('no_permintaan', 'desc')
@@ -437,7 +437,7 @@ class Create extends Component
     public function obatPulangData()
     {
         return \App\Models\DetailPermintaanResepPulang::with('barang')
-            ->whereHas('permintaanResepPulang', function($q) {
+            ->whereHas('permintaan', function($q) {
                 $q->where('no_rawat', $this->no_rawat);
             })
             ->orderBy('no_permintaan', 'desc')

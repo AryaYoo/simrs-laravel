@@ -490,10 +490,7 @@
             Livewire.on('swal', (event) => {
                 const data = event[0];
                 
-                // Jika sukses, beri jeda sedikit agar modal sempat tertutup/animasi selesai
-                // sehingga SweetAlert tidak ikut terhapus jika di-target ke modal.
-                const delay = (data.icon === 'success' || !data.icon) ? 150 : 0;
-                
+                // Hapus delay yang membuat popup terkesan lambat
                 setTimeout(() => {
                     Swal.fire({
                         title: data.title ?? '',
@@ -501,9 +498,11 @@
                         html: data.html,
                         icon: data.icon ?? 'success',
                         confirmButtonColor: '#4C5C2D',
-                        confirmButtonText: data.confirmButtonText ?? 'OK'
+                        confirmButtonText: data.confirmButtonText ?? 'OK',
+                        timer: data.timer ?? undefined, // Tambahkan timer agar bisa auto-close
+                        timerProgressBar: data.timer ? true : false
                     });
-                }, delay);
+                }, 10);
             });
         });
     </script>
