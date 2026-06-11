@@ -2,22 +2,11 @@
     x-data="{ 
         showKeluhanModal: false, 
         isDirty: false,
-        isSubmitting: false,
-        autoResizeTextareas() {
-            $el.querySelectorAll('textarea').forEach(t => {
-                t.style.height = 'auto';
-                t.style.height = (t.scrollHeight) + 'px';
-            });
-        }
+        isSubmitting: false
     }"
-    @input="if($event.target.tagName === 'TEXTAREA') { $event.target.style.height = 'auto'; $event.target.style.height = ($event.target.scrollHeight) + 'px'; } isDirty = true"
     @change="isDirty = true"
     @click="let btn = $event.target.closest('button'); if(btn && (btn.title.includes('Otomatis') || btn.innerText.includes('Tambahkan'))) { isDirty = true }"
     x-init="
-        setTimeout(() => autoResizeTextareas(), 100);
-        Livewire.hook('morph.updated', ({ el, component }) => {
-            setTimeout(() => autoResizeTextareas(), 50);
-        });
         window.addEventListener('beforeunload', (e) => {
             if (isDirty && !isSubmitting) {
                 e.preventDefault();
@@ -154,15 +143,16 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Keluhan Utama & Riwayat Penyakit</flux:label>
                             <div class="flex items-center gap-2">
-                                <button type="button" wire:click="autoFillSOAP('keluhan_utama', 'keluhan')" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Keluhan">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                <button type="button" wire:click="autoFillSOAP('keluhan_utama', 'keluhan')" wire:loading.class="opacity-50 cursor-wait pointer-events-none scale-95" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Keluhan">
+                                    <flux:icon wire:loading.remove wire:target="autoFillSOAP('keluhan_utama', 'keluhan')" name="sparkles" class="w-3.5 h-3.5" />
+                                    <svg wire:loading wire:target="autoFillSOAP('keluhan_utama', 'keluhan')" class="animate-spin w-3.5 h-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 </button>
                                 <button type="button" @click="$wire.prepareAttach('keluhan_utama', 'keluhan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition shadow-sm border border-white/10" title="Pilih Keluhan">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
                         </div>
-                        <flux:textarea wire:model="keluhan_utama" rows="3" placeholder="Isi keluhan utama..." />
+                        <flux:textarea wire:model="keluhan_utama" rows="8" placeholder="Isi keluhan utama..." />
                     </div>
 
                     {{-- 2. Pemeriksaan Fisik --}}
@@ -170,15 +160,16 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Pemeriksaan Fisik</flux:label>
                             <div class="flex items-center gap-2">
-                                <button type="button" wire:click="autoFillSOAP('pemeriksaan_fisik', 'pemeriksaan')" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Pemeriksaan">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                <button type="button" wire:click="autoFillSOAP('pemeriksaan_fisik', 'pemeriksaan')" wire:loading.class="opacity-50 cursor-wait pointer-events-none scale-95" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Pemeriksaan">
+                                    <flux:icon wire:loading.remove wire:target="autoFillSOAP('pemeriksaan_fisik', 'pemeriksaan')" name="sparkles" class="w-3.5 h-3.5" />
+                                    <svg wire:loading wire:target="autoFillSOAP('pemeriksaan_fisik', 'pemeriksaan')" class="animate-spin w-3.5 h-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 </button>
                                 <button type="button" @click="$wire.prepareAttach('pemeriksaan_fisik', 'pemeriksaan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition shadow-sm border border-white/10" title="Pilih Pemeriksaan Fisik">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
                         </div>
-                        <flux:textarea wire:model="pemeriksaan_fisik" rows="3" placeholder="Status generalis dan lokal..." />
+                        <flux:textarea wire:model="pemeriksaan_fisik" rows="8" placeholder="Status generalis dan lokal..." />
                     </div>
 
                     {{-- 3. Riwayat Penyakit Sekarang (Jalannya Penyakit) --}}
@@ -186,15 +177,16 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Riwayat Penyakit Sekarang (Jalannya Penyakit)</flux:label>
                             <div class="flex items-center gap-2">
-                                <button type="button" wire:click="autoFillSOAP('jalannya_penyakit', 'keluhan')" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Riwayat">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                <button type="button" wire:click="autoFillSOAP('jalannya_penyakit', 'keluhan')" wire:loading.class="opacity-50 cursor-wait pointer-events-none scale-95" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Riwayat">
+                                    <flux:icon wire:loading.remove wire:target="autoFillSOAP('jalannya_penyakit', 'keluhan')" name="sparkles" class="w-3.5 h-3.5" />
+                                    <svg wire:loading wire:target="autoFillSOAP('jalannya_penyakit', 'keluhan')" class="animate-spin w-3.5 h-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 </button>
                                 <button type="button" @click="$wire.prepareAttach('jalannya_penyakit', 'keluhan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition shadow-sm border border-white/10" title="Pilih Keluhan">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                 </button>
                             </div>
                         </div>
-                        <flux:textarea wire:model="jalannya_penyakit" rows="3" placeholder="Perkembangan penyakit selama perawatan..." />
+                        <flux:textarea wire:model="jalannya_penyakit" rows="8" placeholder="Perkembangan penyakit selama perawatan..." />
                     </div>
 
                     {{-- 4. RAD --}}
@@ -207,7 +199,7 @@
                                 </button>
                             </div>
                         </div>
-                        <flux:textarea wire:model="pemeriksaan_penunjang" rows="3" placeholder="Hasil USG, Rontgen, CT-Scan, dll..." />
+                        <flux:textarea wire:model="pemeriksaan_penunjang" rows="8" placeholder="Hasil USG, Rontgen, CT-Scan, dll..." />
                     </div>
 
                     {{-- 5. LAB --}}
@@ -220,7 +212,7 @@
                                 </button>
                             </div>
                         </div>
-                    <flux:textarea wire:model="hasil_laborat" rows="3" placeholder="Hasil Laboratorium darah, urin, dll..." />
+                    <flux:textarea wire:model="hasil_laborat" rows="8" placeholder="Hasil Laboratorium darah, urin, dll..." />
                     </div>
 
                     {{-- 6. Tindakan & Obat --}}
@@ -229,29 +221,31 @@
                             <div class="flex items-center justify-between">
                                 <flux:label>Tindakan/Operasi Selama Perawatan</flux:label>
                                 <div class="flex items-center gap-2">
-                                    <button type="button" wire:click="autoFillTindakan" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Tindakan">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                    <button type="button" wire:click="autoFillTindakan" wire:loading.class="opacity-50 cursor-wait pointer-events-none scale-95" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Tindakan">
+                                        <flux:icon wire:loading.remove wire:target="autoFillTindakan" name="sparkles" class="w-3.5 h-3.5" />
+                                        <svg wire:loading wire:target="autoFillTindakan" class="animate-spin w-3.5 h-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     </button>
                                     <button type="button" @click="$wire.prepareAttach('tindakan_dan_operasi', 'tindakan').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition shadow-sm border border-white/10" title="Pilih Tindakan">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                     </button>
                                 </div>
                             </div>
-                            <flux:textarea wire:model="tindakan_dan_operasi" rows="3" placeholder="Sebutkan tindakan medis atau operasi yang dilakukan..." />
+                            <flux:textarea wire:model="tindakan_dan_operasi" rows="8" placeholder="Sebutkan tindakan medis atau operasi yang dilakukan..." />
                         </div>
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <flux:label>Obat-obatan Selama Perawatan</flux:label>
                                 <div class="flex items-center gap-2">
-                                    <button type="button" wire:click="autoFillObat" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Obat">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                    <button type="button" wire:click="autoFillObat" wire:loading.class="opacity-50 cursor-wait pointer-events-none scale-95" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Semua Obat">
+                                        <flux:icon wire:loading.remove wire:target="autoFillObat" name="sparkles" class="w-3.5 h-3.5" />
+                                        <svg wire:loading wire:target="autoFillObat" class="animate-spin w-3.5 h-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     </button>
                                     <button type="button" @click="$wire.prepareAttach('obat_di_rs', 'obat').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition shadow-sm border border-white/10" title="Pilih Obat">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
                                     </button>
                                 </div>
                             </div>
-                            <flux:textarea wire:model="obat_di_rs" rows="3" placeholder="Daftar obat-obatan selama pasien dirawat..." />
+                            <flux:textarea wire:model="obat_di_rs" rows="8" placeholder="Daftar obat-obatan selama pasien dirawat..." />
                         </div>
                     </div>
                 </div>
@@ -452,8 +446,9 @@
                         <div class="flex items-center justify-between">
                             <flux:label>Obat Pulang</flux:label>
                             <div class="flex items-center gap-2">
-                                <button type="button" wire:click="autoFillObatPulang()" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Obat Pulang">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                                <button type="button" wire:click="autoFillObatPulang()" wire:loading.class="opacity-50 cursor-wait pointer-events-none scale-95" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-gradient-to-br from-[#4C5C2D] to-[#6a803f] hover:from-[#3D4A24] hover:to-[#4C5C2D] text-white transition shadow-sm" title="Isi Otomatis Obat Pulang">
+                                    <flux:icon wire:loading.remove wire:target="autoFillObatPulang" name="sparkles" class="w-3.5 h-3.5" />
+                                    <svg wire:loading wire:target="autoFillObatPulang" class="animate-spin w-3.5 h-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 </button>
                                 <button type="button" @click="$wire.prepareAttach('obat_pulang', 'OBAT_PULANG').then(() => { showKeluhanModal = true })" class="inline-flex items-center justify-center rounded-lg text-sm font-medium px-2 py-1 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white transition shadow-sm border border-white/10" title="Pilih Obat Pulang">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" /></svg>
