@@ -3,6 +3,7 @@
         showKeluhanModal: false, 
         isDirty: false,
         isSubmitting: false,
+        savedRowKey: '',
         autoResizeTextareas() {
             $el.querySelectorAll('textarea').forEach(t => {
                 t.style.height = 'auto';
@@ -38,6 +39,10 @@
             fail(() => {
                 isSubmitting = false;
             });
+        });
+        $wire.on('inline-edit-saved', ({ rowKey }) => {
+            savedRowKey = rowKey;
+            setTimeout(() => { savedRowKey = ''; }, 1500);
         });
     "
 >
@@ -666,33 +671,83 @@
                                     @if($targetAttachColumn == 'lab_hasil')
                                         <th class="px-4 py-3">Nilai Normal</th>
                                     @endif
+                                    @if($targetAttachColumn !== 'tindakan')
+                                        <th class="px-2 py-3 w-10 text-center">Edit</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+
+                                {{-- ================================================ --}}
+                                {{-- TIPE: LAB                                         --}}
+                                {{-- ================================================ --}}
                                 @if($targetAttachColumn == 'lab_hasil')
                                     @forelse($regPeriksa->detailPeriksaLab->sortByDesc(fn($lab) => $lab->tgl_periksa . ' ' . $lab->jam) as $lab)
-                                        <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                        @php
+                                            $rowKey = $lab->tgl_periksa . '|' . $lab->jam . '|' . $lab->kd_jenis_prw . '|' . $lab->id_template;
+                                        @endphp
+                                        <tr class="transition-colors duration-700"
+                                            :class="savedRowKey === '{{ $rowKey }}' ? 'bg-green-100 dark:bg-green-900/40' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800'">
                                             <td class="px-4 py-3 text-center">
-                                                <input type="checkbox" wire:model="selectedLab" value="{{ $lab->tgl_periksa . '|' . $lab->jam . '|' . $lab->kd_jenis_prw . '|' . $lab->id_template }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
+                                                <input type="checkbox" wire:model="selectedLab" value="{{ $rowKey }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
                                             </td>
                                             <td class="px-4 py-3">
                                                 <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $lab->tgl_periksa }}</p>
                                                 <p class="text-[10px] text-neutral-500">{{ $lab->jam }}</p>
                                             </td>
                                             <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                                                <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $lab->template->Pemeriksaan ?? '-' }}</span> : <span class="text-[#4C5C2D] font-bold">{{ $lab->nilai }}</span>
+                                                <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $lab->template->Pemeriksaan ?? '-' }}</span> :
+                                                {{-- MODE NORMAL --}}
+                                                <span x-show="$wire.editingRowKey !== '{{ $rowKey }}'">
+                                                    <span class="text-[#4C5C2D] font-bold">{{ $lab->nilai }}</span>
+                                                </span>
+                                                {{-- MODE EDIT: input nilai --}}
+                                                <div x-show="$wire.editingRowKey === '{{ $rowKey }}'" class="mt-1 space-y-1">
+                                                    <input type="text"
+                                                        wire:model="editValue"
+                                                        class="w-32 px-2 py-1 text-xs border border-[#4C5C2D] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4C5C2D] dark:bg-neutral-700 dark:text-white"
+                                                        @keydown.enter="$wire.saveEdit()"
+                                                        @keydown.escape="$wire.cancelEdit()"
+                                                        x-ref="editInput_{{ $rowKey }}"
+                                                    />
+                                                    <div class="flex items-center gap-1 mt-1">
+                                                        <button type="button" wire:click="saveEdit" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-md transition">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                            Simpan
+                                                        </button>
+                                                        <button type="button" wire:click="cancelEdit" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 rounded-md transition">
+                                                            Batal
+                                                        </button>
+                                                    </div>
+                                                    @if($editError && $editingRowKey === $rowKey)
+                                                        <p class="text-[10px] text-red-500 mt-1">{{ $editError }}</p>
+                                                    @endif
+                                                </div>
                                             </td>
-                                            <td class="px-4 py-3 text-xs text-neutral-500 italic">
-                                                {{ $lab->nilai_rujukan }}
+                                            <td class="px-4 py-3 text-xs text-neutral-500 italic">{{ $lab->nilai_rujukan }}</td>
+                                            <td class="px-2 py-3 text-center">
+                                                <button type="button"
+                                                    x-show="$wire.editingRowKey === '' || $wire.editingRowKey === '{{ $rowKey }}'"
+                                                    x-cloak
+                                                    wire:click="startEdit('{{ $rowKey }}', '{{ addslashes($lab->nilai) }}')"
+                                                    class="p-1 rounded-lg text-neutral-400 hover:text-[#4C5C2D] hover:bg-[#4C5C2D]/10 transition"
+                                                    title="Edit nilai"
+                                                    x-show="$wire.editingRowKey !== '{{ $rowKey }}'">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                </button>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="px-4 py-10 text-center text-neutral-400 italic">
+                                            <td colspan="5" class="px-4 py-10 text-center text-neutral-400 italic">
                                                 Data pemeriksaan lab belum tersedia untuk pasien ini.
                                             </td>
                                         </tr>
                                     @endforelse
+
+                                {{-- ================================================ --}}
+                                {{-- TIPE: TINDAKAN (READ-ONLY, tanpa tombol edit)    --}}
+                                {{-- ================================================ --}}
                                 @elseif($targetAttachColumn == 'tindakan')
                                     @php
                                         $allTindakan = collect($regPeriksa->rawatInapDr)
@@ -709,7 +764,7 @@
                                                 <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $t->tgl_perawatan }}</p>
                                                 <p class="text-[10px] text-neutral-500">{{ $t->jam_rawat }}</p>
                                             </td>
-                                            <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                                            <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed" colspan="2">
                                                 <p class="font-medium text-neutral-800 dark:text-neutral-200">{{ $t->jnsPerawatan->nm_perawatan ?? '-' }}</p>
                                                 <p class="text-[10px] text-neutral-400 uppercase">
                                                     @if(isset($t->kd_dokter) && isset($t->nip))
@@ -720,6 +775,7 @@
                                                         Petugas: {{ $t->petugas->nm_petugas ?? '-' }}
                                                     @endif
                                                 </p>
+                                                <p class="text-[9px] text-neutral-400 italic mt-0.5">Data tindakan berasal dari master — tidak dapat diedit di sini.</p>
                                             </td>
                                         </tr>
                                     @empty
@@ -729,11 +785,19 @@
                                             </td>
                                         </tr>
                                     @endforelse
+
+                                {{-- ================================================ --}}
+                                {{-- TIPE: OBAT DI RS                                 --}}
+                                {{-- ================================================ --}}
                                 @elseif($targetAttachColumn == 'obat')
                                     @forelse($regPeriksa->detailPemberianObat->sortByDesc(fn($o) => $o->tgl_perawatan . ' ' . $o->jam) as $o)
-                                        <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                        @php
+                                            $rowKey = $o->tgl_perawatan . '|' . $o->jam . '|' . $o->kode_brng;
+                                        @endphp
+                                        <tr class="transition-colors duration-700"
+                                            :class="savedRowKey === '{{ $rowKey }}' ? 'bg-green-100 dark:bg-green-900/40' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800'">
                                             <td class="px-4 py-3 text-center">
-                                                <input type="checkbox" wire:model="selectedObat" value="{{ $o->tgl_perawatan . '|' . $o->jam . '|' . $o->kode_brng }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
+                                                <input type="checkbox" wire:model="selectedObat" value="{{ $rowKey }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
                                             </td>
                                             <td class="px-4 py-3">
                                                 <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $o->tgl_perawatan }}</p>
@@ -741,21 +805,67 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
                                                 <p class="font-medium text-neutral-800 dark:text-neutral-200">{{ $o->barang->nama_brng ?? '-' }}</p>
-                                                <p class="text-[10px] text-neutral-400 uppercase">Jml : {{ $o->jml }}</p>
+                                                {{-- MODE NORMAL: tampilkan jumlah --}}
+                                                <p x-show="$wire.editingRowKey !== '{{ $rowKey }}'" class="text-[10px] text-neutral-400 uppercase">
+                                                    Jml: <span class="font-bold text-[#4C5C2D]">{{ $o->jml }}</span>
+                                                </p>
+                                                {{-- MODE EDIT: input jumlah --}}
+                                                <div x-show="$wire.editingRowKey === '{{ $rowKey }}'" class="mt-1 space-y-1">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-[10px] text-neutral-500">Jml:</span>
+                                                        <input type="number" min="0" step="0.5"
+                                                            wire:model="editValue"
+                                                            class="w-24 px-2 py-1 text-xs border border-[#4C5C2D] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4C5C2D] dark:bg-neutral-700 dark:text-white"
+                                                            @keydown.enter="$wire.saveEdit()"
+                                                            @keydown.escape="$wire.cancelEdit()"
+                                                        />
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
+                                                        <button type="button" wire:click="saveEdit" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-md transition">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                            Simpan
+                                                        </button>
+                                                        <button type="button" wire:click="cancelEdit" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 rounded-md transition">
+                                                            Batal
+                                                        </button>
+                                                    </div>
+                                                    @if($editError && $editingRowKey === $rowKey)
+                                                        <p class="text-[10px] text-red-500 mt-1">{{ $editError }}</p>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="px-2 py-3 text-center">
+                                                <button type="button"
+                                                    wire:click="startEdit('{{ $rowKey }}', '{{ $o->jml }}')"
+                                                    class="p-1 rounded-lg text-neutral-400 hover:text-[#4C5C2D] hover:bg-[#4C5C2D]/10 transition"
+                                                    title="Edit jumlah"
+                                                    x-show="$wire.editingRowKey !== '{{ $rowKey }}'">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                </button>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
+                                            <td colspan="4" class="px-4 py-10 text-center text-neutral-400 italic">
                                                 Data pemberian obat belum tersedia untuk pasien ini.
                                             </td>
                                         </tr>
                                     @endforelse
+
+                                {{-- ================================================ --}}
+                                {{-- TIPE: KELUHAN / PEMERIKSAAN FISIK / RTL          --}}
+                                {{-- ================================================ --}}
                                 @else
                                     @forelse($regPeriksa->pemeriksaanRanap as $pemeriksaan)
-                                        <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors">
+                                        @php
+                                            $rowKey  = $pemeriksaan->tgl_perawatan . '|' . $pemeriksaan->jam_rawat;
+                                            $colName = $targetAttachColumn; // 'keluhan' | 'pemeriksaan' | 'rtl'
+                                            $isiData = $pemeriksaan->$colName ?? '';
+                                        @endphp
+                                        <tr class="transition-colors duration-700"
+                                            :class="savedRowKey === '{{ $rowKey }}' ? 'bg-green-100 dark:bg-green-900/40' : 'hover:bg-neutral-50 dark:hover:bg-neutral-800'">
                                             <td class="px-4 py-3 text-center">
-                                                <input type="checkbox" wire:model="selectedKeluhan" value="{{ $pemeriksaan->tgl_perawatan . '|' . $pemeriksaan->jam_rawat }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
+                                                <input type="checkbox" wire:model="selectedKeluhan" value="{{ $rowKey }}" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]" />
                                             </td>
                                             <td class="px-4 py-3">
                                                 <p class="text-xs font-bold text-neutral-700 dark:text-neutral-200">{{ $pemeriksaan->tgl_perawatan }}</p>
@@ -763,36 +873,70 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
                                                 <div class="space-y-1">
-                                                    @if($targetAttachColumn == 'pemeriksaan')
-                                                        <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Pemeriksaan Fisik:</p>
-                                                        <p>{{ $pemeriksaan->pemeriksaan }}</p>
-                                                    @elseif($targetAttachColumn == 'rtl')
-                                                        <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">RTL:</p>
-                                                        <p>{{ $pemeriksaan->rtl }}</p>
-                                                    @else
-                                                        <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">Keluhan:</p>
-                                                        <p>{{ $pemeriksaan->keluhan }}</p>
-                                                    @endif
+                                                    <p class="font-bold text-[10px] text-[#4C5C2D] uppercase tracking-tighter">
+                                                        @if($targetAttachColumn == 'pemeriksaan') Pemeriksaan Fisik:
+                                                        @elseif($targetAttachColumn == 'rtl') RTL:
+                                                        @else Keluhan:
+                                                        @endif
+                                                    </p>
+                                                    {{-- MODE NORMAL --}}
+                                                    <p x-show="$wire.editingRowKey !== '{{ $rowKey }}'">{{ $isiData }}</p>
+                                                    {{-- MODE EDIT --}}
+                                                    <div x-show="$wire.editingRowKey === '{{ $rowKey }}'" class="space-y-1">
+                                                        <textarea
+                                                            wire:model="editValue"
+                                                            rows="3"
+                                                            class="w-full px-2 py-1.5 text-xs border border-[#4C5C2D] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4C5C2D] dark:bg-neutral-700 dark:text-white resize-none"
+                                                            @keydown.escape="$wire.cancelEdit()"
+                                                        ></textarea>
+                                                        <div class="flex items-center gap-1">
+                                                            <button type="button" wire:click="saveEdit" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-md transition">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                                Simpan
+                                                            </button>
+                                                            <button type="button" wire:click="cancelEdit" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-neutral-600 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-700 dark:text-neutral-300 rounded-md transition">
+                                                                Batal
+                                                            </button>
+                                                        </div>
+                                                        @if($editError && $editingRowKey === $rowKey)
+                                                            <p class="text-[10px] text-red-500 mt-1">{{ $editError }}</p>
+                                                        @endif
+                                                    </div>
                                                 </div>
+                                            </td>
+                                            <td class="px-2 py-3 text-center">
+                                                <button type="button"
+                                                    wire:click="startEdit('{{ $rowKey }}', '{{ addslashes($isiData) }}')"
+                                                    class="p-1 rounded-lg text-neutral-400 hover:text-[#4C5C2D] hover:bg-[#4C5C2D]/10 transition"
+                                                    title="Edit"
+                                                    x-show="$wire.editingRowKey !== '{{ $rowKey }}'">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                </button>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="3" class="px-4 py-10 text-center text-neutral-400 italic">
+                                            <td colspan="4" class="px-4 py-10 text-center text-neutral-400 italic">
                                                 Data pemeriksaan belum tersedia untuk pasien ini.
                                             </td>
                                         </tr>
                                     @endforelse
                                 @endif
+
                             </tbody>
                         </table>
                     </div>
 
                     <div class="flex justify-between items-center pt-2">
                         <button type="button" @click="showKeluhanModal = false" class="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-800 transition">Batal</button>
-                        <button type="button" wire:click="{{ $targetAttachColumn == 'lab_hasil' ? 'attachLab' : ($targetAttachColumn == 'tindakan' ? 'attachTindakan' : ($targetAttachColumn == 'obat' ? 'attachObat' : 'attachKeluhan')) }}" @click="showKeluhanModal = false" class="px-4 py-2 text-sm font-medium text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-lg transition">
-                            Tambahkan yang Dipilih
-                        </button>
+                        <button type="button"
+                            wire:click="{{ $targetAttachColumn == 'lab_hasil' ? 'attachLab' : ($targetAttachColumn == 'tindakan' ? 'attachTindakan' : ($targetAttachColumn == 'obat' ? 'attachObat' : 'attachKeluhan')) }}"
+                            @click="showKeluhanModal = false"
+                            :disabled="$wire.editingRowKey !== ''"
+                            :class="$wire.editingRowKey !== '' ? 'opacity-50 cursor-not-allowed bg-neutral-400' : 'bg-[#4C5C2D] hover:bg-[#3D4A24]'"
+                            class="px-4 py-2 text-sm font-medium text-white rounded-lg transition"
+                            x-text="$wire.editingRowKey !== '' ? 'Selesaikan edit terlebih dahulu' : 'Tambahkan yang Dipilih'"
+                        ></button>
                     </div>
                 </div>
             </div>

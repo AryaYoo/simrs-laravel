@@ -70,6 +70,11 @@ class Form extends Component
     public $targetAttachField = 'keluhan_utama';
     public $targetAttachColumn = 'keluhan';
 
+    // Inline Edit State
+    public string $editingRowKey = '';
+    public string $editValue    = '';
+    public ?string $editError   = null;
+
     // Dokter Search State
     public $searchDokter = '';
     public $dokterResults = [];
@@ -545,6 +550,156 @@ class Form extends Component
             'timer' => 1000,
             'showConfirmButton' => false
         ]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Inline Edit Methods
+    // -------------------------------------------------------------------------
+
+    /**
+     * Mulai mode edit pada baris tertentu di dalam modal.
+     * $rowKey adalah composite key yang dipisah '|' (misal "2026-01-10|08:00:00").
+     */
+    public function startEdit(string $rowKey, string $currentValue): void
+    {
+        $this->editingRowKey = $rowKey;
+        $this->editValue     = $currentValue;
+        $this->editError     = null;
+    }
+
+    /** Batalkan mode edit tanpa menyimpan apapun. */
+    public function cancelEdit(): void
+    {
+        $this->editingRowKey = '';
+        $this->editValue     = '';
+        $this->editError     = null;
+    }
+
+    /**
+     * Simpan hasil edit ke database dengan validasi per tipe data.
+     *
+     * Validasi:
+     *   - lab_hasil : nilai harus numerik dan tidak boleh kosong
+     *   - obat      : jml harus numerik, minimal 1, dan tidak melebihi stok di databarang
+     *   - keluhan/pemeriksaan/rtl : tidak boleh kosong
+     *
+     * Re-render otomatis karena $regPeriksa di-reload ulang secara penuh dari DB,
+     * sehingga Livewire akan merender baris dengan nilai terbaru bukan nilai cached.
+     */
+    public function saveEdit(): void
+    {
+        if (empty($this->editingRowKey)) {
+            return;
+        }
+
+        $this->editError = null;
+        $col    = $this->targetAttachColumn;
+        $rowKey = $this->editingRowKey;
+        $val    = trim($this->editValue);
+
+        // -----------------------------------------------------------------
+        // Validasi per tipe data
+        // -----------------------------------------------------------------
+        if (in_array($col, ['keluhan', 'pemeriksaan', 'rtl'])) {
+            if ($val === '') {
+                $this->editError = 'Isian tidak boleh kosong.';
+                return;
+            }
+
+        } elseif ($col === 'lab_hasil') {
+            if ($val === '') {
+                $this->editError = 'Nilai hasil lab tidak boleh kosong.';
+                return;
+            }
+            if (!is_numeric($val)) {
+                $this->editError = 'Nilai hasil lab harus berupa angka (contoh: 12.5).';
+                return;
+            }
+
+        } elseif ($col === 'obat') {
+            if ($val === '' || !is_numeric($val)) {
+                $this->editError = 'Jumlah obat harus berupa angka.';
+                return;
+            }
+            if ((float) $val < 1) {
+                $this->editError = 'Jumlah obat minimal adalah 1.';
+                return;
+            }
+            // Cek stok databarang — ambil kode_brng dari rowKey
+            [$tgl, $jam, $kode_brng] = explode('|', $rowKey);
+            $barang = \App\Models\DataBarang::find($kode_brng);
+            if ($barang && $barang->stok !== null) {
+                // Ambil jumlah asal dari record untuk menghitung delta stok
+                $currentJml = \Illuminate\Support\Facades\DB::table('detail_pemberian_obat')
+                    ->where('no_rawat', $this->no_rawat)
+                    ->where('tgl_perawatan', $tgl)
+                    ->where('jam', $jam)
+                    ->where('kode_brng', $kode_brng)
+                    ->value('jml') ?? 0;
+                $delta = (float) $val - (float) $currentJml;
+                if ($delta > 0 && $barang->stok < $delta) {
+                    $this->editError = "Stok barang tidak mencukupi. Stok tersedia: {$barang->stok} {$barang->kode_sat}.";
+                    return;
+                }
+            }
+        }
+
+        // -----------------------------------------------------------------
+        // Eksekusi update ke database
+        // -----------------------------------------------------------------
+        try {
+            if (in_array($col, ['keluhan', 'pemeriksaan', 'rtl'])) {
+                // Tabel: pemeriksaan_ranap — composite key: no_rawat + tgl_perawatan + jam_rawat
+                [$tgl, $jam] = explode('|', $rowKey);
+                \Illuminate\Support\Facades\DB::table('pemeriksaan_ranap')
+                    ->where('no_rawat', $this->no_rawat)
+                    ->where('tgl_perawatan', $tgl)
+                    ->where('jam_rawat', $jam)
+                    ->update([$col => $val]);
+
+            } elseif ($col === 'lab_hasil') {
+                // Tabel: detail_periksa_lab — composite key: no_rawat + kd_jenis_prw + id_template + tgl_periksa + jam
+                [$tgl, $jam, $kd_jenis_prw, $id_template] = explode('|', $rowKey);
+                \Illuminate\Support\Facades\DB::table('detail_periksa_lab')
+                    ->where('no_rawat', $this->no_rawat)
+                    ->where('tgl_periksa', $tgl)
+                    ->where('jam', $jam)
+                    ->where('kd_jenis_prw', $kd_jenis_prw)
+                    ->where('id_template', $id_template)
+                    ->update(['nilai' => $val]);
+
+            } elseif ($col === 'obat') {
+                // Tabel: detail_pemberian_obat — composite key: no_rawat + tgl_perawatan + jam + kode_brng
+                // Variabel $tgl, $jam, $kode_brng sudah di-set pada blok validasi di atas
+                [$tgl, $jam, $kode_brng] = explode('|', $rowKey);
+                \Illuminate\Support\Facades\DB::table('detail_pemberian_obat')
+                    ->where('no_rawat', $this->no_rawat)
+                    ->where('tgl_perawatan', $tgl)
+                    ->where('jam', $jam)
+                    ->where('kode_brng', $kode_brng)
+                    ->update(['jml' => (float) $val]);
+            }
+
+            // Reload $regPeriksa secara penuh dari DB agar Livewire me-render ulang
+            // baris dengan nilai BARU dari database, bukan dari nilai yang di-cache.
+            $this->regPeriksa = RegPeriksa::with([
+                'pasien', 'dokter', 'kamarInap.kamar.bangsal',
+                'diagnosaPasien.penyakit', 'detailPeriksaLab.template',
+                'pemeriksaanRanap', 'rawatInapDr.jnsPerawatan',
+                'rawatInapPr.jnsPerawatan', 'rawatInapDrpr.jnsPerawatan',
+                'detailPemberianObat.barang',
+                'permintaanResepPulang.detailPermintaan.barang',
+            ])->findOrFail($this->no_rawat);
+
+            // Kirim event ke Alpine agar baris berkilau hijau ~1.5 detik
+            $this->dispatch('inline-edit-saved', rowKey: $this->editingRowKey);
+
+            $this->editingRowKey = '';
+            $this->editValue     = '';
+
+        } catch (\Exception $e) {
+            $this->editError = 'Gagal menyimpan: ' . $e->getMessage();
+        }
     }
 
     public function attachEarliest($targetField = 'keluhan_utama', $column = 'keluhan')

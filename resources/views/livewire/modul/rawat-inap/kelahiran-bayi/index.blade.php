@@ -63,17 +63,18 @@
                     <flux:table.row :key="$bayi->no_rkm_medis">
                         <flux:table.cell class="font-medium tracking-tight font-mono text-xs">{{ $bayi->no_rkm_medis }}</flux:table.cell>
                         <flux:table.cell>
-                            @if($bayi->pasien?->jk === 'L')
-                                <span class="inline-flex items-center gap-1.5 font-semibold text-blue-600 dark:text-blue-400">
-                                    <flux:icon name="user" class="w-3.5 h-3.5 opacity-70" /> {{ $bayi->pasien->nm_pasien ?? '-' }}
-                                </span>
-                            @elseif($bayi->pasien?->jk === 'P')
-                                <span class="inline-flex items-center gap-1.5 font-semibold text-pink-600 dark:text-pink-400">
-                                    <flux:icon name="user" class="w-3.5 h-3.5 opacity-70" /> {{ $bayi->pasien->nm_pasien ?? '-' }}
-                                </span>
-                            @else
-                                <span class="text-neutral-700 dark:text-neutral-300">{{ $bayi->pasien->nm_pasien ?? '-' }}</span>
-                            @endif
+                            <div class="flex items-center gap-2">
+                                <span class="font-semibold text-neutral-800 dark:text-neutral-100">{{ $bayi->pasien->nm_pasien ?? '-' }}</span>
+                                @if(($bayi->pasien?->jk ?? '') === 'L')
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40" title="Laki-laki">
+                                        <span class="w-1 h-1 rounded-full bg-blue-500"></span> L
+                                    </span>
+                                @elseif(($bayi->pasien?->jk ?? '') === 'P')
+                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-900/40" title="Perempuan">
+                                        <span class="w-1 h-1 rounded-full bg-pink-500"></span> P
+                                    </span>
+                                @endif
+                            </div>
                         </flux:table.cell>
                         <flux:table.cell>{{ $bayi->pasien ? \Carbon\Carbon::parse($bayi->pasien->tgl_lahir)->format('d-m-Y') : '-' }}</flux:table.cell>
                         <flux:table.cell>{{ $bayi->jam_lahir }}</flux:table.cell>
