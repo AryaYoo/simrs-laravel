@@ -14,23 +14,12 @@
     @input="if($event.target.tagName === 'TEXTAREA') { $event.target.style.height = 'auto'; $event.target.style.height = ($event.target.scrollHeight) + 'px'; } isDirty = true"
     @change="isDirty = true"
     @click="let btn = $event.target.closest('button'); if(btn && (btn.title.includes('Otomatis') || btn.innerText.includes('Tambahkan'))) { isDirty = true }"
+    @beforeunload.window="if (isDirty && !isSubmitting) { $event.preventDefault(); $event.returnValue = ''; }"
+    x-on:livewire:navigating.document="if (isDirty && !isSubmitting) { if (!confirm('Data belum tersimpan. Yakin ingin meninggalkan halaman?')) $event.preventDefault(); }"
     x-init="
         setTimeout(() => autoResizeTextareas(), 100);
         Livewire.hook('morph.updated', ({ el, component }) => {
             setTimeout(() => autoResizeTextareas(), 50);
-        });
-        window.addEventListener('beforeunload', (e) => {
-            if (isDirty && !isSubmitting) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
-        document.addEventListener('livewire:navigating', (e) => {
-            if (isDirty && !isSubmitting) {
-                if (!confirm('Data belum tersimpan. Yakin ingin meninggalkan halaman?')) {
-                    e.preventDefault();
-                }
-            }
         });
         Livewire.hook('commit', ({ succeed, fail }) => {
             succeed(() => {
@@ -38,6 +27,7 @@
             });
             fail(() => {
                 isSubmitting = false;
+                isDirty = true;
             });
         });
         $wire.on('inline-edit-saved', ({ rowKey }) => {
@@ -62,7 +52,7 @@
             <flux:button href="{{ route('modul.casemix-rawat-inap.resume', str_replace('/', '-', $no_rawat)) }}" wire:navigate variant="ghost" class="h-9 text-sm">
                 Batal
             </flux:button>
-            <flux:button wire:click="save" @click="isSubmitting = true" variant="primary" icon="check" class="bg-[#4C5C2D] hover:bg-[#3D4A24] h-9 px-6 text-sm">
+            <flux:button wire:click="save" @click="isDirty = false; isSubmitting = true" variant="primary" icon="check" class="bg-[#4C5C2D] hover:bg-[#3D4A24] h-9 px-6 text-sm">
                 Simpan Resume
             </flux:button>
         </div>
@@ -697,20 +687,23 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
                                                 <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $lab->template->Pemeriksaan ?? '-' }}</span> :
+                                                <span class="text-[#4C5C2D] font-bold">{{ $lab->nilai }}</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-xs text-neutral-500 italic">
                                                 {{-- MODE NORMAL --}}
                                                 <span x-show="$wire.editingRowKey !== '{{ $rowKey }}'">
-                                                    <span class="text-[#4C5C2D] font-bold">{{ $lab->nilai }}</span>
+                                                    {{ $lab->nilai_rujukan }}
                                                 </span>
-                                                {{-- MODE EDIT: input nilai --}}
+                                                {{-- MODE EDIT: input nilai_rujukan --}}
                                                 <div x-show="$wire.editingRowKey === '{{ $rowKey }}'" class="mt-1 space-y-1">
                                                     <input type="text"
                                                         wire:model="editValue"
-                                                        class="w-32 px-2 py-1 text-xs border border-[#4C5C2D] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4C5C2D] dark:bg-neutral-700 dark:text-white"
+                                                        class="w-32 px-2 py-1 text-xs border border-[#4C5C2D] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4C5C2D] dark:bg-neutral-700 dark:text-white not-italic"
                                                         @keydown.enter="$wire.saveEdit()"
                                                         @keydown.escape="$wire.cancelEdit()"
                                                         x-ref="editInput_{{ $rowKey }}"
                                                     />
-                                                    <div class="flex items-center gap-1 mt-1">
+                                                    <div class="flex items-center gap-1 mt-1 not-italic">
                                                         <button type="button" wire:click="saveEdit" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-md transition">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                                                             Simpan
@@ -720,16 +713,15 @@
                                                         </button>
                                                     </div>
                                                     @if($editError && $editingRowKey === $rowKey)
-                                                        <p class="text-[10px] text-red-500 mt-1">{{ $editError }}</p>
+                                                        <p class="text-[10px] text-red-500 mt-1 not-italic">{{ $editError }}</p>
                                                     @endif
                                                 </div>
                                             </td>
-                                            <td class="px-4 py-3 text-xs text-neutral-500 italic">{{ $lab->nilai_rujukan }}</td>
                                             <td class="px-2 py-3 text-center">
                                                 <button type="button"
                                                     x-show="$wire.editingRowKey === '' || $wire.editingRowKey === '{{ $rowKey }}'"
                                                     x-cloak
-                                                    wire:click="startEdit('{{ $rowKey }}', '{{ addslashes($lab->nilai) }}')"
+                                                    wire:click="startEdit('{{ $rowKey }}', '{{ addslashes($lab->nilai_rujukan) }}')"
                                                     class="p-1 rounded-lg text-neutral-400 hover:text-[#4C5C2D] hover:bg-[#4C5C2D]/10 transition"
                                                     title="Edit nilai"
                                                     x-show="$wire.editingRowKey !== '{{ $rowKey }}'">

@@ -148,7 +148,7 @@
                         { label: 'Checklist Pemberian Fibrinolitik', url: '#' },
                         { label: 'Laporan Tindakan', url: '#' },
                     ]},
-                    { label: 'Diagnosa', url: '#' },
+                    { label: 'Diagnosa', url: '{{ route('modul.rawat-inap.sub-rawat-inap.diagnosa', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                     { label: 'RM Gizi', children: [
                         { label: 'Skrining Nutrisi Pasien Dewasa', url: '#' },
                         { label: 'Skrining Nutrisi Pasien Lansia', url: '#' },

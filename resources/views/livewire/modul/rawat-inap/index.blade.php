@@ -30,6 +30,7 @@
             return template.replace(/(:noRawat|%3AnoRawat)/g, this.activePatient.noRawatSlug);
         },
         routeTemplates: {
+            diagnosa: '{{ route("modul.rawat-inap.sub-rawat-inap.diagnosa", ":noRawat") }}',
             resume: '{{ route("modul.rawat-inap.sub-rawat-inap.resume", ":noRawat") }}',
             riwayat: '{{ route("modul.rawat-inap.sub-rawat-inap.riwayat-pasien", ":noRawat") }}',
             detail: '{{ route("modul.rawat-inap.show", ":noRawat") }}',
@@ -172,7 +173,7 @@
                         { label: 'Checklist Pemberian Fibrinolitik', url: '#' },
                         { label: 'Laporan Tindakan', url: '#' },
                     ]},
-                    { label: 'Diagnosa', url: '#' },
+                    { label: 'Diagnosa', url: 'diagnosa', target: '_blank' },
                     { label: 'RM Gizi', children: [
                         { label: 'Skrining Nutrisi Pasien Dewasa', url: '#' },
                         { label: 'Skrining Nutrisi Pasien Lansia', url: '#' },

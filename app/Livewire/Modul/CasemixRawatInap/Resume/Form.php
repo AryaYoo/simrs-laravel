@@ -607,14 +607,8 @@ class Form extends Component
             }
 
         } elseif ($col === 'lab_hasil') {
-            if ($val === '') {
-                $this->editError = 'Nilai hasil lab tidak boleh kosong.';
-                return;
-            }
-            if (!is_numeric($val)) {
-                $this->editError = 'Nilai hasil lab harus berupa angka (contoh: 12.5).';
-                return;
-            }
+            // nilai_rujukan adalah teks bebas (misal: "P. <= 12", "44 - 71")
+            // tidak wajib diisi — pengguna boleh mengosongkan untuk menghapus nilai normal
 
         } elseif ($col === 'obat') {
             if ($val === '' || !is_numeric($val)) {
@@ -666,7 +660,7 @@ class Form extends Component
                     ->where('jam', $jam)
                     ->where('kd_jenis_prw', $kd_jenis_prw)
                     ->where('id_template', $id_template)
-                    ->update(['nilai' => $val]);
+                    ->update(['nilai_rujukan' => $val]);
 
             } elseif ($col === 'obat') {
                 // Tabel: detail_pemberian_obat — composite key: no_rawat + tgl_perawatan + jam + kode_brng
