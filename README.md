@@ -37,7 +37,8 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 
 ### 🛌 Modul Rawat Inap (Ranap)
 - [x] **Architecture Refactoring (SRP)**: Implementasi *Feature-Based Folder Structure* & *Repository Pattern* untuk seluruh sub-modul utama demi skalabilitas dan kemudahan *maintenance*.
-- [x] **Mega Menu "Fused Tab"**: Navigasi intuitif untuk 50+ layanan pasien.
+- [x] **Mega Menu "Fused Tab"**: Navigasi intuitif untuk 50+ layanan pasien dengan fitur *Contextual Target Navigation*.
+- [x] **Diagnosa & Prosedur (Ranap)**: Implementasi *Dual-Panel Cart System* dengan fitur *Full Sync*, *Auto-Increment* prioritas, dan form *manual override* (VC, AP, AST, IM).
 - [x] **Pemeriksaan (SOAPIE)**: Grafik Vital Signs & pencatatan riwayat medis terstruktur (Refactored to Repository).
 - [x] **Perawatan & Tindakan**: Input tindakan medis, petugas, dan BHP secara terpadu (Refactored to Repository).
 - [x] **Riwayat Pasien**: Timeline riwayat pemeriksaan dan kunjungan pasien (Refactored to Repository).
