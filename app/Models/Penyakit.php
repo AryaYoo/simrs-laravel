@@ -24,4 +24,9 @@ class Penyakit extends Model
         'asterisk',
         'im',
     ];
+
+    public function kategoriPenyakit()
+    {
+        return $this->belongsTo(KategoriPenyakit::class, 'kd_ktg', 'kd_ktg');
+    }
 }
