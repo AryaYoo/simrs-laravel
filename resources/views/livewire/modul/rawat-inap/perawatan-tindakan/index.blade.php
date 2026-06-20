@@ -13,6 +13,7 @@
          searchQuery: '',
          activeSubMenu: null,
          isAdmin: {{ auth()->user()->role === 'admin' ? 'true' : 'false' }},
+         openInNewTab: false,
          cols: 2,
          init() {
             this.updateCols();
@@ -566,7 +567,7 @@
                                                     {{-- Item WITHOUT children = direct link --}}
                                                     <template x-if="!item.children || item.children.length === 0">
                                                         <div class="h-full flex flex-col">
-                                                            <a :href="item.url" :target="item.target ? item.target : ((!item.url || item.url === '#') ? '_self' : '_blank')"
+                                                            <a :href="item.url" :target="item.target !== undefined ? item.target : ((!item.url || item.url === '#') ? '_self' : (openInNewTab ? '_blank' : '_self'))"
                                                                 class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm">
                                                                 <div
                                                                     class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
@@ -610,7 +611,7 @@
                                                             <div class="relative w-full h-[64px]" x-data="{ openDropdown: false }" @click.away="openDropdown = false">
                                                                 {{-- Item without subchildren --}}
                                                                 <template x-if="!child.children || child.children.length === 0">
-                                                                    <a :href="child.url" :target="child.target ? child.target : ((!child.url || child.url === '#') ? '_self' : '_blank')"
+                                                                    <a :href="child.url" :target="child.target !== undefined ? child.target : ((!child.url || child.url === '#') ? '_self' : (openInNewTab ? '_blank' : '_self'))"
                                                                         class="flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
                                                                         <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
                                                                             x-text="idx + 1"></div>
@@ -635,7 +636,7 @@
                                                                             class="absolute top-[68px] left-0 z-50 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl overflow-hidden min-w-[220px]">
                                                                             <div class="flex flex-col py-2">
                                                                                 <template x-for="subChild in child.children" :key="subChild.label">
-                                                                                    <a :href="subChild.url" :target="subChild.target ? subChild.target : ((!subChild.url || subChild.url === '#') ? '_self' : '_blank')"
+                                                                                    <a :href="subChild.url" :target="subChild.target !== undefined ? subChild.target : ((!subChild.url || subChild.url === '#') ? '_self' : (openInNewTab ? '_blank' : '_self'))"
                                                                                         class="px-4 py-2.5 text-[11px] font-medium text-neutral-600 dark:text-neutral-300 hover:bg-[#4C5C2D]/10 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-colors flex items-center gap-2">
                                                                                         <span class="w-1.5 h-1.5 rounded-full bg-[#4C5C2D]/40"></span>
                                                                                         <span x-text="subChild.label"></span>
