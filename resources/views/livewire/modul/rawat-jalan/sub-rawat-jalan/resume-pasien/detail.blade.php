@@ -86,27 +86,44 @@
                 </div>
 
                 {{-- Visit Info Grid --}}
-                <div class="md:col-span-7 grid grid-cols-2 gap-y-6 gap-x-4 border-l border-neutral-200/50 dark:border-neutral-700/50 pl-8">
-                    <div class="flex flex-col">
-                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-none mb-2">DPJP Utama</span>
-                        <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300">{{ $resume->dokter->nm_dokter ?? '-' }}</span>
+                <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-6 border-l border-neutral-200/50 dark:border-neutral-700/50 pl-8">
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-tight mb-1.5">
+                            DPJP Utama
+                        </span>
+                        <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300 leading-relaxed break-words">
+                            {{ $resume->dokter->nm_dokter ?? '-' }}
+                        </span>
                     </div>
-                    <div class="flex flex-col">
-                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-none mb-2">Poliklinik</span>
-                        <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-tight mb-1.5">
+                            Poliklinik
+                        </span>
+                        <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300 leading-relaxed break-words">
                             {{ $resume->regPeriksa->poliklinik->nm_poli ?? '-' }}
                         </span>
                     </div>
-                    <div class="flex flex-col border-t border-neutral-100 dark:border-neutral-700 pt-3">
-                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-none mb-2">Tanggal Registrasi</span>
-                        <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300">
+
+                    <div class="flex flex-col min-w-0 border-t border-neutral-100 dark:border-neutral-700 pt-3">
+                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-tight mb-1.5">
+                            Tanggal Registrasi
+                        </span>
+                        <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300 leading-relaxed">
                             {{ \Carbon\Carbon::parse($resume->regPeriksa->tgl_registrasi)->translatedFormat('d F Y') }}
-                            <span class="text-[10px] text-neutral-400 font-mono ml-1">{{ $resume->regPeriksa->jam_reg }}</span>
+                            <span class="block text-[10px] text-neutral-400 font-mono mt-0.5">
+                                {{ $resume->regPeriksa->jam_reg }}
+                            </span>
                         </span>
                     </div>
-                    <div class="flex flex-col border-t border-neutral-100 dark:border-neutral-700 pt-3">
-                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-none mb-2">Cara Bayar</span>
-                        <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">{{ $resume->regPeriksa->penjab->png_jawab ?? '-' }}</span>
+
+                    <div class="flex flex-col min-w-0 border-t border-neutral-100 dark:border-neutral-700 pt-3">
+                        <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest leading-tight mb-1.5">
+                            Cara Bayar
+                        </span>
+                        <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                            {{ $resume->regPeriksa->penjab->png_jawab ?? '-' }}
+                        </span>
                     </div>
                 </div>
             </div>
