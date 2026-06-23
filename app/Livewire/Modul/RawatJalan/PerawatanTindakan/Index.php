@@ -88,7 +88,8 @@ class Index extends Component
         $this->initializeLock($this->regPeriksa);
     }
 
-    public function getPemeriksaanRalanProperty()
+    #[Computed]
+    public function pemeriksaanRalan()
     {
         return PemeriksaanRalan::with(['pegawai'])
             ->where('no_rawat', $this->no_rawat)
@@ -97,22 +98,26 @@ class Index extends Component
             ->get();
     }
 
-    public function getAllTindakanProperty()
+    #[Computed]
+    public function allTindakan()
     {
         return PerawatanTindakanRalanRepository::getAllTindakanHistory($this->no_rawat);
     }
 
-    public function getDokterListProperty()
+    #[Computed]
+    public function dokterList()
     {
         return PerawatanTindakanRalanRepository::searchDokter($this->dokterSearch);
     }
 
-    public function getPetugasListProperty()
+    #[Computed]
+    public function petugasList()
     {
         return PerawatanTindakanRalanRepository::searchPetugas($this->petugasSearch);
     }
 
-    public function getTindakanListProperty()
+    #[Computed]
+    public function tindakanList()
     {
         return PerawatanTindakanRalanRepository::searchTarif($this->tindakanSearch, $this->lookupType);
     }
@@ -125,24 +130,27 @@ class Index extends Component
         $this->jam_rawat     = now()->format('H:i:s');
         $this->isEditMode    = false;
 
-        // Fetch last data as reference
-        $this->lastPemeriksaan = PemeriksaanRalan::where('no_rawat', $this->no_rawat)
+        // Fetch last data as reference and store as Array to prevent Livewire model hydration bug with composite keys
+        $lastRecord = PemeriksaanRalan::where('no_rawat', $this->no_rawat)
             ->orderBy('tgl_perawatan', 'desc')
             ->orderBy('jam_rawat', 'desc')
             ->first();
 
-        if ($this->lastPemeriksaan) {
-            $this->suhu_tubuh  = $this->lastPemeriksaan->suhu_tubuh;
-            $this->tensi       = $this->lastPemeriksaan->tensi;
-            $this->nadi        = $this->lastPemeriksaan->nadi;
-            $this->respirasi   = $this->lastPemeriksaan->respirasi;
-            $this->tinggi      = $this->lastPemeriksaan->tinggi;
-            $this->berat       = $this->lastPemeriksaan->berat;
-            $this->spo2        = $this->lastPemeriksaan->spo2;
-            $this->gcs         = $this->lastPemeriksaan->gcs;
-            $this->kesadaran   = $this->lastPemeriksaan->kesadaran;
-            $this->alergi      = $this->lastPemeriksaan->alergi;
-            $this->lingkar_perut = $this->lastPemeriksaan->lingkar_perut;
+        if ($lastRecord) {
+            $this->lastPemeriksaan = $lastRecord->toArray();
+            $this->suhu_tubuh    = $lastRecord->suhu_tubuh;
+            $this->tensi         = $lastRecord->tensi;
+            $this->nadi          = $lastRecord->nadi;
+            $this->respirasi     = $lastRecord->respirasi;
+            $this->tinggi        = $lastRecord->tinggi;
+            $this->berat         = $lastRecord->berat;
+            $this->spo2          = $lastRecord->spo2;
+            $this->gcs           = $lastRecord->gcs;
+            $this->kesadaran     = $lastRecord->kesadaran;
+            $this->alergi        = $lastRecord->alergi;
+            $this->lingkar_perut = $lastRecord->lingkar_perut;
+        } else {
+            $this->lastPemeriksaan = null;
         }
 
         // Default auto-fill petugas from logged-in user
@@ -208,7 +216,8 @@ class Index extends Component
         }
     }
 
-    public function getPegawaiListProperty()
+    #[Computed]
+    public function pegawaiList()
     {
         if (strlen($this->pegawaiSearch) >= 2) {
             return \App\Models\Pegawai::where('stts_aktif', 'AKTIF')
@@ -282,6 +291,8 @@ class Index extends Component
             $this->createModalOpen = false;
             $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Data pemeriksaan rawat jalan berhasil disimpan.', 'icon' => 'success']);
 
+            $this->initializeLock($this->regPeriksa->fresh());
+
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Terjadi Kesalahan', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
@@ -297,6 +308,7 @@ class Index extends Component
         try {
             PemeriksaanRalanRepository::delete($this->no_rawat, $tgl_perawatan, $jam_rawat);
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Data pemeriksaan berhasil dihapus.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Terjadi Kesalahan', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
@@ -381,6 +393,7 @@ class Index extends Component
 
             $this->tindakanCreateModalOpen = false;
             $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Data penanganan/tindakan berhasil disimpan.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Terjadi Kesalahan', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
@@ -416,6 +429,7 @@ class Index extends Component
         try {
             PerawatanTindakanRalanRepository::deleteTindakan($type, $this->no_rawat, $kd_jenis_prw, $tgl_perawatan, $jam_rawat);
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Data tindakan berhasil dihapus.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Terjadi Kesalahan', 'text' => $e->getMessage(), 'icon' => 'error']);
         }
@@ -482,6 +496,7 @@ class Index extends Component
 
             $this->catatanDokterModalOpen = false;
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Catatan berhasil disimpan.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Gagal menyimpan catatan: ' . $e->getMessage(), 'icon' => 'error']);
         }
@@ -518,6 +533,7 @@ class Index extends Component
         try {
             CatatanDokterRepository::deleteCatatan($this->no_rawat, $tanggal, $jam, $kd_dokter);
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Catatan berhasil dihapus.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Gagal menghapus catatan: ' . $e->getMessage(), 'icon' => 'error']);
         }
@@ -602,6 +618,7 @@ class Index extends Component
             DiagnosaProsedurRepository::saveMultipleDiagnosa($this->no_rawat, $this->selectedDiagnosa);
             $this->diagnosaModalOpen = false;
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Diagnosa berhasil disimpan.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Gagal menyimpan diagnosa: ' . $e->getMessage(), 'icon' => 'error']);
         }
@@ -617,6 +634,7 @@ class Index extends Component
         try {
             DiagnosaProsedurRepository::deleteDiagnosa($this->no_rawat, $kd_penyakit);
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Diagnosa berhasil dihapus.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Gagal menghapus diagnosa: ' . $e->getMessage(), 'icon' => 'error']);
         }
@@ -669,6 +687,7 @@ class Index extends Component
             DiagnosaProsedurRepository::saveMultipleProsedur($this->no_rawat, $this->selectedProsedur);
             $this->prosedurModalOpen = false;
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Prosedur berhasil disimpan.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Gagal menyimpan prosedur: ' . $e->getMessage(), 'icon' => 'error']);
         }
@@ -684,6 +703,7 @@ class Index extends Component
         try {
             DiagnosaProsedurRepository::deleteProsedur($this->no_rawat, $kode);
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Prosedur berhasil dihapus.', 'icon' => 'success']);
+            $this->initializeLock($this->regPeriksa->fresh());
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Gagal', 'text' => 'Gagal menghapus prosedur: ' . $e->getMessage(), 'icon' => 'error']);
         }
