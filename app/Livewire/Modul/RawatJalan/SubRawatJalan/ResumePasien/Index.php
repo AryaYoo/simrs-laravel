@@ -16,24 +16,12 @@ class Index extends Component
     public string $no_rawat;
     public string $no_rkm_medis;
     public $regPeriksa;
-    public $selectedResume = null;
 
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
         $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter'])->findOrFail($this->no_rawat);
         $this->no_rkm_medis = $this->regPeriksa->no_rkm_medis;
-    }
-
-    public function viewResume($no_rawat)
-    {
-        $this->selectedResume = ResumePasien::with([
-            'regPeriksa.pasien',
-            'regPeriksa.dokter',
-            'dokter'
-        ])->find($no_rawat);
-        
-        $this->dispatch('open-modal', 'view-resume-modal');
     }
 
     public function delete($no_rawat)

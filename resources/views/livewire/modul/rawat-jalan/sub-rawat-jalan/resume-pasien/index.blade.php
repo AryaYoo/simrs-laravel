@@ -103,9 +103,9 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
-                                    <button type="button" @click="$wire.viewResume('{{ $resume->no_rawat }}').then(() => { $dispatch('open-modal', 'view-resume-modal') })" title="Lihat Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-sky-100 hover:text-sky-600 transition-all cursor-pointer border-none">
+                                    <a href="{{ route('modul.rawat-jalan.sub-rawat-jalan.resume-detail', str_replace('/', '-', $resume->no_rawat)) }}" wire:navigate title="Lihat Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-sky-100 hover:text-sky-600 transition-all cursor-pointer border-none flex items-center justify-center">
                                         <flux:icon name="eye" class="w-4 h-4" />
-                                    </button>
+                                    </a>
                                     <a href="#" onclick="alert('Cetak Resume belum diimplementasikan')" title="Cetak Resume" class="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-500 hover:bg-[#4C5C2D]/10 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-all">
                                         <flux:icon name="printer" class="w-4 h-4" />
                                     </a>
@@ -154,121 +154,4 @@
             </div>
         @endif
     </div>
-
-    {{-- MODAL DETAIL RESUME --}}
-    <flux:modal name="view-resume-modal" class="md:w-3/4 lg:w-2/3 xl:w-1/2">
-        @if($selectedResume)
-            <div class="space-y-6">
-                <div class="flex items-start justify-between border-b border-neutral-200 dark:border-neutral-700 pb-4">
-                    <div>
-                        <flux:heading size="lg" class="text-[#4C5C2D] dark:text-[#8CC7C4]">Detail Resume Medis</flux:heading>
-                        <flux:subheading>{{ $selectedResume->regPeriksa->pasien->nm_pasien ?? '-' }} ({{ $selectedResume->no_rawat }})</flux:subheading>
-                    </div>
-                    <div class="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg text-xs font-bold text-neutral-600 dark:text-neutral-400">
-                        {{ \Carbon\Carbon::parse($selectedResume->regPeriksa->tgl_registrasi)->format('d F Y') }}
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[60vh] overflow-y-auto pr-2">
-                    {{-- Kiri --}}
-                    <div class="space-y-5">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">Dokter DPJP</span>
-                            <p class="text-sm font-medium text-neutral-800 dark:text-neutral-200">{{ $selectedResume->dokter->nm_dokter ?? '-' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">Kondisi Pulang</span>
-                            @if($selectedResume->kondisi_pulang === 'Meninggal')
-                                <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 text-xs font-bold uppercase">{{ $selectedResume->kondisi_pulang }}</span>
-                            @else
-                                <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 text-xs font-bold uppercase">{{ $selectedResume->kondisi_pulang }}</span>
-                            @endif
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">Keluhan Utama</span>
-                            <p class="text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800">{{ $selectedResume->keluhan_utama ?: '-' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">Jalannya Penyakit</span>
-                            <p class="text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800 whitespace-pre-wrap">{{ $selectedResume->jalannya_penyakit ?: '-' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">Pemeriksaan Penunjang</span>
-                            <p class="text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800 whitespace-pre-wrap">{{ $selectedResume->pemeriksaan_penunjang ?: '-' }}</p>
-                        </div>
-                    </div>
-                    
-                    {{-- Kanan --}}
-                    <div class="space-y-5">
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">Hasil Laboratorium</span>
-                            <p class="text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800 whitespace-pre-wrap">{{ $selectedResume->hasil_laborat ?: '-' }}</p>
-                        </div>
-                        <div>
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 block mb-1">Obat Pulang / Edukasi</span>
-                            <p class="text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-900/50 p-3 rounded-xl border border-neutral-100 dark:border-neutral-800 whitespace-pre-wrap">{{ $selectedResume->obat_pulang ?: '-' }}</p>
-                        </div>
-                        
-                        <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-[#4C5C2D] block mb-2">Diagnosa (ICD-10)</span>
-                            <ul class="space-y-2">
-                                @if($selectedResume->diagnosa_utama)
-                                    <li class="flex items-start gap-2 text-sm bg-blue-50/50 dark:bg-blue-900/10 p-2 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                                        <span class="font-bold text-blue-700 dark:text-blue-400 min-w-[50px]">{{ $selectedResume->kd_diagnosa_utama }}</span>
-                                        <span class="text-neutral-700 dark:text-neutral-300">{{ $selectedResume->diagnosa_utama }} <span class="text-[10px] ml-1 bg-blue-100 text-blue-700 px-1 rounded uppercase">Utama</span></span>
-                                    </li>
-                                @endif
-                                @foreach(['', '2', '3', '4'] as $i)
-                                    @php
-                                        $diag = 'diagnosa_sekunder' . $i;
-                                        $kd = 'kd_diagnosa_sekunder' . $i;
-                                    @endphp
-                                    @if($selectedResume->$diag)
-                                        <li class="flex items-start gap-2 text-sm p-2">
-                                            <span class="font-bold text-neutral-500 min-w-[50px]">{{ $selectedResume->$kd }}</span>
-                                            <span class="text-neutral-600 dark:text-neutral-400">{{ $selectedResume->$diag }}</span>
-                                        </li>
-                                    @endif
-                                @endforeach
-                            </ul>
-                        </div>
-
-                        <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-[#4C5C2D] block mb-2">Prosedur (ICD-9)</span>
-                            <ul class="space-y-2">
-                                @if($selectedResume->prosedur_utama)
-                                    <li class="flex items-start gap-2 text-sm bg-emerald-50/50 dark:bg-emerald-900/10 p-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30">
-                                        <span class="font-bold text-emerald-700 dark:text-emerald-400 min-w-[50px]">{{ $selectedResume->kd_prosedur_utama }}</span>
-                                        <span class="text-neutral-700 dark:text-neutral-300">{{ $selectedResume->prosedur_utama }} <span class="text-[10px] ml-1 bg-emerald-100 text-emerald-700 px-1 rounded uppercase">Utama</span></span>
-                                    </li>
-                                @endif
-                                @foreach(['', '2', '3'] as $i)
-                                    @php
-                                        $pros = 'prosedur_sekunder' . $i;
-                                        $kd = 'kd_prosedur_sekunder' . $i;
-                                    @endphp
-                                    @if($selectedResume->$pros)
-                                        <li class="flex items-start gap-2 text-sm p-2">
-                                            <span class="font-bold text-neutral-500 min-w-[50px]">{{ $selectedResume->$kd }}</span>
-                                            <span class="text-neutral-600 dark:text-neutral-400">{{ $selectedResume->$pros }}</span>
-                                        </li>
-                                    @endif
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-end pt-4 border-t border-neutral-200 dark:border-neutral-700 mt-6">
-                    <flux:modal.close>
-                        <flux:button variant="ghost" class="px-6">Tutup</flux:button>
-                    </flux:modal.close>
-                </div>
-            </div>
-        @else
-            <div class="p-8 flex items-center justify-center">
-                <flux:icon name="arrow-path" class="w-8 h-8 animate-spin text-neutral-300" />
-            </div>
-        @endif
-    </flux:modal>
 </div>
