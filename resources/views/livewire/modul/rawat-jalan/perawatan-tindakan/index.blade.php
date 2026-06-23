@@ -44,6 +44,7 @@
             'observasi-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.observasi-igd", ":noRawat") }}',
             'pengkajian-awal-keperawatan-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd", ":noRawat") }}',
             'riwayat-pasien': '{{ route("modul.rawat-jalan.sub-rawat-jalan.riwayat-pasien", ":noRawat") }}',
+            'resume': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resume", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -192,7 +193,7 @@
                         { label: 'Asesment Edukasi Pasien & Keluarga', url: '#' },
                         { label: 'Pelaksanaan Informasi dan Edukasi', url: '#' },
                     ]},
-                    { label: 'Resume', url: '#' },
+                    { label: 'Resume', url: 'resume' },
                     { label: 'Riwayat Perawatan', url: 'riwayat-pasien' },
                     { label: 'Deteksi Dini Corona', url: '#' },
                 ]

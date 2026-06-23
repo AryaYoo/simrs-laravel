@@ -127,6 +127,8 @@ Untuk menjaga kualitas dan integritas data, setiap pengembang **WAJIB** mengikut
 Untuk mencegah data tertimpa (*Lost Update*) saat dua user mengedit data yang sama, gunakan Trait `WithOptimisticLocking`. 
 **Update:** Pastikan selalu menggunakan `$model->fresh()` saat validasi untuk tabel legacy dengan *composite key*.
 
+**ATURAN KRUSIAL:** Setelah melakukan operasi simpan (insert/update/delete) pada *database* yang dapat mengubah state tabel referensi utama (misal: merubah status `RegPeriksa` dari "Belum" menjadi "Sudah"), Anda **WAJIB** memperbarui penguncian (lock) di memori komponen menggunakan `$this->initializeLock($model->fresh())` pada akhir proses simpan. Jika hal ini dilewatkan, akan terjadi `CONCURRENCY_ERROR` palsu saat pengguna yang sama mencoba melakukan aksi kedua kalinya di halaman yang sama tanpa me-refresh browser.
+
 **Cara Implementasi di Livewire:**
 ```php
 use App\Livewire\Concerns\WithOptimisticLocking;
@@ -142,10 +144,16 @@ class EditData extends Component {
 
     public function save() {
         $model = Model::find($this->id);
+        
         // 2. Validasi kunci sebelum menyimpan
         $this->validateLock($model); 
 
+        // 3. Eksekusi update data
         $model->update([...]);
+        
+        // 4. (WAJIB) Perbarui kunci/hash setelah data tersimpan 
+        // agar pengguna bisa lanjut menggunakan form tanpa error
+        $this->initializeLock($model->fresh());
     }
 }
 ```
