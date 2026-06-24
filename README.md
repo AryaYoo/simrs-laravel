@@ -69,6 +69,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Pengkajian Awal Keperawatan IGD**: Form vertikal 6 tahap lengkap dengan floating minimap, panduan skala nyeri visual, integrasi tabel masalah/rencana keperawatan, dan View Modal Alpine.js (Refactored to Repository, Optimistic Locking).
 - [x] **Catatan Keperawatan Ralan**: Modul pencatatan asuhan keperawatan rawat jalan terintegrasi dengan legacy database.
 - [x] **Observasi IGD**: Modul pencatatan tanda-tanda vital pasien IGD (GCS, TD, HR, RR, Suhu, SpO2) dengan CRUD penuh, validasi ketat, dan sinkronisasi legacy database (Refactored to Repository).
+- [x] **Resume Medis (Ralan)**: Modul resume medis pasien rawat jalan dengan CRUD lengkap, auto-fill diagnosa & prosedur (status Ralan), visual minimap/scrollspy interaktif, proteksi SweetAlert konfirmasi jika resume sudah ada, serta toggle filter kunjungan aktif vs semua riwayat kunjungan.
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
 ### 💵 Modul Casemix
