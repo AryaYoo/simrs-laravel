@@ -378,52 +378,56 @@
                 { id: 2, label: 'Klinis', icon: 'clipboard-document-list' },
                 { id: 3, label: 'Diagnosa', icon: 'bookmark-square' }
             ],
+            init() {
+                window.addEventListener('scroll', () => {
+                    this.sections.forEach(s => {
+                        const el = document.getElementById('section-' + s.id);
+                        if (el) {
+                            const rect = el.getBoundingClientRect();
+                            if (rect.top <= 200 && rect.bottom >= 200) {
+                                this.activeSection = s.id;
+                            }
+                        }
+                    });
+                });
+            },
             scrollTo(id) {
-                document.getElementById('section-'+id).scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }"
-        @scroll.window="
-            let current = 1;
-            for(let i=1; i<=3; i++) {
-                let el = document.getElementById('section-'+i);
-                if(el && window.scrollY >= (el.offsetTop - 200)) {
-                    current = i;
+                const el = document.getElementById('section-' + id);
+                if (el) {
+                    const top = el.offsetTop - 100;
+                    window.scrollTo({ top: top, behavior: 'smooth' });
                 }
             }
-            activeSection = current;
-        "
+         }" 
          class="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col gap-3">
-        {{-- Button 1 --}}
-        <button type="button" @click="scrollTo(1)" class="group relative flex items-center justify-end">
-            <span class="absolute right-12 px-2 py-1 rounded bg-neutral-800 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Identitas</span>
-            <span class="text-[9px] font-black uppercase text-neutral-400 mr-3 tracking-widest">Identitas</span>
-            <div :class="activeSection === 1 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white text-neutral-400 border border-neutral-200 hover:border-[#4C5C2D] hover:text-[#4C5C2D]'"
-                 class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300">
-                <flux:icon name="user" class="w-4 h-4" />
-            </div>
-        </button>
-        {{-- Button 2 --}}
-        <button type="button" @click="scrollTo(2)" class="group relative flex items-center justify-end">
-            <span class="absolute right-12 px-2 py-1 rounded bg-neutral-800 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Klinis</span>
-            <span class="text-[9px] font-black uppercase text-neutral-400 mr-3 tracking-widest">Klinis</span>
-            <div :class="activeSection === 2 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white text-neutral-400 border border-neutral-200 hover:border-[#4C5C2D] hover:text-[#4C5C2D]'"
-                 class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300">
-                <flux:icon name="clipboard-document-list" class="w-4 h-4" />
-            </div>
-        </button>
-        {{-- Button 3 --}}
-        <button type="button" @click="scrollTo(3)" class="group relative flex items-center justify-end">
-            <span class="absolute right-12 px-2 py-1 rounded bg-neutral-800 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Diagnosa</span>
-            <span class="text-[9px] font-black uppercase text-neutral-400 mr-3 tracking-widest">Diagnosa</span>
-            <div :class="activeSection === 3 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white text-neutral-400 border border-neutral-200 hover:border-[#4C5C2D] hover:text-[#4C5C2D]'"
-                 class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300">
-                <flux:icon name="bookmark-square" class="w-4 h-4" />
-            </div>
-        </button>
-        <!-- scroll to top -->
-        <div class="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
-            <button type="button" @click="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-10 h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 flex items-center justify-center transition-colors">
-                <flux:icon name="chevron-up" class="w-4 h-4" />
+         
+        <div class="group flex items-center justify-end gap-3">
+            <span :class="activeSection === 1 ? 'opacity-100 text-[#4C5C2D] scale-100' : 'opacity-0 group-hover:opacity-100 text-neutral-400 scale-95 translate-x-2 group-hover:translate-x-0'"
+                  class="text-[10px] font-black uppercase tracking-widest transition-all duration-300">Identitas</span>
+            <button @click="scrollTo(1)"
+                    :class="activeSection === 1 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white dark:bg-neutral-800 text-neutral-400 hover:text-[#4C5C2D] border border-neutral-200 dark:border-neutral-700 shadow-sm hover:scale-105'"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300">
+                <flux:icon name="user" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="group flex items-center justify-end gap-3">
+            <span :class="activeSection === 2 ? 'opacity-100 text-[#4C5C2D] scale-100' : 'opacity-0 group-hover:opacity-100 text-neutral-400 scale-95 translate-x-2 group-hover:translate-x-0'"
+                  class="text-[10px] font-black uppercase tracking-widest transition-all duration-300">Klinis</span>
+            <button @click="scrollTo(2)"
+                    :class="activeSection === 2 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white dark:bg-neutral-800 text-neutral-400 hover:text-[#4C5C2D] border border-neutral-200 dark:border-neutral-700 shadow-sm hover:scale-105'"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300">
+                <flux:icon name="clipboard-document-list" class="w-5 h-5" />
+            </button>
+        </div>
+
+        <div class="group flex items-center justify-end gap-3">
+            <span :class="activeSection === 3 ? 'opacity-100 text-[#4C5C2D] scale-100' : 'opacity-0 group-hover:opacity-100 text-neutral-400 scale-95 translate-x-2 group-hover:translate-x-0'"
+                  class="text-[10px] font-black uppercase tracking-widest transition-all duration-300">Diagnosa</span>
+            <button @click="scrollTo(3)"
+                    :class="activeSection === 3 ? 'bg-[#4C5C2D] text-white scale-110 shadow-lg' : 'bg-white dark:bg-neutral-800 text-neutral-400 hover:text-[#4C5C2D] border border-neutral-200 dark:border-neutral-700 shadow-sm hover:scale-105'"
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300">
+                <flux:icon name="bookmark-square" class="w-5 h-5" />
             </button>
         </div>
     </div>

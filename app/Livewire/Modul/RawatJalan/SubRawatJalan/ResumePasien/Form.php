@@ -82,6 +82,7 @@ class Form extends Component
             $this->kd_dokter = $this->regPeriksa->kd_dokter;
             $this->nmDokter  = $this->regPeriksa->dokter->nm_dokter ?? '';
             $this->autoFillFromPemeriksaan();
+            $this->autoFillFromDiagnosaProsedur();
         }
     }
 
@@ -127,6 +128,62 @@ class Form extends Component
             $this->keluhan_utama      = $pemeriksaan->keluhan;
             $this->jalannya_penyakit  = $pemeriksaan->pemeriksaan;
             $this->pemeriksaan_penunjang = $pemeriksaan->rtl;
+        }
+    }
+
+    protected function autoFillFromDiagnosaProsedur()
+    {
+        // Filter status='Ralan' agar sinkron dengan tab Perawatan/Tindakan
+        $diagnosas = \App\Models\DiagnosaPasien::with('penyakit')
+            ->where('no_rawat', $this->no_rawat)
+            ->where('status', 'Ralan')
+            ->orderBy('prioritas')
+            ->get();
+            
+        foreach ($diagnosas as $index => $diag) {
+            $nama = $diag->penyakit->nm_penyakit ?? '';
+            $kode = $diag->kd_penyakit;
+            if ($index === 0) {
+                $this->kd_diagnosa_utama = $kode;
+                $this->diagnosa_utama = $nama;
+            } elseif ($index === 1) {
+                $this->kd_diagnosa_sekunder = $kode;
+                $this->diagnosa_sekunder = $nama;
+            } elseif ($index === 2) {
+                $this->kd_diagnosa_sekunder2 = $kode;
+                $this->diagnosa_sekunder2 = $nama;
+            } elseif ($index === 3) {
+                $this->kd_diagnosa_sekunder3 = $kode;
+                $this->diagnosa_sekunder3 = $nama;
+            } elseif ($index === 4) {
+                $this->kd_diagnosa_sekunder4 = $kode;
+                $this->diagnosa_sekunder4 = $nama;
+            }
+        }
+
+        // Filter status='Ralan' agar sinkron dengan tab Perawatan/Tindakan
+        $prosedurs = \App\Models\ProsedurPasien::with('icd9')
+            ->where('no_rawat', $this->no_rawat)
+            ->where('status', 'Ralan')
+            ->orderBy('prioritas')
+            ->get();
+            
+        foreach ($prosedurs as $index => $proc) {
+            $nama = $proc->icd9->deskripsi_panjang ?? '';
+            $kode = $proc->kode;
+            if ($index === 0) {
+                $this->kd_prosedur_utama = $kode;
+                $this->prosedur_utama = $nama;
+            } elseif ($index === 1) {
+                $this->kd_prosedur_sekunder = $kode;
+                $this->prosedur_sekunder = $nama;
+            } elseif ($index === 2) {
+                $this->kd_prosedur_sekunder2 = $kode;
+                $this->prosedur_sekunder2 = $nama;
+            } elseif ($index === 3) {
+                $this->kd_prosedur_sekunder3 = $kode;
+                $this->prosedur_sekunder3 = $nama;
+            }
         }
     }
 
@@ -222,60 +279,58 @@ class Form extends Component
         ]);
 
         try {
-            if ($this->mode === 'edit') {
-                $resume = ResumePasien::findOrFail($this->no_rawat);
-                $this->validateLock($resume->fresh());
-            } else {
-                $resume = new ResumePasien();
-                $resume->no_rawat = $this->no_rawat;
+            // Validasi lock hanya saat edit (resume sudah ada)
+            $existing = ResumePasien::find($this->no_rawat);
+            if ($existing) {
+                $this->validateLock($existing->fresh());
             }
 
             $empty = fn($v) => empty($v) ? '' : $v;
 
-            $resume->kd_dokter            = $this->kd_dokter;
-            $resume->kondisi_pulang       = $this->kondisi_pulang;
-            $resume->keluhan_utama        = $empty($this->keluhan_utama);
-            $resume->jalannya_penyakit    = $empty($this->jalannya_penyakit);
-            $resume->pemeriksaan_penunjang= $empty($this->pemeriksaan_penunjang);
-            $resume->hasil_laborat        = $empty($this->hasil_laborat);
-            $resume->obat_pulang          = $empty($this->obat_pulang);
-            $resume->diagnosa_utama       = $empty($this->diagnosa_utama);
-            $resume->kd_diagnosa_utama    = $empty($this->kd_diagnosa_utama);
-            $resume->diagnosa_sekunder    = $empty($this->diagnosa_sekunder);
-            $resume->kd_diagnosa_sekunder = $empty($this->kd_diagnosa_sekunder);
-            $resume->diagnosa_sekunder2   = $empty($this->diagnosa_sekunder2);
-            $resume->kd_diagnosa_sekunder2= $empty($this->kd_diagnosa_sekunder2);
-            $resume->diagnosa_sekunder3   = $empty($this->diagnosa_sekunder3);
-            $resume->kd_diagnosa_sekunder3= $empty($this->kd_diagnosa_sekunder3);
-            $resume->diagnosa_sekunder4   = $empty($this->diagnosa_sekunder4);
-            $resume->kd_diagnosa_sekunder4= $empty($this->kd_diagnosa_sekunder4);
-            $resume->prosedur_utama       = $empty($this->prosedur_utama);
-            $resume->kd_prosedur_utama    = $empty($this->kd_prosedur_utama);
-            $resume->prosedur_sekunder    = $empty($this->prosedur_sekunder);
-            $resume->kd_prosedur_sekunder = $empty($this->kd_prosedur_sekunder);
-            $resume->prosedur_sekunder2   = $empty($this->prosedur_sekunder2);
-            $resume->kd_prosedur_sekunder2= $empty($this->kd_prosedur_sekunder2);
-            $resume->prosedur_sekunder3   = $empty($this->prosedur_sekunder3);
-            $resume->kd_prosedur_sekunder3= $empty($this->kd_prosedur_sekunder3);
+            $resume = ResumePasien::updateOrCreate(
+                ['no_rawat' => $this->no_rawat],
+                [
+                    'kd_dokter'             => $this->kd_dokter,
+                    'kondisi_pulang'        => $this->kondisi_pulang,
+                    'keluhan_utama'         => $empty($this->keluhan_utama),
+                    'jalannya_penyakit'     => $empty($this->jalannya_penyakit),
+                    'pemeriksaan_penunjang' => $empty($this->pemeriksaan_penunjang),
+                    'hasil_laborat'         => $empty($this->hasil_laborat),
+                    'obat_pulang'           => $empty($this->obat_pulang),
+                    'diagnosa_utama'        => $empty($this->diagnosa_utama),
+                    'kd_diagnosa_utama'     => $empty($this->kd_diagnosa_utama),
+                    'diagnosa_sekunder'     => $empty($this->diagnosa_sekunder),
+                    'kd_diagnosa_sekunder'  => $empty($this->kd_diagnosa_sekunder),
+                    'diagnosa_sekunder2'    => $empty($this->diagnosa_sekunder2),
+                    'kd_diagnosa_sekunder2' => $empty($this->kd_diagnosa_sekunder2),
+                    'diagnosa_sekunder3'    => $empty($this->diagnosa_sekunder3),
+                    'kd_diagnosa_sekunder3' => $empty($this->kd_diagnosa_sekunder3),
+                    'diagnosa_sekunder4'    => $empty($this->diagnosa_sekunder4),
+                    'kd_diagnosa_sekunder4' => $empty($this->kd_diagnosa_sekunder4),
+                    'prosedur_utama'        => $empty($this->prosedur_utama),
+                    'kd_prosedur_utama'     => $empty($this->kd_prosedur_utama),
+                    'prosedur_sekunder'     => $empty($this->prosedur_sekunder),
+                    'kd_prosedur_sekunder'  => $empty($this->kd_prosedur_sekunder),
+                    'prosedur_sekunder2'    => $empty($this->prosedur_sekunder2),
+                    'kd_prosedur_sekunder2' => $empty($this->kd_prosedur_sekunder2),
+                    'prosedur_sekunder3'    => $empty($this->prosedur_sekunder3),
+                    'kd_prosedur_sekunder3' => $empty($this->kd_prosedur_sekunder3),
+                ]
+            );
 
-            $resume->save();
+            $this->syncDiagnosaProsedurPasien();
 
-            if ($this->mode === 'edit') {
-                $this->initializeLock($resume->fresh());
-                $this->dispatch('swal', [
-                    'title' => 'Berhasil!',
-                    'text'  => 'Resume medis rawat jalan berhasil diupdate.',
-                    'icon'  => 'success',
-                    'timer' => 2000,
-                ]);
-            } else {
-                $this->dispatch('swal', [
-                    'title' => 'Berhasil!',
-                    'text'  => 'Resume medis rawat jalan berhasil disimpan.',
-                    'icon'  => 'success',
-                    'timer' => 2000,
-                ]);
-            }
+            // Perbarui lock setelah simpan
+            $this->initializeLock($resume->fresh());
+
+            $this->dispatch('swal', [
+                'title' => 'Berhasil!',
+                'text'  => $existing
+                    ? 'Resume medis rawat jalan berhasil diupdate.'
+                    : 'Resume medis rawat jalan berhasil disimpan.',
+                'icon'  => 'success',
+                'timer' => 2000,
+            ]);
             
             $this->redirect(
                 route('modul.rawat-jalan.sub-rawat-jalan.resume', str_replace('/', '-', $this->no_rawat)),
@@ -287,6 +342,56 @@ class Form extends Component
                 'text'  => $e->getMessage(),
                 'icon'  => 'error',
             ]);
+        }
+    }
+
+    protected function syncDiagnosaProsedurPasien()
+    {
+        // Hapus hanya status='Ralan' agar data Ranap tidak ikut terhapus
+        \App\Models\DiagnosaPasien::where('no_rawat', $this->no_rawat)
+            ->where('status', 'Ralan')
+            ->delete();
+
+        $diags = [
+            ['kd' => $this->kd_diagnosa_utama, 'prioritas' => 1],
+            ['kd' => $this->kd_diagnosa_sekunder, 'prioritas' => 2],
+            ['kd' => $this->kd_diagnosa_sekunder2, 'prioritas' => 3],
+            ['kd' => $this->kd_diagnosa_sekunder3, 'prioritas' => 4],
+            ['kd' => $this->kd_diagnosa_sekunder4, 'prioritas' => 5],
+        ];
+        foreach ($diags as $diag) {
+            if (!empty($diag['kd'])) {
+                \App\Models\DiagnosaPasien::create([
+                    'no_rawat'       => $this->no_rawat,
+                    'kd_penyakit'    => $diag['kd'],
+                    'status'         => 'Ralan',
+                    'prioritas'      => $diag['prioritas'],
+                    'status_penyakit'=> 'Baru',
+                ]);
+            }
+        }
+
+        // Hapus hanya status='Ralan' agar data Ranap tidak ikut terhapus
+        \App\Models\ProsedurPasien::where('no_rawat', $this->no_rawat)
+            ->where('status', 'Ralan')
+            ->delete();
+
+        $procs = [
+            ['kd' => $this->kd_prosedur_utama, 'prioritas' => 1],
+            ['kd' => $this->kd_prosedur_sekunder, 'prioritas' => 2],
+            ['kd' => $this->kd_prosedur_sekunder2, 'prioritas' => 3],
+            ['kd' => $this->kd_prosedur_sekunder3, 'prioritas' => 4],
+        ];
+        foreach ($procs as $proc) {
+            if (!empty($proc['kd'])) {
+                \App\Models\ProsedurPasien::create([
+                    'no_rawat' => $this->no_rawat,
+                    'kode'     => $proc['kd'],
+                    'status'   => 'Ralan',
+                    'prioritas'=> $proc['prioritas'],
+                    'jumlah'   => 1,
+                ]);
+            }
         }
     }
 

@@ -16,6 +16,7 @@ class Index extends Component
     public string $no_rawat;
     public string $no_rkm_medis;
     public $regPeriksa;
+    public bool $showOtherVisits = false;
 
     public function mount($no_rawat)
     {
@@ -46,19 +47,25 @@ class Index extends Component
 
     public function render()
     {
-        // Fetch resumes for the patient of the current visit across ALL their visits
-        $resumes = ResumePasien::with([
+        $query = ResumePasien::with([
             'regPeriksa.pasien',
             'regPeriksa.dokter',
-        ])
-        ->whereHas('regPeriksa', function($query) {
-            $query->where('no_rkm_medis', $this->no_rkm_medis);
-        })
-        ->orderByDesc('no_rawat') // Chronological order by visit number
-        ->paginate(10);
+        ]);
+
+        if ($this->showOtherVisits) {
+            $query->whereHas('regPeriksa', function($q) {
+                $q->where('no_rkm_medis', $this->no_rkm_medis);
+            });
+        } else {
+            $query->where('no_rawat', $this->no_rawat);
+        }
+
+        $resumes = $query->orderByDesc('no_rawat')->paginate(10);
 
         return view('livewire.modul.rawat-jalan.sub-rawat-jalan.resume-pasien.index', [
-            'resumes' => $resumes
+            'resumes'      => $resumes,
+            'resumeExists' => ResumePasien::where('no_rawat', $this->no_rawat)->exists(),
+            'formUrl'      => route('modul.rawat-jalan.sub-rawat-jalan.resume-form', str_replace('/', '-', $this->no_rawat)),
         ]);
     }
 }

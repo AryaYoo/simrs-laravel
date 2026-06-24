@@ -54,17 +54,50 @@
 
     {{-- Main List Card --}}
     <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <h3 class="font-bold text-neutral-800 dark:text-neutral-100">Daftar Resume Medis</h3>
-                <span class="px-2.5 py-1 rounded-full bg-[#4C5C2D] text-white text-[10px] font-bold uppercase tracking-wider">{{ $resumes->total() }} Total</span>
+        <div class="px-6 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-neutral-50/50 dark:bg-neutral-900/20 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <h3 class="font-bold text-neutral-800 dark:text-neutral-100">Daftar Resume Medis</h3>
+                    <span class="px-2.5 py-1 rounded-full bg-[#4C5C2D] text-white text-[10px] font-bold uppercase tracking-wider">{{ $resumes->total() }} Total</span>
+                </div>
+                
+                {{-- Toggle Button --}}
+                <div class="flex items-center gap-2 border-l border-neutral-200 dark:border-neutral-700 pl-4">
+                    <button type="button" wire:click="$toggle('showOtherVisits')" class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $showOtherVisits ? 'bg-[#4C5C2D]' : 'bg-neutral-200 dark:bg-neutral-700' }}">
+                        <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $showOtherVisits ? 'translate-x-4' : 'translate-x-0' }}"></span>
+                    </button>
+                    <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400 select-none">
+                        Tampilkan No. Rawat Lain
+                    </span>
+                </div>
             </div>
             
-            <a href="{{ route('modul.rawat-jalan.sub-rawat-jalan.resume-form', str_replace('/', '-', $no_rawat)) }}" wire:navigate>
-                <flux:button variant="primary" icon="plus" class="bg-[#4C5C2D] hover:bg-[#3D4A24] text-[11px] h-8 font-bold uppercase tracking-wider">
-                    Buat Resume Baru
-                </flux:button>
-            </a>
+            <button
+                type="button"
+                onclick="
+                    @if($resumeExists)
+                        Swal.fire({
+                            title: 'Resume Sudah Ada!',
+                            html: 'Resume medis untuk kunjungan <strong>{{ $no_rawat }}</strong> sudah pernah dibuat.<br>Apakah Anda ingin mengedit resume tersebut?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#4C5C2D',
+                            cancelButtonColor: '#9ca3af',
+                            confirmButtonText: '<i class=\"fa fa-edit\"></i> Ya, Edit Resume',
+                            cancelButtonText: 'Batal',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '{{ $formUrl }}';
+                            }
+                        });
+                    @else
+                        window.location.href = '{{ $formUrl }}';
+                    @endif
+                "
+                class="inline-flex items-center gap-2 px-3 h-8 rounded-lg bg-[#4C5C2D] hover:bg-[#3D4A24] text-white text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
+                <flux:icon name="{{ $resumeExists ? 'pencil-square' : 'plus' }}" class="w-4 h-4" />
+                {{ $resumeExists ? 'Edit Resume' : 'Buat Resume Baru' }}
+            </button>
         </div>
 
         <div class="overflow-x-auto">
