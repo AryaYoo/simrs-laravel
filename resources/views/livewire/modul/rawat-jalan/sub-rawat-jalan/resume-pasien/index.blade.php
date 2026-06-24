@@ -83,7 +83,7 @@
                             showCancelButton: true,
                             confirmButtonColor: '#4C5C2D',
                             cancelButtonColor: '#9ca3af',
-                            confirmButtonText: '<i class=\"fa fa-edit\"></i> Ya, Edit Resume',
+                            confirmButtonText: 'Ya, Edit Resume',
                             cancelButtonText: 'Batal',
                         }).then((result) => {
                             if (result.isConfirmed) {
