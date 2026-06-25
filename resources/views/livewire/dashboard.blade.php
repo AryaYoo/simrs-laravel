@@ -172,7 +172,7 @@
                         $pct = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100) : 0;
                         $pctColor = $pct >= 100 ? 'text-emerald-500' : ($pct >= 50 ? 'text-amber-500' : 'text-rose-500');
                     @endphp
-                    <tr class="hover:bg-[#F7F9F3] dark:hover:bg-neutral-700/40 transition-colors">
+                    <tr wire:key="{{ $reg->no_rawat }}" class="hover:bg-[#F7F9F3] dark:hover:bg-neutral-700/40 transition-colors">
                         <td class="px-5 py-3 whitespace-nowrap">
                             <div class="text-xs font-semibold text-neutral-700 dark:text-neutral-200">{{ $reg->tgl_registrasi }}</div>
                             <div class="text-[10px] text-neutral-400">{{ $reg->jam_reg }}</div>
