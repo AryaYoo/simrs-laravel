@@ -4,18 +4,44 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 #[Layout('layouts.app', ['title' => 'Dashboard'])]
 class Dashboard extends Component
 {
+    use WithPagination;
+
+    public $filterDate;
+    public $filterSearch = '';
+
+    protected $queryString = [
+        'filterDate' => ['except' => ''],
+        'filterSearch' => ['except' => ''],
+    ];
+
+    public function mount()
+    {
+        if (!$this->filterDate) {
+            $this->filterDate = Carbon::today()->format('Y-m-d');
+        }
+    }
+
+    public function updatingFilterDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingFilterSearch()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $today = Carbon::today()->format('Y-m-d');
-        $startOfMonth = Carbon::now()->startOfMonth()->format('Y-m-d');
-        $endOfMonth   = Carbon::now()->endOfMonth()->format('Y-m-d');
-
+        
         // ─── 1. KPI Cards ────────────────────────────────────────────────────
         $stats = [
             'inhouse'   => DB::table('kamar_inap')->where('stts_pulang', '-')->count(),
@@ -44,7 +70,6 @@ class Dashboard extends Component
             ];
         }
 
-        // Aggregate per month with payer category
         $trendRaw = DB::table('reg_periksa')
             ->join('penjab', 'reg_periksa.kd_pj', '=', 'penjab.kd_pj')
             ->whereBetween('reg_periksa.tgl_registrasi', [
@@ -76,176 +101,110 @@ class Dashboard extends Component
             ];
         }
 
-        // ─── 3. Kelengkapan Rawat Jalan (bulan ini) ──────────────────────────
-        $rjStats = DB::table('reg_periksa as rp')
-            ->whereBetween('rp.tgl_registrasi', [$startOfMonth, $endOfMonth])
-            ->where('rp.status_lanjut', 'Ralan')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM rawat_jl_dr) jl_dr'), 'rp.no_rawat', '=', 'jl_dr.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM rawat_jl_pr) jl_pr'), 'rp.no_rawat', '=', 'jl_pr.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM rawat_jl_drpr) jl_drpr'), 'rp.no_rawat', '=', 'jl_drpr.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM diagnosa_pasien) dp'), 'rp.no_rawat', '=', 'dp.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM resume_pasien) rsp'), 'rp.no_rawat', '=', 'rsp.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM resep_obat) ro'), 'rp.no_rawat', '=', 'ro.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM permintaan_lab) plab'), 'rp.no_rawat', '=', 'plab.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM permintaan_radiologi) prad'), 'rp.no_rawat', '=', 'prad.no_rawat')
-            ->selectRaw("
-                COUNT(rp.no_rawat)          as total,
-                SUM(jl_dr.no_rawat IS NOT NULL)    as ada_dokter,
-                SUM(jl_pr.no_rawat IS NOT NULL)    as ada_petugas,
-                SUM(jl_drpr.no_rawat IS NOT NULL)  as ada_drpr,
-                SUM(dp.no_rawat IS NOT NULL)       as ada_diagnosa,
-                SUM(rsp.no_rawat IS NOT NULL)      as ada_resume,
-                SUM(ro.no_rawat IS NOT NULL)       as ada_obat,
-                SUM(plab.no_rawat IS NOT NULL)     as ada_lab,
-                SUM(prad.no_rawat IS NOT NULL)     as ada_radiologi
-            ")
-            ->first();
-
-        $rjTotal = max($rjStats->total ?? 1, 1);
-        $ralanKelengkapan = [
-            'total'     => $rjStats->total ?? 0,
-            'items'     => [
-                ['label' => 'Penanganan Dokter',         'value' => (int)($rjStats->ada_dokter   ?? 0), 'pct' => round(($rjStats->ada_dokter   ?? 0) / $rjTotal * 100)],
-                ['label' => 'Penanganan Petugas',        'value' => (int)($rjStats->ada_petugas  ?? 0), 'pct' => round(($rjStats->ada_petugas  ?? 0) / $rjTotal * 100)],
-                ['label' => 'Dokter + Petugas',          'value' => (int)($rjStats->ada_drpr     ?? 0), 'pct' => round(($rjStats->ada_drpr     ?? 0) / $rjTotal * 100)],
-                ['label' => 'Diagnosa',                  'value' => (int)($rjStats->ada_diagnosa ?? 0), 'pct' => round(($rjStats->ada_diagnosa ?? 0) / $rjTotal * 100)],
-                ['label' => 'Catatan Dokter (Resume)',   'value' => (int)($rjStats->ada_resume   ?? 0), 'pct' => round(($rjStats->ada_resume   ?? 0) / $rjTotal * 100)],
-                ['label' => 'Permintaan Obat',           'value' => (int)($rjStats->ada_obat     ?? 0), 'pct' => round(($rjStats->ada_obat     ?? 0) / $rjTotal * 100)],
-                ['label' => 'Permintaan Lab',            'value' => (int)($rjStats->ada_lab      ?? 0), 'pct' => round(($rjStats->ada_lab      ?? 0) / $rjTotal * 100)],
-                ['label' => 'Permintaan Radiologi',      'value' => (int)($rjStats->ada_radiologi ?? 0), 'pct' => round(($rjStats->ada_radiologi ?? 0) / $rjTotal * 100)],
-            ],
-        ];
-
-        // ─── 4. Kelengkapan Rawat Inap (bulan ini) ───────────────────────────
-        $riStats = DB::table('reg_periksa as rp')
-            ->whereBetween('rp.tgl_registrasi', [$startOfMonth, $endOfMonth])
-            ->where('rp.status_lanjut', 'Ranap')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM penilaian_awal_keperawatan_ranap) pakr'), 'rp.no_rawat', '=', 'pakr.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM rawat_inap_dr) ri_dr'), 'rp.no_rawat', '=', 'ri_dr.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM rawat_inap_pr) ri_pr'), 'rp.no_rawat', '=', 'ri_pr.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM rawat_inap_drpr) ri_drpr'), 'rp.no_rawat', '=', 'ri_drpr.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM diagnosa_pasien) dp2'), 'rp.no_rawat', '=', 'dp2.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM resume_pasien_ranap) rspri'), 'rp.no_rawat', '=', 'rspri.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM resep_obat) ro2'), 'rp.no_rawat', '=', 'ro2.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM permintaan_lab) plab2'), 'rp.no_rawat', '=', 'plab2.no_rawat')
-            ->leftJoin(DB::raw('(SELECT DISTINCT no_rawat FROM permintaan_radiologi) prad2'), 'rp.no_rawat', '=', 'prad2.no_rawat')
-            ->selectRaw("
-                COUNT(rp.no_rawat)              as total,
-                SUM(pakr.no_rawat IS NOT NULL)  as ada_pengkajian,
-                SUM(ri_dr.no_rawat IS NOT NULL)  as ada_dokter,
-                SUM(ri_pr.no_rawat IS NOT NULL)  as ada_petugas,
-                SUM(ri_drpr.no_rawat IS NOT NULL) as ada_drpr,
-                SUM(dp2.no_rawat IS NOT NULL)    as ada_diagnosa,
-                SUM(rspri.no_rawat IS NOT NULL)  as ada_resume,
-                SUM(ro2.no_rawat IS NOT NULL)    as ada_obat,
-                SUM(plab2.no_rawat IS NOT NULL)  as ada_lab,
-                SUM(prad2.no_rawat IS NOT NULL)  as ada_radiologi
-            ")
-            ->first();
-
-        $riTotal = max($riStats->total ?? 1, 1);
-        $ranapKelengkapan = [
-            'total' => $riStats->total ?? 0,
-            'items' => [
-                ['label' => 'Pengkajian Awal Keperawatan', 'value' => (int)($riStats->ada_pengkajian ?? 0), 'pct' => round(($riStats->ada_pengkajian ?? 0) / $riTotal * 100)],
-                ['label' => 'Penanganan Dokter',           'value' => (int)($riStats->ada_dokter     ?? 0), 'pct' => round(($riStats->ada_dokter     ?? 0) / $riTotal * 100)],
-                ['label' => 'Penanganan Petugas',          'value' => (int)($riStats->ada_petugas    ?? 0), 'pct' => round(($riStats->ada_petugas    ?? 0) / $riTotal * 100)],
-                ['label' => 'Dokter + Petugas',            'value' => (int)($riStats->ada_drpr       ?? 0), 'pct' => round(($riStats->ada_drpr       ?? 0) / $riTotal * 100)],
-                ['label' => 'Diagnosa',                    'value' => (int)($riStats->ada_diagnosa   ?? 0), 'pct' => round(($riStats->ada_diagnosa   ?? 0) / $riTotal * 100)],
-                ['label' => 'Catatan Dokter (Resume)',     'value' => (int)($riStats->ada_resume     ?? 0), 'pct' => round(($riStats->ada_resume     ?? 0) / $riTotal * 100)],
-                ['label' => 'Permintaan Obat',             'value' => (int)($riStats->ada_obat       ?? 0), 'pct' => round(($riStats->ada_obat       ?? 0) / $riTotal * 100)],
-                ['label' => 'Permintaan Lab',              'value' => (int)($riStats->ada_lab        ?? 0), 'pct' => round(($riStats->ada_lab        ?? 0) / $riTotal * 100)],
-                ['label' => 'Permintaan Radiologi',        'value' => (int)($riStats->ada_radiologi  ?? 0), 'pct' => round(($riStats->ada_radiologi  ?? 0) / $riTotal * 100)],
-            ],
-        ];
-
-        // ─── 5. Kelengkapan Farmasi (bulan ini) ──────────────────────────────
-        $farmasiPermintaan = DB::table('resep_obat')
-            ->whereBetween('tgl_perawatan', [$startOfMonth, $endOfMonth])
-            ->count();
-        $farmasiPemberian = DB::table('detail_pemberian_obat')
-            ->whereBetween('tgl_perawatan', [$startOfMonth, $endOfMonth])
-            ->count();
-        $farmasiValidasi = DB::table('resep_obat')
-            ->whereBetween('tgl_perawatan', [$startOfMonth, $endOfMonth])
-            ->where('status', 'Sudah')
-            ->count();
-
-        $farmasiTotal = max($farmasiPermintaan, 1);
-        $farmasiKelengkapan = [
-            'total' => $farmasiPermintaan,
-            'items' => [
-                ['label' => 'Permintaan Obat', 'value' => $farmasiPermintaan, 'pct' => 100],
-                ['label' => 'Pemberian Obat',  'value' => $farmasiPemberian,  'pct' => round($farmasiPemberian  / $farmasiTotal * 100)],
-                ['label' => 'Validasi/Selesai','value' => $farmasiValidasi,   'pct' => round($farmasiValidasi   / $farmasiTotal * 100)],
-            ],
-        ];
-
-        // ─── 6. Kelengkapan Lab (bulan ini) ──────────────────────────────────
-        $labPermintaan = DB::table('permintaan_lab')
-            ->whereBetween('tgl_permintaan', [$startOfMonth, $endOfMonth])
-            ->count();
-        $labHasil = DB::table('permintaan_lab')
-            ->whereBetween('tgl_permintaan', [$startOfMonth, $endOfMonth])
-            ->whereNotNull('tgl_hasil')
-            ->where('tgl_hasil', '!=', '')
-            ->count();
-
-        $labTotal = max($labPermintaan, 1);
-        $labKelengkapan = [
-            'total' => $labPermintaan,
-            'items' => [
-                ['label' => 'Permintaan Lab', 'value' => $labPermintaan, 'pct' => 100],
-                ['label' => 'Hasil Lab Tersedia', 'value' => $labHasil, 'pct' => round($labHasil / $labTotal * 100)],
-            ],
-        ];
-
-        // ─── 7. Kelengkapan Radiologi (bulan ini) ────────────────────────────
-        $radPermintaan = DB::table('permintaan_radiologi')
-            ->whereBetween('tgl_permintaan', [$startOfMonth, $endOfMonth])
-            ->count();
-        $radHasil = DB::table('permintaan_radiologi')
-            ->whereBetween('tgl_permintaan', [$startOfMonth, $endOfMonth])
-            ->where(function ($q) {
-                $q->whereNotNull('tgl_hasil')->where('tgl_hasil', '!=', '');
-            })
-            ->count();
-        $radSelesai = DB::table('permintaan_radiologi')
-            ->whereBetween('tgl_permintaan', [$startOfMonth, $endOfMonth])
-            ->where('status', 'Sudah')
-            ->count();
-
-        $radTotal = max($radPermintaan, 1);
-        $radiologiKelengkapan = [
-            'total' => $radPermintaan,
-            'items' => [
-                ['label' => 'Permintaan Radiologi', 'value' => $radPermintaan, 'pct' => 100],
-                ['label' => 'Hasil Tersedia',        'value' => $radHasil,     'pct' => round($radHasil    / $radTotal * 100)],
-                ['label' => 'Selesai / Sudah',       'value' => $radSelesai,   'pct' => round($radSelesai  / $radTotal * 100)],
-            ],
-        ];
-
-        // ─── 8. Recent Registrations ─────────────────────────────────────────
-        $recentRegistrations = DB::table('reg_periksa as rp')
+        // ─── 3. Monitoring Kelengkapan (Tabel Registrasi) ─────────────────────
+        $query = DB::table('reg_periksa as rp')
             ->join('pasien as p', 'rp.no_rkm_medis', '=', 'p.no_rkm_medis')
             ->join('penjab as pj', 'rp.kd_pj', '=', 'pj.kd_pj')
             ->leftJoin('dokter as d', 'rp.kd_dokter', '=', 'd.kd_dokter')
-            ->orderByDesc('rp.tgl_registrasi')
+            ->select('rp.no_rawat', 'rp.no_rkm_medis', 'rp.tgl_registrasi', 'rp.jam_reg', 'rp.stts', 'rp.status_lanjut', 'p.nm_pasien', 'pj.png_jawab', 'd.nm_dokter');
+
+        if ($this->filterDate) {
+            $query->where('rp.tgl_registrasi', $this->filterDate);
+        }
+
+        if ($this->filterSearch) {
+            $query->where(function($q) {
+                $q->where('p.nm_pasien', 'like', '%' . $this->filterSearch . '%')
+                  ->orWhere('rp.no_rkm_medis', 'like', '%' . $this->filterSearch . '%')
+                  ->orWhere('rp.no_rawat', 'like', '%' . $this->filterSearch . '%');
+            });
+        }
+
+        $registrations = $query->orderByDesc('rp.tgl_registrasi')
             ->orderByDesc('rp.jam_reg')
-            ->limit(8)
-            ->select('rp.no_rawat', 'rp.no_rkm_medis', 'rp.tgl_registrasi', 'rp.jam_reg', 'rp.stts', 'rp.status_lanjut', 'p.nm_pasien', 'pj.png_jawab', 'd.nm_dokter')
-            ->get();
+            ->paginate(15);
+
+        // Fetch Checklist Data for the current page
+        $noRawats = collect($registrations->items())->pluck('no_rawat')->toArray();
+        $checklistData = [];
+
+        if (!empty($noRawats)) {
+            $rawatJlDr = DB::table('rawat_jl_dr')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            $rawatJlPr = DB::table('rawat_jl_pr')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            $rawatJlDrPr = DB::table('rawat_jl_drpr')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            
+            $rawatInapDr = DB::table('rawat_inap_dr')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            $rawatInapPr = DB::table('rawat_inap_pr')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            $rawatInapDrPr = DB::table('rawat_inap_drpr')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            
+            $diagnosa = DB::table('diagnosa_pasien')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            
+            // Catatan Dokter
+            $catatan = DB::table('catatan_perawatan')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            
+            // Resume
+            $resume = DB::table('resume_pasien')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            $resumeRanap = DB::table('resume_pasien_ranap')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+            
+            $pengkajianRanap = DB::table('penilaian_awal_keperawatan_ranap')->whereIn('no_rawat', $noRawats)->pluck('no_rawat')->toArray();
+
+            $resepObat = DB::table('resep_obat')->whereIn('no_rawat', $noRawats)
+                ->selectRaw("no_rawat, COUNT(*) as permintaan, SUM(CASE WHEN status = 'Sudah' THEN 1 ELSE 0 END) as selesai")
+                ->groupBy('no_rawat')->get()->keyBy('no_rawat');
+            $pemberianObat = DB::table('detail_pemberian_obat')->whereIn('no_rawat', $noRawats)
+                ->selectRaw("no_rawat, COUNT(*) as pemberian")
+                ->groupBy('no_rawat')->get()->keyBy('no_rawat');
+
+            $permintaanLab = DB::table('permintaan_lab')->whereIn('no_rawat', $noRawats)
+                ->selectRaw("no_rawat, COUNT(*) as permintaan, SUM(CASE WHEN tgl_hasil IS NOT NULL AND tgl_hasil != '' THEN 1 ELSE 0 END) as hasil")
+                ->groupBy('no_rawat')->get()->keyBy('no_rawat');
+
+            $permintaanRad = DB::table('permintaan_radiologi')->whereIn('no_rawat', $noRawats)
+                ->selectRaw("no_rawat, COUNT(*) as permintaan, SUM(CASE WHEN tgl_hasil IS NOT NULL AND tgl_hasil != '' THEN 1 ELSE 0 END) as hasil, SUM(CASE WHEN status = 'Sudah' THEN 1 ELSE 0 END) as selesai")
+                ->groupBy('no_rawat')->get()->keyBy('no_rawat');
+
+            foreach ($noRawats as $nr) {
+                $checklistData[$nr] = [
+                    'ralan' => [
+                        'dr' => in_array($nr, $rawatJlDr),
+                        'pr' => in_array($nr, $rawatJlPr),
+                        'drpr' => in_array($nr, $rawatJlDrPr),
+                        'diagnosa' => in_array($nr, $diagnosa),
+                        'catatan' => in_array($nr, $catatan),
+                        'resume' => in_array($nr, $resume),
+                    ],
+                    'ranap' => [
+                        'pengkajian' => in_array($nr, $pengkajianRanap),
+                        'dr' => in_array($nr, $rawatInapDr),
+                        'pr' => in_array($nr, $rawatInapPr),
+                        'drpr' => in_array($nr, $rawatInapDrPr),
+                        'diagnosa' => in_array($nr, $diagnosa),
+                        'catatan' => in_array($nr, $catatan),
+                        'resume' => in_array($nr, $resumeRanap) || in_array($nr, $resume),
+                    ],
+                    'farmasi' => [
+                        'permintaan' => isset($resepObat[$nr]) && $resepObat[$nr]->permintaan > 0,
+                        'pemberian' => isset($pemberianObat[$nr]) && $pemberianObat[$nr]->pemberian > 0,
+                        'validasi' => isset($resepObat[$nr]) && $resepObat[$nr]->selesai > 0,
+                    ],
+                    'lab' => [
+                        'permintaan' => isset($permintaanLab[$nr]) && $permintaanLab[$nr]->permintaan > 0,
+                        'hasil' => isset($permintaanLab[$nr]) && $permintaanLab[$nr]->hasil > 0,
+                    ],
+                    'radiologi' => [
+                        'permintaan' => isset($permintaanRad[$nr]) && $permintaanRad[$nr]->permintaan > 0,
+                        'hasil' => isset($permintaanRad[$nr]) && $permintaanRad[$nr]->hasil > 0,
+                        'selesai' => isset($permintaanRad[$nr]) && $permintaanRad[$nr]->selesai > 0,
+                    ]
+                ];
+            }
+        }
 
         return view('livewire.dashboard', [
-            'stats'              => $stats,
-            'trendData'          => $trendData,
-            'ralanKelengkapan'   => $ralanKelengkapan,
-            'ranapKelengkapan'   => $ranapKelengkapan,
-            'farmasiKelengkapan' => $farmasiKelengkapan,
-            'labKelengkapan'     => $labKelengkapan,
-            'radiologiKelengkapan' => $radiologiKelengkapan,
-            'recent'             => $recentRegistrations,
-            'currentMonth'       => Carbon::now()->translatedFormat('F Y'),
+            'stats'         => $stats,
+            'trendData'     => $trendData,
+            'registrations' => $registrations,
+            'checklistData' => $checklistData,
         ]);
     }
 }

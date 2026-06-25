@@ -1,4 +1,14 @@
-<div class="p-6 lg:p-8 transition-all duration-500 animate-in fade-in space-y-8">
+<div class="p-6 lg:p-8 transition-all duration-500 animate-in fade-in space-y-8"
+     x-data="{
+         showDetail: false,
+         selectedReg: null,
+         checklist: null,
+         openChecklist(reg, checklistData) {
+             this.selectedReg = reg;
+             this.checklist = checklistData;
+             this.showDetail = true;
+         }
+     }">
 
     {{-- ═══ HEADER ══════════════════════════════════════════════════════════════ --}}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -82,140 +92,86 @@
         </div>
     </div>
 
-    {{-- ═══ KELENGKAPAN DATA PASIEN ═══════════════════════════════════════════════ --}}
-    <div>
-        <div class="flex items-center gap-2 mb-4">
-            <h2 class="text-base font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
-                <flux:icon name="clipboard-document-check" class="w-5 h-5 text-[#4C5C2D]" />
-                Kelengkapan Pengisian Data Pasien
-            </h2>
-            <span class="text-xs text-neutral-400 bg-neutral-100 dark:bg-neutral-700 px-2.5 py-0.5 rounded-full font-medium">{{ $currentMonth }}</span>
-        </div>
-
-        @php
-        $units = [
-            [
-                'key'   => 'ralan',
-                'title' => 'Rawat Jalan',
-                'icon'  => 'user-circle',
-                'color' => '#4C5C2D',
-                'data'  => $ralanKelengkapan,
-            ],
-            [
-                'key'   => 'ranap',
-                'title' => 'Rawat Inap',
-                'icon'  => 'building-office',
-                'color' => '#0284c7',
-                'data'  => $ranapKelengkapan,
-            ],
-            [
-                'key'   => 'farmasi',
-                'title' => 'Farmasi',
-                'icon'  => 'beaker',
-                'color' => '#7c3aed',
-                'data'  => $farmasiKelengkapan,
-            ],
-            [
-                'key'   => 'lab',
-                'title' => 'Laboratorium',
-                'icon'  => 'eye-dropper',
-                'color' => '#b45309',
-                'data'  => $labKelengkapan,
-            ],
-            [
-                'key'   => 'radiologi',
-                'title' => 'Radiologi',
-                'icon'  => 'photo',
-                'color' => '#be185d',
-                'data'  => $radiologiKelengkapan,
-            ],
-        ];
-        @endphp
-
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            @foreach($units as $unit)
-            @php
-                $avgPct = count($unit['data']['items']) > 0
-                    ? round(collect($unit['data']['items'])->avg('pct'))
-                    : 0;
-                $circumference = 2 * M_PI * 42;
-                $dashoffset = $circumference * (1 - $avgPct / 100);
-            @endphp
-            <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
-                {{-- Card Header --}}
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background: {{ $unit['color'] }}20">
-                            <flux:icon name="{{ $unit['icon'] }}" class="w-5 h-5" style="color: {{ $unit['color'] }}" />
-                        </div>
-                        <div>
-                            <div class="text-sm font-bold text-neutral-800 dark:text-neutral-100">{{ $unit['title'] }}</div>
-                            <div class="text-[10px] text-neutral-400">{{ $unit['data']['total'] }} kunjungan bulan ini</div>
-                        </div>
-                    </div>
-
-                    {{-- Donut Percentage --}}
-                    <div class="relative w-16 h-16 flex-shrink-0">
-                        <svg class="w-16 h-16 -rotate-90" viewBox="0 0 96 96">
-                            <circle cx="48" cy="48" r="42" fill="none" stroke="currentColor" class="text-neutral-100 dark:text-neutral-700" stroke-width="9" />
-                            <circle cx="48" cy="48" r="42" fill="none"
-                                stroke="{{ $unit['color'] }}"
-                                stroke-width="9"
-                                stroke-linecap="round"
-                                stroke-dasharray="{{ number_format($circumference, 2) }}"
-                                stroke-dashoffset="{{ number_format($dashoffset, 2) }}"
-                                style="transition: stroke-dashoffset 1s ease"
-                            />
-                        </svg>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="text-xs font-extrabold" style="color: {{ $unit['color'] }}">{{ $avgPct }}%</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Progress Bars --}}
-                <div class="space-y-2.5">
-                    @foreach($unit['data']['items'] as $item)
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[11px] text-neutral-600 dark:text-neutral-400 font-medium leading-tight">{{ $item['label'] }}</span>
-                            <div class="flex items-center gap-1.5 flex-shrink-0">
-                                <span class="text-[10px] font-mono text-neutral-400">{{ number_format($item['value']) }}</span>
-                                <span class="text-[10px] font-bold tabular-nums" style="color: {{ $unit['color'] }}; min-width: 3ch; text-align: right">{{ $item['pct'] }}%</span>
-                            </div>
-                        </div>
-                        <div class="w-full bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden h-1.5">
-                            <div class="h-full rounded-full transition-all duration-700" style="width: {{ $item['pct'] }}%; background: {{ $unit['color'] }}"></div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
+    {{-- ═══ MONITORING KELENGKAPAN DATA (PER NO RAWAT) ══════════════════════════ --}}
+    <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm overflow-hidden flex flex-col">
+        <div class="px-6 py-4 border-b border-neutral-100 dark:border-neutral-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <h2 class="text-base font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
+                    <flux:icon name="clipboard-document-check" class="w-5 h-5 text-[#4C5C2D]" />
+                    Monitoring Kelengkapan Data Pasien
+                </h2>
             </div>
-            @endforeach
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <flux:input type="date" wire:model.live="filterDate" class="w-full md:w-40" />
+                <flux:input type="text" wire:model.live.debounce.500ms="filterSearch" placeholder="Cari Pasien / No. Rawat..." class="w-full md:w-64" icon="magnifying-glass" />
+            </div>
         </div>
-    </div>
+        
+        <div class="overflow-x-auto relative">
+            <div wire:loading.delay.longer class="absolute inset-0 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm z-10 flex items-center justify-center">
+                <flux:icon name="arrow-path" class="w-8 h-8 text-[#4C5C2D] animate-spin" />
+            </div>
 
-    {{-- ═══ REGISTRASI TERBARU ════════════════════════════════════════════════════ --}}
-    <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-neutral-100 dark:border-neutral-700 flex items-center gap-2">
-            <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100">Registrasi Terbaru</h2>
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        </div>
-        <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-neutral-50 dark:bg-neutral-900/50 text-[10px] font-bold uppercase tracking-widest text-neutral-400 border-b border-neutral-100 dark:border-neutral-700">
                     <tr>
-                        <th class="px-5 py-3 text-left">Waktu</th>
-                        <th class="px-5 py-3 text-left">No. Rawat</th>
-                        <th class="px-5 py-3 text-left">Pasien / RM</th>
-                        <th class="px-5 py-3 text-left">Dokter DPJP</th>
-                        <th class="px-5 py-3 text-center">Penjamin</th>
-                        <th class="px-5 py-3 text-center">Jenis</th>
-                        <th class="px-5 py-3 text-center">Status</th>
+                        <th class="px-5 py-3 text-left w-32">Waktu</th>
+                        <th class="px-5 py-3 text-left w-40">No. Rawat</th>
+                        <th class="px-5 py-3 text-left min-w-[200px]">Pasien / RM</th>
+                        <th class="px-5 py-3 text-left w-48">Dokter DPJP</th>
+                        <th class="px-5 py-3 text-center w-28">Penjamin</th>
+                        <th class="px-5 py-3 text-center w-24">Jenis</th>
+                        <th class="px-5 py-3 text-center w-36">Kelengkapan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700">
-                    @foreach($recent as $reg)
+                    @forelse($registrations as $reg)
+                    @php 
+                        $cl = $checklistData[$reg->no_rawat] ?? null;
+                        $isRanap = $reg->status_lanjut === 'Ranap';
+                        $regArray = [
+                            'no_rawat' => $reg->no_rawat,
+                            'nm_pasien' => $reg->nm_pasien,
+                            'jenis' => $isRanap ? 'RANAP' : 'RALAN',
+                        ];
+                        
+                        // Calculate percentage
+                        $totalPoints = 0;
+                        $earnedPoints = 0;
+                        if ($cl) {
+                            if ($isRanap) {
+                                $totalPoints += 5;
+                                if ($cl['ranap']['pengkajian']) $earnedPoints++;
+                                if ($cl['ranap']['dr'] || $cl['ranap']['pr'] || $cl['ranap']['drpr']) $earnedPoints++;
+                                if ($cl['ranap']['diagnosa']) $earnedPoints++;
+                                if ($cl['ranap']['catatan']) $earnedPoints++;
+                                if ($cl['ranap']['resume']) $earnedPoints++;
+                            } else {
+                                $totalPoints += 4;
+                                if ($cl['ralan']['dr'] || $cl['ralan']['pr'] || $cl['ralan']['drpr']) $earnedPoints++;
+                                if ($cl['ralan']['diagnosa']) $earnedPoints++;
+                                if ($cl['ralan']['catatan']) $earnedPoints++;
+                                if ($cl['ralan']['resume']) $earnedPoints++;
+                            }
+
+                            if ($cl['farmasi']['permintaan'] || $cl['farmasi']['pemberian'] || $cl['farmasi']['validasi']) {
+                                $totalPoints += 2;
+                                if ($cl['farmasi']['pemberian']) $earnedPoints++;
+                                if ($cl['farmasi']['validasi']) $earnedPoints++;
+                            }
+                            if ($cl['lab']['permintaan'] || $cl['lab']['hasil']) {
+                                $totalPoints += 1;
+                                if ($cl['lab']['hasil']) $earnedPoints++;
+                            }
+                            if ($cl['radiologi']['permintaan'] || $cl['radiologi']['hasil']) {
+                                $totalPoints += 2;
+                                if ($cl['radiologi']['hasil']) $earnedPoints++;
+                                if ($cl['radiologi']['selesai']) $earnedPoints++;
+                            }
+                        }
+                        $pct = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100) : 0;
+                        $pctColor = $pct >= 100 ? 'text-emerald-500' : ($pct >= 50 ? 'text-amber-500' : 'text-rose-500');
+                    @endphp
                     <tr class="hover:bg-[#F7F9F3] dark:hover:bg-neutral-700/40 transition-colors">
                         <td class="px-5 py-3 whitespace-nowrap">
                             <div class="text-xs font-semibold text-neutral-700 dark:text-neutral-200">{{ $reg->tgl_registrasi }}</div>
@@ -234,21 +190,197 @@
                             </span>
                         </td>
                         <td class="px-5 py-3 text-center whitespace-nowrap">
-                            @php $isRanap = $reg->status_lanjut === 'Ranap'; @endphp
                             <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold {{ $isRanap ? 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' }}">
                                 {{ $isRanap ? 'RANAP' : 'RALAN' }}
                             </span>
                         </td>
                         <td class="px-5 py-3 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold {{ $reg->stts === 'Belum' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
-                                <span class="w-1.5 h-1.5 rounded-full {{ $reg->stts === 'Belum' ? 'bg-amber-500' : 'bg-emerald-500' }}"></span>
-                                {{ $reg->stts }}
-                            </span>
+                            <div class="flex items-center justify-center gap-3">
+                                <span class="text-xs font-bold {{ $pctColor }}">{{ $pct }}%</span>
+                                <button
+                                    type="button"
+                                    @click='openChecklist({{ json_encode($regArray, JSON_HEX_APOS) }}, {{ json_encode($cl, JSON_HEX_APOS) }})'
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-lg bg-[#4C5C2D] hover:bg-[#3b4723] text-white transition-colors shadow-sm"
+                                >
+                                    <flux:icon name="check-badge" class="w-4 h-4" />
+                                    Cek Kelengkapan
+                                </button>
+                            </div>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="7" class="px-5 py-10 text-center text-neutral-400">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <flux:icon name="inbox" class="w-10 h-10 opacity-50" />
+                                <span>Tidak ada data registrasi yang sesuai.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
+        </div>
+        
+        @if($registrations->hasPages())
+        <div class="px-6 py-4 border-t border-neutral-100 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/30">
+            {{ $registrations->links() }}
+        </div>
+        @endif
+    </div>
+
+    {{-- ═══ MODAL CHECKLIST KELENGKAPAN (Alpine.js) ═════════════════════════════ --}}
+    <div x-show="showDetail" x-cloak class="fixed inset-0 z-[99] flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm" @click="showDetail = false"></div>
+
+        <div class="relative bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[90vh]" @click.stop>
+            {{-- Modal Header --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50">
+                <div class="flex flex-col">
+                    <h3 class="text-lg font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
+                        <flux:icon name="clipboard-document-check" class="w-5 h-5 text-[#4C5C2D]" />
+                        Checklist Kelengkapan Data
+                    </h3>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-xs font-medium text-neutral-500" x-text="selectedReg?.no_rawat"></span>
+                        <span class="text-xs text-neutral-300">&bull;</span>
+                        <span class="text-xs font-bold text-[#4C5C2D] dark:text-[#8CC7C4]" x-text="selectedReg?.nm_pasien"></span>
+                    </div>
+                </div>
+                <button @click="showDetail = false" class="p-2 rounded-lg text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors">
+                    <flux:icon name="x-mark" class="w-5 h-5" />
+                </button>
+            </div>
+
+            {{-- Modal Body --}}
+            <template x-if="selectedReg && checklist">
+                <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                    
+                    {{-- 1. Tindakan & Pemeriksaan --}}
+                    <div>
+                        <h4 class="text-[11px] font-bold uppercase tracking-widest text-neutral-400 mb-3" x-text="'Tindakan & Pemeriksaan ' + selectedReg.jenis"></h4>
+                        <div class="bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 rounded-xl overflow-hidden divide-y divide-neutral-100 dark:divide-neutral-800">
+                            
+                            <template x-if="selectedReg.jenis === 'RANAP'">
+                                <div class="flex items-center justify-between p-3">
+                                    <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Pengkajian Awal Keperawatan</span>
+                                    <div class="inline-flex">
+                                        <flux:icon name="check-circle" class="w-5 h-5 text-emerald-500" x-show="checklist.ranap.pengkajian" />
+                                        <flux:icon name="x-circle" class="w-5 h-5 text-rose-500" x-show="!checklist.ranap.pengkajian" />
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <div class="flex items-center justify-between p-3">
+                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Tindakan / Penanganan</span>
+                                <div class="inline-flex">
+                                    <flux:icon name="check-circle" class="w-5 h-5 text-emerald-500" x-show="selectedReg.jenis === 'RANAP' ? (checklist.ranap.dr || checklist.ranap.pr || checklist.ranap.drpr) : (checklist.ralan.dr || checklist.ralan.pr || checklist.ralan.drpr)" />
+                                    <flux:icon name="x-circle" class="w-5 h-5 text-rose-500" x-show="selectedReg.jenis === 'RANAP' ? !(checklist.ranap.dr || checklist.ranap.pr || checklist.ranap.drpr) : !(checklist.ralan.dr || checklist.ralan.pr || checklist.ralan.drpr)" />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800/30">
+                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Diagnosa</span>
+                                <div class="inline-flex">
+                                    <flux:icon name="check-circle" class="w-5 h-5 text-emerald-500" x-show="(selectedReg.jenis === 'RANAP' ? checklist.ranap.diagnosa : checklist.ralan.diagnosa)" />
+                                    <flux:icon name="x-circle" class="w-5 h-5 text-rose-500" x-show="!(selectedReg.jenis === 'RANAP' ? checklist.ranap.diagnosa : checklist.ralan.diagnosa)" />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800/30">
+                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Catatan Dokter</span>
+                                <div class="inline-flex">
+                                    <flux:icon name="check-circle" class="w-5 h-5 text-emerald-500" x-show="(selectedReg.jenis === 'RANAP' ? checklist.ranap.catatan : checklist.ralan.catatan)" />
+                                    <flux:icon name="x-circle" class="w-5 h-5 text-rose-500" x-show="!(selectedReg.jenis === 'RANAP' ? checklist.ranap.catatan : checklist.ralan.catatan)" />
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800/30">
+                                <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Resume Pasien</span>
+                                <div class="inline-flex">
+                                    <flux:icon name="check-circle" class="w-5 h-5 text-emerald-500" x-show="(selectedReg.jenis === 'RANAP' ? checklist.ranap.resume : checklist.ralan.resume)" />
+                                    <flux:icon name="x-circle" class="w-5 h-5 text-rose-500" x-show="!(selectedReg.jenis === 'RANAP' ? checklist.ranap.resume : checklist.ralan.resume)" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 2. Penunjang --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- Farmasi --}}
+                        <div>
+                            <h4 class="text-[11px] font-bold uppercase tracking-widest text-[#7c3aed] mb-3">Farmasi</h4>
+                            <div class="bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 rounded-xl overflow-hidden divide-y divide-neutral-100 dark:divide-neutral-800">
+                                <div class="flex items-center justify-between p-2.5">
+                                    <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Permintaan Obat</span>
+                                    <div>
+                                        <flux:icon name="check-circle" class="w-4 h-4 text-emerald-500" x-show="checklist.farmasi.permintaan" />
+                                        <span class="text-[10px] text-neutral-400 font-bold bg-neutral-100 px-1.5 py-0.5 rounded" x-show="!checklist.farmasi.permintaan">TIDAK ADA</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-2.5">
+                                    <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Pemberian Obat</span>
+                                    <div>
+                                        <flux:icon name="check-circle" class="w-4 h-4 text-emerald-500" x-show="checklist.farmasi.pemberian" />
+                                        <span class="text-[10px] text-neutral-400 font-bold bg-neutral-100 px-1.5 py-0.5 rounded" x-show="!checklist.farmasi.pemberian" x-text="(checklist.farmasi.permintaan || checklist.farmasi.pemberian || checklist.farmasi.validasi) ? 'BELUM' : 'TIDAK ADA'"></span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-2.5">
+                                    <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Status Validasi</span>
+                                    <div>
+                                        <flux:icon name="check-circle" class="w-4 h-4 text-emerald-500" x-show="checklist.farmasi.validasi" />
+                                        <span class="text-[10px] text-neutral-400 font-bold bg-neutral-100 px-1.5 py-0.5 rounded" x-show="!checklist.farmasi.validasi" x-text="(checklist.farmasi.permintaan || checklist.farmasi.pemberian || checklist.farmasi.validasi) ? 'BELUM' : 'TIDAK ADA'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Laboratorium & Radiologi --}}
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-[11px] font-bold uppercase tracking-widest text-[#b45309] mb-3">Laboratorium</h4>
+                                <div class="bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 rounded-xl overflow-hidden divide-y divide-neutral-100 dark:divide-neutral-800">
+                                    <div class="flex items-center justify-between p-2.5">
+                                        <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Permintaan Lab</span>
+                                        <div>
+                                            <flux:icon name="check-circle" class="w-4 h-4 text-emerald-500" x-show="checklist.lab.permintaan" />
+                                            <span class="text-[10px] text-neutral-400 font-bold bg-neutral-100 px-1.5 py-0.5 rounded" x-show="!checklist.lab.permintaan">TIDAK ADA</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-2.5">
+                                        <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Hasil Lab</span>
+                                        <div>
+                                            <flux:icon name="check-circle" class="w-4 h-4 text-emerald-500" x-show="checklist.lab.hasil" />
+                                            <span class="text-[10px] text-neutral-400 font-bold bg-neutral-100 px-1.5 py-0.5 rounded" x-show="!checklist.lab.hasil" x-text="(checklist.lab.permintaan || checklist.lab.hasil) ? 'BELUM' : 'TIDAK ADA'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="text-[11px] font-bold uppercase tracking-widest text-[#be185d] mb-3">Radiologi</h4>
+                                <div class="bg-white dark:bg-neutral-900 ring-1 ring-neutral-200 dark:ring-neutral-800 rounded-xl overflow-hidden divide-y divide-neutral-100 dark:divide-neutral-800">
+                                    <div class="flex items-center justify-between p-2.5">
+                                        <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Permintaan Rad</span>
+                                        <div>
+                                            <flux:icon name="check-circle" class="w-4 h-4 text-emerald-500" x-show="checklist.radiologi.permintaan" />
+                                            <span class="text-[10px] text-neutral-400 font-bold bg-neutral-100 px-1.5 py-0.5 rounded" x-show="!checklist.radiologi.permintaan">TIDAK ADA</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-2.5">
+                                        <span class="text-xs font-medium text-neutral-700 dark:text-neutral-300">Hasil Rad</span>
+                                        <div>
+                                            <flux:icon name="check-circle" class="w-4 h-4 text-emerald-500" x-show="checklist.radiologi.hasil" />
+                                            <span class="text-[10px] text-neutral-400 font-bold bg-neutral-100 px-1.5 py-0.5 rounded" x-show="!checklist.radiologi.hasil" x-text="(checklist.radiologi.permintaan || checklist.radiologi.hasil) ? 'BELUM' : 'TIDAK ADA'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </template>
         </div>
     </div>
 </div>
