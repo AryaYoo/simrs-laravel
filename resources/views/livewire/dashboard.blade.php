@@ -87,7 +87,7 @@
         </div>
 
         {{-- Chart.js Canvas --}}
-        <div class="relative" style="height: 280px;">
+        <div class="relative" style="height: 280px;" wire:ignore>
             <canvas id="trendChart"></canvas>
         </div>
     </div>
