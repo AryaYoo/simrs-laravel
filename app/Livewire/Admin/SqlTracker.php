@@ -19,6 +19,7 @@ class SqlTracker extends Component
     
     public ?array $selectedLog = null;
     public bool $detailModalOpen = false;
+    public array $currentPageLogs = []; // Stores current page row IDs for safe Detail lookup
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -47,17 +48,12 @@ class SqlTracker extends Component
         $this->resetPage();
     }
 
-    public function showDetail(string $tanggal, string $sqlan, string $usere)
+    public function showDetail(int $rowIndex)
     {
-        $parsed = $this->parseSqlLog($sqlan);
-        $this->selectedLog = [
-            'tanggal' => $tanggal,
-            'ip' => $parsed['ip'],
-            'raw_sql' => $parsed['raw_sql'],
-            'action' => $parsed['action'],
-            'table' => $parsed['table'],
-            'user' => $usere,
-        ];
+        if (!isset($this->currentPageLogs[$rowIndex])) {
+            return;
+        }
+        $this->selectedLog = $this->currentPageLogs[$rowIndex];
         $this->detailModalOpen = true;
     }
 
@@ -116,37 +112,28 @@ class SqlTracker extends Component
         }
 
         if ($this->user) {
-            $query->where('usere', $this->user);
+            $query->where('usere', 'like', '%' . $this->user . '%');
         }
 
         if ($this->action) {
             if ($this->action === 'insert') {
-                $query->where('sqlan', 'like', '% insert into%');
+                $query->where('sqle', 'like', '% insert into%');
             } elseif ($this->action === 'update') {
-                $query->where('sqlan', 'like', '% update %');
+                $query->where('sqle', 'like', '% update %');
             } elseif ($this->action === 'delete') {
-                $query->where('sqlan', 'like', '% delete %');
+                $query->where('sqle', 'like', '% delete %');
             }
         }
 
         if ($this->search) {
-            $query->where('sqlan', 'like', '%' . $this->search . '%');
+            $query->where('sqle', 'like', '%' . $this->search . '%');
         }
 
         $logs = $query->orderBy('tanggal', 'desc')->paginate(20);
 
-        // Fetch list of active users who generated logs for filter dropdown
-        $usersList = DB::table('trackersql')
-            ->select('usere')
-            ->distinct()
-            ->whereNotNull('usere')
-            ->where('usere', '!=', '')
-            ->orderBy('usere', 'asc')
-            ->pluck('usere');
-
-        // Map and parse log entries
-        $mappedLogs = collect($logs->items())->map(function ($item) {
-            $parsed = $this->parseSqlLog($item->sqlan);
+        // Map and parse log entries; store in public property for safe Detail lookup
+        $this->currentPageLogs = collect($logs->items())->values()->map(function ($item) {
+            $parsed = $this->parseSqlLog($item->sqle);
             return [
                 'tanggal' => $item->tanggal,
                 'ip' => $parsed['ip'],
@@ -154,13 +141,13 @@ class SqlTracker extends Component
                 'action' => $parsed['action'],
                 'table' => $parsed['table'],
                 'usere' => $item->usere,
+                'user' => $item->usere,
             ];
-        });
+        })->toArray();
 
         return view('livewire.admin.sql-tracker', [
             'logs' => $logs,
-            'mappedLogs' => $mappedLogs,
-            'usersList' => $usersList,
+            'mappedLogs' => collect($this->currentPageLogs),
         ]);
     }
 }

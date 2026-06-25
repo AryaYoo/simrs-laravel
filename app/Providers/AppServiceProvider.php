@@ -71,7 +71,7 @@ class AppServiceProvider extends ServiceProvider
                 try {
                     DB::table('trackersql')->insert([
                         'tanggal' => now(),
-                        'sqlan' => $ip . ' ' . $rawSql,
+                        'sqle' => $ip . ' ' . $rawSql,
                         'usere' => $username
                     ]);
                 } catch (\Exception $e) {
