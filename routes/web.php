@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin', \App\Livewire\Dashboard::class)->name('admin.dashboard');
         Route::get('users', \App\Livewire\User\Index::class)->name('users.index');
         Route::get('admin/settings', \App\Livewire\Admin\Settings::class)->name('admin.settings');
+        Route::get('admin/sql-tracker', \App\Livewire\Admin\SqlTracker::class)->name('admin.sql-tracker');
         
         Route::view('master-data', 'master-data.index')->name('master-data.index');
         Route::get('master-data/penjamin', \App\Livewire\MasterData\Penjamin\Index::class)->name('master-data.penjamin.index');

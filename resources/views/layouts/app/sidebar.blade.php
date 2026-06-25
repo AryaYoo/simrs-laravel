@@ -114,6 +114,17 @@
                         <flux:icon name="cog-8-tooth" class="w-4 h-4 flex-shrink-0" />
                         <span x-show="sidebarOpen">{{ __('Pengaturan') }}</span>
                     </a>
+                    
+                    <a href="{{ route('admin.sql-tracker') }}" wire:navigate
+                        class="flex items-center rounded-md text-sm font-medium transition-colors"
+                        :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                        style="color: white; text-decoration: none; background-color: {{ request()->routeIs('admin.sql-tracker') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};"
+                        onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                        onmouseout="this.style.backgroundColor='{{ request()->routeIs('admin.sql-tracker') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
+                        title="{{ __('SQL Tracker') }}">
+                        <flux:icon name="clock" class="w-4 h-4 flex-shrink-0" />
+                        <span x-show="sidebarOpen">{{ __('SQL Tracker') }}</span>
+                    </a>
                 </nav>
             </div>
             @else
