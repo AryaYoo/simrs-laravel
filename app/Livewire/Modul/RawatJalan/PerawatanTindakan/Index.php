@@ -119,7 +119,7 @@ class Index extends Component
     #[Computed]
     public function tindakanList()
     {
-        return PerawatanTindakanRalanRepository::searchTarif($this->tindakanSearch, $this->lookupType);
+        return PerawatanTindakanRalanRepository::searchTarif($this->tindakanSearch, $this->lookupType, $this->regPeriksa->kd_pj);
     }
 
     public function openCreateModal()

@@ -109,12 +109,19 @@ class PerawatanTindakanRalanRepository
         return collect([]);
     }
 
-    public static function searchTarif(string $search, string $lookupType)
+    public static function searchTarif(string $search, string $lookupType, string $kd_pj = null)
     {
         $tindakanFilter = JnsPerawatan::query()->where('status', '1');
         
         if (strlen($search) >= 3) {
             $tindakanFilter->where('nm_perawatan', 'like', '%' . $search . '%');
+        }
+
+        if ($kd_pj) {
+            $tindakanFilter->where(function($q) use ($kd_pj) {
+                $q->where('kd_pj', $kd_pj)
+                  ->orWhere('kd_pj', '-');
+            });
         }
 
         if ($lookupType == 'dr') {
