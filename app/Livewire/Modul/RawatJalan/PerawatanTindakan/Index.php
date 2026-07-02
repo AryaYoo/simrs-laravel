@@ -236,8 +236,8 @@ class Index extends Component
     public function save()
     {
         // SOP Rekam Medis: Validate if admission is already completed or canceled.
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah selesai/dibatalkan. Modifikasi data tindakan ditolak (SOP).', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah dibatalkan. Modifikasi data tindakan ditolak (SOP).', 'icon' => 'error']);
             return;
         }
 
@@ -302,8 +302,8 @@ class Index extends Component
 
     public function deletePemeriksaan($tgl_perawatan, $jam_rawat)
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah selesai/dibatalkan. Penghapusan data ditolak (SOP).', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah dibatalkan. Penghapusan data ditolak (SOP).', 'icon' => 'error']);
             return;
         }
 
@@ -371,8 +371,8 @@ class Index extends Component
 
     public function saveTindakan()
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah selesai/dibatalkan. Modifikasi data ditolak (SOP).', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah dibatalkan. Modifikasi data ditolak (SOP).', 'icon' => 'error']);
             return;
         }
 
@@ -431,8 +431,8 @@ class Index extends Component
 
     public function deleteTindakan($type, $kd_jenis_prw, $tgl_perawatan, $jam_rawat)
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah selesai/dibatalkan. Penghapusan data ditolak (SOP).', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Terkunci', 'text' => 'Pelayanan pasien sudah dibatalkan. Penghapusan data ditolak (SOP).', 'icon' => 'error']);
             return;
         }
 
@@ -493,8 +493,8 @@ class Index extends Component
 
     public function saveCatatan()
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dilayani atau dibatalkan. Tidak dapat memodifikasi catatan.', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dibatalkan. Tidak dapat memodifikasi catatan.', 'icon' => 'error']);
             return;
         }
 
@@ -537,8 +537,8 @@ class Index extends Component
 
     public function editCatatan($data)
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dilayani atau dibatalkan. Tidak dapat memodifikasi catatan.', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dibatalkan. Tidak dapat memodifikasi catatan.', 'icon' => 'error']);
             return;
         }
 
@@ -558,8 +558,8 @@ class Index extends Component
 
     public function deleteCatatan($tanggal, $jam, $kd_dokter)
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dilayani atau dibatalkan. Tidak dapat memodifikasi catatan.', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dibatalkan. Tidak dapat memodifikasi catatan.', 'icon' => 'error']);
             return;
         }
 
@@ -637,8 +637,8 @@ class Index extends Component
     {
         $this->validateLock($this->regPeriksa->fresh());
 
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dilayani atau dibatalkan.', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dibatalkan.', 'icon' => 'error']);
             return;
         }
 
@@ -659,8 +659,8 @@ class Index extends Component
 
     public function deleteDiagnosa($kd_penyakit)
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dilayani atau dibatalkan.', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dibatalkan.', 'icon' => 'error']);
             return;
         }
 
@@ -706,8 +706,8 @@ class Index extends Component
     {
         $this->validateLock($this->regPeriksa->fresh());
 
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dilayani atau dibatalkan.', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dibatalkan.', 'icon' => 'error']);
             return;
         }
 
@@ -728,8 +728,8 @@ class Index extends Component
 
     public function deleteProsedur($kode)
     {
-        if ($this->regPeriksa->stts === 'Sudah' || $this->regPeriksa->stts === 'Batal') {
-            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dilayani atau dibatalkan.', 'icon' => 'error']);
+        if ($this->regPeriksa->stts === 'Batal') {
+            $this->dispatch('swal', ['title' => 'Ditolak', 'text' => 'Pasien sudah dibatalkan.', 'icon' => 'error']);
             return;
         }
 
