@@ -200,11 +200,32 @@ class Dashboard extends Component
             }
         }
 
+
+        // ─── 4. Top 10 Pasien Umum dengan Pengeluaran Terbanyak ──────────────────
+        $topUmumPatients = DB::table('reg_periksa as rp')
+            ->join('penjab as pj', 'rp.kd_pj', '=', 'pj.kd_pj')
+            ->join('pasien as p', 'rp.no_rkm_medis', '=', 'p.no_rkm_medis')
+            ->join('billing as b', 'rp.no_rawat', '=', 'b.no_rawat')
+            ->where('pj.png_jawab', 'like', '%Umum%')
+            ->whereNotIn('b.status', ['-', 'Dokter', 'Perawat', 'TtlObat', 'TtlRanap Dokter', 'TtlRanap Paramedis', 'TtlRalan Dokter', 'TtlRalan Paramedis', 'TtlKamar', 'TtlTambahan', 'TtlRetur Obat', 'TtlResep Pulang', 'TtlPotongan', 'TtlLaborat', 'TtlOperasi', 'TtlRadiologi', 'Tagihan'])
+            ->selectRaw("
+                p.no_rkm_medis,
+                p.nm_pasien,
+                COUNT(DISTINCT rp.no_rawat) as total_kunjungan,
+                SUM(b.totalbiaya) as total_pengeluaran
+            ")
+            ->groupBy('p.no_rkm_medis', 'p.nm_pasien')
+            ->having('total_pengeluaran', '>', 0)
+            ->orderByDesc('total_pengeluaran')
+            ->limit(10)
+            ->get();
+
         return view('livewire.dashboard', [
-            'stats'         => $stats,
-            'trendData'     => $trendData,
-            'registrations' => $registrations,
-            'checklistData' => $checklistData,
+            'stats'            => $stats,
+            'trendData'        => $trendData,
+            'registrations'    => $registrations,
+            'checklistData'    => $checklistData,
+            'topUmumPatients'  => $topUmumPatients,
         ]);
     }
 }
