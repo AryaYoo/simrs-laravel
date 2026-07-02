@@ -405,3 +405,8 @@ Ketentuan dalam membuka halaman dari tombol-tombol di dalam **Sub Menu Layanan R
 
 2. **Dari Halaman Perawatan & Tindakan Rawat Jalan (Halaman Detail)**
    Jika sub menu dibuka dari halaman detail pasien ini, maka setiap tombol yang diklik harus mengarahkan ke halaman tujuan pada **tab browser yang sama** (`target="_self"`).
+
+### Aturan Kunci (Lock) Modifikasi Data Perawatan & Tindakan
+Terdapat pembatasan dalam mengubah (menambah, mengedit, atau menghapus) data pemeriksaan, tindakan, catatan, diagnosa, dan prosedur pada form Perawatan & Tindakan Rawat Jalan berdasarkan status periksa pasien:
+- Kunci pengubahan data **hanya berlaku** jika status periksa pasien adalah **"Batal"**.
+- Jika status periksa pasien adalah **"Sudah"** (Sudah Diperiksa), data masih dapat diubah/dimodifikasi karena pemeriksaan telah selesai dilakukan namun pengguna mungkin perlu menyesuaikan data rekam medis.
