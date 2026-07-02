@@ -16,6 +16,11 @@ class Dashboard extends Component
     public $filterDate;
     public $filterSearch = '';
 
+    public $selectedPatientRm = null;
+    public $selectedPatientName = null;
+    public $patientVisits = [];
+    public $patientVisitModalOpen = false;
+
     protected $queryString = [
         'filterDate' => ['except' => ''],
         'filterSearch' => ['except' => ''],
@@ -36,6 +41,36 @@ class Dashboard extends Component
     public function updatingFilterSearch()
     {
         $this->resetPage();
+    }
+
+    public function loadPatientVisits(string $noRm, string $nmPasien): void
+    {
+        $this->selectedPatientRm   = $noRm;
+        $this->selectedPatientName = $nmPasien;
+
+        $this->patientVisits = DB::table('reg_periksa as rp')
+            ->join('penjab as pj', 'rp.kd_pj', '=', 'pj.kd_pj')
+            ->leftJoin('dokter as d', 'rp.kd_dokter', '=', 'd.kd_dokter')
+            ->leftJoin('billing as b', 'rp.no_rawat', '=', 'b.no_rawat')
+            ->where('rp.no_rkm_medis', $noRm)
+            ->where('pj.png_jawab', 'like', '%Umum%')
+            ->whereNotIn('b.status', ['-', 'Dokter', 'Perawat', 'TtlObat', 'TtlRanap Dokter', 'TtlRanap Paramedis', 'TtlRalan Dokter', 'TtlRalan Paramedis', 'TtlKamar', 'TtlTambahan', 'TtlRetur Obat', 'TtlResep Pulang', 'TtlPotongan', 'TtlLaborat', 'TtlOperasi', 'TtlRadiologi', 'Tagihan'])
+            ->selectRaw("
+                rp.no_rawat,
+                rp.tgl_registrasi,
+                rp.jam_reg,
+                rp.stts,
+                rp.status_lanjut,
+                d.nm_dokter,
+                SUM(b.totalbiaya) as total_biaya
+            ")
+            ->groupBy('rp.no_rawat', 'rp.tgl_registrasi', 'rp.jam_reg', 'rp.stts', 'rp.status_lanjut', 'd.nm_dokter')
+            ->orderByDesc('rp.tgl_registrasi')
+            ->orderByDesc('rp.jam_reg')
+            ->get()
+            ->toArray();
+
+        $this->patientVisitModalOpen = true;
     }
 
     public function render()

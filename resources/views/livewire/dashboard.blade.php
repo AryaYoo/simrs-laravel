@@ -135,7 +135,8 @@
                 $medal = $medalColors[$idx] ?? null;
                 $rankBg = $medal ? $medal['bg'] . ' ' . $medal['text'] : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-300';
             @endphp
-            <div class="flex items-center gap-3 group">
+            <div wire:click="loadPatientVisits('{{ $patient->no_rkm_medis }}', '{{ addslashes($patient->nm_pasien) }}')"
+                 class="flex items-center gap-3 group cursor-pointer rounded-xl px-2 py-2 -mx-2 hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
                 {{-- Rank Badge --}}
                 <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $rankBg }} {{ $medal ? 'ring-2 '.$medal['ring'] : '' }} flex items-center justify-center text-xs font-black shadow-sm">
                     @if($idx < 3)
@@ -149,7 +150,7 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between mb-1 gap-2">
                         <div class="flex items-center gap-2 min-w-0">
-                            <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate">{{ $patient->nm_pasien }}</span>
+                            <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] transition-colors">{{ $patient->nm_pasien }}</span>
                             <span class="flex-shrink-0 font-mono text-[10px] text-neutral-400 dark:text-neutral-500">{{ $patient->no_rkm_medis }}</span>
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
@@ -159,6 +160,7 @@
                             <span class="text-sm font-bold {{ $idx === 0 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-700 dark:text-neutral-200' }}">
                                 Rp {{ number_format($patient->total_pengeluaran, 0, ',', '.') }}
                             </span>
+                            <flux:icon name="eye" class="w-4 h-4 text-neutral-300 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] transition-colors flex-shrink-0" />
                         </div>
                     </div>
                     <div class="w-full bg-neutral-100 dark:bg-neutral-700 rounded-full h-2 overflow-hidden">
@@ -171,6 +173,124 @@
         </div>
         @endif
     </div>
+
+    {{-- ═══ POPUP: Detail Kunjungan Pasien ══════════════════════════════════════ --}}
+    @if($patientVisitModalOpen)
+    <template x-teleport="body">
+        <div x-data="{ open: @entangle('patientVisitModalOpen') }"
+             x-show="open"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6"
+             style="display: none;"
+             @keydown.escape.window="open = false">
+
+            {{-- Backdrop --}}
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="open = false"></div>
+
+            {{-- Panel --}}
+            <div x-show="open"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                 class="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl z-10 overflow-hidden flex flex-col max-h-[85vh]">
+
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-700 bg-[#F7F9F3] dark:bg-neutral-900/50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/20 flex items-center justify-center">
+                            <flux:icon name="user" class="w-5 h-5 text-[#4C5C2D] dark:text-[#8CC7C4]" />
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-neutral-800 dark:text-neutral-100">{{ $selectedPatientName }}</h3>
+                            <p class="text-xs text-neutral-400 font-mono">No. RM: {{ $selectedPatientRm }}</p>
+                        </div>
+                    </div>
+                    <button @click="open = false" class="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+                        <flux:icon name="x-mark" class="w-5 h-5" />
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <div class="overflow-y-auto flex-1 p-5">
+                    <p class="text-xs text-neutral-400 mb-4 font-semibold uppercase tracking-wider">Riwayat Kunjungan – Penjamin Umum</p>
+
+                    @if(empty($patientVisits))
+                        <div class="flex flex-col items-center justify-center py-10 text-neutral-400">
+                            <flux:icon name="calendar-x-mark" class="w-10 h-10 mb-2 opacity-40" />
+                            <p class="text-sm">Tidak ada riwayat kunjungan ditemukan.</p>
+                        </div>
+                    @else
+                    <div class="space-y-3">
+                        @foreach($patientVisits as $i => $visit)
+                        @php
+                            $visit = (object) $visit;
+                            $sttsColor = match($visit->stts ?? '') {
+                                'Sudah'   => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                'Batal'   => 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                'Belum'   => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                                'Dirawat' => 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
+                                default   => 'bg-neutral-100 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-400',
+                            };
+                        @endphp
+                        <div class="flex items-start gap-4 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-700 hover:border-[#4C5C2D]/30 transition-colors">
+                            {{-- Visit Number --}}
+                            <div class="flex-shrink-0 w-7 h-7 rounded-full bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/20 flex items-center justify-center text-[10px] font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">
+                                {{ $i + 1 }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-start justify-between gap-2 mb-1.5">
+                                    <div>
+                                        <div class="text-xs font-bold font-mono text-neutral-700 dark:text-neutral-200">{{ $visit->no_rawat }}</div>
+                                        <div class="text-[11px] text-neutral-400 mt-0.5">
+                                            {{ \Carbon\Carbon::parse($visit->tgl_registrasi)->translatedFormat('d F Y') }}
+                                            <span class="mx-1 opacity-40">·</span>
+                                            {{ substr($visit->jam_reg ?? '', 0, 5) }}
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold {{ $sttsColor }}">{{ $visit->stts ?? '-' }}</span>
+                                        @if($visit->status_lanjut)
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">{{ $visit->status_lanjut }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+                                        <flux:icon name="user-circle" class="w-3.5 h-3.5" />
+                                        <span>{{ $visit->nm_dokter ?? 'Dokter tidak tercatat' }}</span>
+                                    </div>
+                                    @if($visit->total_biaya > 0)
+                                    <span class="text-xs font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">
+                                        Rp {{ number_format($visit->total_biaya, 0, ',', '.') }}
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+
+                {{-- Footer --}}
+                <div class="px-6 py-3 border-t border-neutral-100 dark:border-neutral-700 flex justify-between items-center bg-neutral-50 dark:bg-neutral-900/30">
+                    <span class="text-xs text-neutral-400">{{ count($patientVisits) }} kunjungan ditemukan</span>
+                    <button @click="open = false" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-[#4C5C2D] text-white hover:bg-[#3d4b24] transition-colors">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+    @endif
 
     {{-- ═══ MONITORING KELENGKAPAN DATA (PER NO RAWAT) ══════════════════════════ --}}
     <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm overflow-hidden flex flex-col">
