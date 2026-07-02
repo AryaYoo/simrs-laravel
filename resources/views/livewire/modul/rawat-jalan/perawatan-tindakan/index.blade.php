@@ -19,9 +19,100 @@
             nmPasien: '{{ addslashes($regPeriksa->pasien->nm_pasien ?? '') }}' 
         },
         cols: 2,
+
+        // Exit Confirmation State
+        _pendingNavUrl: null,
+        _exitConfirmed: false,
+        _popstateHandler: null,
+        _navigateHandler: null,
+
         init() {
             this.updateCols();
             window.addEventListener('resize', () => this.updateCols());
+
+            const statusBelum = {{ $status_periksa === 'Belum' ? 'true' : 'false' }};
+            if (!statusBelum) return;
+
+            // Push a sentinel history state so back-button can be intercepted
+            history.pushState({ exitGuard: true }, '');
+
+            // Intercept browser back button
+            this._popstateHandler = (e) => {
+                if (this._exitConfirmed) return;
+                // If status is still Belum on the wire component
+                const currentStatus = document.querySelector('[data-status-periksa]')?.dataset?.statusPeriksa ?? 'Belum';
+                if (currentStatus !== 'Belum') return;
+                
+                // Push state again to prevent leaving immediately
+                history.pushState({ exitGuard: true }, '');
+                this._pendingNavUrl = null; // back button
+                this.promptExit();
+            };
+            window.addEventListener('popstate', this._popstateHandler);
+
+            // Intercept Livewire wire:navigate links
+            this._navigateHandler = (e) => {
+                const currentStatus = document.querySelector('[data-status-periksa]')?.dataset?.statusPeriksa ?? 'Belum';
+                if (currentStatus !== 'Belum' || this._exitConfirmed) return;
+                
+                e.preventDefault();
+                this._pendingNavUrl = e.detail?.url ?? null;
+                this.promptExit();
+            };
+            document.addEventListener('livewire:navigate', this._navigateHandler);
+
+            // When Livewire updates the status, keep the data attribute in sync & release guards
+            window.addEventListener('status-periksa-changed', (e) => {
+                const newStatus = e.detail?.status ?? e.detail?.[0] ?? null;
+                const el = document.querySelector('[data-status-periksa]');
+                if (el && newStatus) el.dataset.statusPeriksa = newStatus;
+                if (newStatus && newStatus !== 'Belum') {
+                    // Status is no longer Belum — remove all guards
+                    if (this._popstateHandler) window.removeEventListener('popstate', this._popstateHandler);
+                    if (this._navigateHandler) document.removeEventListener('livewire:navigate', this._navigateHandler);
+                }
+            });
+        },
+
+        promptExit() {
+            Swal.fire({
+                title: 'Ubah Status Pasien?',
+                html: 'Status pasien masih <b class=\'text-yellow-600\'>Belum Diperiksa</b>. Ubah menjadi <b class=\'text-green-600\'>Sudah Diperiksa</b> sebelum keluar?',
+                icon: 'warning',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonColor: '#4C5C2D',
+                denyButtonColor: '#6b7280',
+                cancelButtonColor: '#ef4444',
+                confirmButtonText: 'Ya, Ubah Status',
+                denyButtonText: 'Tidak, Keluar Saja',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this._exitConfirmed = true;
+                    $wire.updateStatusPeriksa('Sudah').then(() => {
+                        this._doLeave();
+                    });
+                } else if (result.isDenied) {
+                    this._exitConfirmed = true;
+                    this._doLeave();
+                } else {
+                    // Canceled, do nothing (stay on page)
+                }
+            });
+        },
+
+        _doLeave() {
+            // Remove guards
+            if (this._popstateHandler) window.removeEventListener('popstate', this._popstateHandler);
+            if (this._navigateHandler) document.removeEventListener('livewire:navigate', this._navigateHandler);
+
+            if (this._pendingNavUrl) {
+                window.location.href = this._pendingNavUrl;
+            } else {
+                history.back();
+            }
         },
         updateCols() {
             if (window.innerWidth >= 1024) this.cols = 5;
@@ -39,6 +130,7 @@
             action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
             'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
             'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
+            'permintaan-rawat-inap': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-rawat-inap", ":noRawat") }}',
             'triase-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.triase-igd", ":noRawat") }}',
             'catatan-keperawatan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.catatan-keperawatan", ":noRawat") }}',
             'observasi-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.observasi-igd", ":noRawat") }}',
@@ -204,7 +296,7 @@
                     { label: 'Jadwal Operasi', url: '#' },
                     { label: 'Pemeriksaan Lab', url: 'permintaan-lab' },
                     { label: 'Pemeriksaan Radiologi', url: '#' },
-                    { label: 'Rawat Inap', url: '#' },
+                    { label: 'Rawat Inap', url: 'permintaan-rawat-inap' },
                     { label: 'Informasi Obat', url: '#' },
                     { label: 'Konsultasi Medik', url: '#' },
                 ]
@@ -460,6 +552,39 @@
         </div>
 
         <div class="flex items-center gap-2">
+            {{-- Status Periksa Pasien --}}
+            <div class="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm"
+                 data-status-periksa="{{ $status_periksa }}">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Status Periksa</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    {{-- Color dot indicator --}}
+                    @php
+                        $statusColor = match($status_periksa) {
+                            'Sudah'   => 'bg-green-500',
+                            'Batal'   => 'bg-red-500',
+                            'Dirujuk' => 'bg-blue-500',
+                            'Dirawat' => 'bg-purple-500',
+                            'Pulang'  => 'bg-neutral-400',
+                            default   => 'bg-yellow-400', // Belum
+                        };
+                    @endphp
+                    <span class="w-2 h-2 rounded-full {{ $statusColor }} flex-shrink-0 shadow-sm"></span>
+                    <select
+                        wire:change="updateStatusPeriksa($event.target.value)"
+                        class="text-xs font-semibold bg-transparent border-none outline-none text-neutral-700 dark:text-neutral-200 cursor-pointer pr-1 appearance-none focus:ring-0"
+                    >
+                        <option value="Belum"   @selected($status_periksa === 'Belum')>Belum Periksa</option>
+                        <option value="Sudah"   @selected($status_periksa === 'Sudah')>Sudah Periksa</option>
+                        <option value="Dirujuk" @selected($status_periksa === 'Dirujuk')>Dirujuk</option>
+                        <option value="Dirawat" @selected($status_periksa === 'Dirawat')>Dirawat</option>
+                        <option value="Pulang"  @selected($status_periksa === 'Pulang')>Pulang</option>
+                        <option value="Batal"   @selected($status_periksa === 'Batal')>Batal</option>
+                    </select>
+                </div>
+            </div>
+
             <a href="{{ route('modul.rawat-jalan.sub-rawat-jalan.riwayat-pasien', str_replace('/', '-', $no_rawat)) }}" 
                wire:navigate
                class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all shadow-sm">
@@ -679,7 +804,7 @@
                                                     <template x-if="!item.children || item.children.length === 0">
                                                         <div class="h-full flex flex-col">
                                                             <a :href="getMenuUrl(item.url)"
-                                                                :target="(!item.url || item.url === '#') ? '_self' : '_blank'"
+                                                                :target="'_self'"
                                                                 class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm">
                                                                 <div
                                                                     class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
@@ -717,7 +842,7 @@
                                                             x-for="(child, idx) in row.find(it => isSubMenuOpen(group.label + '_' + it.label))?.children"
                                                             :key="child.label">
                                                             <a :href="getMenuUrl(child.url)"
-                                                                :target="(!child.url || child.url === '#') ? '_self' : '_blank'"
+                                                                :target="'_self'"
                                                                 class="flex items-center gap-3 p-3 h-[64px] rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
                                                                 <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
                                                                     x-text="idx + 1"></div>

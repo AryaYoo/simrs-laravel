@@ -34,6 +34,7 @@
             action: '{{ route("modul.rawat-jalan.perawatan-tindakan", ":noRawat") }}',
             'resep-dokter': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resep-dokter", ":noRawat") }}',
             'permintaan-lab': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-lab", ":noRawat") }}',
+            'permintaan-rawat-inap': '{{ route("modul.rawat-jalan.sub-rawat-jalan.permintaan-rawat-inap", ":noRawat") }}',
             'triase-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.triase-igd", ":noRawat") }}',
             'catatan-keperawatan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.catatan-keperawatan", ":noRawat") }}',
             'observasi-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.observasi-igd", ":noRawat") }}',
@@ -199,7 +200,7 @@
                     { label: 'Jadwal Operasi', url: '#' },
                     { label: 'Pemeriksaan Lab', url: 'permintaan-lab' },
                     { label: 'Pemeriksaan Radiologi', url: '#' },
-                    { label: 'Rawat Inap', url: '#' },
+                    { label: 'Rawat Inap', url: 'permintaan-rawat-inap' },
                     { label: 'Informasi Obat', url: '#' },
                     { label: 'Konsultasi Medik', url: '#' },
                 ]
@@ -533,13 +534,16 @@
                         placeholder="Cari No Rawat, No RM, atau Nama Pasien..."
                         icon="magnifying-glass" />
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900/50 p-1 rounded-lg border border-neutral-100 dark:border-neutral-800">
-                    <div class="flex items-center gap-2 px-2">
-                        <label class="text-[10px] font-black uppercase tracking-tighter text-neutral-400">Periode</label>
-                        <flux:input type="date" wire:model.live="dari" size="sm" class="w-36" />
-                        <span class="text-xs text-neutral-400 font-bold">-</span>
-                        <flux:input type="date" wire:model.live="sampai" size="sm" class="w-36" />
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900/50 p-1 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                        <div class="flex items-center gap-2 px-2">
+                            <label class="text-[10px] font-black uppercase tracking-tighter text-neutral-400">Periode</label>
+                            <flux:input type="date" wire:model.live="dari" size="sm" class="w-36" />
+                            <span class="text-xs text-neutral-400 font-bold">-</span>
+                            <flux:input type="date" wire:model.live="sampai" size="sm" class="w-36" />
+                        </div>
                     </div>
+                    <flux:button wire:click="$refresh" icon="arrow-path" square size="sm" variant="outline" class="flex-shrink-0 !h-[38px] !w-[38px] !rounded-lg border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700" title="Refresh Data" />
                 </div>
             </div>
             

@@ -21,6 +21,7 @@ class Index extends Component
     public string $no_rawat;
     public $regPeriksa;
     public string $activeTab = 'pemeriksaan';
+    public string $status_periksa = 'Belum';
 
     // Form State for Pemeriksaan
     public bool $createModalOpen = false;
@@ -81,8 +82,9 @@ class Index extends Component
         ->where('no_rawat', $this->no_rawat)
         ->firstOrFail();
 
-        $this->tgl_perawatan = now()->format('Y-m-d');
-        $this->jam_rawat     = now()->format('H:i:s');
+        $this->tgl_perawatan  = now()->format('Y-m-d');
+        $this->jam_rawat      = now()->format('H:i:s');
+        $this->status_periksa = $this->regPeriksa->stts ?? 'Belum';
 
         // SOP #1: Initialize concurrency lock
         $this->initializeLock($this->regPeriksa);
@@ -438,6 +440,29 @@ class Index extends Component
             PerawatanTindakanRalanRepository::deleteTindakan($type, $this->no_rawat, $kd_jenis_prw, $tgl_perawatan, $jam_rawat);
             $this->dispatch('swal', ['title' => 'Berhasil', 'text' => 'Data tindakan berhasil dihapus.', 'icon' => 'success']);
             $this->initializeLock($this->regPeriksa->fresh());
+        } catch (\Exception $e) {
+            $this->dispatch('swal', ['title' => 'Terjadi Kesalahan', 'text' => $e->getMessage(), 'icon' => 'error']);
+        }
+    }
+
+    /**
+     * Update the patient examination status (stts).
+     */
+    public function updateStatusPeriksa(string $newStatus): void
+    {
+        $allowed = ['Belum', 'Sudah', 'Batal', 'Dirujuk', 'Dirawat', 'Pulang'];
+        if (!in_array($newStatus, $allowed)) {
+            $this->dispatch('swal', ['title' => 'Peringatan', 'text' => 'Status tidak valid.', 'icon' => 'warning']);
+            return;
+        }
+
+        try {
+            $this->regPeriksa->stts = $newStatus;
+            $this->regPeriksa->save();
+            $this->status_periksa = $newStatus;
+            $this->regPeriksa = $this->regPeriksa->fresh(['pasien', 'penjab', 'dokter', 'poliklinik']);
+            $this->dispatch('status-periksa-changed', status: $newStatus);
+            $this->dispatch('swal', ['title' => 'Berhasil!', 'text' => 'Status periksa pasien berhasil diubah ke "' . $newStatus . '".', 'icon' => 'success']);
         } catch (\Exception $e) {
             $this->dispatch('swal', ['title' => 'Terjadi Kesalahan', 'text' => $e->getMessage(), 'icon' => 'error']);
         }

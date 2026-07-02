@@ -392,3 +392,16 @@ Dapat diakses di: [https://github.com/AryaYoo/simrs-laravel.git](https://github.
 
 ---
 *Dikembangkan dengan ❤️ untuk kemajuan Layanan Kesehatan Indonesia.*
+
+---
+
+## 📜 SOP (Standard Operating Procedure)
+
+### Navigasi Sub Menu Layanan Rawat Jalan
+Ketentuan dalam membuka halaman dari tombol-tombol di dalam **Sub Menu Layanan Rawat Jalan**:
+
+1. **Dari Halaman Daftar Pasien Rawat Jalan (Halaman Utama / Index)**
+   Jika sub menu dibuka dari halaman daftar pasien, maka setiap tombol yang diklik harus mengarahkan ke halaman tujuan dengan membuka **tab browser baru** (`target="_blank"`).
+
+2. **Dari Halaman Perawatan & Tindakan Rawat Jalan (Halaman Detail)**
+   Jika sub menu dibuka dari halaman detail pasien ini, maka setiap tombol yang diklik harus mengarahkan ke halaman tujuan pada **tab browser yang sama** (`target="_self"`).

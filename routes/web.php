@@ -61,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('modul/rawat-jalan', \App\Livewire\Modul\RawatJalan\Index::class)->name('modul.rawat-jalan.index');
     Route::get('modul/rawat-jalan/{no_rawat}/perawatan-tindakan', \App\Livewire\Modul\RawatJalan\PerawatanTindakan\Index::class)->name('modul.rawat-jalan.perawatan-tindakan')->where('no_rawat', '.*');
+    Route::get('modul/rawat-jalan/{no_rawat}/permintaan-rawat-inap', \App\Livewire\Modul\RawatJalan\SubRawatJalan\PermintaanRawatInap\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.permintaan-rawat-inap')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/resep-dokter', \App\Livewire\Modul\RawatJalan\SubRawatJalan\ResepDokter\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.resep-dokter')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/permintaan-lab', \App\Livewire\Modul\RawatJalan\SubRawatJalan\PermintaanLab\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.permintaan-lab')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/permintaan-lab/cetak/{noorder}', [\App\Http\Controllers\RawatInap\CetakPermintaanLabController::class, 'cetak'])->name('modul.rawat-jalan.permintaan-lab.cetak')->where('no_rawat', '.*');
