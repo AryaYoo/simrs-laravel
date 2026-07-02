@@ -321,13 +321,21 @@ class Index extends Component
     {
         $this->reset(['kd_dokter_tindakan', 'nm_dokter_tindakan', 'nip_tindakan', 'nm_petugas_tindakan', 'kd_jenis_prw_selected', 'nm_perawatan_selected', 'isEditTindakanMode', 'original_tindakan_type', 'original_tgl_perawatan', 'original_jam_rawat', 'original_kd_jenis_prw']);
 
-        // Auto-fill petugas from logged-in user
+        // Auto-fill pelaksana from logged-in user
+        // Priority: if the user is a doctor, fill Dokter Pelaksana; otherwise fill Petugas Pelaksana
         $loggedInUsername = auth()->user()->username ?? null;
         if ($loggedInUsername) {
             $pegawai = \App\Models\Pegawai::find($loggedInUsername);
             if ($pegawai) {
-                $this->nip_tindakan = $pegawai->nik;
-                $this->nm_petugas_tindakan = $pegawai->nama;
+                // Check if this pegawai is also registered as a dokter (kd_dokter = nik)
+                $dokter = \App\Models\Dokter::where('kd_dokter', $pegawai->nik)->first();
+                if ($dokter) {
+                    $this->kd_dokter_tindakan = $dokter->kd_dokter;
+                    $this->nm_dokter_tindakan = $dokter->nm_dokter;
+                } else {
+                    $this->nip_tindakan = $pegawai->nik;
+                    $this->nm_petugas_tindakan = $pegawai->nama;
+                }
             }
         }
 

@@ -5,6 +5,7 @@
         activePatient: { noRawat: '', noRawatSlug: '', nmPasien: '' },
         isAdmin: {{ auth()->user()->role === 'admin' ? 'true' : 'false' }},
         cols: 2,
+        showBpjsColor: false,
         init() {
             this.updateCols();
             window.addEventListener('resize', () => this.updateCols());
@@ -491,6 +492,39 @@
         </div>
     </div>
 
+    {{-- Keterangan Kode Warna --}}
+    <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 mb-3 shadow-sm">
+        <div class="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+            <flux:icon name="information-circle" class="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+            <span>Keterangan Status &amp; Kode Warna Pasien</span>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-100 dark:border-neutral-850">
+                <span class="w-3.5 h-3.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 block flex-shrink-0"></span>
+                <span class="text-xs font-medium text-neutral-600 dark:text-neutral-300">Umum/Lainnya (Belum Bayar)</span>
+            </div>
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-neutral-200 dark:bg-neutral-700/70 border border-neutral-300/80 dark:border-neutral-600/80">
+                <span class="w-3.5 h-3.5 rounded bg-neutral-300 dark:bg-neutral-600 border border-neutral-400 dark:border-neutral-500 block flex-shrink-0"></span>
+                <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-200">Umum/Lainnya (Sudah Bayar)</span>
+            </div>
+            <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                <div class="flex items-center gap-2">
+                    <span class="w-3.5 h-3.5 rounded bg-emerald-250 dark:bg-emerald-800 border border-emerald-350 dark:border-emerald-750 block flex-shrink-0" x-show="showBpjsColor"></span>
+                    <span class="w-3.5 h-3.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 block flex-shrink-0" x-show="!showBpjsColor"></span>
+                    <span class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Pasien BPJS (Belum Periksa)</span>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer select-none">
+                    <input type="checkbox" x-model="showBpjsColor" class="sr-only peer">
+                    <div class="w-7 h-4 bg-neutral-300 dark:bg-neutral-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-350 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+            </div>
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/30">
+                <span class="w-3.5 h-3.5 rounded bg-red-200 dark:bg-red-800 border border-red-300 dark:border-red-700 block flex-shrink-0"></span>
+                <span class="text-xs font-semibold text-red-800 dark:text-red-300">Pasien BPJS (Sudah Periksa)</span>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4">
         <div class="flex flex-col gap-4 mb-6">
             <div class="flex flex-col md:flex-row gap-3">
@@ -542,8 +576,26 @@
 
             <flux:table.rows>
                 @forelse ($regPeriksas as $reg)
-                    @php $isBpjs = str_contains(strtoupper($reg->penjab->png_jawab ?? ''), 'BPJS'); @endphp
-                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''">
+                    @php
+                        $isBpjs = str_contains(strtoupper($reg->penjab->png_jawab ?? ''), 'BPJS');
+                        $rowClassWithGreen = '';
+                        $rowClassWithoutGreen = '';
+                        if ($isBpjs) {
+                            if (($reg->stts ?? '') === 'Sudah') {
+                                $rowClassWithGreen = 'bg-red-50 dark:bg-red-950/30';
+                                $rowClassWithoutGreen = 'bg-red-50 dark:bg-red-950/30';
+                            } else {
+                                $rowClassWithGreen = 'bg-emerald-50 dark:bg-emerald-950/20';
+                                $rowClassWithoutGreen = '';
+                            }
+                        } else {
+                            if (($reg->status_bayar ?? '') === 'Sudah Bayar') {
+                                $rowClassWithGreen = 'bg-neutral-200 dark:bg-neutral-700/70';
+                                $rowClassWithoutGreen = 'bg-neutral-200 dark:bg-neutral-700/70';
+                            }
+                        }
+                    @endphp
+                    <flux:table.row :key="$reg->no_rawat" x-bind:class="showBpjsColor ? '{{ $rowClassWithGreen }}' : '{{ $rowClassWithoutGreen }}'">
                         <flux:table.cell>
                             <button type="button"
                                 @click="openMenu('{{ $reg->no_rawat }}', '{{ $reg->pasien->nm_pasien ?? '' }}')"
