@@ -1,5 +1,6 @@
 <div class="p-6 lg:p-8 transition-all duration-500 animate-in fade-in space-y-8"
      x-data="{
+         activeTab: 'data',
          showDetail: false,
          selectedReg: null,
          checklist: null,
@@ -92,8 +93,23 @@
         </div>
     </div>
 
+    {{-- ═══ TAB NAVIGATION ══════════════════════════════════════════════════════ --}}
+    <div class="flex items-center gap-4 border-b border-neutral-200 dark:border-neutral-700 pb-px mb-2">
+        <button @click="activeTab = 'data'" :class="activeTab === 'data' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors flex items-center gap-2">
+            <flux:icon name="clipboard-document-check" class="w-4 h-4" />
+            Data Pasien
+        </button>
+        <button @click="activeTab = 'analisis'" :class="activeTab === 'analisis' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'" class="px-4 py-3 text-sm font-bold border-b-2 transition-colors flex items-center gap-2">
+            <flux:icon name="chart-pie" class="w-4 h-4" />
+            Analisis Pasien
+        </button>
+    </div>
+
+    {{-- TAB CONTENT: ANALISIS PASIEN --}}
+    <div x-show="activeTab === 'analisis'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-8">
+
     {{-- ═══ ANALISIS KUNJUNGAN PASIEN TERBANYAK (TOP 10) ══════════════════════ --}}
-    <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm p-6 mt-4 mb-4">
+    <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm p-6">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h2 class="text-base font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
@@ -336,6 +352,11 @@
         </div>
     </template>
     @endif
+
+    </div> {{-- END TAB CONTENT: ANALISIS PASIEN --}}
+
+    {{-- TAB CONTENT: DATA PASIEN --}}
+    <div x-show="activeTab === 'data'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-8">
 
     {{-- ═══ MONITORING KELENGKAPAN DATA (PER NO RAWAT) ══════════════════════════ --}}
     <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm overflow-hidden flex flex-col">
@@ -627,7 +648,7 @@
                 </div>
             </template>
         </div>
-    </div>
+    </div> {{-- END TAB CONTENT: DATA PASIEN --}}
 </div>
 
 {{-- ─── Chart.js untuk Tren Kunjungan ─────────────────────────────────────── --}}
