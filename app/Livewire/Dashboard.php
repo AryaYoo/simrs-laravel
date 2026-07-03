@@ -255,12 +255,27 @@ class Dashboard extends Component
             ->limit(10)
             ->get();
 
+        // ─── 5. Top 10 Pasien dengan Kunjungan Terbanyak ──────────────────────────
+        $topVisitPatients = DB::table('reg_periksa as rp')
+            ->join('pasien as p', 'rp.no_rkm_medis', '=', 'p.no_rkm_medis')
+            ->selectRaw("
+                p.no_rkm_medis,
+                p.nm_pasien,
+                COUNT(rp.no_rawat) as total_kunjungan
+            ")
+            ->groupBy('p.no_rkm_medis', 'p.nm_pasien')
+            ->having('total_kunjungan', '>', 0)
+            ->orderByDesc('total_kunjungan')
+            ->limit(10)
+            ->get();
+
         return view('livewire.dashboard', [
             'stats'            => $stats,
             'trendData'        => $trendData,
             'registrations'    => $registrations,
             'checklistData'    => $checklistData,
             'topUmumPatients'  => $topUmumPatients,
+            'topVisitPatients' => $topVisitPatients,
         ]);
     }
 }

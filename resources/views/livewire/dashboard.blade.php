@@ -92,6 +92,68 @@
         </div>
     </div>
 
+    {{-- ═══ ANALISIS KUNJUNGAN PASIEN TERBANYAK (TOP 10) ══════════════════════ --}}
+    <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm p-6 mt-4 mb-4">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h2 class="text-base font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
+                    <flux:icon name="users" class="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                    Analisis Pasien dengan Kunjungan Terbanyak (Top 10)
+                </h2>
+                <p class="text-xs text-neutral-400 mt-0.5">Berdasarkan total riwayat registrasi seluruh pasien</p>
+            </div>
+            <span class="hidden md:flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900/20 text-neutral-600 dark:text-neutral-400 text-xs font-bold ring-1 ring-neutral-200 dark:ring-neutral-800">
+                <flux:icon name="document-chart-bar" class="w-3.5 h-3.5" />
+                Detail Analitik
+            </span>
+        </div>
+
+        @if($topVisitPatients->isEmpty())
+            <div class="flex flex-col items-center justify-center py-12 text-neutral-400">
+                <flux:icon name="presentation-chart-bar" class="w-12 h-12 mb-3 opacity-40" />
+                <p class="text-sm font-medium">Belum ada data kunjungan pasien</p>
+            </div>
+        @else
+        @php
+            $maxVisits = $topVisitPatients->first()->total_kunjungan;
+        @endphp
+        <div class="space-y-3">
+            @foreach($topVisitPatients as $idx => $patient)
+            @php
+                $pct = $maxVisits > 0 ? round(($patient->total_kunjungan / $maxVisits) * 100) : 0;
+            @endphp
+            <div wire:click="loadPatientVisits('{{ $patient->no_rkm_medis }}', '{{ addslashes($patient->nm_pasien) }}')"
+                 class="flex items-center gap-3 group cursor-pointer rounded-xl px-2 py-2 -mx-2 hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
+                
+                {{-- Rank Number --}}
+                <div class="flex-shrink-0 w-8 h-8 rounded-md bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-300 flex items-center justify-center text-xs font-bold shadow-sm">
+                    {{ $idx + 1 }}
+                </div>
+
+                {{-- Patient Info + Bar --}}
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between mb-1 gap-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">{{ $patient->nm_pasien }}</span>
+                            <span class="flex-shrink-0 font-mono text-[10px] text-neutral-400 dark:text-neutral-500">{{ $patient->no_rkm_medis }}</span>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <span class="text-sm font-bold text-neutral-700 dark:text-neutral-200">
+                                {{ $patient->total_kunjungan }} kunjungan
+                            </span>
+                            <flux:icon name="eye" class="w-4 h-4 text-neutral-300 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors flex-shrink-0" />
+                        </div>
+                    </div>
+                    <div class="w-full bg-neutral-100 dark:bg-neutral-700 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-700 bg-sky-500" style="width: {{ $pct }}%"></div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
+    </div>
+
     {{-- ═══ ANALISIS PENDAPATAN PASIEN UMUM (TOP 10) ═══════════════════════════ --}}
     <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm p-6">
         <div class="flex items-center justify-between mb-5">
