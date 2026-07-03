@@ -464,7 +464,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-neutral-800 dark:text-white">Upload Foto USG Kandungan</h3>
-                        <p class="text-xs text-neutral-500">JPEG, PNG, WebP · Maks 10MB</p>
+                        <p class="text-xs text-neutral-500">JPEG/JPG · Maks 10MB</p>
                     </div>
                 </div>
                 <button @click="closePhotoModal()"
@@ -518,7 +518,7 @@
 
                         <input id="photo-file-input" type="file" class="hidden"
                             wire:model="photoUpload"
-                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                            accept="image/jpeg,image/jpg"
                             @change="handleFileSelect($event)">
                     </div>
 

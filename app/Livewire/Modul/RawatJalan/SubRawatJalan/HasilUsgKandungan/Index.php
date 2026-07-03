@@ -268,11 +268,11 @@ class Index extends Component
     {
         try {
             $this->validate([
-                'photoUpload' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240',
+                'photoUpload' => 'required|image|mimes:jpeg,jpg|max:10240',
             ], [
                 'photoUpload.required'  => 'Silakan pilih file gambar terlebih dahulu.',
                 'photoUpload.image'     => 'File harus berupa gambar.',
-                'photoUpload.mimes'     => 'Format gambar harus jpeg, jpg, png, atau webp.',
+                'photoUpload.mimes'     => 'Format gambar harus jpeg atau jpg (sesuai standar Khanza).',
                 'photoUpload.max'       => 'Ukuran gambar tidak boleh lebih dari 10MB.',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
