@@ -92,58 +92,42 @@
         </div>
     </div>
 
-    {{-- ═══ TOP 10 PASIEN UMUM – PENGELUARAN TERBANYAK ═══════════════════════════ --}}
+    {{-- ═══ ANALISIS PENDAPATAN PASIEN UMUM (TOP 10) ═══════════════════════════ --}}
     <div class="bg-white dark:bg-neutral-800 rounded-2xl ring-1 ring-neutral-200 dark:ring-neutral-700 shadow-sm p-6">
         <div class="flex items-center justify-between mb-5">
             <div>
                 <h2 class="text-base font-bold text-neutral-800 dark:text-neutral-100 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                    </svg>
-                    Top 10 Pasien Umum – Pengeluaran Terbanyak
+                    <flux:icon name="chart-bar-square" class="w-5 h-5 text-[#4C5C2D]" />
+                    Analisis Pendapatan Pasien Umum (Top 10)
                 </h2>
                 <p class="text-xs text-neutral-400 mt-0.5">Berdasarkan total tagihan billing seluruh kunjungan (pasien dengan penjamin Umum)</p>
             </div>
-            <span class="hidden md:flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-xs font-bold ring-1 ring-amber-200 dark:ring-amber-800">
-                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
-                </svg>
-                Leaderboard
+            <span class="hidden md:flex items-center gap-1 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900/20 text-neutral-600 dark:text-neutral-400 text-xs font-bold ring-1 ring-neutral-200 dark:ring-neutral-800">
+                <flux:icon name="document-chart-bar" class="w-3.5 h-3.5" />
+                Detail Analitik
             </span>
         </div>
 
         @if($topUmumPatients->isEmpty())
             <div class="flex flex-col items-center justify-center py-12 text-neutral-400">
-                <svg class="w-12 h-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
-                <p class="text-sm font-medium">Belum ada data tagihan pasien umum</p>
+                <flux:icon name="presentation-chart-bar" class="w-12 h-12 mb-3 opacity-40" />
+                <p class="text-sm font-medium">Belum ada data analitik pasien umum</p>
             </div>
         @else
         @php
             $maxSpend = $topUmumPatients->first()->total_pengeluaran;
-            $medalColors = [
-                0 => ['bg' => 'bg-amber-400',  'text' => 'text-amber-900',  'ring' => 'ring-amber-300',  'bar' => 'bg-gradient-to-r from-amber-400 to-amber-300'],
-                1 => ['bg' => 'bg-neutral-300', 'text' => 'text-neutral-700','ring' => 'ring-neutral-200', 'bar' => 'bg-gradient-to-r from-neutral-400 to-neutral-300'],
-                2 => ['bg' => 'bg-orange-400',  'text' => 'text-orange-900', 'ring' => 'ring-orange-300',  'bar' => 'bg-gradient-to-r from-orange-400 to-orange-300'],
-            ];
         @endphp
         <div class="space-y-3">
             @foreach($topUmumPatients as $idx => $patient)
             @php
-                $pct   = $maxSpend > 0 ? round(($patient->total_pengeluaran / $maxSpend) * 100) : 0;
-                $medal = $medalColors[$idx] ?? null;
-                $rankBg = $medal ? $medal['bg'] . ' ' . $medal['text'] : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-300';
+                $pct = $maxSpend > 0 ? round(($patient->total_pengeluaran / $maxSpend) * 100) : 0;
             @endphp
             <div wire:click="loadPatientVisits('{{ $patient->no_rkm_medis }}', '{{ addslashes($patient->nm_pasien) }}')"
                  class="flex items-center gap-3 group cursor-pointer rounded-xl px-2 py-2 -mx-2 hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
-                {{-- Rank Badge --}}
-                <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $rankBg }} {{ $medal ? 'ring-2 '.$medal['ring'] : '' }} flex items-center justify-center text-xs font-black shadow-sm">
-                    @if($idx < 3)
-                        {{ $idx === 0 ? '🥇' : ($idx === 1 ? '🥈' : '🥉') }}
-                    @else
-                        {{ $idx + 1 }}
-                    @endif
+                
+                {{-- Rank Number --}}
+                <div class="flex-shrink-0 w-8 h-8 rounded-md bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-300 flex items-center justify-center text-xs font-bold shadow-sm">
+                    {{ $idx + 1 }}
                 </div>
 
                 {{-- Patient Info + Bar --}}
@@ -155,17 +139,16 @@
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
                             <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/20 text-[#4C5C2D] dark:text-[#8CC7C4] font-semibold">
-                                {{ $patient->total_kunjungan }}x kunjungan
+                                {{ $patient->total_kunjungan }} kunjungan
                             </span>
-                            <span class="text-sm font-bold {{ $idx === 0 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-700 dark:text-neutral-200' }}">
+                            <span class="text-sm font-bold text-neutral-700 dark:text-neutral-200 w-32 text-right">
                                 Rp {{ number_format($patient->total_pengeluaran, 0, ',', '.') }}
                             </span>
                             <flux:icon name="eye" class="w-4 h-4 text-neutral-300 group-hover:text-[#4C5C2D] dark:group-hover:text-[#8CC7C4] transition-colors flex-shrink-0" />
                         </div>
                     </div>
-                    <div class="w-full bg-neutral-100 dark:bg-neutral-700 rounded-full h-2 overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-700 {{ $medal ? $medal['bar'] : 'bg-gradient-to-r from-[#4C5C2D] to-[#6B8340]' }}"
-                             style="width: {{ $pct }}%"></div>
+                    <div class="w-full bg-neutral-100 dark:bg-neutral-700 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-700 bg-[#4C5C2D]" style="width: {{ $pct }}%"></div>
                     </div>
                 </div>
             </div>
