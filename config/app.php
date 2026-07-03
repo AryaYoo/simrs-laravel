@@ -132,6 +132,11 @@ return [
     |
     */
 
-    'khanza_usg_url' => env('KHANZA_USG_URL', 'http://localhost/webapps/hasilpemeriksaanusg/'),
+    'khanza_usg_url'  => env('KHANZA_USG_URL', 'http://localhost/webapps/hasilpemeriksaanusg/'),
+
+    // Physical disk path ke direktori webapps Khanza (untuk menyimpan file upload).
+    // Di production Debian: /var/www/html/webapps/hasilpemeriksaanusg/
+    // Di dev Windows: biarkan kosong, akan fallback ke folder public/ lokal.
+    'khanza_usg_path' => env('KHANZA_USG_PATH', ''),
 
 ];

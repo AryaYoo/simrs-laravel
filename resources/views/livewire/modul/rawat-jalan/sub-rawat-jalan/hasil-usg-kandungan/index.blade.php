@@ -336,7 +336,12 @@
                             <h4 class="text-xs font-bold uppercase tracking-widest text-neutral-400">Foto Hasil USG</h4>
                             <div class="flex items-center gap-2">
                                 @if($gambar && $gambar->photo)
-                                    <a href="{{ asset($gambar->photo) }}" target="_blank"
+                                    @php
+                                        // Cek apakah gambar disimpan di Laralite (dev) atau Khanza (prod)
+                                        $isLocal = str_starts_with($gambar->photo, 'uploads/usg/');
+                                        $imgUrl = $isLocal ? asset($gambar->photo) : config('app.khanza_usg_url') . $gambar->photo;
+                                    @endphp
+                                    <a href="{{ $imgUrl }}" target="_blank"
                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-900/20 text-sky-600 text-xs font-medium hover:bg-sky-100 transition-colors">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
                                         Buka
@@ -357,7 +362,7 @@
                             {{-- Photo display --}}
                             <div class="relative flex-1 rounded-2xl overflow-hidden border-2 border-neutral-200 dark:border-neutral-700 bg-black min-h-48"
                                  x-data="{ showDeleteConfirm: false }">
-                                <img src="{{ asset($gambar->photo) }}"
+                                <img src="{{ $imgUrl }}"
                                      alt="Foto USG Kandungan"
                                      class="w-full h-full object-contain"
                                      style="min-height: 12rem"

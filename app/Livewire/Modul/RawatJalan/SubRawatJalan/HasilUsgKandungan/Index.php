@@ -276,38 +276,56 @@ class Index extends Component
         ]);
 
         try {
-            // Build destination path (public/uploads/usg/{no_rawat_slug}/)
-            $slug   = str_replace('/', '-', $this->no_rawat);
-            $dir    = public_path('uploads/usg/' . $slug);
+            $khanzaBasePath = config('app.khanza_usg_path');
+            $useKhanza      = !empty($khanzaBasePath) && is_dir($khanzaBasePath);
+
+            // Tentukan direktori tujuan:
+            // - Production (Debian): {KHANZA_USG_PATH}/pages/upload/
+            // - Dev (fallback): public/uploads/usg/ lokal
+            if ($useKhanza) {
+                $dir          = rtrim($khanzaBasePath, '/\\') . DIRECTORY_SEPARATOR . 'pages' . DIRECTORY_SEPARATOR . 'upload';
+                $subPath      = 'pages/upload';
+            } else {
+                $slug         = str_replace('/', '-', $this->no_rawat);
+                $dir          = public_path('uploads/usg/' . $slug);
+                $subPath      = 'uploads/usg/' . $slug;
+            }
 
             // Pastikan direktori tujuan ada (recursive)
             if (!is_dir($dir)) {
                 mkdir($dir, 0755, true);
             }
 
-            // Remove old photo if exists
+            // Hapus foto lama jika ada
             $existing = HasilPemeriksaanUsgGambar::where('no_rawat', $this->no_rawat)->first();
             if ($existing && $existing->photo) {
-                $oldPath = public_path($existing->photo);
+                $isLocal = str_starts_with($existing->photo, 'uploads/usg/');
+                $oldPath = $isLocal
+                    ? public_path($existing->photo)
+                    : rtrim($khanzaBasePath, '/\\') . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $existing->photo);
+                
                 if (File::exists($oldPath)) {
                     File::delete($oldPath);
                 }
             }
 
-            // Store new photo
-            // Gunakan copy() bukan move() karena Livewire menyimpan file di
-            // storage/app/private/livewire-tmp sehingga move_uploaded_file() gagal di Windows
-            $filename     = 'usg_' . $slug . '_' . time() . '.' . $this->photoUpload->getClientOriginalExtension();
-            $sourcePath   = $this->photoUpload->getRealPath();
-            $destPath     = $dir . DIRECTORY_SEPARATOR . $filename;
+            // Simpan foto baru
+            // Gunakan copy() bukan move() karena Livewire menyimpan file sementara di
+            // storage/app/private/livewire-tmp sehingga move_uploaded_file() gagal di Windows.
+            $slug       = str_replace('/', '-', $this->no_rawat);
+            $filename   = 'usg_' . $slug . '_' . time() . '.' . $this->photoUpload->getClientOriginalExtension();
+            $sourcePath = $this->photoUpload->getRealPath();
+            $destPath   = $dir . DIRECTORY_SEPARATOR . $filename;
 
             if (!copy($sourcePath, $destPath)) {
-                throw new Exception('Gagal menyalin file foto ke direktori tujuan. Pastikan folder public/uploads/ dapat ditulis.');
+                throw new Exception('Gagal menyalin file foto ke direktori tujuan. Pastikan direktori dapat ditulis.');
             }
 
-            $relativePath = 'uploads/usg/' . $slug . '/' . $filename;
+            // Format path di DB mengikuti konvensi Khanza: "pages/upload/{filename}"
+            // sehingga sistem Khanza juga dapat menampilkan gambar yang diupload Laralite.
+            $relativePath = $subPath . '/' . $filename;
 
-            // Upsert record in hasil_pemeriksaan_usg_gambar
+            // Upsert record di hasil_pemeriksaan_usg_gambar
             HasilPemeriksaanUsgGambar::updateOrCreate(
                 ['no_rawat' => $this->no_rawat],
                 ['photo'    => $relativePath]
@@ -336,7 +354,13 @@ class Index extends Component
             $gambar = HasilPemeriksaanUsgGambar::where('no_rawat', $this->no_rawat)->first();
 
             if ($gambar) {
-                $path = public_path($gambar->photo);
+                $khanzaBasePath = config('app.khanza_usg_path');
+                $isLocal = str_starts_with($gambar->photo, 'uploads/usg/');
+
+                $path = $isLocal
+                    ? public_path($gambar->photo)
+                    : rtrim($khanzaBasePath, '/\\') . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $gambar->photo);
+
                 if (File::exists($path)) {
                     File::delete($path);
                 }
