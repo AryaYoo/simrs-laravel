@@ -612,17 +612,31 @@
                     x-show="previewUrl"
                     wire:click="uploadPhoto"
                     wire:loading.attr="disabled"
+                    wire:target="photoUpload, uploadPhoto"
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold transition-colors shadow-lg shadow-purple-200 dark:shadow-none disabled:opacity-60 disabled:cursor-not-allowed">
-                    <span wire:loading.remove wire:target="uploadPhoto">
+                    
+                    {{-- Default State --}}
+                    <span wire:loading.remove wire:target="photoUpload, uploadPhoto" class="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3" /><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5" /></svg>
+                        <span>Simpan Foto</span>
                     </span>
-                    <span wire:loading.remove wire:target="uploadPhoto">Simpan Foto</span>
-                    <span wire:loading wire:target="uploadPhoto" class="flex items-center gap-2">
-                        <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+
+                    {{-- Loading: Uploading file to Livewire temp folder --}}
+                    <span wire:loading wire:target="photoUpload" class="flex items-center gap-2">
+                        <svg class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                         </svg>
-                        Mengupload...
+                        <span>Mengirim Gambar...</span>
+                    </span>
+
+                    {{-- Loading: Saving database entry --}}
+                    <span wire:loading wire:target="uploadPhoto" class="flex items-center gap-2">
+                        <svg class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        <span>Menyimpan...</span>
                     </span>
                 </button>
             </div>
