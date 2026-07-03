@@ -137,6 +137,8 @@
             'pengkajian-awal-keperawatan-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd", ":noRawat") }}',
             'riwayat-pasien': '{{ route("modul.rawat-jalan.sub-rawat-jalan.riwayat-pasien", ":noRawat") }}',
             'resume': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resume", ":noRawat") }}',
+            'hasilUsgKandungan': '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan", ":noRawat") }}',
+            'hasilUsgGynecologi': '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -187,7 +189,12 @@
                     { label: 'RM Rawat Jalan', children: [
                         { label: 'Awal Keperawatan', url: '#' },
                         { label: 'Awal Medis', url: '#' },
-                        { label: 'Hasil USG', url: '#' },
+                        { label: 'Hasil USG', children: [
+                            { label: 'Hasil USG Kandungan', url: 'hasilUsgKandungan' },
+                            { label: 'Hasil USG Urologi', url: '#' },
+                            { label: 'Hasil USG Neonatus', url: '#' },
+                            { label: 'Hasil USG Gynecologi', url: 'hasilUsgGynecologi' },
+                        ]},
                         { label: 'Hasil Endoskopi', url: '#' },
                         { label: 'Hasil Pemeriksaan EKG', url: '#' },
                         { label: 'Hasil Pemeriksaan ECHO', url: '#' },
