@@ -15,7 +15,7 @@
         });
 
         setInterval(() => {
-            if ($wire.isAutoTimestamp) { $wire.updateTime(); }
+            if (this.showModal && $wire.isAutoTimestamp) { $wire.updateTime(); }
         }, 1000);
     },
     handleFileSelect(event) {
