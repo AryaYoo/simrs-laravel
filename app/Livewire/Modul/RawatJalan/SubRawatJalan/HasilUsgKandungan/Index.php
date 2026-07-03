@@ -161,7 +161,7 @@ class Index extends Component
                 
                 $this->repository->update($this->no_rawat, $data);
                 
-                $this->dispatch('sweet-alert', [
+                $this->dispatch('swal', [
                     'icon' => 'success',
                     'title' => 'Berhasil',
                     'text' => 'Data Hasil USG Kandungan berhasil diupdate!'
@@ -174,7 +174,7 @@ class Index extends Component
                 
                 $this->repository->create($data);
                 
-                $this->dispatch('sweet-alert', [
+                $this->dispatch('swal', [
                     'icon' => 'success',
                     'title' => 'Berhasil',
                     'text' => 'Data Hasil USG Kandungan berhasil ditambahkan!'
@@ -185,7 +185,7 @@ class Index extends Component
             $this->resetForm();
 
         } catch (Exception $e) {
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Gagal',
                 'text' => $e->getMessage()
@@ -234,7 +234,7 @@ class Index extends Component
             // Dispatch event untuk membuka modal via Alpine
             $this->dispatch('open-modal');
         } else {
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Gagal',
                 'text' => 'Data tidak ditemukan.'
@@ -247,7 +247,7 @@ class Index extends Component
         try {
             $this->repository->delete($this->no_rawat);
             
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon' => 'success',
                 'title' => 'Berhasil',
                 'text' => 'Data Hasil USG Kandungan berhasil dihapus!'
@@ -256,7 +256,7 @@ class Index extends Component
             $this->resetForm();
             
         } catch (Exception $e) {
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Gagal',
                 'text' => 'Terjadi kesalahan: ' . $e->getMessage()
@@ -279,7 +279,11 @@ class Index extends Component
             // Build destination path (public/uploads/usg/{no_rawat_slug}/)
             $slug   = str_replace('/', '-', $this->no_rawat);
             $dir    = public_path('uploads/usg/' . $slug);
-            File::ensureDirectoryExists($dir);
+
+            // Pastikan direktori tujuan ada (recursive)
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
 
             // Remove old photo if exists
             $existing = HasilPemeriksaanUsgGambar::where('no_rawat', $this->no_rawat)->first();
@@ -291,8 +295,16 @@ class Index extends Component
             }
 
             // Store new photo
-            $filename  = 'usg_' . $slug . '_' . time() . '.' . $this->photoUpload->getClientOriginalExtension();
-            $this->photoUpload->move($dir, $filename);
+            // Gunakan copy() bukan move() karena Livewire menyimpan file di
+            // storage/app/private/livewire-tmp sehingga move_uploaded_file() gagal di Windows
+            $filename     = 'usg_' . $slug . '_' . time() . '.' . $this->photoUpload->getClientOriginalExtension();
+            $sourcePath   = $this->photoUpload->getRealPath();
+            $destPath     = $dir . DIRECTORY_SEPARATOR . $filename;
+
+            if (!copy($sourcePath, $destPath)) {
+                throw new Exception('Gagal menyalin file foto ke direktori tujuan. Pastikan folder public/uploads/ dapat ditulis.');
+            }
+
             $relativePath = 'uploads/usg/' . $slug . '/' . $filename;
 
             // Upsert record in hasil_pemeriksaan_usg_gambar
@@ -303,14 +315,14 @@ class Index extends Component
 
             $this->photoUpload = null;
             $this->dispatch('photo-uploaded');
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon'  => 'success',
                 'title' => 'Berhasil',
                 'text'  => 'Foto USG berhasil disimpan!',
             ]);
 
         } catch (Exception $e) {
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon'  => 'error',
                 'title' => 'Gagal Upload',
                 'text'  => $e->getMessage(),
@@ -331,14 +343,14 @@ class Index extends Component
                 $gambar->delete();
             }
 
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon'  => 'success',
                 'title' => 'Berhasil',
                 'text'  => 'Foto USG berhasil dihapus.',
             ]);
 
         } catch (Exception $e) {
-            $this->dispatch('sweet-alert', [
+            $this->dispatch('swal', [
                 'icon'  => 'error',
                 'title' => 'Gagal',
                 'text'  => $e->getMessage(),
