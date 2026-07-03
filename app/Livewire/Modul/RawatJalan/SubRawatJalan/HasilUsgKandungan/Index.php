@@ -266,14 +266,23 @@ class Index extends Component
 
     public function uploadPhoto()
     {
-        $this->validate([
-            'photoUpload' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240',
-        ], [
-            'photoUpload.required'  => 'Silakan pilih file gambar terlebih dahulu.',
-            'photoUpload.image'     => 'File harus berupa gambar.',
-            'photoUpload.mimes'     => 'Format gambar harus jpeg, jpg, png, atau webp.',
-            'photoUpload.max'       => 'Ukuran gambar tidak boleh lebih dari 10MB.',
-        ]);
+        try {
+            $this->validate([
+                'photoUpload' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240',
+            ], [
+                'photoUpload.required'  => 'Silakan pilih file gambar terlebih dahulu.',
+                'photoUpload.image'     => 'File harus berupa gambar.',
+                'photoUpload.mimes'     => 'Format gambar harus jpeg, jpg, png, atau webp.',
+                'photoUpload.max'       => 'Ukuran gambar tidak boleh lebih dari 10MB.',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->dispatch('swal', [
+                'icon'  => 'error',
+                'title' => 'Validasi Gagal',
+                'text'  => collect($e->errors())->first()[0],
+            ]);
+            throw $e;
+        }
 
         try {
             $khanzaBasePath = config('app.khanza_usg_path');
