@@ -137,7 +137,7 @@
             'pengkajian-awal-keperawatan-igd': '{{ route("modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd", ":noRawat") }}',
             'riwayat-pasien': '{{ route("modul.rawat-jalan.sub-rawat-jalan.riwayat-pasien", ":noRawat") }}',
             'resume': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resume", ":noRawat") }}',
-            'hasilUsgKandungan': '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan", ":noRawat") }}',
+            'hasilUsgKandungan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.hasil-usg-kandungan", ":noRawat") }}',
             'hasilUsgGynecologi': '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}',
         },
         chunk(items, size) {
