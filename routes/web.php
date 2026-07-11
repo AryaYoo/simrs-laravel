@@ -15,7 +15,6 @@ Route::get('lang/{locale}', function (string $locale) {
 
 Route::middleware(['auth'])->group(function () {
     // Shared Auth Routes
-    Route::get('dashboard', \App\Livewire\Dashboard::class)->name('dashboard');
     Route::get('welcome', \App\Livewire\UserDashboard::class)->name('user.dashboard');
     
     // Module Routes (Accessible by both Admin and User for now)
@@ -94,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
     // Admin Specific Routes
     Route::middleware(['role:admin'])->group(function () {
         Route::get('admin', \App\Livewire\Dashboard::class)->name('admin.dashboard');
+        Route::get('dashboard', \App\Livewire\Dashboard::class)->name('dashboard');
         Route::get('users', \App\Livewire\User\Index::class)->name('users.index');
         Route::get('admin/settings', \App\Livewire\Admin\Settings::class)->name('admin.settings');
         Route::get('admin/sql-tracker', \App\Livewire\Admin\SqlTracker::class)->name('admin.sql-tracker');

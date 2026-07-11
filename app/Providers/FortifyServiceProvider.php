@@ -31,7 +31,10 @@ class FortifyServiceProvider extends ServiceProvider
                         return redirect()->intended(route('admin.dashboard'));
                     }
 
-                    return redirect()->intended(route('user.dashboard'));
+                    // Untuk user non-admin, selalu redirect langsung ke user dashboard
+                    // TANPA menggunakan intended() agar tidak bisa diarahkan ke halaman admin
+                    // yang mungkin tersimpan di session sebelum login.
+                    return redirect()->to(route('user.dashboard'));
                 }
             };
         });
