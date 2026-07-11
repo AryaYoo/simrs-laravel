@@ -84,6 +84,44 @@ class Create extends Component
     {
         $this->tgl_daftar = now()->format('Y-m-d');
         $this->tgl_lahir = now()->format('Y-m-d');
+
+        // Auto-generate SKL number
+        $lastSkl = \App\Models\AppSetting::where('setting_key', 'LAST_SKL_NUMBER')->first();
+        if (!$lastSkl) {
+            // Auto-detect maximum number from database if not set yet
+            $maxSklRecord = \App\Models\PasienBayi::whereNotNull('no_skl')
+                ->where('no_skl', 'like', '%/%')
+                ->get()
+                ->filter(function($b) {
+                    $firstPart = explode('/', $b->no_skl)[0];
+                    return is_numeric($firstPart);
+                })
+                ->sortByDesc(function($b) {
+                    return intval(explode('/', $b->no_skl)[0]);
+                })
+                ->first();
+            
+            $lastVal = 0;
+            if ($maxSklRecord) {
+                $lastVal = intval(explode('/', $maxSklRecord->no_skl)[0]);
+            }
+
+            $lastSkl = \App\Models\AppSetting::create([
+                'setting_key' => 'LAST_SKL_NUMBER',
+                'setting_value' => strval($lastVal),
+                'description' => 'Nomor urutan terakhir untuk Surat Keterangan Lahir (SKL)'
+            ]);
+        }
+
+        $nextSeq = intval($lastSkl->setting_value) + 1;
+        $romans = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+        ];
+        $romanMonth = $romans[intval(date('m'))] ?? 'I';
+        $currentYear = date('Y');
+        
+        $this->no_skl = "{$nextSeq}/KL.RSIAIBI/{$romanMonth}/{$currentYear}";
     }
 
     public function updatedSearchPasien()
@@ -252,6 +290,20 @@ class Create extends Component
                 'mikasi' => $this->mikasi ?: '-',
                 'mikonium' => $this->mikonium ?: '-',
             ]);
+
+            // Update last SKL number
+            if (!empty($this->no_skl)) {
+                $parts = explode('/', $this->no_skl);
+                if (!empty($parts) && is_numeric($parts[0])) {
+                    \App\Models\AppSetting::updateOrCreate(
+                        ['setting_key' => 'LAST_SKL_NUMBER'],
+                        [
+                            'setting_value' => strval($parts[0]),
+                            'description' => 'Nomor urutan terakhir untuk Surat Keterangan Lahir (SKL)'
+                        ]
+                    );
+                }
+            }
 
             $this->dispatch('swal', [
                 'title' => 'Berhasil!',

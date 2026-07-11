@@ -27,6 +27,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('modul/rawat-inap', \App\Livewire\Modul\RawatInap\Index::class)->name('modul.rawat-inap.index');
     Route::get('modul/rawat-inap/kelahiran-bayi', \App\Livewire\Modul\RawatInap\KelahiranBayi\Index::class)->name('modul.rawat-inap.kelahiran-bayi');
+    Route::get('modul/rawat-inap/kelahiran-bayi/settings', \App\Livewire\Modul\RawatInap\KelahiranBayi\SklSettings::class)->name('modul.rawat-inap.kelahiran-bayi.settings');
     Route::get('modul/rawat-inap/kelahiran-bayi/create', \App\Livewire\Modul\RawatInap\KelahiranBayi\Create::class)->name('modul.rawat-inap.kelahiran-bayi.create');
     Route::get('modul/rawat-inap/kelahiran-bayi/{no_rkm_medis}/edit', \App\Livewire\Modul\RawatInap\KelahiranBayi\Edit::class)->name('modul.rawat-inap.kelahiran-bayi.edit')->where('no_rkm_medis', '.*');
     Route::get('modul/rawat-inap/kelahiran-bayi/{no_rkm_medis}/cetak-skl', [\App\Http\Controllers\RawatInap\CetakSklController::class, 'cetak'])->name('modul.rawat-inap.kelahiran-bayi.cetak-skl')->where('no_rkm_medis', '.*');

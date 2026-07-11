@@ -314,6 +314,20 @@ class Edit extends Component
                 'mikonium' => $this->mikonium ?: '-',
             ]);
 
+            // Update last SKL number
+            if (!empty($this->no_skl)) {
+                $parts = explode('/', $this->no_skl);
+                if (!empty($parts) && is_numeric($parts[0])) {
+                    \App\Models\AppSetting::updateOrCreate(
+                        ['setting_key' => 'LAST_SKL_NUMBER'],
+                        [
+                            'setting_value' => strval($parts[0]),
+                            'description' => 'Nomor urutan terakhir untuk Surat Keterangan Lahir (SKL)'
+                        ]
+                    );
+                }
+            }
+
             $this->dispatch('swal', [
                 'title' => 'Berhasil!',
                 'text'  => 'Data kelahiran bayi berhasil diupdate.',

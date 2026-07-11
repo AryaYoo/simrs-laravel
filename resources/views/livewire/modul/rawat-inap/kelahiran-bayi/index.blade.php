@@ -16,9 +16,12 @@
                 <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Daftar Pasien Bayi</h1>
             </div>
         </div>
-        <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.create')" icon="plus" wire:navigate class="!bg-[#4C5C2D] !border-[#4C5C2D] !text-white hover:!bg-[#3E4A25]">
-            Tambah Bayi
-        </flux:button>
+        <div class="flex items-center gap-2">
+            <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.settings')" icon="cog-6-tooth" variant="ghost" wire:navigate title="Pengaturan SKL" />
+            <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.create')" icon="plus" wire:navigate class="!bg-[#4C5C2D] !border-[#4C5C2D] !text-white hover:!bg-[#3E4A25]">
+                Tambah Bayi
+            </flux:button>
+        </div>
     </div>
 
     {{-- Main Card --}}
