@@ -22,7 +22,7 @@
         </div>
         <div class="flex gap-2">
             <flux:button href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}"
-                wire:navigate variant="ghost" icon="arrow-left">Kembali</flux:button>
+                wire:navigate variant="ghost" icon="arrow-left" size="sm">Kembali</flux:button>
             @if(count($dataUsg) == 0)
             <flux:button variant="primary" icon="plus" @click="$wire.resetForm(); showModal = true"
                 class="!bg-[#4C5C2D] hover:!bg-[#3f4d25] !text-white !border-none">Buat Baru</flux:button>

@@ -18,9 +18,23 @@ class Index extends Component
     public string $sampai = '';
     public string $jk = '';
     public int $perPage = 20;
+    
+    public string $sortColumn = 'tgl_daftar';
+    public string $sortDirection = 'desc';
 
     // Detail modal
     public ?array $detailBayi = null;
+
+    public function sortBy(string $column): void
+    {
+        if ($this->sortColumn === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortColumn = $column;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
 
     public function updatedSearch() { $this->resetPage(); }
     public function updatedPerPage() { $this->resetPage(); }
@@ -101,7 +115,7 @@ class Index extends Component
     public function render(KelahiranBayiRepository $repository)
     {
         return view('livewire.modul.rawat-inap.kelahiran-bayi.index', [
-            'bayis' => $repository->getPaginatedData($this->search, $this->dari, $this->sampai, $this->jk, $this->perPage)
+            'bayis' => $repository->getPaginatedData($this->search, $this->dari, $this->sampai, $this->jk, $this->perPage, $this->sortColumn, $this->sortDirection)
         ]);
     }
 }

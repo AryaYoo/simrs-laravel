@@ -11,7 +11,7 @@
         ================================================ */
         body {
             font-family: Arial, sans-serif;
-            font-size: 11.5px;
+            font-size: 14.5px;
             color: #000;
             margin: 0;
             padding: 0;
@@ -113,20 +113,20 @@
         }
         .kop-text h1 {
             margin: 0 0 2px 0;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
         .kop-text h2 {
             margin: 0 0 3px 0;
-            font-size: 13px;
+            font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
         }
         .kop-text p {
             margin: 1px 0;
-            font-size: 10.5px;
+            font-size: 12px;
         }
 
         .doc-title-block {
@@ -134,14 +134,14 @@
             margin: 16px 0 8px 0;
         }
         .doc-title {
-            font-size: 13px;
+            font-size: 17px;
             font-weight: bold;
             text-decoration: underline;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         .doc-nomor {
-            font-size: 11px;
+            font-size: 13px;
             margin-top: 3px;
         }
 
@@ -149,7 +149,7 @@
             text-align: justify;
             margin: 16px 0 12px 0;
             line-height: 1.7;
-            font-size: 11.5px;
+            font-size: 14.5px;
         }
 
         /* Data table - label:colon:value style */
@@ -163,20 +163,20 @@
             vertical-align: top;
         }
         .data-list .label {
-            width: 130px;
-            font-size: 11.5px;
+            width: 160px;
+            font-size: 14.5px;
         }
         .data-list .colon {
             width: 12px;
             text-align: center;
         }
         .data-list .value {
-            font-size: 11.5px;
+            font-size: 14.5px;
         }
         .section-label {
             font-weight: bold;
             margin: 10px 0 4px 0;
-            font-size: 11.5px;
+            font-size: 14.5px;
         }
 
         .signature-block {
@@ -189,11 +189,11 @@
             width: 220px;
         }
         .signature-city-date {
-            font-size: 11.5px;
+            font-size: 14.5px;
             margin-bottom: 2px;
         }
         .signature-title {
-            font-size: 11.5px;
+            font-size: 14.5px;
             margin-bottom: 4px;
         }
         .signature-qr img {
@@ -203,7 +203,7 @@
             height: 90px;
         }
         .signature-name {
-            font-size: 11.5px;
+            font-size: 14.5px;
             font-weight: bold;
             margin-top: 2px;
         }
@@ -336,16 +336,10 @@
         <div class="toolbar-group">
             @if(!empty($setting['wallpaper']))
                 <label class="toggle-container">
-                    <input type="checkbox" id="toggle-bg" onchange="toggleBg(this.checked)">
+                    <input type="checkbox" id="toggle-bg" checked onchange="toggleBg(this.checked)">
                     <div class="toggle-switch"></div>
                     <span>Sembunyikan Background</span>
                 </label>
-                <button class="btn-secondary" onclick="printWithoutBg()">
-                    <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                    </svg>
-                    Cetak Tanpa Background
-                </button>
             @endif
             <button class="btn-action" onclick="window.print()">
                 <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,7 +353,7 @@
 
     {{-- PAPER WRAPPER --}}
     <div class="preview-container">
-        <div class="document-page size-a4" id="documentPage"
+        <div class="document-page size-a4 no-bg" id="documentPage"
             @if(!empty($setting['wallpaper']))
                 style="background-image: url('data:image/jpeg;base64,{{ base64_encode($setting['wallpaper']) }}'); background-size: cover; background-position: center; background-repeat: no-repeat;"
             @endif
@@ -491,17 +485,7 @@
                         {{ $labelAnakke }}
                     </td>
                 </tr>
-                <tr>
-                    <td class="label">Kelahiran Ke -</td>
-                    <td class="colon">:</td>
-                    <td class="value">
-                        @php
-                            $kelke = intval($bayi->kelahiran_ke ?? 0);
-                            $labelKelke = $kelke >= 1 && $kelke <= 10 ? $kelke . ' (' . $terbilang[$kelke] . ')' : ($bayi->kelahiran_ke ?? '-');
-                        @endphp
-                        {{ $labelKelke }}
-                    </td>
-                </tr>
+
             </table>
 
             {{-- ===================== KETERANGAN FISIK ===================== --}}

@@ -302,7 +302,17 @@ class Index extends Component
 
             // Pastikan direktori tujuan ada (recursive)
             if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
+                $mkdirResult = @mkdir($dir, 0755, true);
+                if (!$mkdirResult && !is_dir($dir)) {
+                    $lastError = error_get_last();
+                    $detail = $lastError['message'] ?? 'Tidak ada detail error dari PHP.';
+                    \Log::error('Gagal membuat direktori upload USG', [
+                        'dir' => $dir,
+                        'detail' => $detail,
+                        'no_rawat' => $this->no_rawat,
+                    ]);
+                    throw new Exception('Gagal membuat direktori tujuan: ' . $dir . '. Detail: ' . $detail);
+                }
             }
 
             // Hapus foto lama jika ada
@@ -327,7 +337,15 @@ class Index extends Component
             $destPath   = $dir . DIRECTORY_SEPARATOR . $filename;
 
             if (!copy($sourcePath, $destPath)) {
-                throw new Exception('Gagal menyalin file foto ke direktori tujuan. Pastikan direktori dapat ditulis.');
+                $lastError = error_get_last();
+                $detail = $lastError['message'] ?? 'Tidak ada detail error dari PHP.';
+                \Log::error('Gagal menyalin file foto USG', [
+                    'sourcePath' => $sourcePath,
+                    'destPath' => $destPath,
+                    'detail' => $detail,
+                    'no_rawat' => $this->no_rawat,
+                ]);
+                throw new Exception('Gagal menyalin file foto ke direktori tujuan: ' . $destPath . '. Detail: ' . $detail);
             }
 
             // Format path di DB mengikuti konvensi Khanza: "pages/upload/{filename}"

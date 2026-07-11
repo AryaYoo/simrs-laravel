@@ -183,9 +183,11 @@
                             <flux:input label="Proses Kelahiran" wire:model="proses_lahir" placeholder="Normal, Sectio Caesarea, Vakum, dll..." />
                             @error('proses_lahir') <span class="text-xs text-red-500 font-medium">{{ $message }}</span> @enderror
                         </div>
-                        <div class="grid grid-cols-2 gap-6">
+                        <div>
                             <flux:input label="Anak Ke" wire:model="anakke" placeholder="Contoh: 1" />
-                            <flux:input label="Kelahiran Ke" wire:model="kelahiran_ke" placeholder="Contoh: 1" />
+                            <div class="hidden">
+                                <flux:input label="Kelahiran Ke" wire:model="kelahiran_ke" />
+                            </div>
                         </div>
                     </div>
 

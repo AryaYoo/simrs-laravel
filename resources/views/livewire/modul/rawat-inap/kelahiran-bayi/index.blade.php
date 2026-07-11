@@ -49,13 +49,76 @@
         {{-- Table --}}
         <flux:table :paginate="$bayis">
             <flux:table.columns>
-                <flux:table.column>No. RM</flux:table.column>
-                <flux:table.column>Nama Anak/Bayi</flux:table.column>
-                <flux:table.column>Tgl. Lahir</flux:table.column>
-                <flux:table.column>Jam Lahir</flux:table.column>
-                <flux:table.column>Umur</flux:table.column>
-                <flux:table.column>Tgl. Daftar</flux:table.column>
-                <flux:table.column>Nama Ibu</flux:table.column>
+                <flux:table.column>
+                    <button type="button" wire:click="sortBy('no_rkm_medis')" class="flex items-center gap-1 font-semibold hover:text-[#4C5C2D] focus:outline-none group">
+                        No. RM
+                        @if($sortColumn === 'no_rkm_medis')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-[#4C5C2D]" />
+                        @else
+                            <flux:icon name="arrows-up-down" class="w-3 h-3 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500" />
+                        @endif
+                    </button>
+                </flux:table.column>
+                <flux:table.column>
+                    <button type="button" wire:click="sortBy('nm_pasien')" class="flex items-center gap-1 font-semibold hover:text-[#4C5C2D] focus:outline-none group">
+                        Nama Anak/Bayi
+                        @if($sortColumn === 'nm_pasien')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-[#4C5C2D]" />
+                        @else
+                            <flux:icon name="arrows-up-down" class="w-3 h-3 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500" />
+                        @endif
+                    </button>
+                </flux:table.column>
+                <flux:table.column>
+                    <button type="button" wire:click="sortBy('tgl_lahir')" class="flex items-center gap-1 font-semibold hover:text-[#4C5C2D] focus:outline-none group">
+                        Tgl. Lahir
+                        @if($sortColumn === 'tgl_lahir')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-[#4C5C2D]" />
+                        @else
+                            <flux:icon name="arrows-up-down" class="w-3 h-3 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500" />
+                        @endif
+                    </button>
+                </flux:table.column>
+                <flux:table.column>
+                    <button type="button" wire:click="sortBy('jam_lahir')" class="flex items-center gap-1 font-semibold hover:text-[#4C5C2D] focus:outline-none group">
+                        Jam Lahir
+                        @if($sortColumn === 'jam_lahir')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-[#4C5C2D]" />
+                        @else
+                            <flux:icon name="arrows-up-down" class="w-3 h-3 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500" />
+                        @endif
+                    </button>
+                </flux:table.column>
+                <flux:table.column>
+                    <button type="button" wire:click="sortBy('umur')" class="flex items-center gap-1 font-semibold hover:text-[#4C5C2D] focus:outline-none group">
+                        Umur
+                        @if($sortColumn === 'umur')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-[#4C5C2D]" />
+                        @else
+                            <flux:icon name="arrows-up-down" class="w-3 h-3 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500" />
+                        @endif
+                    </button>
+                </flux:table.column>
+                <flux:table.column>
+                    <button type="button" wire:click="sortBy('tgl_daftar')" class="flex items-center gap-1 font-semibold hover:text-[#4C5C2D] focus:outline-none group">
+                        Tgl. Daftar
+                        @if($sortColumn === 'tgl_daftar')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-[#4C5C2D]" />
+                        @else
+                            <flux:icon name="arrows-up-down" class="w-3 h-3 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500" />
+                        @endif
+                    </button>
+                </flux:table.column>
+                <flux:table.column>
+                    <button type="button" wire:click="sortBy('nm_ibu')" class="flex items-center gap-1 font-semibold hover:text-[#4C5C2D] focus:outline-none group">
+                        Nama Ibu
+                        @if($sortColumn === 'nm_ibu')
+                            <flux:icon name="{{ $sortDirection === 'asc' ? 'chevron-up' : 'chevron-down' }}" class="w-3.5 h-3.5 text-[#4C5C2D]" />
+                        @else
+                            <flux:icon name="arrows-up-down" class="w-3 h-3 text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500" />
+                        @endif
+                    </button>
+                </flux:table.column>
                 <flux:table.column>Action</flux:table.column>
             </flux:table.columns>
             <flux:table.rows>

@@ -9,8 +9,21 @@ class KelahiranBayiRepository
     /**
      * Mendapatkan data bayi beserta relasi pasien dengan fitur paginasi dan pencarian.
      */
-    public function getPaginatedData(string $search = '', string $dari = '', string $sampai = '', string $jk = '', int $perPage = 20)
+    public function getPaginatedData(string $search = '', string $dari = '', string $sampai = '', string $jk = '', int $perPage = 20, string $sortColumn = 'tgl_daftar', string $sortDirection = 'desc')
     {
+        $sortMapping = [
+            'no_rkm_medis' => 'pasien_bayi.no_rkm_medis',
+            'nm_pasien' => 'pasien.nm_pasien',
+            'tgl_lahir' => 'pasien.tgl_lahir',
+            'jam_lahir' => 'pasien_bayi.jam_lahir',
+            'umur' => 'pasien.umur',
+            'tgl_daftar' => 'pasien.tgl_daftar',
+            'nm_ibu' => 'pasien.nm_ibu',
+        ];
+
+        $orderByColumn = $sortMapping[$sortColumn] ?? 'pasien.tgl_daftar';
+        $direction = in_array(strtolower($sortDirection), ['asc', 'desc']) ? $sortDirection : 'desc';
+
         $query = PasienBayi::query()
             ->with('pasien')
             ->join('pasien', 'pasien_bayi.no_rkm_medis', '=', 'pasien.no_rkm_medis')
@@ -32,7 +45,7 @@ class KelahiranBayiRepository
             ->when($jk, function ($q) use ($jk) {
                 $q->where('pasien.jk', $jk);
             })
-            ->orderBy('pasien.tgl_daftar', 'desc');
+            ->orderBy($orderByColumn, $direction);
 
         return $query->paginate($perPage);
     }
