@@ -509,12 +509,12 @@
                 <tr>
                     <td class="label">No. KTP Ibu</td>
                     <td class="colon">:</td>
-                    <td class="value">{{ $pasienRaw->no_ktp ?? '-' }}</td>
+                    <td class="value">{{ $ibunya->no_ktp ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td class="label">Pekerjaan Ibu</td>
                     <td class="colon">:</td>
-                    <td class="value">{{ $pasienRaw->pekerjaan ?? '-' }}</td>
+                    <td class="value">{{ $ibunya->pekerjaan ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td class="label">Pada Tanggal</td>
