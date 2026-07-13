@@ -465,6 +465,10 @@
                 $penolongJabatan = $bayi->pegawai->jbtn ?? '';
                 $jkBayi = $bayi->pasien->jk ?? 'L';
                 $jkLabel = $jkBayi === 'P' ? 'PEREMPUAN' : 'LAKI-LAKI';
+
+                // Set locale ke Bahasa Indonesia agar nama bulan tampil dalam BI
+                \Carbon\Carbon::setLocale('id');
+
                 $tglLahir = $bayi->pasien?->tgl_lahir
                     ? \Carbon\Carbon::parse($bayi->pasien->tgl_lahir)
                     : null;
