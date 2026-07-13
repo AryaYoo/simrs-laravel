@@ -240,7 +240,23 @@
             {
                 label: 'Laporan & Dokumen',
                 items: [
-                    { label: 'Laporan & Surat', url: '#' },
+                    { 
+                        label: 'Laporan & Surat', 
+                        url: '#',
+                        children: [
+                            { label: 'Surat Kontrol', url: '#' },
+                            { label: 'Rincian Penggunaan Obat', url: '#' },
+                            { label: 'Sensus Harian Ranap', url: '#' },
+                            { label: 'Penggunaan Kamar', url: '#' },
+                            { label: 'Surat Pengantar Pulang', url: '#' },
+                            { label: 'Formulir Penerimaan Pasien', url: '#' },
+                            { label: 'Surat Keterangan Rawat Inap', url: '#' },
+                            { label: 'Surat Jaminan Pelayanan', url: '#' },
+                            { label: 'Surat Cuti Sakit', url: '#' },
+                            { label: 'Surat Cuti Sakit Pihak ke 2', url: '#' },
+                            { label: 'Ringkasan Masuk Keluar', url: '#' }
+                        ]
+                    },
                     { label: 'Label & Gelang Pasien', url: '#' },
                 ]
             },
@@ -291,7 +307,6 @@
                 items: [
                     { label: 'Berkas Digital', url: '#' },
                     { label: 'Surat Kontrol', url: '#' },
-                    { label: 'Surat Keterangan Rawat Inap', url: '#' },
                 ]
             },
         ],
@@ -331,9 +346,10 @@
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.index') }}" wire:navigate class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
-            <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
-        </a>
+            <a href="{{ route('modul.index') }}" wire:navigate
+                class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
+            </a>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
@@ -456,13 +472,18 @@
                         <flux:table.cell>{{ $reg->no_rkm_medis }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex items-center gap-2">
-                                <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $reg->pasien->nm_pasien ?? '-' }}</span>
+                                <span
+                                    class="font-medium text-neutral-800 dark:text-neutral-200">{{ $reg->pasien->nm_pasien ?? '-' }}</span>
                                 @if(($reg->pasien->jk ?? '') === 'L')
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40" title="Laki-laki">
+                                    <span
+                                        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40"
+                                        title="Laki-laki">
                                         <span class="w-1 h-1 rounded-full bg-blue-500"></span> L
                                     </span>
                                 @elseif(($reg->pasien->jk ?? '') === 'P')
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-900/40" title="Perempuan">
+                                    <span
+                                        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-900/40"
+                                        title="Perempuan">
                                         <span class="w-1 h-1 rounded-full bg-pink-500"></span> P
                                     </span>
                                 @endif
@@ -472,7 +493,8 @@
                         <flux:table.cell>{{ $reg->p_jawab }}</flux:table.cell>
                         <flux:table.cell>
                             @if($isBpjs)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
                                     {{ $reg->penjab->png_jawab ?? '-' }}
                                 </span>
                             @else
@@ -702,9 +724,12 @@
                                                         <template
                                                             x-for="(child, idx) in row.find(it => isSubMenuOpen(group.label + '_' + it.label))?.children"
                                                             :key="child.label">
-                                                            <div class="relative w-full h-[64px]" x-data="{ openDropdown: false }" @click.away="openDropdown = false">
+                                                            <div class="relative w-full h-[64px]"
+                                                                x-data="{ openDropdown: false }"
+                                                                @click.away="openDropdown = false">
                                                                 {{-- Item without subchildren --}}
-                                                                <template x-if="!child.children || child.children.length === 0">
+                                                                <template
+                                                                    x-if="!child.children || child.children.length === 0">
                                                                     <a :href="getMenuUrl(child.url)"
                                                                         :target="(!child.url || child.url === '#') ? '_self' : (openInNewTab ? '_blank' : '_self')"
                                                                         class="flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
@@ -716,7 +741,8 @@
                                                                 </template>
 
                                                                 {{-- Item with subchildren (Dropdown) --}}
-                                                                <template x-if="child.children && child.children.length > 0">
+                                                                <template
+                                                                    x-if="child.children && child.children.length > 0">
                                                                     <div class="h-full">
                                                                         <button @click="openDropdown = !openDropdown"
                                                                             class="w-full flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child text-left">
@@ -724,18 +750,31 @@
                                                                                 x-text="idx + 1"></div>
                                                                             <span x-text="child.label"
                                                                                 class="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 group-hover/child:text-[#4C5C2D] dark:group-hover/child:text-[#8CC7C4] leading-tight line-clamp-2 flex-1"></span>
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-400 transition-transform" :class="openDropdown ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                class="w-4 h-4 text-neutral-400 transition-transform"
+                                                                                :class="openDropdown ? 'rotate-180' : ''"
+                                                                                fill="none" viewBox="0 0 24 24"
+                                                                                stroke="currentColor">
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M19 9l-7 7-7-7" />
+                                                                            </svg>
                                                                         </button>
-                                                                        
+
                                                                         <div x-show="openDropdown" x-transition.opacity
                                                                             class="absolute top-[68px] left-0 z-50 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl overflow-hidden min-w-[220px]">
                                                                             <div class="flex flex-col py-2">
-                                                                                <template x-for="subChild in child.children" :key="subChild.label">
+                                                                                <template
+                                                                                    x-for="subChild in child.children"
+                                                                                    :key="subChild.label">
                                                                                     <a :href="getMenuUrl(subChild.url)"
                                                                                         :target="(!subChild.url || subChild.url === '#') ? '_self' : (openInNewTab ? '_blank' : '_self')"
                                                                                         class="px-4 py-2.5 text-[11px] font-medium text-neutral-600 dark:text-neutral-300 hover:bg-[#4C5C2D]/10 hover:text-[#4C5C2D] dark:hover:text-[#8CC7C4] transition-colors flex items-center gap-2">
-                                                                                        <span class="w-1.5 h-1.5 rounded-full bg-[#4C5C2D]/40"></span>
-                                                                                        <span x-text="subChild.label"></span>
+                                                                                        <span
+                                                                                            class="w-1.5 h-1.5 rounded-full bg-[#4C5C2D]/40"></span>
+                                                                                        <span
+                                                                                            x-text="subChild.label"></span>
                                                                                     </a>
                                                                                 </template>
                                                                             </div>
