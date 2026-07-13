@@ -20,6 +20,7 @@
     {{-- Wrapper dengan Alpine.js untuk toggle sidebar --}}
     <div x-data="{ 
             sidebarOpen: {{ isset($hideSidebar) && $hideSidebar ? 'false' : "localStorage.getItem('sidebarOpen') !== 'false'" }},
+            mobileMenuOpen: false,
             frontOfficeOpen: {{ request()->routeIs('modul.registrasi-pasien*') || request()->routeIs('modul.pasien*') ? 'true' : 'false' }},
             rawatInapOpen: {{ request()->routeIs('modul.rawat-inap*') ? 'true' : 'false' }},
             casemixOpen: {{ request()->is('modul/casemix*') ? 'true' : 'false' }}
@@ -413,46 +414,252 @@
             {{-- (Desktop Top Header Removed) --}}
 
             {{-- Mobile Header --}}
-            <flux:header class="lg:hidden" style="background-color: #4C5C2D;">
-                <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" style="color: white;" />
-                <span class="font-bold" style="color: white; font-size: 0.95rem;">LaraLite</span>
-                <flux:spacer />
-                <flux:dropdown position="top" align="end">
-                    <flux:profile :initials="auth()->user()->initials()" icon-trailing="chevron-down"
-                        style="color:white;" />
-                    <flux:menu>
-                        <flux:menu.radio.group>
-                            <div class="p-0 font-normal">
-                                <div class="flex items-center gap-2 px-1 py-1.5 text-start">
-                                    <flux:avatar :name="auth()->user()->fullname"
-                                        :initials="auth()->user()->initials()" />
-                                    <div class="grid flex-1 text-start leading-tight">
-                                        <flux:heading class="truncate text-base font-semibold">
-                                            {{ auth()->user()->fullname }}
-                                        </flux:heading>
-                                        <flux:text class="truncate text-sm text-zinc-500"
-                                            style="text-transform:capitalize;">{{ auth()->user()->role }}</flux:text>
+            <header class="lg:hidden flex items-center h-14 px-4 sticky top-0 z-40" style="background-color: #4C5C2D;">
+                {{-- Hamburger Button --}}
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
+                    class="p-2 rounded-lg hover:bg-white/10 transition-colors text-white focus:outline-none flex-shrink-0"
+                    aria-label="Toggle menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <span class="font-bold ml-3 text-white" style="font-size: 0.95rem;">LaraLite</span>
+
+                <div class="ml-auto flex items-center gap-2">
+                    <flux:dropdown position="bottom" align="end">
+                        <flux:profile :initials="auth()->user()->initials()" icon-trailing="chevron-down"
+                            style="color:white;" />
+                        <flux:menu>
+                            <flux:menu.radio.group>
+                                <div class="p-0 font-normal">
+                                    <div class="flex items-center gap-2 px-1 py-1.5 text-start">
+                                        <flux:avatar :name="auth()->user()->fullname"
+                                            :initials="auth()->user()->initials()" />
+                                        <div class="grid flex-1 text-start leading-tight">
+                                            <flux:heading class="truncate text-base font-semibold">
+                                                {{ auth()->user()->fullname }}
+                                            </flux:heading>
+                                            <flux:text class="truncate text-sm text-zinc-500"
+                                                style="text-transform:capitalize;">{{ auth()->user()->role }}</flux:text>
+                                        </div>
                                     </div>
                                 </div>
+                            </flux:menu.radio.group>
+                            <flux:menu.separator />
+                            <flux:menu.radio.group>
+                                <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
+                                    {{ __('Settings') }}
+                                </flux:menu.item>
+                            </flux:menu.radio.group>
+                            <flux:menu.separator />
+                            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                                @csrf
+                                <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
+                                    class="w-full cursor-pointer" data-test="logout-button">
+                                    {{ __('Log out') }}
+                                </flux:menu.item>
+                            </form>
+                        </flux:menu>
+                    </flux:dropdown>
+                </div>
+            </header>
+
+            {{-- Mobile Sidebar Overlay --}}
+            <div x-show="mobileMenuOpen" class="lg:hidden fixed inset-0 z-50 flex"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0">
+
+                {{-- Backdrop --}}
+                <div class="absolute inset-0 bg-black/50" @click="mobileMenuOpen = false"></div>
+
+                {{-- Drawer --}}
+                <div class="relative flex flex-col w-72 h-full overflow-y-auto shadow-xl z-10"
+                    style="background-color: #4C5C2D;"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="-translate-x-full"
+                    x-transition:enter-end="translate-x-0"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="translate-x-0"
+                    x-transition:leave-end="-translate-x-full">
+
+                    {{-- Drawer Header --}}
+                    <div class="flex items-center justify-between h-14 px-4 flex-shrink-0 border-b border-white/10">
+                        <span class="font-bold text-white uppercase" style="font-size:1rem; letter-spacing:0.03em;">LaraLite</span>
+                        <button @click="mobileMenuOpen = false"
+                            class="p-1.5 rounded-lg hover:bg-white/10 text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Drawer Navigation --}}
+                    <nav class="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+
+                        @if(auth()->user()->role === 'admin')
+                        <p class="px-3 pb-1 text-[0.6rem] font-bold uppercase tracking-widest" style="color:rgba(255,255,255,0.5);">Admin Menu</p>
+                        <a href="{{ route('admin.dashboard') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            style="color:white; text-decoration:none; background-color:{{ request()->routeIs('admin.dashboard') || request()->routeIs('dashboard') ? 'rgba(255,255,255,0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('admin.dashboard') || request()->routeIs('dashboard') ? 'rgba(255,255,255,0.2)' : 'transparent' }}'"
+                            >
+                            <flux:icon name="layout-grid" class="w-4 h-4 flex-shrink-0" />
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ route('users.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            style="color:white; text-decoration:none; background-color:{{ request()->routeIs('users*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('users*') ? 'rgba(255,255,255,0.2)' : 'transparent' }}'">
+                            <flux:icon name="users" class="w-4 h-4 flex-shrink-0" />
+                            <span>Manajemen User</span>
+                        </a>
+                        <a href="{{ route('admin.settings') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            style="color:white; text-decoration:none; background-color:{{ request()->routeIs('admin.settings') ? 'rgba(255,255,255,0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('admin.settings') ? 'rgba(255,255,255,0.2)' : 'transparent' }}'">
+                            <flux:icon name="cog-6-tooth" class="w-4 h-4 flex-shrink-0" />
+                            <span>Pengaturan</span>
+                        </a>
+                        <div class="my-2 border-t border-white/10"></div>
+                        @endif
+
+                        <p class="px-3 pb-1 text-[0.6rem] font-bold uppercase tracking-widest" style="color:rgba(255,255,255,0.5);">User Menu</p>
+
+                        <a href="{{ route('modul.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            style="color:white; text-decoration:none; background-color:{{ request()->routeIs('modul.index') ? 'rgba(255,255,255,0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('modul.index') ? 'rgba(255,255,255,0.2)' : 'transparent' }}'">
+                            <flux:icon name="cube" class="w-4 h-4 flex-shrink-0" />
+                            <span>Semua Modul</span>
+                        </a>
+
+                        {{-- Front Office --}}
+                        <div x-data="{ open: {{ request()->routeIs('modul.registrasi-pasien*') || request()->routeIs('modul.pasien*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left"
+                                style="color:white; background-color:{{ request()->routeIs('modul.registrasi-pasien*') || request()->routeIs('modul.pasien*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};">
+                                <flux:icon name="building-office-2" class="w-4 h-4 flex-shrink-0" />
+                                <span class="flex-1">Front Office</span>
+                                <flux:icon name="chevron-down" class="w-3 h-3 transition-transform" :class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" class="ml-6 mt-1 space-y-1 border-l border-white/10 pl-2">
+                                <a href="{{ route('modul.registrasi-pasien.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.registrasi-pasien*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="users" class="w-3.5 h-3.5" /><span>Registrasi</span>
+                                </a>
+                                <a href="{{ route('modul.pasien.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.pasien*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="identification" class="w-3.5 h-3.5" /><span>Pasien</span>
+                                </a>
                             </div>
-                        </flux:menu.radio.group>
-                        <flux:menu.separator />
-                        <flux:menu.radio.group>
-                            <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
-                                {{ __('Settings') }}
-                            </flux:menu.item>
-                        </flux:menu.radio.group>
-                        <flux:menu.separator />
+                        </div>
+
+                        <a href="{{ route('modul.rawat-jalan.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            style="color:white; text-decoration:none; background-color:{{ request()->routeIs('modul.rawat-jalan*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('modul.rawat-jalan*') ? 'rgba(255,255,255,0.2)' : 'transparent' }}'">
+                            <flux:icon name="calendar-days" class="w-4 h-4 flex-shrink-0" />
+                            <span>Rawat Jalan</span>
+                        </a>
+
+                        {{-- Rawat Inap --}}
+                        <div x-data="{ open: {{ request()->routeIs('modul.rawat-inap*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left"
+                                style="color:white; background-color:{{ request()->routeIs('modul.rawat-inap*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};">
+                                <flux:icon name="home" class="w-4 h-4 flex-shrink-0" />
+                                <span class="flex-1">Rawat Inap</span>
+                                <flux:icon name="chevron-down" class="w-3 h-3 transition-transform" :class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" class="ml-6 mt-1 space-y-1 border-l border-white/10 pl-2">
+                                <a href="{{ route('modul.rawat-inap.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.rawat-inap.index') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="users" class="w-3.5 h-3.5" /><span>Pasien Ranap</span>
+                                </a>
+                                <a href="{{ route('modul.rawat-inap.kelahiran-bayi') }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.rawat-inap.kelahiran-bayi') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="face-smile" class="w-3.5 h-3.5" /><span>Kelahiran Bayi</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- Casemix --}}
+                        <div x-data="{ open: {{ request()->is('modul/casemix*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left"
+                                style="color:white; background-color:{{ request()->is('modul/casemix*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};">
+                                <flux:icon name="clipboard-document-check" class="w-4 h-4 flex-shrink-0" />
+                                <span class="flex-1">Casemix</span>
+                                <flux:icon name="chevron-down" class="w-3 h-3 transition-transform" :class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" class="ml-6 mt-1 space-y-1 border-l border-white/10 pl-2">
+                                <a href="{{ route('modul.casemix-rawat-jalan.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.casemix-rawat-jalan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="calendar-days" class="w-3.5 h-3.5" /><span>Casemix RAJAL</span>
+                                </a>
+                                <a href="{{ route('modul.casemix-rawat-inap.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.casemix-rawat-inap*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="home" class="w-3.5 h-3.5" /><span>Casemix RANAP</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        @if(auth()->user()->role === 'admin')
+                        <div class="my-2 border-t border-white/10"></div>
+                        <p class="px-3 pb-1 text-[0.6rem] font-bold uppercase tracking-widest" style="color:rgba(255,255,255,0.5);">Bridging</p>
+                        <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            style="color:white; text-decoration:none; background-color:{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255,255,255,0.2)' : 'transparent' }}'">
+                            <flux:icon name="document-text" class="w-4 h-4 flex-shrink-0" />
+                            <span>Rekam Medis (E-Claim)</span>
+                        </a>
+                        @endif
+
+                    </nav>
+
+                    {{-- Drawer Footer --}}
+                    <div class="flex-shrink-0 border-t border-white/10 p-3" style="background-color:#2F381C;">
+                        <a href="{{ route('profile.edit') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 mb-2" style="text-decoration:none;">
+                            <div class="flex items-center justify-center rounded-full flex-shrink-0 font-bold"
+                                style="background-color:rgba(255,255,255,0.2); width:2.2rem; height:2.2rem; color:white; font-size:0.75rem;">
+                                {{ auth()->user()->initials() }}
+                            </div>
+                            <div class="overflow-hidden">
+                                <p class="truncate font-semibold text-white" style="font-size:0.8rem; line-height:1.2;">{{ auth()->user()->fullname }}</p>
+                                <p class="truncate text-white/50" style="font-size:0.65rem; text-transform:capitalize;">{{ auth()->user()->role }}</p>
+                            </div>
+                        </a>
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
-                            <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
-                                class="w-full cursor-pointer" data-test="logout-button">
+                            <button type="submit" class="flex items-center gap-1.5 w-full rounded-lg text-[0.7rem] font-semibold py-2 px-3 hover:bg-white/20 bg-white/10"
+                                style="color:white; border:1px solid rgba(255,255,255,0.05); cursor:pointer;">
+                                <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
                                 {{ __('Log out') }}
-                            </flux:menu.item>
+                            </button>
                         </form>
-                    </flux:menu>
-                </flux:dropdown>
-            </flux:header>
+                    </div>
+
+                </div>
+            </div>
 
             {{-- Page content --}}
             <main class="flex-1">
