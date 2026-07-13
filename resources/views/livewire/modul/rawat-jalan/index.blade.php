@@ -448,9 +448,10 @@
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.index') }}" wire:navigate class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
-            <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
-        </a>
+            <a href="{{ route('modul.index') }}" wire:navigate
+                class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
+            </a>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
@@ -501,33 +502,51 @@
     </div>
 
     {{-- Keterangan Kode Warna --}}
-    <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 mb-3 shadow-sm">
-        <div class="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+    <div
+        class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 mb-3 shadow-sm">
+        <div
+            class="text-[10px] font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
             <flux:icon name="information-circle" class="w-4 h-4 text-neutral-400 dark:text-neutral-500" />
             <span>Keterangan Status &amp; Kode Warna Pasien</span>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-100 dark:border-neutral-850">
-                <span class="w-3.5 h-3.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 block flex-shrink-0"></span>
-                <span class="text-xs font-medium text-neutral-600 dark:text-neutral-300">Umum/Lainnya (Belum Bayar)</span>
+            <div
+                class="flex items-center gap-2 p-2 rounded-lg bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-100 dark:border-neutral-850">
+                <span
+                    class="w-3.5 h-3.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 block flex-shrink-0"></span>
+                <span class="text-xs font-medium text-neutral-600 dark:text-neutral-300">Umum/Lainnya (Belum
+                    Bayar)</span>
             </div>
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-neutral-200 dark:bg-neutral-700/70 border border-neutral-300/80 dark:border-neutral-600/80">
-                <span class="w-3.5 h-3.5 rounded bg-neutral-300 dark:bg-neutral-600 border border-neutral-400 dark:border-neutral-500 block flex-shrink-0"></span>
-                <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-200">Umum/Lainnya (Sudah Bayar)</span>
+            <div
+                class="flex items-center gap-2 p-2 rounded-lg bg-neutral-200 dark:bg-neutral-700/70 border border-neutral-300/80 dark:border-neutral-600/80">
+                <span
+                    class="w-3.5 h-3.5 rounded bg-neutral-300 dark:bg-neutral-600 border border-neutral-400 dark:border-neutral-500 block flex-shrink-0"></span>
+                <span class="text-xs font-semibold text-neutral-700 dark:text-neutral-200">Umum/Lainnya (Sudah
+                    Bayar)</span>
             </div>
-            <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+            <div
+                class="flex items-center justify-between gap-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
                 <div class="flex items-center gap-2">
-                    <span class="w-3.5 h-3.5 rounded bg-emerald-250 dark:bg-emerald-800 border border-emerald-350 dark:border-emerald-750 block flex-shrink-0" x-show="showBpjsColor"></span>
-                    <span class="w-3.5 h-3.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 block flex-shrink-0" x-show="!showBpjsColor"></span>
-                    <span class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Pasien BPJS (Belum Periksa)</span>
+                    <span
+                        class="w-3.5 h-3.5 rounded bg-emerald-250 dark:bg-emerald-800 border border-emerald-350 dark:border-emerald-750 block flex-shrink-0"
+                        x-show="showBpjsColor"></span>
+                    <span
+                        class="w-3.5 h-3.5 rounded bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 block flex-shrink-0"
+                        x-show="!showBpjsColor"></span>
+                    <span class="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Pasien BPJS (Belum
+                        Periksa)</span>
                 </div>
                 <label class="relative inline-flex items-center cursor-pointer select-none">
                     <input type="checkbox" x-model="showBpjsColor" class="sr-only peer">
-                    <div class="w-7 h-4 bg-neutral-300 dark:bg-neutral-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-350 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500"></div>
+                    <div
+                        class="w-7 h-4 bg-neutral-300 dark:bg-neutral-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-350 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-emerald-500">
+                    </div>
                 </label>
             </div>
-            <div class="flex items-center gap-2 p-2 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/30">
-                <span class="w-3.5 h-3.5 rounded bg-red-200 dark:bg-red-800 border border-red-300 dark:border-red-700 block flex-shrink-0"></span>
+            <div
+                class="flex items-center gap-2 p-2 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/30">
+                <span
+                    class="w-3.5 h-3.5 rounded bg-red-200 dark:bg-red-800 border border-red-300 dark:border-red-700 block flex-shrink-0"></span>
                 <span class="text-xs font-semibold text-red-800 dark:text-red-300">Pasien BPJS (Sudah Periksa)</span>
             </div>
         </div>
@@ -538,22 +557,25 @@
             <div class="flex flex-col md:flex-row gap-3">
                 <div class="flex-1">
                     <flux:input wire:model.live.debounce.300ms="search"
-                        placeholder="Cari No Rawat, No RM, atau Nama Pasien..."
-                        icon="magnifying-glass" />
+                        placeholder="Cari No Rawat, No RM, atau Nama Pasien..." icon="magnifying-glass" />
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-2 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900/50 p-1 rounded-lg border border-neutral-100 dark:border-neutral-800">
+                    <div
+                        class="flex items-center gap-2 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900/50 p-1 rounded-lg border border-neutral-100 dark:border-neutral-800">
                         <div class="flex items-center gap-2 px-2">
-                            <label class="text-[10px] font-black uppercase tracking-tighter text-neutral-400">Periode</label>
+                            <label
+                                class="text-[10px] font-black uppercase tracking-tighter text-neutral-400">Periode</label>
                             <flux:input type="date" wire:model.live="dari" size="sm" class="w-36" />
                             <span class="text-xs text-neutral-400 font-bold">-</span>
                             <flux:input type="date" wire:model.live="sampai" size="sm" class="w-36" />
                         </div>
                     </div>
-                    <flux:button wire:click="$refresh" icon="arrow-path" square size="sm" variant="outline" class="flex-shrink-0 !h-[38px] !w-[38px] !rounded-lg border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700" title="Refresh Data" />
+                    <flux:button wire:click="$refresh" icon="arrow-path" square size="sm" variant="outline"
+                        class="flex-shrink-0 !h-[38px] !w-[38px] !rounded-lg border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+                        title="Refresh Data" />
                 </div>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <flux:select wire:model.live="kd_poli" placeholder="Semua Poliklinik">
                     <flux:select.option value="">-- Semua Poliklinik --</flux:select.option>
@@ -606,7 +628,8 @@
                             }
                         }
                     @endphp
-                    <flux:table.row :key="$reg->no_rawat" x-bind:class="showBpjsColor ? '{{ $rowClassWithGreen }}' : '{{ $rowClassWithoutGreen }}'">
+                    <flux:table.row :key="$reg->no_rawat"
+                        x-bind:class="showBpjsColor ? '{{ $rowClassWithGreen }}' : '{{ $rowClassWithoutGreen }}'">
                         <flux:table.cell>
                             <button type="button"
                                 @click="openMenu('{{ $reg->no_rawat }}', '{{ $reg->pasien->nm_pasien ?? '' }}')"
@@ -618,13 +641,18 @@
                         <flux:table.cell>{{ $reg->no_rkm_medis }}</flux:table.cell>
                         <flux:table.cell>
                             <div class="flex items-center gap-2">
-                                <span class="font-medium text-neutral-800 dark:text-neutral-200">{{ $reg->pasien->nm_pasien ?? '-' }}</span>
+                                <span
+                                    class="font-medium text-neutral-800 dark:text-neutral-200">{{ $reg->pasien->nm_pasien ?? '-' }}</span>
                                 @if(($reg->pasien->jk ?? '') === 'L')
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40" title="Laki-laki">
+                                    <span
+                                        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40"
+                                        title="Laki-laki">
                                         <span class="w-1 h-1 rounded-full bg-blue-500"></span> L
                                     </span>
                                 @elseif(($reg->pasien->jk ?? '') === 'P')
-                                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-900/40" title="Perempuan">
+                                    <span
+                                        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-900/40"
+                                        title="Perempuan">
                                         <span class="w-1 h-1 rounded-full bg-pink-500"></span> P
                                     </span>
                                 @endif
@@ -635,7 +663,8 @@
                         <flux:table.cell>{{ $reg->p_jawab }}</flux:table.cell>
                         <flux:table.cell>
                             @if($isBpjs)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
                                     {{ $reg->penjab->png_jawab ?? '-' }}
                                 </span>
                             @else
@@ -650,13 +679,16 @@
                             </div>
                         </flux:table.cell>
                         <flux:table.cell>
-                            <flux:button icon="eye" size="xs" :href="route('modul.rawat-jalan.show', str_replace('/', '-', $reg->no_rawat))" target="_blank" variant="ghost" />
+                            <flux:button icon="eye" size="xs"
+                                :href="route('modul.rawat-jalan.show', str_replace('/', '-', $reg->no_rawat))"
+                                target="_blank" variant="ghost" />
                         </flux:table.cell>
                     </flux:table.row>
                 @empty
                     <flux:table.row>
                         <flux:table.cell colspan="9">
-                            <div class="flex flex-col items-center justify-center py-12 text-neutral-400 dark:text-neutral-500">
+                            <div
+                                class="flex flex-col items-center justify-center py-12 text-neutral-400 dark:text-neutral-500">
                                 <flux:icon name="calendar" class="w-12 h-12 mb-3 opacity-40" />
                                 <p class="text-sm font-medium">Tidak ada pasien rawat jalan di periode ini</p>
                             </div>
@@ -690,7 +722,8 @@
                 @click.stop>
 
                 {{-- Header (Search & Info) --}}
-                <div class="flex flex-col sm:flex-row items-center gap-4 justify-between px-6 py-4 border-b border-neutral-200 dark:border-[#4C5C2D] bg-[#4C5C2D] flex-shrink-0 shadow-lg">
+                <div
+                    class="flex flex-col sm:flex-row items-center gap-4 justify-between px-6 py-4 border-b border-neutral-200 dark:border-[#4C5C2D] bg-[#4C5C2D] flex-shrink-0 shadow-lg">
                     <div class="flex flex-col gap-1 text-white">
                         <div class="flex items-center gap-3">
                             <div class="p-2 rounded-lg bg-white/20">
@@ -699,7 +732,8 @@
                             <h2 class="font-bold text-white text-lg">Sub Menu Layanan Rawat Jalan</h2>
                         </div>
                         <div class="flex items-center gap-2 mt-1 text-xs opacity-90">
-                            <span class="bg-white/20 px-2 py-0.5 rounded font-mono" x-text="activePatient.noRawat"></span>
+                            <span class="bg-white/20 px-2 py-0.5 rounded font-mono"
+                                x-text="activePatient.noRawat"></span>
                             <span class="opacity-50">•</span>
                             <span class="font-semibold uppercase tracking-wide" x-text="activePatient.nmPasien"></span>
                         </div>
@@ -715,7 +749,8 @@
                                 class="block w-full pl-9 pr-3 py-2 text-sm border border-white/20 rounded-lg bg-white/10 text-white focus:ring-2 focus:ring-white/30 focus:border-white/40 transition-colors placeholder-white/50">
                         </div>
 
-                        <button @click="menuModalOpen = false" class="hidden sm:flex p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors flex-shrink-0">
+                        <button @click="menuModalOpen = false"
+                            class="hidden sm:flex p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors flex-shrink-0">
                             <flux:icon name="x-mark" class="w-5 h-5" />
                         </button>
                     </div>
@@ -856,9 +891,12 @@
                                                         <template
                                                             x-for="(child, idx) in row.find(it => isSubMenuOpen(group.label + '_' + it.label))?.children"
                                                             :key="child.label">
-                                                            <div class="relative w-full h-[64px]" x-data="{ openDropdown: false }" @click.away="openDropdown = false">
+                                                            <div class="relative w-full h-[64px]"
+                                                                x-data="{ openDropdown: false }"
+                                                                @click.away="openDropdown = false">
                                                                 {{-- Item without subchildren --}}
-                                                                <template x-if="!child.children || child.children.length === 0">
+                                                                <template
+                                                                    x-if="!child.children || child.children.length === 0">
                                                                     <a :href="getMenuUrl(child.url)"
                                                                         :target="(!child.url || child.url === '#') ? '_self' : '_blank'"
                                                                         class="flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
@@ -870,7 +908,8 @@
                                                                 </template>
 
                                                                 {{-- Item with subchildren (Dropdown) --}}
-                                                                <template x-if="child.children && child.children.length > 0">
+                                                                <template
+                                                                    x-if="child.children && child.children.length > 0">
                                                                     <div class="h-full">
                                                                         <button @click="openDropdown = !openDropdown"
                                                                             class="w-full flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child text-left">
@@ -878,17 +917,30 @@
                                                                                 x-text="idx + 1"></div>
                                                                             <span x-text="child.label"
                                                                                 class="text-[11px] font-medium text-neutral-600 dark:text-neutral-400 group-hover/child:text-[#4C5C2D] dark:group-hover/child:text-[#8CC7C4] leading-tight line-clamp-2 flex-1"></span>
-                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-neutral-400 transition-transform" :class="openDropdown ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                class="w-4 h-4 text-neutral-400 transition-transform"
+                                                                                :class="openDropdown ? 'rotate-180' : ''"
+                                                                                fill="none" viewBox="0 0 24 24"
+                                                                                stroke="currentColor">
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M19 9l-7 7-7-7" />
+                                                                            </svg>
                                                                         </button>
-                                                                        
+
                                                                         <div x-show="openDropdown" x-transition.opacity
                                                                             class="absolute left-0 top-full mt-2 w-56 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 py-2 z-50">
-                                                                            <template x-for="sub in child.children" :key="sub.label">
+                                                                            <template x-for="sub in child.children"
+                                                                                :key="sub.label">
                                                                                 <a :href="getMenuUrl(sub.url)"
                                                                                     :target="(!sub.url || sub.url === '#') ? '_self' : '_blank'"
                                                                                     class="flex items-center gap-3 px-4 py-2 hover:bg-[#F1F5E9] dark:hover:bg-[#4C5C2D]/10 transition-colors group/sub">
-                                                                                    <div class="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700 group-hover/sub:bg-[#4C5C2D] dark:group-hover/sub:bg-[#8CC7C4] transition-colors"></div>
-                                                                                    <span x-text="sub.label" class="text-xs font-medium text-neutral-600 dark:text-neutral-400 group-hover/sub:text-[#4C5C2D] dark:group-hover/sub:text-[#8CC7C4]"></span>
+                                                                                    <div
+                                                                                        class="w-1.5 h-1.5 rounded-full bg-neutral-300 dark:bg-neutral-700 group-hover/sub:bg-[#4C5C2D] dark:group-hover/sub:bg-[#8CC7C4] transition-colors">
+                                                                                    </div>
+                                                                                    <span x-text="sub.label"
+                                                                                        class="text-xs font-medium text-neutral-600 dark:text-neutral-400 group-hover/sub:text-[#4C5C2D] dark:group-hover/sub:text-[#8CC7C4]"></span>
                                                                                 </a>
                                                                             </template>
                                                                         </div>

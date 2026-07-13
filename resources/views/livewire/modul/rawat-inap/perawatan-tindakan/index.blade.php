@@ -225,7 +225,7 @@
                             { label: 'Penggunaan Kamar', url: '#' },
                             { label: 'Surat Pengantar Pulang', url: '#' },
                             { label: 'Formulir Penerimaan Pasien', url: '#' },
-                            { label: 'Surat Keterangan Rawat Inap', url: '#' },
+                            { label: 'Surat Keterangan Rawat Inap', url: '{{ route('modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap', str_replace('/', '-', $no_rawat)) }}' },
                             { label: 'Surat Jaminan Pelayanan', url: '#' },
                             { label: 'Surat Cuti Sakit', url: '#' },
                             { label: 'Surat Cuti Sakit Pihak ke 2', url: '#' },

@@ -57,6 +57,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-inap/{no_rawat}/hasil-usg-gynecologi', \App\Livewire\Modul\RawatInap\SubRawatInap\HasilUsgGynecologi\Index::class)->name('modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/jadwal-operasi', \App\Livewire\Modul\RawatInap\SubRawatInap\JadwalOperasi\Index::class)->name('modul.rawat-inap.sub-rawat-inap.jadwal-operasi')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/diagnosa', \App\Livewire\Modul\RawatInap\SubRawatInap\Diagnosa\Index::class)->name('modul.rawat-inap.sub-rawat-inap.diagnosa')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/surat-keterangan-rawat-inap', \App\Livewire\Modul\RawatInap\SubRawatInap\SuratKeteranganRawatInap\Index::class)->name('modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/surat-keterangan-rawat-inap/settings', \App\Livewire\Modul\RawatInap\SubRawatInap\SuratKeteranganRawatInap\Settings::class)->name('modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap.settings')->where('no_rawat', '.*');
+    Route::get('modul/rawat-inap/{no_rawat}/surat-keterangan-rawat-inap/{no_surat}/cetak', [\App\Http\Controllers\RawatInap\CetakSkriController::class, 'cetak'])->name('modul.rawat-inap.skri.cetak')->where(['no_rawat' => '.*', 'no_surat' => '.*']);
     Route::get('modul/rawat-inap/{no_rawat}', \App\Livewire\Modul\RawatInap\Show::class)->name('modul.rawat-inap.show')->where('no_rawat', '.*');
 
     Route::get('modul/rawat-jalan', \App\Livewire\Modul\RawatJalan\Index::class)->name('modul.rawat-jalan.index');

@@ -48,7 +48,8 @@
             catatanAdimeGizi: '{{ route("modul.rawat-inap.sub-rawat-inap.catatan-adime-gizi", ":noRawat") }}',
             hasilUsgKandungan: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan", ":noRawat") }}',
             hasilUsgGynecologi: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}',
-            jadwalOperasi: '{{ route("modul.rawat-inap.sub-rawat-inap.jadwal-operasi", ":noRawat") }}'
+            jadwalOperasi: '{{ route("modul.rawat-inap.sub-rawat-inap.jadwal-operasi", ":noRawat") }}',
+            suratKeteranganRawatInap: '{{ route("modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -250,7 +251,7 @@
                             { label: 'Penggunaan Kamar', url: '#' },
                             { label: 'Surat Pengantar Pulang', url: '#' },
                             { label: 'Formulir Penerimaan Pasien', url: '#' },
-                            { label: 'Surat Keterangan Rawat Inap', url: '#' },
+                            { label: 'Surat Keterangan Rawat Inap', url: 'suratKeteranganRawatInap' },
                             { label: 'Surat Jaminan Pelayanan', url: '#' },
                             { label: 'Surat Cuti Sakit', url: '#' },
                             { label: 'Surat Cuti Sakit Pihak ke 2', url: '#' },
