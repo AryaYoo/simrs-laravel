@@ -401,14 +401,7 @@
                 <tr>
                     <td class="label">Diagnosa</td>
                     <td class="colon">:</td>
-                    <td class="value">
-                        @if(isset($diagnosa) && isset($diagnosa->penyakit))
-                            {{ $diagnosa->penyakit->nm_penyakit }} 
-                            {{ isset($diagnosa->penyakit->kd_penyakit) ? '(' . $diagnosa->penyakit->kd_penyakit . ')' : '' }}
-                        @else
-                            -
-                        @endif
-                    </td>
+                    <td class="value">{{ $diagnosa_awal }}</td>
                 </tr>
             </table>
 

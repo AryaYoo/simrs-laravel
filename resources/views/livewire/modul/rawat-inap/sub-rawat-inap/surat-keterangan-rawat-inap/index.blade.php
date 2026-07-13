@@ -125,7 +125,8 @@
                                         </a>
                                         {{-- Hapus --}}
                                         <button type="button"
-                                            onclick="Swal.fire({title:'Hapus Surat?',text:'Surat {{ $surat->no_surat }} akan dihapus permanen.',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626',cancelButtonColor:'#6b7280',confirmButtonText:'Ya, Hapus!',cancelButtonText:'Batal'}).then((r)=>{if(r.isConfirmed){$wire.delete('{{ $surat->no_surat }}')}});"
+                                            data-no-surat="{{ $surat->no_surat }}"
+                                            x-on:click="Swal.fire({title:'Hapus Surat?',text:'Surat ini akan dihapus permanen.',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626',cancelButtonColor:'#6b7280',confirmButtonText:'Ya, Hapus!',cancelButtonText:'Batal'}).then(function(r){if(r.isConfirmed){$wire.delete($el.dataset.noSurat)}})"
                                             class="flex items-center justify-center w-7 h-7 rounded-lg text-neutral-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 transition-all"
                                             title="Hapus">
                                             <flux:icon name="trash" class="w-3.5 h-3.5" />

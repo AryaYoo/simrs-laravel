@@ -34,11 +34,33 @@ class CetakSkriController extends Controller
             $setting = $legacySetting ? (array) $legacySetting : [];
         }
 
-        // Ambil data tambahan
-        $diagnosa = \App\Models\DiagnosaPasien::with('penyakit')
-            ->where('no_rawat', $no_rawat)
-            ->orderBy('prioritas', 'asc')
+        // Ambil diagnosa awal dari kamar_inap (SOP Khanza)
+        $kamarInap = \App\Models\KamarInap::where('no_rawat', $no_rawat)
+            ->orderBy('tgl_masuk', 'asc')
+            ->orderBy('jam_masuk', 'asc')
             ->first();
+        
+        $diagnosa_awal = '-';
+        if ($kamarInap && !empty(trim($kamarInap->diagnosa_awal))) {
+            $kodeOrNama = trim($kamarInap->diagnosa_awal);
+            // Try to find in penyakit table (ICD-10 code lookup)
+            $penyakit = \Illuminate\Support\Facades\DB::table('penyakit')
+                ->where('kd_penyakit', $kodeOrNama)
+                ->first();
+            if ($penyakit) {
+                $diagnosa_awal = $penyakit->nm_penyakit . ' (' . $kodeOrNama . ')';
+            } else {
+                $diagnosa_awal = $kodeOrNama;
+            }
+        } else {
+            $diagnosa = \App\Models\DiagnosaPasien::with('penyakit')
+                ->where('no_rawat', $no_rawat)
+                ->orderBy('prioritas', 'asc')
+                ->first();
+            if ($diagnosa && $diagnosa->penyakit) {
+                $diagnosa_awal = $diagnosa->penyakit->nm_penyakit . ' (' . $diagnosa->penyakit->kd_penyakit . ')';
+            }
+        }
 
         $sep = \App\Models\BridgingSep::where('no_rawat', $no_rawat)->first();
 
@@ -53,6 +75,6 @@ class CetakSkriController extends Controller
             }
         }
 
-        return view('modul.rawat-inap.surat-keterangan-rawat-inap.cetak', compact('surat', 'regPeriksa', 'setting', 'diagnosa', 'sep', 'nm_sps'));
+        return view('modul.rawat-inap.surat-keterangan-rawat-inap.cetak', compact('surat', 'regPeriksa', 'setting', 'diagnosa_awal', 'sep', 'nm_sps'));
     }
 }
