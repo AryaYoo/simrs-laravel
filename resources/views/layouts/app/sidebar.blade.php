@@ -274,6 +274,13 @@
                                 <flux:icon name="face-smile" class="w-3.5 h-3.5" />
                                 <span>Kelahiran Bayi</span>
                             </a>
+                            
+                            <a href="{{ route('modul.rawat-inap.permintaan-ranap') }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.rawat-inap.permintaan-ranap') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.rawat-inap.permintaan-ranap') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="document-text" class="w-3.5 h-3.5" />
+                                <span>Permintaan Ranap</span>
+                            </a>
                         </div>
                     </div>
 
@@ -593,6 +600,11 @@
                                     class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
                                     style="color:{{ request()->routeIs('modul.rawat-inap.kelahiran-bayi') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
                                     <flux:icon name="face-smile" class="w-3.5 h-3.5" /><span>Kelahiran Bayi</span>
+                                </a>
+                                <a href="{{ route('modul.rawat-inap.permintaan-ranap') }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.rawat-inap.permintaan-ranap') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="document-text" class="w-3.5 h-3.5" /><span>Permintaan Ranap</span>
                                 </a>
                             </div>
                         </div>

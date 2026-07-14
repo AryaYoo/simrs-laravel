@@ -26,4 +26,9 @@ class PermintaanRanap extends Model
     {
         return $this->belongsTo(Kamar::class, 'kd_kamar', 'kd_kamar');
     }
+
+    public function kamarInap()
+    {
+        return $this->hasOne(KamarInap::class, 'no_rawat', 'no_rawat');
+    }
 }
