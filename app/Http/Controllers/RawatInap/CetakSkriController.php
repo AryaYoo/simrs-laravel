@@ -62,21 +62,27 @@ class CetakSkriController extends Controller
             }
         }
 
-        // Ambil DPJP dari rawat_inap_dr (dokter visite/perawatan)
-        // Ambil dokter yang paling banyak tercatat, atau yang pertama kali visite
-        $rawatInapDr = \Illuminate\Support\Facades\DB::table('rawat_inap_dr')
-            ->select('kd_dokter', \Illuminate\Support\Facades\DB::raw('COUNT(*) as total'))
-            ->where('no_rawat', $no_rawat)
-            ->groupBy('kd_dokter')
-            ->orderByDesc('total')
-            ->first();
-
+        // Prioritas 1: DPJP yang di-override manual saat buat surat
         $dpjp = null;
-        if ($rawatInapDr) {
-            $dpjp = \App\Models\Dokter::find($rawatInapDr->kd_dokter);
+        if (!empty($surat->dpjp_keterangan_inap)) {
+            $dpjp = \App\Models\Dokter::find($surat->dpjp_keterangan_inap);
         }
 
-        // Fallback ke dokter pendaftar jika tidak ada rawat_inap_dr
+        // Prioritas 2: DPJP dari rawat_inap_dr (dokter visite/perawatan terbanyak)
+        if (!$dpjp) {
+            $rawatInapDr = \Illuminate\Support\Facades\DB::table('rawat_inap_dr')
+                ->select('kd_dokter', \Illuminate\Support\Facades\DB::raw('COUNT(*) as total'))
+                ->where('no_rawat', $no_rawat)
+                ->groupBy('kd_dokter')
+                ->orderByDesc('total')
+                ->first();
+
+            if ($rawatInapDr) {
+                $dpjp = \App\Models\Dokter::find($rawatInapDr->kd_dokter);
+            }
+        }
+
+        // Prioritas 3: Fallback ke dokter pendaftar (reg_periksa)
         if (!$dpjp) {
             $dpjp = $regPeriksa->dokter;
         }

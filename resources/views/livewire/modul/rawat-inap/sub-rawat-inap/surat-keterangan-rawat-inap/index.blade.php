@@ -206,6 +206,51 @@
                             </div>
                         </div>
 
+                        {{-- DPJP Override (Opsional) --}}
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+                                Dokter DPJP Pencetak (Opsional)
+                                <span class="font-normal text-neutral-400 ml-1">— kosongkan jika sesuai data visite</span>
+                            </label>
+
+                            @if(empty($dpjp_keterangan_inap))
+                                {{-- Search Input --}}
+                                <div class="relative">
+                                    <input type="text" wire:model.live.debounce.300ms="searchDpjp"
+                                        placeholder="Cari nama / kode dokter..."
+                                        class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-800 dark:text-neutral-100 focus:ring-2 focus:ring-[#4C5C2D]/30 focus:border-[#4C5C2D] outline-none transition-all pl-8" />
+                                    <svg class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                </div>
+                                @if(!empty($dpjpList))
+                                    <div class="border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden max-h-40 overflow-y-auto bg-white dark:bg-neutral-800 shadow-lg">
+                                        @foreach($dpjpList as $d)
+                                            <button type="button"
+                                                wire:click="selectDpjp('{{ $d->kd_dokter ?? $d['kd_dokter'] }}', '{{ $d->nm_dokter ?? $d['nm_dokter'] }}')"
+                                                class="w-full text-left px-3 py-2 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100 dark:border-neutral-800">
+                                                <p class="text-xs font-semibold text-neutral-800 dark:text-neutral-200">{{ $d->nm_dokter ?? $d['nm_dokter'] }}</p>
+                                                <p class="text-[10px] text-neutral-400 font-mono">{{ $d->kd_dokter ?? $d['kd_dokter'] }}</p>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            @else
+                                {{-- Selected Doctor Card --}}
+                                <div class="flex items-center justify-between bg-[#4C5C2D]/5 border border-[#4C5C2D]/20 rounded-lg px-3 py-2">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-[#4C5C2D] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        <div>
+                                            <p class="text-xs font-bold text-neutral-800 dark:text-neutral-200">{{ $nm_dpjp_keterangan }}</p>
+                                            <p class="text-[10px] text-neutral-400 font-mono">{{ $dpjp_keterangan_inap }}</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" wire:click="resetDpjp" class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-neutral-400 hover:text-red-500 transition-colors" title="Ubah Dokter">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+
+
                         {{-- Action Buttons --}}
                         <div class="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-700">
                             <button type="button" wire:click="closeCreateModal"

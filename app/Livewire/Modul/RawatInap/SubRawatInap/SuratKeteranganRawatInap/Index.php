@@ -22,6 +22,12 @@ class Index extends Component
     public string $tanggal_awal = '';
     public string $tanggal_akhir = '';
 
+    // DPJP Override (opsional)
+    public string $dpjp_keterangan_inap = '';
+    public string $nm_dpjp_keterangan = '';
+    public string $searchDpjp = '';
+    public array $dpjpList = [];
+
     public function mount($no_rawat)
     {
         $this->noRawat = str_replace('-', '/', $no_rawat);
@@ -43,7 +49,7 @@ class Index extends Component
     public function closeCreateModal(): void
     {
         $this->showCreateModal = false;
-        $this->reset(['tanggal_awal', 'tanggal_akhir']);
+        $this->reset(['tanggal_awal', 'tanggal_akhir', 'dpjp_keterangan_inap', 'nm_dpjp_keterangan', 'searchDpjp', 'dpjpList']);
     }
 
     private function getRomanMonth($month)
@@ -103,11 +109,42 @@ class Index extends Component
         return $noSurat;
     }
 
+    public function updatedSearchDpjp(): void
+    {
+        if (strlen($this->searchDpjp) >= 2) {
+            $this->dpjpList = DB::table('dokter')
+                ->where(function ($q) {
+                    $q->where('nm_dokter', 'like', "%{$this->searchDpjp}%")
+                      ->orWhere('kd_dokter', 'like', "%{$this->searchDpjp}%");
+                })
+                ->where('status', '1')
+                ->limit(6)
+                ->get(['kd_dokter', 'nm_dokter'])
+                ->toArray();
+        } else {
+            $this->dpjpList = [];
+        }
+    }
+
+    public function selectDpjp(string $kdDokter, string $nmDokter): void
+    {
+        $this->dpjp_keterangan_inap = $kdDokter;
+        $this->nm_dpjp_keterangan = $nmDokter;
+        $this->searchDpjp = '';
+        $this->dpjpList = [];
+    }
+
+    public function resetDpjp(): void
+    {
+        $this->reset(['dpjp_keterangan_inap', 'nm_dpjp_keterangan', 'searchDpjp', 'dpjpList']);
+    }
+
     public function store(): void
     {
         $this->validate([
             'tanggal_awal'  => 'required|date',
             'tanggal_akhir' => 'required|date|after_or_equal:tanggal_awal',
+            'dpjp_keterangan_inap' => 'nullable|exists:dokter,kd_dokter',
         ], [
             'tanggal_awal.required'                => 'Tanggal awal wajib diisi.',
             'tanggal_akhir.required'               => 'Tanggal akhir wajib diisi.',
@@ -117,14 +154,15 @@ class Index extends Component
         $noSurat = $this->generateNoSurat();
 
         SuratKeteranganRawatInap::create([
-            'no_surat'     => $noSurat,
-            'no_rawat'     => $this->noRawat,
-            'tanggalawal'  => $this->tanggal_awal,
-            'tanggalakhir' => $this->tanggal_akhir,
+            'no_surat'                => $noSurat,
+            'no_rawat'                => $this->noRawat,
+            'tanggalawal'             => $this->tanggal_awal,
+            'tanggalakhir'            => $this->tanggal_akhir,
+            'dpjp_keterangan_inap'    => $this->dpjp_keterangan_inap ?: null,
         ]);
 
         $this->showCreateModal = false;
-        $this->reset(['tanggal_awal', 'tanggal_akhir']);
+        $this->reset(['tanggal_awal', 'tanggal_akhir', 'dpjp_keterangan_inap', 'nm_dpjp_keterangan', 'searchDpjp', 'dpjpList']);
 
         $this->dispatch('swal', [
             'title' => 'Berhasil!',
