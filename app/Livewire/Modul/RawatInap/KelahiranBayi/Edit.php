@@ -13,6 +13,7 @@ class Edit extends Component
     // Identitas
     public string $no_rkm_medis = '';
     public string $nm_pasien = '';
+    public string $nama_bayi_skl = '';
     public string $nm_ibu = '';
     public string $umur_ibu = '';
     public string $nama_ayah = '';
@@ -40,6 +41,7 @@ class Edit extends Component
     public string $g = '';
     public string $p = '';
     public string $a = '';
+    public string $uk = '';
     public string $penolong = ''; 
     public string $nm_penolong = ''; 
     public string $diagnosa = '';
@@ -98,6 +100,7 @@ class Edit extends Component
         $this->alamat = $bayi->pasien->alamat ?? '';
         $this->umur = $bayi->pasien->umur ?? '';
 
+        $this->nama_bayi_skl = $bayi->nama_bayi_skl ?? '';
         $this->umur_ibu = $bayi->umur_ibu;
         $this->nama_ayah = $bayi->nama_ayah;
         $this->umur_ayah = $bayi->umur_ayah;
@@ -115,6 +118,7 @@ class Edit extends Component
         $this->g = $bayi->g;
         $this->p = $bayi->p;
         $this->a = $bayi->a;
+        $this->uk = $bayi->uk ?? '';
         
         $this->penolong = $bayi->penolong;
         $this->nm_penolong = $bayi->pegawai->nama ?? '';
@@ -176,6 +180,11 @@ class Edit extends Component
         }
         $this->searchPasien = '';
         $this->pasienList = [];
+     }
+
+    public function resetPasien()
+    {
+        $this->reset(['no_rkm_medis', 'nm_pasien', 'nama_bayi_skl', 'nm_ibu', 'jk', 'tgl_lahir', 'tgl_daftar', 'alamat', 'umur']);
     }
 
     public function updatedSearchPenolong()
@@ -233,6 +242,7 @@ class Edit extends Component
     {
         $this->validate([
             'no_rkm_medis' => 'required|exists:pasien,no_rkm_medis',
+            'nama_bayi_skl' => 'nullable|max:40',
             'umur_ibu' => 'required',
             'nama_ayah' => 'required',
             'umur_ayah' => 'required',
@@ -244,6 +254,8 @@ class Edit extends Component
             'kelahiran_ke' => 'nullable|max:5',
             'g' => 'required|max:10',
             'p' => 'required|max:10',
+            'a' => 'required|max:10',
+            'uk' => 'nullable|max:10',
             'jam_lahir' => 'required',
             'penolong' => 'required|exists:pegawai,nik',
         ], [
@@ -269,6 +281,7 @@ class Edit extends Component
             $bayi = \App\Models\PasienBayi::findOrFail($this->no_rkm_medis);
 
             $bayi->update([
+                'nama_bayi_skl' => $this->nama_bayi_skl ?: null,
                 'umur_ibu' => $this->umur_ibu,
                 'nama_ayah' => $this->nama_ayah,
                 'umur_ayah' => $this->umur_ayah,
@@ -290,6 +303,7 @@ class Edit extends Component
                 'g' => $this->g ?: '-',
                 'p' => $this->p ?: '-',
                 'a' => $this->a ?: '-',
+                'uk' => $this->uk ?: '-',
                 'f1' => $this->f1,
                 'u1' => $this->u1,
                 't1' => $this->t1,

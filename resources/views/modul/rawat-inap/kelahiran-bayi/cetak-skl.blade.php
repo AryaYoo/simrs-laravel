@@ -495,10 +495,13 @@
                     <td class="colon">:</td>
                     <td class="value">{{ $bayi->no_rkm_medis }}</td>
                 </tr>
+                @php
+                    $namaBayiCetak = !empty($bayi->nama_bayi_skl) ? $bayi->nama_bayi_skl : ($bayi->pasien->nm_pasien ?? '-');
+                @endphp
                 <tr>
                     <td class="label">Nama Bayi</td>
                     <td class="colon">:</td>
-                    <td class="value">{{ $bayi->pasien->nm_pasien ?? '-' }}</td>
+                    <td class="value">{{ $namaBayiCetak }}</td>
                 </tr>
                 <tr>
                     <td class="label">Nama Ibu</td>
@@ -558,6 +561,13 @@
                         {{ $labelAnakke }}
                     </td>
                 </tr>
+                @if(!empty($bayi->uk) && $bayi->uk !== '-')
+                <tr>
+                    <td class="label">Usia Kehamilan</td>
+                    <td class="colon">:</td>
+                    <td class="value">{{ $bayi->uk }} minggu</td>
+                </tr>
+                @endif
 
             </table>
 
@@ -580,7 +590,7 @@
             @php
                 $qrData = "SKL - " . ($setting['nama_instansi'] ?? 'Rumah Sakit') . "\n" .
                     "Nomor: " . ($bayi->no_skl ?? '-') . "\n" .
-                    "Bayi: " . ($bayi->pasien->nm_pasien ?? '-') . " | RM: " . $bayi->no_rkm_medis . "\n" .
+                    "Bayi: " . $namaBayiCetak . " | RM: " . $bayi->no_rkm_medis . "\n" .
                     "Penolong: " . $penolongNama . "\n" .
                     "Tanggal: " . $tglFormatted;
             @endphp

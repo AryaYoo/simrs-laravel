@@ -34,12 +34,22 @@
             <div class="p-6 space-y-6">
                 {{-- RM & Nama (Readonly pada edit) --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="p-4 rounded-xl border-2 border-dashed border-[#4C5C2D]/30 bg-[#4C5C2D]/5">
-                        <p class="text-[10px] font-bold text-[#4C5C2D] uppercase tracking-widest mb-2">Data Terkunci</p>
-                        <div class="grid grid-cols-2 gap-4">
-                            <flux:input label="No. RM Bayi" wire:model="no_rkm_medis" readonly class="bg-neutral-100 dark:bg-neutral-700 font-mono" />
-                            <flux:input label="Nama Anak/Bayi" wire:model="nm_pasien" readonly class="bg-neutral-100 dark:bg-neutral-700" />
+                    <div class="space-y-4">
+                        <div class="bg-[#4C5C2D]/5 dark:bg-[#4C5C2D]/10 border border-[#4C5C2D]/20 rounded-xl p-4 flex items-center justify-between min-h-[76px] transition-all">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center flex-shrink-0">
+                                    <flux:icon name="user" class="w-5 h-5 text-[#4C5C2D]" />
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wide">{{ $nm_pasien }}</h4>
+                                    <p class="text-[10px] text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">No. RM Bayi: <span class="font-bold text-[#4C5C2D]">{{ $no_rkm_medis }}</span></p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="text-[9px] bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Terkunci</span>
+                            </div>
                         </div>
+                        <flux:input label="Nama Khusus Cetak SKL (Opsional)" wire:model="nama_bayi_skl" placeholder="Isi jika nama cetak SKL berbeda dengan nama RM" />
                     </div>
                     <div class="grid grid-cols-3 gap-4">
                         <flux:select label="J.K. Bayi" wire:model="jk">
@@ -153,10 +163,11 @@
                     <div class="md:col-span-2">
                         <flux:input label="Penyulit Kehamilan" wire:model="penyulit_kehamilan" placeholder="Penyulit/komplikasi kehamilan..." />
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-4 gap-2">
                         <flux:input label="G" wire:model="g" placeholder="G" />
                         <flux:input label="P" wire:model="p" placeholder="P" />
                         <flux:input label="A" wire:model="a" placeholder="A" />
+                        <flux:input label="UK" wire:model="uk" placeholder="UK" />
                     </div>
                 </div>                {{-- Proses & Penolong --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

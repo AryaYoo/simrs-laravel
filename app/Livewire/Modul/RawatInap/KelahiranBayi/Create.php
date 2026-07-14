@@ -13,6 +13,7 @@ class Create extends Component
     // Identitas
     public string $no_rkm_medis = '';
     public string $nm_pasien = '';
+    public string $nama_bayi_skl = '';
     public string $nm_ibu = '';
     public string $umur_ibu = '';
     public string $nama_ayah = '';
@@ -40,6 +41,7 @@ class Create extends Component
     public string $g = '';
     public string $p = '';
     public string $a = '';
+    public string $uk = '';
     public string $penolong = ''; 
     public string $nm_penolong = ''; 
     public string $diagnosa = '';
@@ -155,6 +157,11 @@ class Create extends Component
         $this->pasienList = [];
     }
 
+    public function resetPasien()
+    {
+        $this->reset(['no_rkm_medis', 'nm_pasien', 'nama_bayi_skl', 'nm_ibu', 'jk', 'tgl_lahir', 'tgl_daftar', 'alamat', 'umur']);
+    }
+
     public function updatedSearchPenolong()
     {
         if (strlen($this->searchPenolong) >= 3) {
@@ -208,36 +215,39 @@ class Create extends Component
 
     public function save()
     {
-        $this->validate([
-            'no_rkm_medis' => 'required|exists:pasien,no_rkm_medis|unique:pasien_bayi,no_rkm_medis',
-            'umur_ibu' => 'required',
-            'nama_ayah' => 'required',
-            'umur_ayah' => 'required',
-            'panjang_badan' => 'required|numeric',
-            'berat_badan' => 'required|numeric',
-            'lingkar_kepala' => 'required|max:10',
-            'proses_lahir' => 'required|max:60',
-            'anakke' => 'required|max:2',
-            'kelahiran_ke' => 'nullable|max:5',
-            'g' => 'required|max:10',
-            'p' => 'required|max:10',
-            'jam_lahir' => 'required',
-            'penolong' => 'required|exists:pegawai,nik',
-        ], [
-            'no_rkm_medis.required' => 'No. RM Bayi wajib dipilih.',
-            'no_rkm_medis.exists' => 'No. RM Bayi tidak terdaftar di database Pasien.',
-            'no_rkm_medis.unique' => 'No. RM Bayi sudah terdaftar sebagai data kelahiran bayi.',
-            'umur_ibu.required' => 'Umur Ibu wajib diisi.',
-            'nama_ayah.required' => 'Nama Ayah wajib diisi.',
-            'umur_ayah.required' => 'Umur Ayah wajib diisi.',
-            'panjang_badan.required' => 'Panjang Badan wajib diisi.',
-            'berat_badan.required' => 'Berat Badan wajib diisi.',
-            'lingkar_kepala.required' => 'Lingkar Kepala wajib diisi.',
-            'proses_lahir.required' => 'Proses Lahir wajib diisi.',
-            'anakke.required' => 'Anak Ke wajib diisi.',
-            'jam_lahir.required' => 'Jam Lahir wajib diisi.',
-            'penolong.required' => 'Penolong persalinan wajib dipilih.',
-        ]);
+            $this->validate([
+                'no_rkm_medis' => 'required|exists:pasien,no_rkm_medis|unique:pasien_bayi,no_rkm_medis',
+                'nama_bayi_skl' => 'nullable|max:40',
+                'umur_ibu' => 'required',
+                'nama_ayah' => 'required',
+                'umur_ayah' => 'required',
+                'panjang_badan' => 'required|numeric',
+                'berat_badan' => 'required|numeric',
+                'lingkar_kepala' => 'required|max:10',
+                'proses_lahir' => 'required|max:60',
+                'anakke' => 'required|max:2',
+                'kelahiran_ke' => 'nullable|max:5',
+                'g' => 'required|max:10',
+                'p' => 'required|max:10',
+                'a' => 'required|max:10',
+                'uk' => 'nullable|max:10',
+                'jam_lahir' => 'required',
+                'penolong' => 'required|exists:pegawai,nik',
+            ], [
+                'no_rkm_medis.required' => 'No. RM Bayi wajib dipilih.',
+                'no_rkm_medis.exists' => 'No. RM Bayi tidak terdaftar di database Pasien.',
+                'no_rkm_medis.unique' => 'No. RM Bayi sudah terdaftar sebagai data kelahiran bayi.',
+                'umur_ibu.required' => 'Umur Ibu wajib diisi.',
+                'nama_ayah.required' => 'Nama Ayah wajib diisi.',
+                'umur_ayah.required' => 'Umur Ayah wajib diisi.',
+                'panjang_badan.required' => 'Panjang Badan wajib diisi.',
+                'berat_badan.required' => 'Berat Badan wajib diisi.',
+                'lingkar_kepala.required' => 'Lingkar Kepala wajib diisi.',
+                'proses_lahir.required' => 'Proses Lahir wajib diisi.',
+                'anakke.required' => 'Anak Ke wajib diisi.',
+                'jam_lahir.required' => 'Jam Lahir wajib diisi.',
+                'penolong.required' => 'Penolong persalinan wajib dipilih.',
+            ]);
 
         try {
             $n1Total = intval($this->f1) + intval($this->u1) + intval($this->t1) + intval($this->r1) + intval($this->w1);
@@ -246,6 +256,7 @@ class Create extends Component
 
             \App\Models\PasienBayi::create([
                 'no_rkm_medis' => $this->no_rkm_medis,
+                'nama_bayi_skl' => $this->nama_bayi_skl ?: null,
                 'umur_ibu' => $this->umur_ibu,
                 'nama_ayah' => $this->nama_ayah,
                 'umur_ayah' => $this->umur_ayah,
@@ -267,6 +278,7 @@ class Create extends Component
                 'g' => $this->g ?: '-',
                 'p' => $this->p ?: '-',
                 'a' => $this->a ?: '-',
+                'uk' => $this->uk ?: '-',
                 'f1' => $this->f1,
                 'u1' => $this->u1,
                 't1' => $this->t1,

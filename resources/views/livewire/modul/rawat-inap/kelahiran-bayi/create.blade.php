@@ -57,9 +57,32 @@
                         @error('no_rkm_medis') <span class="text-xs text-red-500 font-medium">{{ $message }}</span> @enderror
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <flux:input label="No. RM Bayi" wire:model="no_rkm_medis" readonly placeholder="Pilih dari pencarian" class="bg-neutral-50" />
-                        <flux:input label="Nama Anak/Bayi" wire:model="nm_pasien" readonly placeholder="Pilih dari pencarian" class="bg-neutral-50" />
+                    <div>
+                        @if(empty($no_rkm_medis))
+                            <div class="border border-dashed border-neutral-200 dark:border-neutral-700 rounded-xl p-4 flex flex-col items-center justify-center text-center text-neutral-400 dark:text-neutral-500 bg-neutral-50/50 dark:bg-neutral-900/10 min-h-[76px]">
+                                <flux:icon name="user" class="w-5 h-5 mb-1 opacity-50 text-[#4C5C2D]" />
+                                <span class="text-xs font-semibold text-[#4C5C2D]">Belum ada pasien bayi yang dipilih</span>
+                                <span class="text-[10px] opacity-75 mt-0.5">Gunakan kolom pencarian di sebelah kiri</span>
+                            </div>
+                        @else
+                            <div class="space-y-4">
+                                <div class="bg-[#4C5C2D]/5 dark:bg-[#4C5C2D]/10 border border-[#4C5C2D]/20 rounded-xl p-4 flex items-center justify-between min-h-[76px] transition-all">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center flex-shrink-0">
+                                            <flux:icon name="user" class="w-5 h-5 text-[#4C5C2D]" />
+                                        </div>
+                                        <div>
+                                            <h4 class="text-xs font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wide">{{ $nm_pasien }}</h4>
+                                            <p class="text-[10px] text-neutral-500 dark:text-neutral-400 font-mono mt-0.5">No. RM Bayi: <span class="font-bold text-[#4C5C2D]">{{ $no_rkm_medis }}</span></p>
+                                        </div>
+                                    </div>
+                                    <button type="button" wire:click="resetPasien" class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-neutral-400 hover:text-red-500 transition-colors" title="Ubah Pasien">
+                                        <flux:icon name="x-mark" class="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <flux:input label="Nama Khusus Cetak SKL (Opsional)" wire:model="nama_bayi_skl" placeholder="Isi jika nama cetak SKL berbeda dengan nama RM" />
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -195,10 +218,11 @@
                     <div class="md:col-span-2">
                         <flux:input label="Penyulit Kehamilan" wire:model="penyulit_kehamilan" placeholder="Masukan jika ada penyulit/komplikasi selama hamil..." />
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-4 gap-2">
                         <flux:input label="G" wire:model="g" placeholder="G" />
                         <flux:input label="P" wire:model="p" placeholder="P" />
                         <flux:input label="A" wire:model="a" placeholder="A" />
+                        <flux:input label="UK" wire:model="uk" placeholder="UK" />
                     </div>
                 </div>
 
