@@ -338,7 +338,7 @@
                 <tr>
                     <td class="label">Nama</td>
                     <td class="colon">:</td>
-                    <td class="value">{{ $regPeriksa->dokter->nm_dokter ?? '-' }}</td>
+                    <td class="value">{{ $dpjp->nm_dokter ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td class="label">Jabatan</td>
@@ -424,12 +424,12 @@
             @php
                 $kotaCetak = $setting['kabupaten'] ?? ($setting['kota'] ?? 'Surabaya');
                 $tglFormatted = \Carbon\Carbon::now()->translatedFormat('d F Y');
-                $penolongNama = $regPeriksa->dokter->nm_dokter ?? 'Dokter Jaga';
+                $penolongNama = $dpjp->nm_dokter ?? ($regPeriksa->dokter->nm_dokter ?? 'Dokter Jaga');
                 
                 $qrData = "Surat Keterangan Opname - " . ($setting['nama_instansi'] ?? 'Rumah Sakit') . "\n" .
                     "Nomor: " . ($surat->no_surat ?? '-') . "\n" .
                     "Pasien: " . ($regPeriksa->pasien->nm_pasien ?? '-') . "\n" .
-                    "Dokter: " . $penolongNama;
+                    "DPJP: " . $penolongNama;
             @endphp
 
             <div class="signature-block">

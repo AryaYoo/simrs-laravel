@@ -62,19 +62,38 @@ class CetakSkriController extends Controller
             }
         }
 
-        $sep = \App\Models\BridgingSep::where('no_rawat', $no_rawat)->first();
+        // Ambil DPJP dari rawat_inap_dr (dokter visite/perawatan)
+        // Ambil dokter yang paling banyak tercatat, atau yang pertama kali visite
+        $rawatInapDr = \Illuminate\Support\Facades\DB::table('rawat_inap_dr')
+            ->select('kd_dokter', \Illuminate\Support\Facades\DB::raw('COUNT(*) as total'))
+            ->where('no_rawat', $no_rawat)
+            ->groupBy('kd_dokter')
+            ->orderByDesc('total')
+            ->first();
 
-        // Get Spesialis from DB directly
+        $dpjp = null;
+        if ($rawatInapDr) {
+            $dpjp = \App\Models\Dokter::find($rawatInapDr->kd_dokter);
+        }
+
+        // Fallback ke dokter pendaftar jika tidak ada rawat_inap_dr
+        if (!$dpjp) {
+            $dpjp = $regPeriksa->dokter;
+        }
+
+        // Ambil nama spesialis DPJP
         $nm_sps = 'Dokter Penanggung Jawab';
-        if ($regPeriksa->dokter && $regPeriksa->dokter->kd_sps) {
+        if ($dpjp && $dpjp->kd_sps) {
             $spesialis = \Illuminate\Support\Facades\DB::table('spesialis')
-                ->where('kd_sps', $regPeriksa->dokter->kd_sps)
+                ->where('kd_sps', $dpjp->kd_sps)
                 ->first();
             if ($spesialis) {
                 $nm_sps = $spesialis->nm_sps;
             }
         }
 
-        return view('modul.rawat-inap.surat-keterangan-rawat-inap.cetak', compact('surat', 'regPeriksa', 'setting', 'diagnosa_awal', 'sep', 'nm_sps'));
+        $sep = \App\Models\BridgingSep::where('no_rawat', $no_rawat)->first();
+
+        return view('modul.rawat-inap.surat-keterangan-rawat-inap.cetak', compact('surat', 'regPeriksa', 'setting', 'diagnosa_awal', 'sep', 'nm_sps', 'dpjp'));
     }
 }
