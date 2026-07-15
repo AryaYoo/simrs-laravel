@@ -275,11 +275,15 @@
                                 <span>Kelahiran Bayi</span>
                             </a>
                             
+                            @php $ranapPendingCount = \App\Models\PermintaanRanap::doesntHave('kamarInap')->count(); @endphp
                             <a href="{{ route('modul.rawat-inap.permintaan-ranap') }}" wire:navigate
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
                                 style="color: {{ request()->routeIs('modul.rawat-inap.permintaan-ranap') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.rawat-inap.permintaan-ranap') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
                                 <flux:icon name="document-text" class="w-3.5 h-3.5" />
-                                <span>Permintaan Ranap</span>
+                                <span class="flex-1">Permintaan Ranap</span>
+                                @if($ranapPendingCount > 0)
+                                    <span class="min-w-[18px] h-[18px] flex items-center justify-center text-[9px] font-bold bg-red-500 text-white rounded-full px-1 shadow">{{ $ranapPendingCount }}</span>
+                                @endif
                             </a>
                         </div>
                     </div>
@@ -604,7 +608,11 @@
                                 <a href="{{ route('modul.rawat-inap.permintaan-ranap') }}" wire:navigate @click="mobileMenuOpen=false"
                                     class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
                                     style="color:{{ request()->routeIs('modul.rawat-inap.permintaan-ranap') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
-                                    <flux:icon name="document-text" class="w-3.5 h-3.5" /><span>Permintaan Ranap</span>
+                                    <flux:icon name="document-text" class="w-3.5 h-3.5" />
+                                    <span class="flex-1">Permintaan Ranap</span>
+                                    @if(isset($ranapPendingCount) && $ranapPendingCount > 0)
+                                        <span class="min-w-[18px] h-[18px] flex items-center justify-center text-[9px] font-bold bg-red-500 text-white rounded-full px-1 shadow">{{ $ranapPendingCount }}</span>
+                                    @endif
                                 </a>
                             </div>
                         </div>

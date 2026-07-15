@@ -215,7 +215,7 @@
                                                 <flux:icon name="eye" class="w-4 h-4" />
                                             </button>
                                             @if(!$ranap->kamarInap)
-                                                <button wire:click="deletePermintaan('{{ str_replace('/', '-', $ranap->no_rawat) }}')" wire:confirm="Yakin ingin menghapus permintaan rawat inap ini?" class="inline-flex items-center justify-center w-7 h-7 rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors border border-red-200 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-600 dark:hover:text-white shadow-sm" title="Hapus">
+                                                <button onclick="if(confirm('Yakin ingin menghapus permintaan rawat inap ini?')) { @this.deletePermintaan('{{ str_replace('/', '-', $ranap->no_rawat) }}') }" class="inline-flex items-center justify-center w-7 h-7 rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors border border-red-200 dark:border-red-900/30 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-600 dark:hover:text-white shadow-sm" title="Hapus">
                                                     <flux:icon name="trash" class="w-4 h-4" />
                                                 </button>
                                             @endif
