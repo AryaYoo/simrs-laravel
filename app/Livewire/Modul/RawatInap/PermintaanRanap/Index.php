@@ -2,11 +2,8 @@
 
 namespace App\Livewire\Modul\RawatInap\PermintaanRanap;
 
-use App\Models\Kamar;
-use App\Models\KamarInap;
 use App\Models\Penjab;
-use App\Models\Penyakit;
-use App\Models\PermintaanRanap;
+use App\Repositories\RawatInap\PermintaanRanapRepository;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -71,19 +68,14 @@ class Index extends Component
         $this->filterTanggalSelesai = date('Y-m-d');
     }
 
-    public function showDetail($id)
+    public function showDetail($id, PermintaanRanapRepository $repo)
     {
         $decodedId = str_replace('-', '/', $id);
-        $this->detailData = PermintaanRanap::with([
-                'kamar', 'kamar.bangsal',
-                'regPeriksa', 'regPeriksa.pasien',
-                'regPeriksa.dokter', 'regPeriksa.poliklinik', 'regPeriksa.penjab',
-                'kamarInap'
-            ])
-            ->where('no_rawat', $decodedId)
-            ->first()
-            ->toArray();
-        $this->detailModalOpen = true;
+        $ranap = $repo->getDetail($decodedId);
+        if ($ranap) {
+            $this->detailData = $ranap->toArray();
+            $this->detailModalOpen = true;
+        }
     }
 
     public function closeDetail()
@@ -92,11 +84,12 @@ class Index extends Component
         $this->detailData = [];
     }
 
-    public function openCheckIn($id)
+    public function openCheckIn($id, PermintaanRanapRepository $repo)
     {
         $decodedId = str_replace('-', '/', $id);
-        $ranap = PermintaanRanap::with(['kamar', 'kamar.bangsal', 'regPeriksa', 'regPeriksa.pasien'])
-            ->where('no_rawat', $decodedId)->first();
+        $ranap = $repo->getForCheckIn($decodedId);
+
+        if (!$ranap) return;
 
         $this->checkInData = $ranap->toArray();
         $this->tanggal_masuk = date('Y-m-d');
@@ -151,7 +144,7 @@ class Index extends Component
         $this->isDiagnosaModalOpen = false;
     }
 
-    public function saveCheckIn()
+    public function saveCheckIn(PermintaanRanapRepository $repo)
     {
         $this->validate([
             'tanggal_masuk' => 'required|date',
@@ -161,93 +154,40 @@ class Index extends Component
         ]);
 
         try {
-            \Illuminate\Support\Facades\DB::beginTransaction();
-
-            $no_rawat = $this->checkInData['no_rawat'];
-
-            $kamar = Kamar::where('kd_kamar', $this->kd_kamar)->first();
-            if ($kamar && $kamar->status == 'ISI') {
-                \Illuminate\Support\Facades\DB::rollBack();
-                $this->dispatch('swal', ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Kamar sudah terisi, silakan pilih kamar lain.']);
-                return;
-            }
-
-            KamarInap::create([
-                'no_rawat'      => $no_rawat,
+            $data = [
+                'no_rawat'      => $this->checkInData['no_rawat'],
                 'kd_kamar'      => $this->kd_kamar,
-                'trf_kamar'     => $this->tarif_kamar,
-                'diagnosa_awal' => $this->diagnosa_awal ?: '-',
-                'diagnosa_akhir'=> '-',
-                'tgl_masuk'     => $this->tanggal_masuk,
+                'tarif_kamar'   => $this->tarif_kamar,
+                'diagnosa_awal' => $this->diagnosa_awal,
+                'tanggal_masuk' => $this->tanggal_masuk,
                 'jam_masuk'     => $this->jam_masuk,
-                'tgl_keluar'    => '0000-00-00',
-                'jam_keluar'    => '00:00:00',
-                'lama'          => $this->lama_inap,
-                'ttl_biaya'     => $this->tarif_kamar * $this->lama_inap,
-                'stts_pulang'   => '-',
-            ]);
+                'lama_inap'     => $this->lama_inap,
+            ];
 
-            Kamar::where('kd_kamar', $this->kd_kamar)->update(['status' => 'ISI']);
-
-            \Illuminate\Support\Facades\DB::commit();
+            $repo->processCheckIn($data);
 
             $this->dispatch('swal', ['icon' => 'success', 'title' => 'Berhasil', 'text' => 'Pasien berhasil di check in ke rawat inap!']);
             $this->closeCheckIn();
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
-    public function render()
+    public function render(PermintaanRanapRepository $repo)
     {
         // Count pending for badge
-        $pendingCount = PermintaanRanap::doesntHave('kamarInap')->count();
+        $pendingCount = $repo->getPendingCount();
 
         // --- TAB ANTRIAN ---
         $listPermintaan = collect();
         if ($this->activeTab === 'antrian') {
-            $antrianQuery = PermintaanRanap::with(['kamar', 'kamar.bangsal', 'regPeriksa', 'regPeriksa.pasien'])
-                ->doesntHave('kamarInap');
-
-            if ($this->search) {
-                $antrianQuery->where(function ($q) {
-                    $q->whereHas('regPeriksa.pasien', function ($q2) {
-                        $q2->where('nm_pasien', 'like', '%' . $this->search . '%')
-                            ->orWhere('no_rkm_medis', 'like', '%' . $this->search . '%');
-                    })->orWhere('no_rawat', 'like', '%' . $this->search . '%');
-                });
-            }
-
-            $listPermintaan = $antrianQuery->paginate(10);
+            $listPermintaan = $repo->getAntrianPending($this->search);
         }
 
         // --- TAB RIWAYAT ---
         $riwayatList = collect();
         if ($this->activeTab === 'riwayat') {
-            $riwayatQuery = PermintaanRanap::with([
-                    'kamar', 'kamar.bangsal',
-                    'regPeriksa', 'regPeriksa.pasien', 'regPeriksa.penjab',
-                    'kamarInap'
-                ])
-                ->whereBetween('tanggal', [$this->filterTanggalMulai, $this->filterTanggalSelesai]);
-
-            if ($this->filterCaraBayar) {
-                $riwayatQuery->whereHas('regPeriksa', function ($q) {
-                    $q->where('kd_pj', $this->filterCaraBayar);
-                });
-            }
-
-            if ($this->searchRiwayat) {
-                $riwayatQuery->where(function ($q) {
-                    $q->whereHas('regPeriksa.pasien', function ($q2) {
-                        $q2->where('nm_pasien', 'like', '%' . $this->searchRiwayat . '%')
-                            ->orWhere('no_rkm_medis', 'like', '%' . $this->searchRiwayat . '%');
-                    })->orWhere('no_rawat', 'like', '%' . $this->searchRiwayat . '%');
-                });
-            }
-
-            $riwayatList = $riwayatQuery->orderBy('tanggal', 'desc')->paginate(10);
+            $riwayatList = $repo->getRiwayat($this->filterTanggalMulai, $this->filterTanggalSelesai, $this->filterCaraBayar, $this->searchRiwayat);
         }
 
         // Penjab list for filter dropdown
@@ -258,27 +198,11 @@ class Index extends Component
         $listDiagnosa = [];
 
         if ($this->isKamarModalOpen) {
-            $kamarQuery = Kamar::with('bangsal')->where('status', '!=', 'ISI');
-            if (strlen($this->searchKamar) >= 2) {
-                $search = $this->searchKamar;
-                $kamarQuery->where(function ($q) use ($search) {
-                    $q->where('kd_kamar', 'like', '%' . $search . '%')
-                        ->orWhereHas('bangsal', function ($q2) use ($search) {
-                            $q2->where('nm_bangsal', 'like', '%' . $search . '%');
-                        });
-                });
-            }
-            $listKamar = $kamarQuery->limit(50)->get();
+            $listKamar = $repo->searchKamar($this->searchKamar);
         }
 
         if ($this->isDiagnosaModalOpen) {
-            $diagQuery = Penyakit::query();
-            if (strlen($this->searchDiagnosa) >= 2) {
-                $search = $this->searchDiagnosa;
-                $diagQuery->where('kd_penyakit', 'like', '%' . $search . '%')
-                    ->orWhere('nm_penyakit', 'like', '%' . $search . '%');
-            }
-            $listDiagnosa = $diagQuery->limit(50)->get();
+            $listDiagnosa = $repo->searchDiagnosa($this->searchDiagnosa);
         }
 
         return view('livewire.modul.rawat-inap.permintaan-ranap.index', [
@@ -291,3 +215,4 @@ class Index extends Component
         ]);
     }
 }
+

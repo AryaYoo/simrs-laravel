@@ -43,6 +43,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Perawatan & Tindakan**: Input tindakan medis, petugas, dan BHP secara terpadu (Refactored to Repository).
 - [x] **Riwayat Pasien**: Timeline riwayat pemeriksaan dan kunjungan pasien (Refactored to Repository).
 - [x] **Resume Medis (Ranap)**: Form pembuatan resume otomatis dengan tata letak *continuous scroll*, navigasi *minimap/scrollspy*, integrasi riwayat klinis otomatis (*auto-fill*), fitur *attachment* (Tindakan, Obat, Lab) via Alpine Modal, serta penguncian status *checkout* (Refactored to Feature-Based & Repository).
+- [x] **Permintaan Rawat Inap**: Manajemen antrian masuk pasien ranap terintegrasi dengan modul rawat jalan, dilengkapi fitur validasi status kamar realtime, kalkulasi estimasi biaya, dan sistem riwayat terpadu (Refactored to Repository).
 - [x] **Pindah & Pulang**: Modul perpindahan kamar pasien (4 opsi logika) dan proses check-out pasien terintegrasi (Refactored to Repository).
 - [x] **E-Resep Ranap**: Digitalisasi resep obat Rawat Inap & Antarmuka Cepat (Split View) (Refactored to Repository).
 - [x] **Catatan Keperawatan Ranap**: Modul pencatatan asuhan keperawatan rawat inap dengan sinkronisasi waktu dan UI premium.

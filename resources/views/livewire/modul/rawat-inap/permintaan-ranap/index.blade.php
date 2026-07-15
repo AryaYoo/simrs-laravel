@@ -149,8 +149,9 @@
         </div>
 
         @if($activeTab === 'antrian')
-            {{-- Search Antrian --}}
-            <div class="flex flex-col sm:flex-row justify-between gap-4">
+            <div wire:key="tab-antrian" class="space-y-4">
+                {{-- Search Antrian --}}
+                <div class="flex flex-col sm:flex-row justify-between gap-4">
                 <div class="relative w-full sm:w-96">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <flux:icon name="magnifying-glass" class="w-5 h-5 text-neutral-400" />
@@ -215,10 +216,12 @@
                     </div>
                 @endif
             </div>
+            </div>
 
         @elseif($activeTab === 'riwayat')
-            {{-- Filter Riwayat --}}
-            <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm p-4">
+            <div wire:key="tab-riwayat" class="space-y-4">
+                {{-- Filter Riwayat --}}
+                <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm p-4">
                 <div class="flex flex-wrap gap-3 items-end">
                     <div class="flex flex-col gap-1">
                         <label class="text-xs text-neutral-500 font-medium">Tanggal Dari</label>
@@ -309,6 +312,7 @@
                         {{ $riwayatList->links(data: ['scrollTo' => false]) }}
                     </div>
                 @endif
+            </div>
             </div>
         @endif
     @endif
