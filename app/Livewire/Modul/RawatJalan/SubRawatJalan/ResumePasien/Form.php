@@ -66,6 +66,14 @@ class Form extends Component
     public $searchIcd9 = '';
     public $targetIcdField = '';
 
+    // Attach / Pick from History State
+    public $targetAttachField  = '';
+    public $targetAttachColumn = '';
+    public $selectedKeluhan    = [];
+    public $selectedLab        = [];
+    public $selectedObat       = [];
+    public $selectedRadiologi  = [];
+
     public function mount($no_rawat)
     {
         $this->no_rawat = str_replace('-', '/', $no_rawat);
@@ -391,6 +399,176 @@ class Form extends Component
                     'prioritas'=> $proc['prioritas'],
                     'jumlah'   => 1,
                 ]);
+            }
+        }
+    }
+
+    // ─── Computed Properties for Modals (Lazy Load) ──────────────────────────
+
+    public function keluhanData()
+    {
+        return \App\Models\PemeriksaanRalan::where('no_rawat', $this->no_rawat)
+            ->orderBy('tgl_perawatan', 'desc')
+            ->orderBy('jam_rawat', 'desc')
+            ->get();
+    }
+
+    public function labHasilData()
+    {
+        return \App\Models\DetailPeriksaLab::with(['template', 'jnsPerawatan'])
+            ->where('no_rawat', $this->no_rawat)
+            ->orderBy('tgl_periksa', 'desc')
+            ->orderBy('jam', 'desc')
+            ->get();
+    }
+
+    public function obatData()
+    {
+        return \App\Models\ResepDokter::with(['barang', 'resepObat'])
+            ->whereHas('resepObat', function ($q) {
+                $q->where('no_rawat', $this->no_rawat);
+            })
+            ->get();
+    }
+
+    public function radiologiData()
+    {
+        return \App\Models\PeriksaRadiologi::with(['jnsPerawatan'])
+            ->where('no_rawat', $this->no_rawat)
+            ->orderBy('tgl_periksa', 'desc')
+            ->orderBy('jam', 'desc')
+            ->get();
+    }
+
+    // ─── Attach Methods ────────────────────────────────────────────────────
+
+    public function prepareAttach($field, $column)
+    {
+        $this->targetAttachField  = $field;
+        $this->targetAttachColumn = $column;
+        $this->selectedKeluhan    = [];
+        $this->selectedLab        = [];
+        $this->selectedObat       = [];
+        $this->selectedRadiologi  = [];
+    }
+
+    public function toggleSelectAll()
+    {
+        if ($this->targetAttachColumn === 'lab') {
+            $lab = $this->labHasilData();
+            $this->selectedLab = count($this->selectedLab) === $lab->count()
+                ? []
+                : $lab->map(fn($l) => "{$l->tgl_periksa}|{$l->jam}|{$l->kd_jenis_prw}|{$l->id_template}")->toArray();
+        } elseif ($this->targetAttachColumn === 'obat') {
+            $obat = $this->obatData();
+            $this->selectedObat = count($this->selectedObat) === $obat->count()
+                ? []
+                : $obat->map(fn($o) => "{$o->no_resep}|{$o->kode_brng}")->toArray();
+        } elseif ($this->targetAttachColumn === 'radiologi') {
+            $rad = $this->radiologiData();
+            $this->selectedRadiologi = count($this->selectedRadiologi) === $rad->count()
+                ? []
+                : $rad->map(fn($r) => "{$r->tgl_periksa}|{$r->jam}|{$r->kd_jenis_prw}")->toArray();
+        } else {
+            $keluhan = $this->keluhanData();
+            $this->selectedKeluhan = count($this->selectedKeluhan) === $keluhan->count()
+                ? []
+                : $keluhan->map(fn($p) => "{$p->tgl_perawatan}|{$p->jam_rawat}")->toArray();
+        }
+    }
+
+    public function attachKeluhan()
+    {
+        if (empty($this->selectedKeluhan)) return;
+
+        $texts = [];
+        $col   = $this->targetAttachColumn; // 'keluhan' or 'pemeriksaan'
+        foreach ($this->selectedKeluhan as $key) {
+            [$tgl, $jam] = explode('|', $key);
+            $row = \App\Models\PemeriksaanRalan::where('no_rawat', $this->no_rawat)
+                ->where('tgl_perawatan', $tgl)
+                ->where('jam_rawat', $jam)
+                ->first();
+            if ($row && !empty($row->$col) && $row->$col !== '-') {
+                $texts[] = $row->$col;
+            }
+        }
+        $this->applyAttachments($texts);
+        $this->selectedKeluhan = [];
+    }
+
+    public function attachLab()
+    {
+        if (empty($this->selectedLab)) return;
+
+        $texts = [];
+        foreach ($this->selectedLab as $key) {
+            [$tgl, $jam, $kd_jenis_prw, $id_template] = explode('|', $key);
+            $row = \App\Models\DetailPeriksaLab::with('template')
+                ->where('no_rawat', $this->no_rawat)
+                ->where('tgl_periksa', $tgl)
+                ->where('jam', $jam)
+                ->where('kd_jenis_prw', $kd_jenis_prw)
+                ->where('id_template', $id_template)
+                ->first();
+            if ($row) {
+                $texts[] = ($row->template->Pemeriksaan ?? '-') . ': ' . ($row->nilai ?? '');
+            }
+        }
+        $this->applyAttachments($texts);
+        $this->selectedLab = [];
+    }
+
+    public function attachObat()
+    {
+        if (empty($this->selectedObat)) return;
+
+        $texts = [];
+        foreach ($this->selectedObat as $key) {
+            [$no_resep, $kode_brng] = explode('|', $key);
+            $row = \App\Models\ResepDokter::with('barang')
+                ->where('no_resep', $no_resep)
+                ->where('kode_brng', $kode_brng)
+                ->first();
+            if ($row && $row->barang) {
+                $texts[] = $row->barang->nama_brng . ' (' . $row->jml . ', ' . $row->aturan_pakai . ')';
+            }
+        }
+        $this->applyAttachments($texts);
+        $this->selectedObat = [];
+    }
+
+    public function attachRadiologi()
+    {
+        if (empty($this->selectedRadiologi)) return;
+
+        $texts = [];
+        foreach ($this->selectedRadiologi as $key) {
+            [$tgl, $jam, $kd_jenis_prw] = explode('|', $key);
+            $row = \App\Models\PeriksaRadiologi::with('jnsPerawatan')
+                ->where('no_rawat', $this->no_rawat)
+                ->where('tgl_periksa', $tgl)
+                ->where('jam', $jam)
+                ->where('kd_jenis_prw', $kd_jenis_prw)
+                ->first();
+            if ($row && !empty($row->hasil) && $row->hasil !== '-') {
+                $nm_perawatan = $row->jnsPerawatan->nm_perawatan ?? '-';
+                $texts[] = "{$nm_perawatan}:\n" . trim($row->hasil);
+            }
+        }
+        $this->applyAttachments($texts, "\n\n");
+        $this->selectedRadiologi = [];
+    }
+
+    private function applyAttachments($texts, $separator = ', ')
+    {
+        if (!empty($texts)) {
+            $joinedText = implode($separator, array_unique($texts));
+            $field = $this->targetAttachField;
+            if (empty($this->$field)) {
+                $this->$field = $joinedText;
+            } else {
+                $this->$field .= ', ' . $joinedText;
             }
         }
     }
