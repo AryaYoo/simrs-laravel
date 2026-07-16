@@ -46,10 +46,17 @@ class PermintaanLabRepository
     /**
      * Get Master Laboratorium List
      */
-    public static function getPemeriksaanList(string $kategori, string $search = '', int $perPage = 15)
+    public static function getPemeriksaanList(string $kategori, string $search = '', string $kd_pj = '', int $perPage = 15)
     {
         $query = JnsPerawatanLab::where('status', '1')
             ->where('kategori', $kategori);
+
+        if ($kd_pj) {
+            $query->where(function($q) use ($kd_pj) {
+                $q->where('kd_pj', $kd_pj)
+                  ->orWhere('kd_pj', '-');
+            });
+        }
 
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -63,21 +70,47 @@ class PermintaanLabRepository
 
     /**
      * Get Detailed Parameters for Selected Tests
+     * Falls back to showing the jns_perawatan_lab entry itself when no template_laboratorium exists (DIRECT_ prefix)
      */
     public static function getDetailParameters(string $kategori, array $selectedTests, string $searchDetail = '')
     {
         if (empty($selectedTests)) return collect([]);
 
-        $query = TemplateLaboratorium::whereIn('kd_jenis_prw', $selectedTests)
-            ->whereHas('pemeriksaanHeader', function($q) use ($kategori) {
-                $q->where('kategori', $kategori);
-            });
+        $query = TemplateLaboratorium::whereIn('kd_jenis_prw', $selectedTests);
 
         if ($searchDetail) {
             $query->where('Pemeriksaan', 'like', '%' . $searchDetail . '%');
         }
 
-        return $query->orderBy('kd_jenis_prw')->orderBy('urut')->get();
+        $templates = $query->orderBy('kd_jenis_prw')->orderBy('urut')->get();
+
+        // Find tests that have NO template entries → show the test itself as a synthetic detail (legacy behavior)
+        $testsWithTemplates = $templates->pluck('kd_jenis_prw')->unique()->toArray();
+        $testsWithoutTemplates = array_diff($selectedTests, $testsWithTemplates);
+
+        if (!empty($testsWithoutTemplates)) {
+            $syntheticFilter = JnsPerawatanLab::whereIn('kd_jenis_prw', $testsWithoutTemplates);
+            if ($searchDetail) {
+                $syntheticFilter->where('nm_perawatan', 'like', '%' . $searchDetail . '%');
+            }
+            $synthetics = $syntheticFilter->get()->map(function ($item) {
+                $t = new TemplateLaboratorium();
+                $t->id_template    = 'DIRECT_' . $item->kd_jenis_prw;
+                $t->kd_jenis_prw   = $item->kd_jenis_prw;
+                $t->Pemeriksaan    = $item->nm_perawatan;
+                $t->satuan         = '';
+                $t->nilai_rujukan_ld = '';
+                $t->nilai_rujukan_la = '';
+                $t->nilai_rujukan_pd = '';
+                $t->nilai_rujukan_pa = '';
+                $t->urut           = 0;
+                $t->setRelation('pemeriksaanHeader', $item);
+                return $t;
+            });
+            return $templates->concat($synthetics)->sortBy('kd_jenis_prw')->values();
+        }
+
+        return $templates;
     }
 
     /**
@@ -268,42 +301,60 @@ class PermintaanLabRepository
             } else {
                 // Header PK / MB
                 DB::table('permintaan_lab')->insert([
-                    'noorder' => $noorder,
-                    'no_rawat' => $data['no_rawat'],
-                    'tgl_permintaan' => $data['tgl_permintaan'],
-                    'jam_permintaan' => $jamF,
-                    'tgl_sampel' => '0000-00-00',
-                    'jam_sampel' => '00:00:00',
-                    'tgl_hasil' => '0000-00-00',
-                    'jam_hasil' => '00:00:00',
-                    'dokter_perujuk' => $data['kd_dokter_perujuk'],
-                    'status' => 'ralan',
-                    'informasi_tambahan' => $data['informasi_tambahan'] ?: '-',
-                    'diagnosa_klinis' => $data['diagnosa_klinis'] ?: '-'
+                    'noorder'             => $noorder,
+                    'no_rawat'            => $data['no_rawat'],
+                    'tgl_permintaan'      => $data['tgl_permintaan'],
+                    'jam_permintaan'      => $jamF,
+                    'tgl_sampel'          => '0000-00-00',
+                    'jam_sampel'          => '00:00:00',
+                    'tgl_hasil'           => '0000-00-00',
+                    'jam_hasil'           => '00:00:00',
+                    'dokter_perujuk'      => $data['kd_dokter_perujuk'],
+                    'status'              => 'ralan',
+                    'informasi_tambahan'  => $data['informasi_tambahan'] ?: '-',
+                    'diagnosa_klinis'     => $data['diagnosa_klinis'] ?: '-'
                 ]);
 
-                // Tests
-                $testIdsToSave = TemplateLaboratorium::whereIn('id_template', $data['selectedDetails'])
-                    ->distinct()
-                    ->pluck('kd_jenis_prw');
+                // Separate DIRECT_ IDs (no template) from real template IDs
+                $directKds    = [];
+                $realDetailIds = [];
+                foreach ($data['selectedDetails'] as $id) {
+                    if (str_starts_with((string)$id, 'DIRECT_')) {
+                        $directKds[] = substr($id, 7); // strip 'DIRECT_' prefix
+                    } else {
+                        $realDetailIds[] = $id;
+                    }
+                }
 
-                foreach ($testIdsToSave as $kd) {
+                // kd_jenis_prw from real templates
+                $testIdsFromTemplates = [];
+                if (!empty($realDetailIds)) {
+                    $testIdsFromTemplates = TemplateLaboratorium::whereIn('id_template', $realDetailIds)
+                        ->distinct()
+                        ->pluck('kd_jenis_prw')
+                        ->toArray();
+                }
+
+                // Merge all kd_jenis_prw to save (real + direct) — deduplicated
+                $allKds = array_unique(array_merge($testIdsFromTemplates, $directKds));
+
+                foreach ($allKds as $kd) {
                     DB::table('permintaan_pemeriksaan_lab')->insert([
-                        'noorder' => $noorder,
+                        'noorder'    => $noorder,
                         'kd_jenis_prw' => $kd,
                         'stts_bayar' => 'Belum'
                     ]);
                 }
 
-                // Parameters
-                foreach ($data['selectedDetails'] as $id_template) {
+                // Parameters — only for real template entries
+                foreach ($realDetailIds as $id_template) {
                     $template = TemplateLaboratorium::find($id_template);
                     if ($template) {
                         DB::table('permintaan_detail_permintaan_lab')->insert([
-                            'noorder' => $noorder,
+                            'noorder'      => $noorder,
                             'kd_jenis_prw' => $template->kd_jenis_prw,
-                            'id_template' => $id_template,
-                            'stts_bayar' => 'Belum'
+                            'id_template'  => $id_template,
+                            'stts_bayar'   => 'Belum'
                         ]);
                     }
                 }

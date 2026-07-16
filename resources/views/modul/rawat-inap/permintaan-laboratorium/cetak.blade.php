@@ -271,7 +271,7 @@
                 <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                 Cetak Dokumen
             </button>
-            <button class="btn-close" onclick="window.close()">Tutup</button>
+            <button class="btn-close" onclick="if(window.history.length > 1) { window.history.back(); } else { window.close(); }">Tutup</button>
         </div>
     </div>
 
@@ -392,7 +392,7 @@
                         @else
                             @php $template = $row['data']; @endphp
                             <tr>
-                                <td style="padding-left: 20px;">{{ $template->urut ?? '' }}_{{ $template->Pemeriksaan ?? '' }}</td>
+                                <td style="padding-left: 20px;">{{ $template->urut !== '' && $template->urut !== null ? $template->urut . '_' : '' }}{{ $template->Pemeriksaan ?? '' }}</td>
                                 <td style="text-align: center;">{{ $template->satuan ?? '' }}</td>
                                 <td style="text-align: center; font-size: 10px;">
                                     @if(empty($template->nilai_rujukan_ld) && empty($template->nilai_rujukan_pd))

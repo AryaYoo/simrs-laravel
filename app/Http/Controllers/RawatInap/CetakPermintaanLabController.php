@@ -55,13 +55,15 @@ class CetakPermintaanLabController extends Controller
                 ->where('reg_periksa.no_rawat', $permintaan->no_rawat)
                 ->first();
 
+            $pemeriksaanHeaders = $permintaan->detailPemeriksaan;
+
             // Fetch details grouped by perawatan
             $detailPemeriksaan = PermintaanDetailPermintaanLab::with(['template', 'pemeriksaan'])
                 ->where('noorder', $noorder)
                 ->get();
+                
+            $groupedDetails = $detailPemeriksaan->groupBy('kd_jenis_prw');
 
-            $detailLab = [];
-            
             // Smart Chunking for Pagination
             $currentPage = [];
             $lineCount = 0;
@@ -70,37 +72,60 @@ class CetakPermintaanLabController extends Controller
             // First page has Kop Surat, so it holds less items
             $isFirstPage = true;
 
-            foreach ($detailPemeriksaan as $detail) {
-                if ($detail->pemeriksaan && $detail->template) {
-                    $nm_perawatan = $detail->pemeriksaan->nm_perawatan;
+            foreach ($pemeriksaanHeaders as $header) {
+                if ($header->pemeriksaan) {
+                    $kd = $header->kd_jenis_prw;
+                    $nm_perawatan = $header->pemeriksaan->nm_perawatan;
                     
-                    if (!isset($detailLab[$nm_perawatan])) {
-                        $detailLab[$nm_perawatan] = [];
+                    $maxLines = $isFirstPage ? 22 : 32;
+                    
+                    // Break page before header if near the bottom to avoid orphans
+                    if ($lineCount > $maxLines - 3) {
+                        $pages[] = $currentPage;
+                        $currentPage = [];
+                        $lineCount = 0;
+                        $isFirstPage = false;
+                    }
+                    
+                    $currentPage[] = ['type' => 'header', 'name' => $nm_perawatan];
+                    $lineCount++;
+
+                    if (isset($groupedDetails[$kd]) && $groupedDetails[$kd]->count() > 0) {
+                        foreach ($groupedDetails[$kd] as $detail) {
+                            if ($detail->template) {
+                                $currentPage[] = ['type' => 'detail', 'data' => $detail->template];
+                                $lineCount++;
+                                
+                                $maxLines = $isFirstPage ? 22 : 32;
+                                if ($lineCount >= $maxLines) {
+                                    $pages[] = $currentPage;
+                                    $currentPage = [];
+                                    $lineCount = 0;
+                                    $isFirstPage = false;
+                                }
+                            }
+                        }
+                    } else {
+                        // Synthetic fallback detail for tests without templates
+                        $t = new \stdClass();
+                        $t->urut = '';
+                        $t->Pemeriksaan = $nm_perawatan;
+                        $t->satuan = '';
+                        $t->nilai_rujukan_ld = '';
+                        $t->nilai_rujukan_la = '';
+                        $t->nilai_rujukan_pd = '';
+                        $t->nilai_rujukan_pa = '';
+                        
+                        $currentPage[] = ['type' => 'detail', 'data' => $t];
+                        $lineCount++;
                         
                         $maxLines = $isFirstPage ? 22 : 32;
-                        
-                        // Break page before header if near the bottom to avoid orphans
-                        if ($lineCount > $maxLines - 3) {
+                        if ($lineCount >= $maxLines) {
                             $pages[] = $currentPage;
                             $currentPage = [];
                             $lineCount = 0;
                             $isFirstPage = false;
                         }
-                        
-                        $currentPage[] = ['type' => 'header', 'name' => $nm_perawatan];
-                        $lineCount++;
-                    }
-                    
-                    $detailLab[$nm_perawatan][] = $detail->template;
-                    $currentPage[] = ['type' => 'detail', 'data' => $detail->template];
-                    $lineCount++;
-                    
-                    $maxLines = $isFirstPage ? 22 : 32;
-                    if ($lineCount >= $maxLines) {
-                        $pages[] = $currentPage;
-                        $currentPage = [];
-                        $lineCount = 0;
-                        $isFirstPage = false;
                     }
                 }
             }

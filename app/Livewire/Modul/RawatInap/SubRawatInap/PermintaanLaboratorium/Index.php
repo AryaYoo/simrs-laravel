@@ -144,15 +144,26 @@ class Index extends Component
 
     public function updatedSelectedTests($values)
     {
-        $allTemplateIds = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests)
-            ->whereHas('pemeriksaanHeader', function($q) {
-                $q->where('kategori', $this->kategori);
-            })
+        // Real template IDs for tests that have template_laboratorium entries
+        $realIds = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests)
+            ->pluck('id_template', 'kd_jenis_prw')
+            ->map(fn($id) => (string)$id);
+
+        $testsWithTemplates = $realIds->keys()->toArray();
+
+        // Synthetic DIRECT_ IDs for tests without template entries (fallback = legacy behavior)
+        $testsWithoutTemplates = array_diff($this->selectedTests, $testsWithTemplates);
+        $directIds = collect($testsWithoutTemplates)->map(fn($kd) => 'DIRECT_' . $kd);
+
+        // Merge: get all id_templates for tests that have real templates
+        $allRealIds = \App\Models\TemplateLaboratorium::whereIn('kd_jenis_prw', $this->selectedTests)
             ->pluck('id_template')
             ->map(fn($id) => (string)$id)
             ->toArray();
-            
-        $this->selectedDetails = $allTemplateIds;
+
+        $this->selectedDetails = array_values(array_unique(
+            array_merge($allRealIds, $directIds->toArray())
+        ));
     }
 
     public function toggleGroup($kd_jenis_prw)
@@ -173,7 +184,8 @@ class Index extends Component
 
     public function getPemeriksaanListProperty()
     {
-        return PermintaanLabRepository::getPemeriksaanList($this->kategori, $this->searchPemeriksaan);
+        $kd_pj = $this->regPeriksa ? $this->regPeriksa->kd_pj : '';
+        return PermintaanLabRepository::getPemeriksaanList($this->kategori, $this->searchPemeriksaan, $kd_pj);
     }
 
     public function getDetailParametersProperty()
