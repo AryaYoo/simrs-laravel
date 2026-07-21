@@ -30,6 +30,7 @@ class Index extends Component
     /**
      * Buat header autentikasi untuk API iCare BPJS.
      * Signature: HMAC-SHA256(consid + "&" + timestamp, secretKey) -> Base64
+     * Content-Type BPJS selalu 'text/plain'.
      */
     protected function buildHeaders(): array
     {
@@ -38,15 +39,16 @@ class Index extends Component
         $userKey   = env('ICARE_USER_KEY');
         $timestamp = strval(time());
 
-        $signature    = hash_hmac('sha256', $consid . '&' . $timestamp, $secretKey, true);
-        $encodedSig   = base64_encode($signature);
+        $signature  = hash_hmac('sha256', $consid . '&' . $timestamp, $secretKey, true);
+        $encodedSig = base64_encode($signature);
 
         return [
-            'X-cons-id'    => $consid,
-            'X-timestamp'  => $timestamp,
-            'X-signature'  => $encodedSig,
-            'user_key'     => $userKey,
-            'Content-Type' => 'application/json',
+            'X-cons-id'   => $consid,
+            'X-timestamp' => $timestamp,
+            'X-signature' => $encodedSig,
+            'user_key'    => $userKey,
+            'Content-Type' => 'text/plain',
+            'Accept'       => 'application/json',
         ];
     }
 
@@ -76,16 +78,20 @@ class Index extends Component
             $client = new Client([
                 'timeout' => 30.0,
                 'verify'  => false,
+                // Paksa TLS 1.2 – diperlukan untuk beberapa endpoint BPJS prod
+                'curl'    => [
+                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+                ],
             ]);
 
-            $payload = json_encode([
-                'param'       => $no_peserta,
-                'kodedokter'  => intval($kd_dokter_bpjs),
-            ]);
-
-            $response    = $client->post($baseUrl, [
+            // WSIHS iCare menggunakan GET request dengan query parameter,
+            // bukan POST body JSON seperti VClaim.
+            $response = $client->get($baseUrl, [
                 'headers' => $this->buildHeaders(),
-                'body'    => $payload,
+                'query'   => [
+                    'param'      => $no_peserta,
+                    'kodedokter' => intval($kd_dokter_bpjs),
+                ],
             ]);
 
             $rawBody = $response->getBody()->getContents();
@@ -94,10 +100,10 @@ class Index extends Component
             $body = json_decode($rawBody, true);
 
             // iCare API: metaData.code == '200' berarti sukses
-            $code = $body['metaData']['code'] ?? $body['metadata']['code'] ?? null;
+            $code    = $body['metaData']['code'] ?? $body['metadata']['code'] ?? null;
+            $message = $body['metaData']['message'] ?? $body['metadata']['message'] ?? null;
 
             if ($code == '200') {
-                // Respons iCare berupa URL langsung dalam field "response"
                 $resp = $body['response'] ?? null;
 
                 if (is_string($resp)) {
@@ -105,27 +111,47 @@ class Index extends Component
                     $parsed = json_decode($resp, true);
                     if (json_last_error() === JSON_ERROR_NONE && isset($parsed['url'])) {
                         $this->iCareUrl = $parsed['url'];
+                    } elseif (json_last_error() === JSON_ERROR_NONE && isset($parsed['URL'])) {
+                        $this->iCareUrl = $parsed['URL'];
                     } else {
                         // Respons langsung berisi URL string
                         $this->iCareUrl = trim($resp, '"');
                     }
-                } elseif (is_array($resp) && isset($resp['url'])) {
-                    $this->iCareUrl = $resp['url'];
-                } elseif (is_array($resp) && isset($resp['URL'])) {
-                    $this->iCareUrl = $resp['URL'];
-                } else {
-                    $this->errorMessage = 'URL iCare tidak ditemukan dalam respons BPJS. Silakan hubungi administrator.';
+                } elseif (is_array($resp)) {
+                    $this->iCareUrl = $resp['url'] ?? $resp['URL'] ?? '';
+                }
+
+                if (empty($this->iCareUrl)) {
+                    Log::warning('iCare: code 200 tapi URL kosong. Raw: ' . $rawBody);
+                    $this->errorMessage = 'URL iCare tidak ditemukan dalam respons BPJS.';
                 }
             } else {
-                $message = $body['metaData']['message']
-                    ?? $body['metadata']['message']
-                    ?? 'Terjadi kesalahan saat memanggil API iCare BPJS.';
-                $this->errorMessage = $message;
+                $this->errorMessage = $message ?? 'Terjadi kesalahan saat memanggil API iCare BPJS.';
             }
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // HTTP 4xx
+            $rawBody = $e->getResponse()->getBody()->getContents();
+            Log::error('iCare Client Error (4xx): ' . $rawBody);
+            $errBody = json_decode($rawBody, true);
+            $this->errorMessage = $errBody['metaData']['message']
+                ?? $errBody['metadata']['message']
+                ?? 'Error HTTP ' . $e->getCode() . ': ' . $rawBody;
+
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            // HTTP 5xx
+            $rawBody = $e->getResponse()->getBody()->getContents();
+            Log::error('iCare Server Error (5xx): ' . $rawBody);
+            $this->errorMessage = 'Server BPJS mengalami gangguan (HTTP 5xx). Silakan coba beberapa saat lagi.';
+
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            // Network / cURL error (seperti error 56)
+            Log::error('iCare Connection Error: ' . $e->getMessage());
+            $this->errorMessage = 'Gagal terhubung ke server BPJS. Pastikan server memiliki akses internet ke apijkn.bpjs-kesehatan.go.id. Detail: ' . $e->getMessage();
 
         } catch (\Exception $e) {
             Log::error('iCare Fetch Error: ' . $e->getMessage());
-            $this->errorMessage = 'Terjadi kesalahan koneksi: ' . $e->getMessage();
+            $this->errorMessage = 'Terjadi kesalahan internal: ' . $e->getMessage();
         }
     }
 
