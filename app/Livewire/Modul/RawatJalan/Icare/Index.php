@@ -43,11 +43,11 @@ class Index extends Component
         $encodedSig = base64_encode($signature);
 
         return [
-            'X-cons-id'   => $consid,
-            'X-timestamp' => $timestamp,
-            'X-signature' => $encodedSig,
-            'user_key'    => $userKey,
-            'Content-Type' => 'text/plain',
+            'X-cons-id'    => $consid,
+            'X-timestamp'  => $timestamp,
+            'X-signature'  => $encodedSig,
+            'user_key'     => $userKey,
+            'Content-Type' => 'application/json',
             'Accept'       => 'application/json',
         ];
     }
