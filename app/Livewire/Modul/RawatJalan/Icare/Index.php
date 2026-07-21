@@ -4,7 +4,7 @@ namespace App\Livewire\Modul\RawatJalan\Icare;
 
 use Livewire\Component;
 use App\Models\RegPeriksa;
-use App\Services\BpjsService;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -18,7 +18,7 @@ class Index extends Component
     public function mount($no_rawat)
     {
         $this->no_rawat = $no_rawat;
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik'])->find(str_replace('-', '/', $no_rawat));
+        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik', 'penjab'])->find(str_replace('-', '/', $no_rawat));
 
         if (!$this->regPeriksa) {
             abort(404, 'Data pendaftaran tidak ditemukan.');
@@ -27,63 +27,105 @@ class Index extends Component
         $this->fetchIcareUrl();
     }
 
+    /**
+     * Buat header autentikasi untuk API iCare BPJS.
+     * Signature: HMAC-SHA256(consid + "&" + timestamp, secretKey) -> Base64
+     */
+    protected function buildHeaders(): array
+    {
+        $consid    = env('ICARE_CONSID');
+        $secretKey = env('ICARE_SECRET_KEY');
+        $userKey   = env('ICARE_USER_KEY');
+        $timestamp = strval(time());
+
+        $signature    = hash_hmac('sha256', $consid . '&' . $timestamp, $secretKey, true);
+        $encodedSig   = base64_encode($signature);
+
+        return [
+            'X-cons-id'    => $consid,
+            'X-timestamp'  => $timestamp,
+            'X-signature'  => $encodedSig,
+            'user_key'     => $userKey,
+            'Content-Type' => 'application/json',
+        ];
+    }
+
     protected function fetchIcareUrl()
     {
         try {
-            $kd_dokter = $this->regPeriksa->kd_dokter;
+            $kd_dokter  = $this->regPeriksa->kd_dokter;
             $no_peserta = $this->regPeriksa->pasien->no_peserta ?? '';
 
-            // Cari mapping dokter VClaim
-            $mapping = DB::table('maping_dokter_dpjpvclaim')->where('kd_dokter', $kd_dokter)->first();
-            $kd_dokter_bpjs = $mapping ? $mapping->kd_dokter_bpjs : null;
-
-            if (!$kd_dokter_bpjs) {
-                $this->errorMessage = 'Dokter belum di-mapping dengan kode dokter BPJS (VClaim).';
-                return;
-            }
-
+            // Validasi: pastikan pasien memiliki nomor peserta BPJS
             if (empty($no_peserta) || $no_peserta === '-') {
                 $this->errorMessage = 'Pasien tidak memiliki nomor peserta BPJS.';
                 return;
             }
 
-            $payload = [
-                'param' => $no_peserta,
-                'kodedokter' => intval($kd_dokter_bpjs)
-            ];
+            // Cari mapping kode dokter BPJS di tabel maping_dokter_dpjpvclaim
+            $mapping        = DB::table('maping_dokter_dpjpvclaim')->where('kd_dokter', $kd_dokter)->first();
+            $kd_dokter_bpjs = $mapping ? $mapping->kd_dokter_bpjs : null;
 
-            $bpjsService = new BpjsService();
-            // Gunakan endpoint iCare dari env, fallback ke dev VClaim iCare RS
-            $endpoint = env('ICARE_BASE_URL', 'https://apijkn-dev.bpjs-kesehatan.go.id/ihs_dev/api/rs/validate');
-            
-            $response = $bpjsService->post($endpoint, $payload);
+            if (!$kd_dokter_bpjs) {
+                $this->errorMessage = 'Dokter (kode: ' . $kd_dokter . ') belum di-mapping dengan kode dokter BPJS. Silakan hubungi administrator.';
+                return;
+            }
 
-            if (isset($response['metaData']['code']) && $response['metaData']['code'] == '200') {
-                if (is_array($response['response']) && isset($response['response']['url'])) {
-                    $this->iCareUrl = $response['response']['url'];
-                } else if (is_string($response['response'])) {
-                    // Try to json_decode it just in case
-                    $decoded = json_decode($response['response'], true);
-                    if (json_last_error() === JSON_ERROR_NONE && isset($decoded['url'])) {
-                        $this->iCareUrl = $decoded['url'];
+            $baseUrl = env('ICARE_BASE_URL', 'https://apijkn.bpjs-kesehatan.go.id/wsihs/api/rs/validate');
+
+            $client = new Client([
+                'timeout' => 30.0,
+                'verify'  => false,
+            ]);
+
+            $payload = json_encode([
+                'param'       => $no_peserta,
+                'kodedokter'  => intval($kd_dokter_bpjs),
+            ]);
+
+            $response    = $client->post($baseUrl, [
+                'headers' => $this->buildHeaders(),
+                'body'    => $payload,
+            ]);
+
+            $rawBody = $response->getBody()->getContents();
+            Log::info('iCare API Raw Response: ' . $rawBody);
+
+            $body = json_decode($rawBody, true);
+
+            // iCare API: metaData.code == '200' berarti sukses
+            $code = $body['metaData']['code'] ?? $body['metadata']['code'] ?? null;
+
+            if ($code == '200') {
+                // Respons iCare berupa URL langsung dalam field "response"
+                $resp = $body['response'] ?? null;
+
+                if (is_string($resp)) {
+                    // Coba parse sebagai JSON
+                    $parsed = json_decode($resp, true);
+                    if (json_last_error() === JSON_ERROR_NONE && isset($parsed['url'])) {
+                        $this->iCareUrl = $parsed['url'];
                     } else {
-                        // Some endpoints just return the URL directly in a decompressed string or array
-                        $this->iCareUrl = $response['response'];
+                        // Respons langsung berisi URL string
+                        $this->iCareUrl = trim($resp, '"');
                     }
+                } elseif (is_array($resp) && isset($resp['url'])) {
+                    $this->iCareUrl = $resp['url'];
+                } elseif (is_array($resp) && isset($resp['URL'])) {
+                    $this->iCareUrl = $resp['URL'];
+                } else {
+                    $this->errorMessage = 'URL iCare tidak ditemukan dalam respons BPJS. Silakan hubungi administrator.';
                 }
-                
-                // If it's still LZString compressed (due to BpjsService not knowing about LZString), 
-                // we might need to handle it. But BpjsService decompresses using gzdecode.
-                // If gzdecode failed inside BpjsService, it leaves response as encrypted string.
-                // Let's rely on BpjsService's successful decryption for now, which sets $response['response'] to array.
-
             } else {
-                $this->errorMessage = $response['metaData']['message'] ?? 'Terjadi kesalahan saat memanggil API iCare BPJS.';
+                $message = $body['metaData']['message']
+                    ?? $body['metadata']['message']
+                    ?? 'Terjadi kesalahan saat memanggil API iCare BPJS.';
+                $this->errorMessage = $message;
             }
 
         } catch (\Exception $e) {
-            Log::error("iCare Fetch Error: " . $e->getMessage());
-            $this->errorMessage = "Terjadi kesalahan internal: " . $e->getMessage();
+            Log::error('iCare Fetch Error: ' . $e->getMessage());
+            $this->errorMessage = 'Terjadi kesalahan koneksi: ' . $e->getMessage();
         }
     }
 
