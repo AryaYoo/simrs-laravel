@@ -139,6 +139,7 @@
             'resume': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resume", ":noRawat") }}',
             'hasilUsgKandungan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.hasil-usg-kandungan", ":noRawat") }}',
             'hasilUsgGynecologi': '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}',
+            'icare': '{{ route("modul.rawat-jalan.icare", ":noRawat") }}',
         },
         chunk(items, size) {
             const chunks = [];
@@ -438,6 +439,7 @@
                     { label: 'Surat Keterangan Covid', url: '#' },
                     { label: 'Surat Keterangan Layak Terbang', url: '#' },
                     { label: 'Persetujuan, Pernyataan & Penolakan', url: '#' },
+                    { label: 'iCare BPJS', url: 'icare' },
                 ]
             },
             {
