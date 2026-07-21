@@ -78,21 +78,44 @@ class Index extends Component
             $client = new Client([
                 'timeout' => 30.0,
                 'verify'  => false,
-                // Paksa TLS 1.2 – diperlukan untuk beberapa endpoint BPJS prod
+                // Paksa TLS 1.2 – diperlukan untuk endpoint BPJS prod
                 'curl'    => [
                     CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
                 ],
             ]);
 
-            // WSIHS iCare menggunakan GET request dengan query parameter,
-            // bukan POST body JSON seperti VClaim.
-            $response = $client->get($baseUrl, [
-                'headers' => $this->buildHeaders(),
-                'query'   => [
-                    'param'      => $no_peserta,
-                    'kodedokter' => intval($kd_dokter_bpjs),
-                ],
+            $payload = json_encode([
+                'param'      => $no_peserta,
+                'kodedokter' => intval($kd_dokter_bpjs),
             ]);
+
+            // BPJS iCare: POST, Content-Type text/plain, body JSON
+            // Retry hingga 2x untuk mengatasi cURL error 56 (connection reset) yang intermittent
+            $maxRetries  = 2;
+            $lastException = null;
+            $response      = null;
+
+            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+                try {
+                    $response = $client->post($baseUrl, [
+                        'headers' => $this->buildHeaders(),
+                        'body'    => $payload,
+                    ]);
+                    $lastException = null;
+                    break; // sukses, keluar dari loop
+                } catch (\GuzzleHttp\Exception\ConnectException $e) {
+                    $lastException = $e;
+                    Log::warning("iCare percobaan ke-{$attempt} gagal: " . $e->getMessage());
+                    if ($attempt < $maxRetries) {
+                        sleep(1); // tunggu 1 detik sebelum retry
+                    }
+                }
+            }
+
+            // Jika semua percobaan gagal
+            if ($lastException !== null) {
+                throw $lastException;
+            }
 
             $rawBody = $response->getBody()->getContents();
             Log::info('iCare API Raw Response: ' . $rawBody);
