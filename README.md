@@ -83,6 +83,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 
 ### 🌉 Bridging & Integrasi
 - [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.
+- [x] **iCare BPJS**: Integrasi bridging iCare BPJS dengan dekripsi data (AES-256-CBC) & dekompresi LZString, embedding iframe riwayat pelayanan kesehatan pasien, serta dukungan refresh URL.
 - [ ] **Satu Sehat**: Integrasi SATUSEHAT Kemenkes (Roadmap).
 
 ### 🛠️ Keamanan & Standar

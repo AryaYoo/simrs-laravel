@@ -14,6 +14,7 @@ class Index extends Component
     public $regPeriksa;
     public $iCareUrl = '';
     public $errorMessage = '';
+    public $isLoading = false;
 
     public function mount($no_rawat)
     {
@@ -24,20 +25,33 @@ class Index extends Component
             abort(404, 'Data pendaftaran tidak ditemukan.');
         }
 
+        $this->isLoading = true;
         $this->fetchIcareUrl();
+        $this->isLoading = false;
+    }
+
+    /**
+     * Re-fetch URL iCare dari API BPJS.
+     * Berguna karena URL iCare bersifat one-time dan bisa expire.
+     */
+    public function refresh(): void
+    {
+        $this->iCareUrl     = '';
+        $this->errorMessage = '';
+        $this->isLoading    = true;
+        $this->fetchIcareUrl();
+        $this->isLoading    = false;
     }
 
     /**
      * Buat header autentikasi untuk API iCare BPJS.
      * Signature: HMAC-SHA256(consid + "&" + timestamp, secretKey) -> Base64
-     * Content-Type BPJS selalu 'text/plain'.
      */
-    protected function buildHeaders(): array
+    protected function buildHeaders(string $timestamp): array
     {
         $consid    = env('ICARE_CONSID');
         $secretKey = env('ICARE_SECRET_KEY');
         $userKey   = env('ICARE_USER_KEY');
-        $timestamp = strval(time());
 
         $signature  = hash_hmac('sha256', $consid . '&' . $timestamp, $secretKey, true);
         $encodedSig = base64_encode($signature);
@@ -50,6 +64,18 @@ class Index extends Component
             'Content-Type' => 'application/json',
             'Accept'       => 'application/json',
         ];
+    }
+
+    /**
+     * Dekripsi respon terenkripsi dari BPJS (AES-256-CBC).
+     */
+    protected function stringDecrypt(string $key, string $string): string|false
+    {
+        $encrypt_method = 'AES-256-CBC';
+        $key_hash       = hex2bin(hash('sha256', $key));
+        $iv             = substr(hex2bin(hash('sha256', $key)), 0, 16);
+
+        return openssl_decrypt(base64_decode($string), $encrypt_method, $key_hash, OPENSSL_RAW_DATA, $iv);
     }
 
     protected function fetchIcareUrl()
@@ -73,12 +99,14 @@ class Index extends Component
                 return;
             }
 
-            $baseUrl = env('ICARE_BASE_URL', 'https://apijkn.bpjs-kesehatan.go.id/wsihs/api/rs/validate');
+            $baseUrl   = env('ICARE_BASE_URL', 'https://apijkn.bpjs-kesehatan.go.id/wsihs/api/rs/validate');
+            $consid    = env('ICARE_CONSID');
+            $secretKey = env('ICARE_SECRET_KEY');
+            $timestamp = strval(time());
 
             $client = new Client([
                 'timeout' => 30.0,
                 'verify'  => false,
-                // Paksa TLS 1.2 – diperlukan untuk endpoint BPJS prod
                 'curl'    => [
                     CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
                 ],
@@ -89,30 +117,27 @@ class Index extends Component
                 'kodedokter' => intval($kd_dokter_bpjs),
             ]);
 
-            // BPJS iCare: POST, Content-Type text/plain, body JSON
-            // Retry hingga 2x untuk mengatasi cURL error 56 (connection reset) yang intermittent
-            $maxRetries  = 2;
+            $maxRetries    = 2;
             $lastException = null;
             $response      = null;
 
             for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
                 try {
                     $response = $client->post($baseUrl, [
-                        'headers' => $this->buildHeaders(),
+                        'headers' => $this->buildHeaders($timestamp),
                         'body'    => $payload,
                     ]);
                     $lastException = null;
-                    break; // sukses, keluar dari loop
+                    break;
                 } catch (\GuzzleHttp\Exception\ConnectException $e) {
                     $lastException = $e;
                     Log::warning("iCare percobaan ke-{$attempt} gagal: " . $e->getMessage());
                     if ($attempt < $maxRetries) {
-                        sleep(1); // tunggu 1 detik sebelum retry
+                        sleep(1);
                     }
                 }
             }
 
-            // Jika semua percobaan gagal
             if ($lastException !== null) {
                 throw $lastException;
             }
@@ -122,31 +147,37 @@ class Index extends Component
 
             $body = json_decode($rawBody, true);
 
-            // iCare API: metaData.code == '200' berarti sukses
             $code    = $body['metaData']['code'] ?? $body['metadata']['code'] ?? null;
             $message = $body['metaData']['message'] ?? $body['metadata']['message'] ?? null;
 
             if ($code == '200') {
                 $resp = $body['response'] ?? null;
 
-                if (is_string($resp)) {
-                    // Coba parse sebagai JSON
-                    $parsed = json_decode($resp, true);
-                    if (json_last_error() === JSON_ERROR_NONE && isset($parsed['url'])) {
-                        $this->iCareUrl = $parsed['url'];
-                    } elseif (json_last_error() === JSON_ERROR_NONE && isset($parsed['URL'])) {
-                        $this->iCareUrl = $parsed['URL'];
+                if (!empty($resp)) {
+                    // 1. Dekripsi AES-256-CBC dengan key: consid + secretKey + timestamp
+                    $key           = $consid . $secretKey . $timestamp;
+                    $stringDecrypt = $this->stringDecrypt($key, $resp);
+
+                    if (!empty($stringDecrypt)) {
+                        // 2. Dekompresi LZString
+                        $decompress = \LZCompressor\LZString::decompressFromEncodedURIComponent($stringDecrypt);
+                        $riwayat    = json_decode($decompress, true);
+
+                        if (is_array($riwayat) && isset($riwayat['url'])) {
+                            $this->iCareUrl = $riwayat['url'];
+                        } elseif (is_string($riwayat) && filter_var($riwayat, FILTER_VALIDATE_URL)) {
+                            $this->iCareUrl = $riwayat;
+                        } else {
+                            Log::warning('iCare decompressed value is not a valid URL array: ' . $decompress);
+                        }
                     } else {
-                        // Respons langsung berisi URL string
-                        $this->iCareUrl = trim($resp, '"');
+                        Log::error('iCare stringDecrypt failed for key: ' . $key);
                     }
-                } elseif (is_array($resp)) {
-                    $this->iCareUrl = $resp['url'] ?? $resp['URL'] ?? '';
                 }
 
                 if (empty($this->iCareUrl)) {
-                    Log::warning('iCare: code 200 tapi URL kosong. Raw: ' . $rawBody);
-                    $this->errorMessage = 'URL iCare tidak ditemukan dalam respons BPJS.';
+                    Log::warning('iCare: code 200 tapi URL kosong setelah dekripsi. Raw: ' . $rawBody);
+                    $this->errorMessage = 'URL iCare tidak ditemukan dalam respons BPJS setelah dekripsi.';
                 }
             } else {
                 $this->errorMessage = $message ?? 'Terjadi kesalahan saat memanggil API iCare BPJS.';

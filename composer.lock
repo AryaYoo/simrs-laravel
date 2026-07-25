@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eea0a113fd9f8f0e2fa69d138ac000c3",
+    "content-hash": "a316e46c06ca187ff3680f41df542a66",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1157,6 +1157,32 @@
                 }
             ],
             "time": "2025-08-22T14:27:06+00:00"
+        },
+        {
+            "name": "juhasz-adam/lz-compressor",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/JuhaszAdam/lz-string-php.git",
+                "reference": "d4b8fd067048635046c2dfef0e0f3ceb1b1ddca3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/JuhaszAdam/lz-string-php/zipball/d4b8fd067048635046c2dfef0e0f3ceb1b1ddca3",
+                "reference": "d4b8fd067048635046c2dfef0e0f3ceb1b1ddca3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "PHP Class implementation of LZ-String javascript.",
+            "support": {
+                "source": "https://github.com/JuhaszAdam/lz-string-php/tree/master"
+            },
+            "time": "2016-02-04T12:12:25+00:00"
         },
         {
             "name": "laravel/fortify",
@@ -9077,12 +9103,14 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "juhasz-adam/lz-compressor": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
