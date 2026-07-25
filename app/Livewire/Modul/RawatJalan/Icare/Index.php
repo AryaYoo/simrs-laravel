@@ -105,10 +105,12 @@ class Index extends Component
             $timestamp = strval(time());
 
             $client = new Client([
-                'timeout' => 30.0,
-                'verify'  => false,
-                'curl'    => [
-                    CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+                'timeout'         => 30.0,
+                'connect_timeout' => 10.0,
+                'verify'          => false,
+                'curl'            => [
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_SSL_VERIFYPEER => false,
                 ],
             ]);
 
