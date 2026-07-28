@@ -4,7 +4,6 @@ namespace App\Livewire\Modul\RawatJalan\Icare;
 
 use Livewire\Component;
 use App\Models\RegPeriksa;
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -103,50 +102,22 @@ class Index extends Component
             $baseUrl   = env('ICARE_BASE_URL', 'https://apijkn.bpjs-kesehatan.go.id/wsihs/api/rs/validate');
             $consid    = env('ICARE_CONSID');
             $secretKey = env('ICARE_SECRET_KEY');
+            $userKey   = env('ICARE_USER_KEY');
             $timestamp = strval(time());
-
-            $client = new Client([
-                'timeout'         => 10.0,
-                'connect_timeout' => 0,
-                'verify'          => false,
-                'curl'            => [
-                    CURLOPT_SSL_VERIFYHOST  => false,
-                    CURLOPT_SSL_VERIFYPEER  => false,
-                    CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
-                ],
-            ]);
 
             $payload = json_encode([
                 'param'      => $no_peserta,
                 'kodedokter' => intval($kd_dokter_bpjs),
             ]);
 
-            $maxRetries    = 2;
-            $lastException = null;
-            $response      = null;
+            // Gunakan raw cURL persis seperti mLITE BpjsService::requestAplicare()
+            $rawBody = $this->curlPost($baseUrl, $payload, $consid, $secretKey, $userKey, $timestamp);
 
-            for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
-                try {
-                    $response = $client->post($baseUrl, [
-                        'headers' => $this->buildHeaders($timestamp),
-                        'body'    => $payload,
-                    ]);
-                    $lastException = null;
-                    break;
-                } catch (\GuzzleHttp\Exception\ConnectException $e) {
-                    $lastException = $e;
-                    Log::warning("iCare percobaan ke-{$attempt} gagal: " . $e->getMessage());
-                    if ($attempt < $maxRetries) {
-                        sleep(1);
-                    }
-                }
+            if ($rawBody === false) {
+                $this->errorMessage = 'Gagal terhubung ke server iCare BPJS. Pastikan server memiliki akses ke apijkn.bpjs-kesehatan.go.id.';
+                return;
             }
 
-            if ($lastException !== null) {
-                throw $lastException;
-            }
-
-            $rawBody = $response->getBody()->getContents();
             Log::info('iCare API Raw Response: ' . $rawBody);
 
             $body = json_decode($rawBody, true);
@@ -175,7 +146,7 @@ class Index extends Component
                             Log::warning('iCare decompressed value is not a valid URL array: ' . $decompress);
                         }
                     } else {
-                        Log::error('iCare stringDecrypt failed for key: ' . $key);
+                        Log::error('iCare stringDecrypt failed. Key used: ' . $consid . '***' . $timestamp);
                     }
                 }
 
@@ -187,30 +158,48 @@ class Index extends Component
                 $this->errorMessage = $message ?? 'Terjadi kesalahan saat memanggil API iCare BPJS.';
             }
 
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            // HTTP 4xx
-            $rawBody = $e->getResponse()->getBody()->getContents();
-            Log::error('iCare Client Error (4xx): ' . $rawBody);
-            $errBody = json_decode($rawBody, true);
-            $this->errorMessage = $errBody['metaData']['message']
-                ?? $errBody['metadata']['message']
-                ?? 'Error HTTP ' . $e->getCode() . ': ' . $rawBody;
-
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            // HTTP 5xx
-            $rawBody = $e->getResponse()->getBody()->getContents();
-            Log::error('iCare Server Error (5xx): ' . $rawBody);
-            $this->errorMessage = 'Server BPJS mengalami gangguan (HTTP 5xx). Silakan coba beberapa saat lagi.';
-
-        } catch (\GuzzleHttp\Exception\ConnectException $e) {
-            // Network / cURL error (seperti error 56)
-            Log::error('iCare Connection Error: ' . $e->getMessage());
-            $this->errorMessage = 'Gagal terhubung ke server BPJS. Pastikan server memiliki akses internet ke apijkn.bpjs-kesehatan.go.id. Detail: ' . $e->getMessage();
-
         } catch (\Exception $e) {
             Log::error('iCare Fetch Error: ' . $e->getMessage());
             $this->errorMessage = 'Terjadi kesalahan internal: ' . $e->getMessage();
         }
+    }
+
+    /**
+     * Kirim POST request ke API BPJS menggunakan raw cURL (persis seperti mLITE).
+     */
+    protected function curlPost(string $url, string $payload, string $consid, string $secretKey, string $userKey, string $timestamp): string|false
+    {
+        $signature      = hash_hmac('sha256', $consid . '&' . $timestamp, $secretKey, true);
+        $encodedSig     = base64_encode($signature);
+
+        $headers = [
+            'X-cons-id: '   . $consid,
+            'X-timestamp: ' . $timestamp,
+            'X-signature: ' . $encodedSig,
+            'user_key: '    . $userKey,
+            'Accept: application/json',
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $output = curl_exec($ch);
+
+        if ($output === false) {
+            Log::error('iCare cURL Error: ' . curl_error($ch) . ' (errno: ' . curl_errno($ch) . ')');
+        }
+
+        curl_close($ch);
+
+        return $output;
     }
 
     public function render()
