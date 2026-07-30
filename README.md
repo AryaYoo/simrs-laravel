@@ -81,6 +81,20 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Column Mapping Mapping Resume**: Penyesuaian sumber data otomatis (Keluhan Utama -> `keluhan`, Pemeriksaan Fisik -> `pemeriksaan`, Penunjang RAD -> `rtl`).
 - [x] **Integrasi Riwayat Medis**: Fitur *Attach* (Pilih Manual via Modal Premium) dan *Auto Fill* (Magic Wand) untuk menarik data Keluhan, Pemeriksaan, Lab, Tindakan, dan Obat-obatan secara otomatis ke dalam resume.
 
+### 💊 Modul Farmasi
+- [x] **Sidebar Farmasi**: Dropdown navigasi Farmasi ditambahkan di bawah dropdown Rawat Inap pada sidebar (desktop & mobile), berisi sub-menu: Penjualan Obat & BHP, Data Penjualan, Data Penyerahan Darah, Daftar Resep Dokter, No. Resep, dan Semua Modul Farmasi.
+- [x] **Penjualan Obat & BHP**: Halaman daftar transaksi penjualan obat dengan fitur:
+  - Tabel paginated dengan kolom: Sub Menu Penjualan, No. Nota, Tanggal, Petugas, Pasien, Keterangan, Jenis Jual, PPN, Asal Stok, Ongkos Kirim, Akun Bayar, Status.
+  - **Pencarian** berdasarkan Nama Pasien, No. RM, atau No. Nota.
+  - **Filter** berdasarkan rentang tanggal (Dari–Sampai) dan Petugas.
+  - Kolom "Sub Menu Penjualan" berisi dua tombol berdampingan: ikon Grid (`squares-2x2`) untuk pop-up Sub Menu (modal Alpine.js, konten dikosongkan) dan ikon Mata (`eye`) untuk membuka Halaman Detail Transaksi.
+- [x] **Detail Penjualan Obat & BHP**: Halaman khusus (`/modul/farmasi/penjualan/{nota_jual}`) yang menampilkan:
+  - Banner ringkasan header transaksi: No. Nota, Tanggal, Pasien & No. RM, Petugas, Jenis Jual (badge warna), Status, Asal Stok, Akun Bayar, Keterangan, PPN, Ongkos Kirim.
+  - Tabel detail item 15 kolom: No., Kode Barang, Nama Barang, Jumlah, Satuan, Harga, Subtotal, Diskon (%), Potongan, Tambahan, Embalase, Tuslah, Total, Aturan Pakai, No. Batch.
+  - Baris footer total (sum) per kolom numerik dan ringkasan Grand Total.
+- [x] **Repository Pattern Farmasi**: `PenjualanRepository` mengelola query `getList()` (search, filter, pagination) dan `getDetail()` (header, detail item, kalkulasi sum).
+- [x] **Model Farmasi**: `KodeSatuan` (tabel `kodesatuan`), relasi `DetailJual` → `KodeSatuan` & `DataBarang`.
+
 ### 🌉 Bridging & Integrasi
 - [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.
 - [x] **iCare BPJS**: Integrasi bridging iCare BPJS dengan dekripsi data (AES-256-CBC) & dekompresi LZString, embedding iframe riwayat pelayanan kesehatan pasien, serta dukungan refresh URL.

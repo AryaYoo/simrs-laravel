@@ -23,6 +23,7 @@
             mobileMenuOpen: false,
             frontOfficeOpen: {{ request()->routeIs('modul.registrasi-pasien*') || request()->routeIs('modul.pasien*') ? 'true' : 'false' }},
             rawatInapOpen: {{ request()->routeIs('modul.rawat-inap*') ? 'true' : 'false' }},
+            farmasiOpen: {{ request()->routeIs('modul.farmasi*') || request()->is('modul/farmasi*') ? 'true' : 'false' }},
             casemixOpen: {{ request()->is('modul/casemix*') ? 'true' : 'false' }}
          }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))" class="flex min-h-screen relative z-10">
 
@@ -284,6 +285,80 @@
                                 @if($ranapPendingCount > 0)
                                     <span class="min-w-[18px] h-[18px] flex items-center justify-center text-[9px] font-bold bg-red-500 text-white rounded-full px-1 shadow">{{ $ranapPendingCount }}</span>
                                 @endif
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- Farmasi with Dropdown --}}
+                    <div class="flex flex-col mb-1" :class="sidebarOpen ? 'w-full' : 'w-full items-center'">
+                        <div class="flex items-center rounded-md text-sm font-medium transition-colors group"
+                            :class="sidebarOpen ? 'w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                            style="background-color: {{ request()->routeIs('modul.farmasi*') || request()->is('modul/farmasi*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};">
+
+                            <a href="#" class="flex items-center grow"
+                                @click.prevent="farmasiOpen = !farmasiOpen; if(!sidebarOpen) sidebarOpen = true;"
+                                :class="sidebarOpen ? 'gap-2 px-3 py-2' : 'justify-center w-full h-full'"
+                                style="color: white; text-decoration: none;"
+                                onmouseover="this.parentElement.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                                onmouseout="this.parentElement.style.backgroundColor='{{ request()->routeIs('modul.farmasi*') || request()->is('modul/farmasi*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
+                                title="Farmasi">
+                                <flux:icon name="beaker" class="w-4 h-4 flex-shrink-0" />
+                                <span x-show="sidebarOpen">Farmasi</span>
+                            </a>
+
+                            <button x-show="sidebarOpen" @click.prevent="farmasiOpen = !farmasiOpen"
+                                class="p-2 mr-1 rounded-md hover:bg-white/10 transition-all text-white/50 hover:text-white"
+                                :class="farmasiOpen ? 'rotate-180 text-white' : ''">
+                                <flux:icon name="chevron-down" class="w-3 h-3" />
+                            </button>
+                        </div>
+
+                        {{-- Sub-menus Farmasi --}}
+                        <div x-show="sidebarOpen && farmasiOpen" x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 -translate-y-2"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="ml-6 space-y-1 mt-1 mb-2 border-l border-white/10 pl-2">
+
+                            <a href="{{ Route::has('modul.farmasi.input-penjualan') ? route('modul.farmasi.input-penjualan') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.input-penjualan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.input-penjualan*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="shopping-bag" class="w-3.5 h-3.5" />
+                                <span>Penjualan Obat & BHP</span>
+                            </a>
+
+                            <a href="{{ Route::has('modul.farmasi.data-penjualan') ? route('modul.farmasi.data-penjualan') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.data-penjualan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.data-penjualan*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="document-text" class="w-3.5 h-3.5" />
+                                <span>Data Penjualan Obat & BHP</span>
+                            </a>
+
+                            <a href="{{ Route::has('modul.farmasi.penyerahan-darah') ? route('modul.farmasi.penyerahan-darah') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.penyerahan-darah*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.penyerahan-darah*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="heart" class="w-3.5 h-3.5" />
+                                <span>Data Penyerahan Darah</span>
+                            </a>
+
+                            <a href="{{ Route::has('modul.farmasi.daftar-resep-dokter') ? route('modul.farmasi.daftar-resep-dokter') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.daftar-resep-dokter*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.daftar-resep-dokter*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="clipboard-document-list" class="w-3.5 h-3.5" />
+                                <span>Daftar Resep Dokter</span>
+                            </a>
+
+                            <a href="{{ Route::has('modul.farmasi.no-resep') ? route('modul.farmasi.no-resep') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.no-resep*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.no-resep*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="hashtag" class="w-3.5 h-3.5" />
+                                <span>No. Resep</span>
+                            </a>
+
+                            <a href="{{ Route::has('modul.farmasi.index') ? route('modul.farmasi.index') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.index') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.index') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="squares-2x2" class="w-3.5 h-3.5" />
+                                <span>Semua Modul Farmasi</span>
                             </a>
                         </div>
                     </div>
@@ -613,6 +688,49 @@
                                     @if(isset($ranapPendingCount) && $ranapPendingCount > 0)
                                         <span class="min-w-[18px] h-[18px] flex items-center justify-center text-[9px] font-bold bg-red-500 text-white rounded-full px-1 shadow">{{ $ranapPendingCount }}</span>
                                     @endif
+                                </a>
+                            </div>
+                        </div>
+
+                        {{-- Farmasi --}}
+                        <div x-data="{ open: {{ request()->routeIs('modul.farmasi*') || request()->is('modul/farmasi*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open"
+                                class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full text-left"
+                                style="color:white; background-color:{{ request()->routeIs('modul.farmasi*') || request()->is('modul/farmasi*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};">
+                                <flux:icon name="beaker" class="w-4 h-4 flex-shrink-0" />
+                                <span class="flex-1">Farmasi</span>
+                                <flux:icon name="chevron-down" class="w-3 h-3 transition-transform" :class="open ? 'rotate-180' : ''" />
+                            </button>
+                            <div x-show="open" class="ml-6 mt-1 space-y-1 border-l border-white/10 pl-2">
+                                <a href="{{ Route::has('modul.farmasi.input-penjualan') ? route('modul.farmasi.input-penjualan') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.input-penjualan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="shopping-bag" class="w-3.5 h-3.5" /><span>Input Penjualan Obat & BHP</span>
+                                </a>
+                                <a href="{{ Route::has('modul.farmasi.data-penjualan') ? route('modul.farmasi.data-penjualan') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.data-penjualan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="document-text" class="w-3.5 h-3.5" /><span>Data Penjualan Obat & BHP</span>
+                                </a>
+                                <a href="{{ Route::has('modul.farmasi.penyerahan-darah') ? route('modul.farmasi.penyerahan-darah') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.penyerahan-darah*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="heart" class="w-3.5 h-3.5" /><span>Data Penyerahan Darah</span>
+                                </a>
+                                <a href="{{ Route::has('modul.farmasi.daftar-resep-dokter') ? route('modul.farmasi.daftar-resep-dokter') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.daftar-resep-dokter*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="clipboard-document-list" class="w-3.5 h-3.5" /><span>Daftar Resep Dokter</span>
+                                </a>
+                                <a href="{{ Route::has('modul.farmasi.no-resep') ? route('modul.farmasi.no-resep') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.no-resep*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="hashtag" class="w-3.5 h-3.5" /><span>No. Resep</span>
+                                </a>
+                                <a href="{{ Route::has('modul.farmasi.index') ? route('modul.farmasi.index') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.index') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="squares-2x2" class="w-3.5 h-3.5" /><span>Semua Modul Farmasi</span>
                                 </a>
                             </div>
                         </div>

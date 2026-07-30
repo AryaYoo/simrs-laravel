@@ -91,6 +91,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/casemix-rawat-inap/{no_rawat}/resume', \App\Livewire\Modul\CasemixRawatInap\Resume\Index::class)->name('modul.casemix-rawat-inap.resume')->where('no_rawat', '.*');
     Route::get('modul/casemix-rawat-inap/{no_rawat}/resume/form', \App\Livewire\Modul\CasemixRawatInap\Resume\Form::class)->name('modul.casemix-rawat-inap.resume.form')->where('no_rawat', '.*');
 
+    // Farmasi Routes
+    Route::get('modul/farmasi/input-penjualan', \App\Livewire\Modul\Farmasi\InputPenjualan::class)->name('modul.farmasi.input-penjualan');
+    Route::get('modul/farmasi/penjualan/{nota_jual}', \App\Livewire\Modul\Farmasi\DetailPenjualan::class)->name('modul.farmasi.detail-penjualan')->where('nota_jual', '.*');
+    Route::get('modul/farmasi/data-penjualan', \App\Livewire\Modul\Farmasi\DataPenjualan::class)->name('modul.farmasi.data-penjualan');
+    Route::get('modul/farmasi/penyerahan-darah', \App\Livewire\Modul\Farmasi\PenyerahanDarah::class)->name('modul.farmasi.penyerahan-darah');
+    Route::get('modul/farmasi/daftar-resep-dokter', \App\Livewire\Modul\Farmasi\DaftarResepDokter::class)->name('modul.farmasi.daftar-resep-dokter');
+    Route::get('modul/farmasi/no-resep', \App\Livewire\Modul\Farmasi\NoResep::class)->name('modul.farmasi.no-resep');
+
     Route::get('modul/pasien', \App\Livewire\Modul\Pasien\Index::class)->name('modul.pasien.index');
     Route::get('modul/pasien/{no_rkm_medis}/edit', \App\Livewire\Modul\Pasien\Edit::class)->name('modul.pasien.edit')->where('no_rkm_medis', '.*');
     Route::get('modul/pasien/{no_rkm_medis}', \App\Livewire\Modul\Pasien\Show::class)->name('modul.pasien.show')->where('no_rkm_medis', '.*');
