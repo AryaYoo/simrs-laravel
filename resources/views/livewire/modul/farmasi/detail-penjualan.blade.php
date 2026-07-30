@@ -3,11 +3,12 @@
     {{-- Header & Breadcrumb --}}
     <div class="flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.farmasi.input-penjualan') }}" wire:navigate
-                class="flex items-center justify-center w-9 h-9 rounded-lg bg-[#4C5C2D] text-white hover:bg-[#3d4b24] transition-colors shadow-sm"
-                title="Kembali ke Daftar Penjualan">
-                <flux:icon name="chevron-left" class="w-5 h-5" />
-            </a>
+        <button type="button"
+            onclick="history.back()"
+            class="flex items-center justify-center w-9 h-9 rounded-lg bg-[#4C5C2D] text-white hover:bg-[#3d4b24] transition-colors shadow-sm"
+            title="Kembali ke Daftar Penjualan">
+            <flux:icon name="chevron-left" class="w-5 h-5" />
+        </button>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
@@ -27,13 +28,8 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <a href="{{ route('modul.farmasi.input-penjualan') }}" wire:navigate
-                class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors">
-                <flux:icon name="arrow-left" class="w-4 h-4" />
-                Kembali
-            </a>
-        </div>
+
+
     </div>
 
     @if($detailData && isset($detailData['penjualan']))

@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Farmasi Routes
     Route::get('modul/farmasi/input-penjualan', \App\Livewire\Modul\Farmasi\InputPenjualan::class)->name('modul.farmasi.input-penjualan');
+    Route::get('modul/farmasi/penjualan/create', \App\Livewire\Modul\Farmasi\CreatePenjualan::class)->name('modul.farmasi.create-penjualan');
     Route::get('modul/farmasi/penjualan/{nota_jual}', \App\Livewire\Modul\Farmasi\DetailPenjualan::class)->name('modul.farmasi.detail-penjualan')->where('nota_jual', '.*');
     Route::get('modul/farmasi/data-penjualan', \App\Livewire\Modul\Farmasi\DataPenjualan::class)->name('modul.farmasi.data-penjualan');
     Route::get('modul/farmasi/penyerahan-darah', \App\Livewire\Modul\Farmasi\PenyerahanDarah::class)->name('modul.farmasi.penyerahan-darah');

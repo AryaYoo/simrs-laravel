@@ -27,6 +27,7 @@ class DetailJual extends Model
         'aturan_pakai',
         'total',
         'no_batch',
+        'no_faktur',
     ];
 
     protected $casts = [

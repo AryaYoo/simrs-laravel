@@ -248,6 +248,14 @@ Saat mengembangkan halaman pratinjau dan cetak dokumen (seperti Permintaan Labor
    - Di dalam `@media print`, pastikan margin kertas fisik di-nol-kan (`@page { margin: 0; }`).
    - Di dalam `@media print`, **susutkan tinggi kertas 1 milimeter** (misal A4: `height: 296mm !important; min-height: 296mm; max-height: 296mm; overflow: hidden;`). Ini sangat krusial agar sisa desimal *scaling* Chrome tidak menyentuh ujung bawah yang akan memicu halaman kosong baru.
    - Tambahkan paksaan `-webkit-print-color-adjust: exact !important;` pada body.
+ 
+### 8. Navigasi & Pertahanan State (State Preservation)
+
+Ketika merancang tombol kembali (**Back Button**) pada halaman detail atau form, ikuti aturan berikut untuk menjaga kenyamanan pengguna:
+1. **Gunakan `history.back()`**: Hindari mengarahkan tombol kembali langsung menggunakan tag jangkar `<a href="...route...">` atau `wire:navigate` ke halaman list utama. Gunakan `<button type="button" onclick="history.back()">` atau JavaScript `history.back()`.
+2. **Persistensi State Filter via URL**: Pada komponen Livewire daftar (list) utama, pasang attribute `#[Url(history: true)]` pada properti filter dan pencarian (misalnya: `$search`, `$dari`, `$sampai`, `$nip`, `$perPage`).
+3. **Manfaat**: Dengan kombinasi ini, ketika pengguna kembali dari halaman detail/form, peramban (browser) akan memuat ulang halaman daftar utama lengkap dengan query string filter sebelumnya tanpa mereset pencarian yang sedang mereka lakukan.
+
    - Akhiri dengan paksaan pemutus halaman: `.document-page { page-break-after: always !important; }` dan batalkan di elemen terakhir: `.document-page:last-of-type { page-break-after: auto !important; }`.
 **Kenapa Alpine Modal lebih reliable:**
 | | Flux Modal | Alpine Modal |

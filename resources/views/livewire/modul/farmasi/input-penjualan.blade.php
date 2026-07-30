@@ -20,13 +20,14 @@
             </nav>
             <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Penjualan Obat & BHP</h1>
         </div>
-        {{-- Tombol Tambah (placeholder) --}}
-        <button type="button"
+        {{-- Tombol Tambah --}}
+        <a href="{{ route('modul.farmasi.create-penjualan') }}" wire:navigate
             class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white shadow transition-colors"
-            style="background-color: #4C5C2D;" title="Tambah transaksi penjualan baru">
+            style="background-color: #4C5C2D;"
+            title="Tambah transaksi penjualan baru">
             <flux:icon name="plus" class="w-4 h-4" />
             Tambah Penjualan
-        </button>
+        </a>
     </div>
 
     {{-- Filter & Search Bar --}}
