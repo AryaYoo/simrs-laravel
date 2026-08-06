@@ -146,7 +146,31 @@
 
 {{-- ===== CREATE MODAL (Livewire + Flux) ===== --}}
 <flux:modal wire:model="createModalOpen" class="w-full max-w-6xl" variant="flyout">
-    <div class="bg-white dark:bg-neutral-900 flex flex-col items-stretch max-h-[95vh]">
+    <div class="bg-white dark:bg-neutral-900 flex flex-col items-stretch max-h-[95vh]"
+        x-data="{
+            handleEnter(e) {
+                if (e.target.tagName === 'TEXTAREA' && e.shiftKey) return;
+                if (e.target.getAttribute('role') !== 'combobox' && (e.target.tagName === 'BUTTON' || e.target.type === 'submit' || e.target.type === 'button')) return;
+                if (e.target.getAttribute('aria-expanded') === 'true' || e.target.closest('[role=listbox]') || e.target.closest('[role=menu]') || e.target.getAttribute('role') === 'option') return;
+
+                e.preventDefault();
+                const focusables = Array.from($el.querySelectorAll('input, select, textarea, [role=combobox], button')).filter(el => {
+                    const isSaveButton = el.getAttribute('wire:click') === 'save' || el.type === 'submit';
+                    if (el.tagName === 'BUTTON' && !isSaveButton && el.getAttribute('role') !== 'combobox') return false;
+                    return el.offsetParent !== null && el.tabIndex !== -1 && !el.disabled && !el.readOnly && el.type !== 'hidden';
+                });
+
+                const currentIndex = focusables.indexOf(e.target);
+                if (currentIndex !== -1 && (currentIndex + 1) < focusables.length) {
+                    const nextEl = focusables[currentIndex + 1];
+                    nextEl.focus();
+                    if (typeof nextEl.select === 'function' && nextEl.tagName === 'INPUT' && !['date', 'time', 'checkbox', 'radio'].includes(nextEl.type)) {
+                        try { nextEl.select(); } catch(err) {}
+                    }
+                }
+            }
+        }"
+        @keydown.enter="handleEnter($event)">
         {{-- Header --}}
         <div class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between flex-shrink-0">
             <div class="flex items-center gap-3">
