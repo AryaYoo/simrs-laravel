@@ -80,6 +80,8 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **ICD Logic Support**: Integrasi pencarian ICD-10 & ICD-9 CM yang konsisten dengan modul medis utama.
 - [x] **Column Mapping Mapping Resume**: Penyesuaian sumber data otomatis (Keluhan Utama -> `keluhan`, Pemeriksaan Fisik -> `pemeriksaan`, Penunjang RAD -> `rtl`).
 - [x] **Integrasi Riwayat Medis**: Fitur *Attach* (Pilih Manual via Modal Premium) dan *Auto Fill* (Magic Wand) untuk menarik data Keluhan, Pemeriksaan, Lab, Tindakan, dan Obat-obatan secara otomatis ke dalam resume.
+- [x] **Kustom Laporan Operasi**: Modul Kustomisasi Cetak Laporan Operasi dengan fitur pemilihan sumber Pre-Surgical Assessment (Rawat Inap/Rawat Jalan/Tanpa Pre-Surgical), pratinjau dinamis, penataan tarif 29 komponen tim medis/perawatan, persisten navigasi, serta opsi cetak PDF Format Standar Web dan Format Persis Legacy Khanza.
+
 
 ### 💊 Modul Farmasi
 - [x] **Sidebar Farmasi**: Dropdown navigasi Farmasi ditambahkan di bawah dropdown Rawat Inap pada sidebar (desktop & mobile), berisi sub-menu: Penjualan Obat & BHP, Data Penjualan, Data Penyerahan Darah, Daftar Resep Dokter, No. Resep, dan Semua Modul Farmasi.
