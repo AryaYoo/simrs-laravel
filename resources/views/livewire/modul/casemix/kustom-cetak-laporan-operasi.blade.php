@@ -265,12 +265,22 @@
                     </div>
                 @endif
 
-                <a href="{{ $printUrl }}"
-                    target="_blank"
-                    class="w-full py-3 px-4 rounded-xl text-xs font-bold bg-[#4C5C2D] text-white hover:bg-[#3d4b24] transition-all shadow-md flex items-center justify-center gap-2">
-                    <flux:icon name="printer" class="w-4 h-4" />
-                    <span>Buka PDF Laporan Operasi</span>
-                </a>
+                <div class="flex flex-col gap-2.5">
+                    <a href="{{ $printUrl }}"
+                        target="_blank"
+                        class="w-full py-3 px-4 rounded-xl text-xs font-bold bg-[#4C5C2D] text-white hover:bg-[#3d4b24] transition-all shadow-md flex items-center justify-center gap-2">
+                        <flux:icon name="printer" class="w-4 h-4" />
+                        <span>Buka PDF Laporan Operasi</span>
+                    </a>
+
+                    <a href="{{ $printKhanzaUrl }}"
+                        target="_blank"
+                        class="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-neutral-800 dark:bg-neutral-700 text-white hover:bg-neutral-900 dark:hover:bg-neutral-600 transition-all shadow-md flex items-center justify-center gap-2">
+                        <flux:icon name="document-text" class="w-4 h-4" />
+                        <span>Buka PDF Laporan Operasi (Persis Khanza)</span>
+                    </a>
+                </div>
+
             </div>
         </div>
 

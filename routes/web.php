@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('modul/casemix/kustom-laporan-operasi', \App\Livewire\Modul\Casemix\KustomLaporanOperasi::class)->name('modul.casemix.kustom-laporan-operasi');
     Route::get('modul/casemix/kustom-laporan-operasi/cetak/{no_rawat}/{tanggal?}', [\App\Http\Controllers\Casemix\CetakLaporanOperasiController::class, 'cetak'])->name('modul.casemix.kustom-laporan-operasi.cetak')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
+    Route::get('modul/casemix/kustom-laporan-operasi/cetak-khanza/{no_rawat}/{tanggal?}', [\App\Http\Controllers\Casemix\CetakLaporanOperasiController::class, 'cetakKhanza'])->name('modul.casemix.kustom-laporan-operasi.cetak-khanza')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
     Route::get('modul/casemix/kustom-laporan-operasi/kustom-cetak/{no_rawat}/{tanggal?}', \App\Livewire\Modul\Casemix\KustomCetakLaporanOperasi::class)->name('modul.casemix.kustom-laporan-operasi.kustom-cetak')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
     Route::get('modul/casemix/kustom-laporan-operasi/{no_rawat}/{tanggal?}/detail', \App\Livewire\Modul\Casemix\KustomLaporanOperasiDetail::class)->name('modul.casemix.kustom-laporan-operasi.detail')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
 

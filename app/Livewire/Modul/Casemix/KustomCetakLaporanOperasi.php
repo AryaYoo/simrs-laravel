@@ -132,15 +132,25 @@ class KustomCetakLaporanOperasi extends Component
             str_replace(' ', '_', $this->tanggal),
         ]);
 
+        $printKhanzaUrl = route('modul.casemix.kustom-laporan-operasi.cetak-khanza', [
+            str_replace('/', '-', $this->no_rawat),
+            str_replace(' ', '_', $this->tanggal),
+        ]);
+
         if ($this->selectedSource !== 'none' && $this->selectedTgl && $this->selectedJam) {
-            $printUrl .= '?source=' . $this->selectedSource . '&tgl=' . urlencode($this->selectedTgl) . '&jam=' . urlencode($this->selectedJam);
+            $queryParams = '?source=' . $this->selectedSource . '&tgl=' . urlencode($this->selectedTgl) . '&jam=' . urlencode($this->selectedJam);
+            $printUrl .= $queryParams;
+            $printKhanzaUrl .= $queryParams;
         } else {
             $printUrl .= '?source=none';
+            $printKhanzaUrl .= '?source=none';
         }
 
         return view('livewire.modul.casemix.kustom-cetak-laporan-operasi', [
             'selectedItem' => $selectedItem,
             'printUrl' => $printUrl,
+            'printKhanzaUrl' => $printKhanzaUrl,
         ])->layout('layouts.app');
+
     }
 }

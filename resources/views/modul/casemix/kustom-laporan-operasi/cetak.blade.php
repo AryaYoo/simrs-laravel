@@ -298,10 +298,16 @@
             {{-- Laporan Operasi Content --}}
             <div class="mb-4 page-break-avoid">
                 <h3 class="font-bold text-xs uppercase mb-1 border-b border-neutral-300 pb-0.5">Laporan Rincian Operasi</h3>
-                <div class="p-3 border border-neutral-300 rounded text-xs whitespace-pre-line leading-relaxed bg-white">
-                    {{ $laporan->laporan_operasi ?: 'Tidak ada rincian catatan operasi.' }}
+                @php
+                    $rawText = $laporan->laporan_operasi ?: 'Tidak ada rincian catatan operasi.';
+                    $lines = array_values(array_filter(array_map('rtrim', explode("\n", str_replace("\r", "", $rawText))), fn($line) => trim($line) !== ''));
+                    $cleanedText = implode("\n", $lines);
+                @endphp
+                <div class="p-3 border border-neutral-300 rounded text-xs whitespace-pre-line leading-normal bg-white">
+                    {{ $cleanedText }}
                 </div>
             </div>
+
 
             {{-- Tanda Tangan Block --}}
             <div class="flex justify-end mt-6 page-break-avoid">
