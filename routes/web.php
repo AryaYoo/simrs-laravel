@@ -91,6 +91,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/casemix-rawat-inap/{no_rawat}/resume', \App\Livewire\Modul\CasemixRawatInap\Resume\Index::class)->name('modul.casemix-rawat-inap.resume')->where('no_rawat', '.*');
     Route::get('modul/casemix-rawat-inap/{no_rawat}/resume/form', \App\Livewire\Modul\CasemixRawatInap\Resume\Form::class)->name('modul.casemix-rawat-inap.resume.form')->where('no_rawat', '.*');
 
+    Route::get('modul/casemix/kustom-laporan-operasi', \App\Livewire\Modul\Casemix\KustomLaporanOperasi::class)->name('modul.casemix.kustom-laporan-operasi');
+    Route::get('modul/casemix/kustom-laporan-operasi/cetak/{no_rawat}/{tanggal?}', [\App\Http\Controllers\Casemix\CetakLaporanOperasiController::class, 'cetak'])->name('modul.casemix.kustom-laporan-operasi.cetak')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
+    Route::get('modul/casemix/kustom-laporan-operasi/kustom-cetak/{no_rawat}/{tanggal?}', \App\Livewire\Modul\Casemix\KustomCetakLaporanOperasi::class)->name('modul.casemix.kustom-laporan-operasi.kustom-cetak')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
+    Route::get('modul/casemix/kustom-laporan-operasi/{no_rawat}/{tanggal?}/detail', \App\Livewire\Modul\Casemix\KustomLaporanOperasiDetail::class)->name('modul.casemix.kustom-laporan-operasi.detail')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
+
     // Farmasi Routes
     Route::get('modul/farmasi/input-penjualan', \App\Livewire\Modul\Farmasi\InputPenjualan::class)->name('modul.farmasi.input-penjualan');
     Route::get('modul/farmasi/penjualan/create', \App\Livewire\Modul\Farmasi\CreatePenjualan::class)->name('modul.farmasi.create-penjualan');

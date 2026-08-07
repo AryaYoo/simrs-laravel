@@ -406,6 +406,13 @@
                                 <flux:icon name="home" class="w-3.5 h-3.5" />
                                 <span>Casemix RANAP</span>
                             </a>
+
+                            <a href="{{ route('modul.casemix.kustom-laporan-operasi') }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.casemix.kustom-laporan-operasi*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.casemix.kustom-laporan-operasi*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="document-chart-bar" class="w-3.5 h-3.5" />
+                                <span>Kustom Laporan Operasi</span>
+                            </a>
                         </div>
                     </div>
                 </nav>
