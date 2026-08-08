@@ -96,14 +96,14 @@
              <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800">
                     <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Koreksi via KTP</h3>
-                    <button @click="closeModal()" class="text-neutral-400 hover:text-neutral-600"><flux:icon name="x-mark" variant="mini" /></button>
+                    <button type="button" @click="closeModal()" class="text-neutral-400 hover:text-neutral-600"><flux:icon name="x-mark" variant="mini" /></button>
                 </div>
                 <div x-show="mode === null" class="p-6 grid grid-cols-2 gap-4">
-                    <button @click="closeModal(); $refs.fileInput.click();" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-amber-400 transition-all">
+                    <button type="button" @click="closeModal(); $refs.fileInput.click();" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-amber-400 transition-all">
                         <flux:icon name="folder-open" class="w-6 h-6 text-amber-500" />
                         <span class="text-sm font-medium">Unggah File</span>
                     </button>
-                    <button @click="startWebcam()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-amber-400 transition-all">
+                    <button type="button" @click="startWebcam()" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-amber-400 transition-all">
                         <flux:icon name="video-camera" class="w-6 h-6 text-amber-500" />
                         <span class="text-sm font-medium">Webcam</span>
                     </button>

@@ -405,6 +405,24 @@ $this->currentJabatan = $pegawai->jbtn;
 **Saat Membuat User Baru:**
 Pastikan field `username` diisi dengan NIK pegawai yang bersangkutan (bukan email, bukan nama, bukan ID lain).
 
+### 15. Atribut type="button" pada Tombol Non-Submit di Dalam Form (WAJIB!)
+
+> [!CAUTION]
+> **Setiap elemen `<button>` yang berada di dalam tag `<form>` dan BUKAN bertugas mengirim data (submit) WAJIB memiliki atribut `type="button"`.**
+
+**Masalah:**
+Secara standar spesifikasi HTML, tombol `<button>` yang berada di dalam `<form>` tanpa atribut `type` secara otomatis dianggap sebagai `type="submit"`. Hal ini sering memicu **Submit Form Tidak Sengaja** saat pengguna menekan tombol tutup modal (`✕`), tombol upload file, tombol kamera/webcam, atau tombol navigasi sekunder yang berada di dalam form.
+
+**Solusi — Selalu Cantumkan `type="button"`:**
+```blade
+{{-- SALAH: Tombol silang tutup modal tanpa type akan memicu wire:submit/form submit --}}
+<button @click="showModal = false"><flux:icon name="x-mark" /></button>
+
+{{-- BENAR: Eksplisit menentukan type="button" --}}
+<button type="button" @click="showModal = false"><flux:icon name="x-mark" /></button>
+```
+
+
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
 1. Masuk ke **Master Data -> Pengaturan Aplikasi**.

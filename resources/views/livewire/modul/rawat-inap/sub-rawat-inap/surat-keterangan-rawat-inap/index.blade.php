@@ -174,7 +174,7 @@
                             <h3 class="font-bold text-white text-base">Buat Surat Keterangan Rawat Inap</h3>
                             <p class="text-white/70 text-xs mt-0.5">Nomor surat akan digenerate otomatis</p>
                         </div>
-                        <button @click="$wire.closeCreateModal()" class="ml-auto p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors">
+                        <button type="button" @click="$wire.closeCreateModal()" class="ml-auto p-2 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors">
                             <flux:icon name="x-mark" class="w-4 h-4" />
                         </button>
                     </div>

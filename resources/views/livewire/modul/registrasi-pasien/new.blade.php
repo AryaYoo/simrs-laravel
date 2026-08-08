@@ -137,7 +137,7 @@
                         <flux:icon name="viewfinder-circle" class="w-5 h-5 text-indigo-500" />
                         <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Scan KTP Pasien</h3>
                     </div>
-                    <button @click="closeModal()" class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 transition-colors">
+                    <button type="button" @click="closeModal()" class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
@@ -146,6 +146,7 @@
                 <div x-show="mode === null" class="p-6 grid grid-cols-2 gap-4">
                     {{-- Opsi 1: Upload File --}}
                     <button
+                        type="button"
                         @click="closeModal(); $refs.fileInput.click();"
                         class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-all group"
                     >
@@ -160,6 +161,7 @@
 
                     {{-- Opsi 2: Webcam --}}
                     <button
+                        type="button"
                         @click="startWebcam()"
                         class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-violet-400 hover:bg-violet-50/50 dark:hover:bg-violet-950/20 transition-all group"
                     >
@@ -188,6 +190,7 @@
                     <div class="p-4 flex items-center justify-between gap-3 bg-neutral-50 dark:bg-neutral-800">
                         <flux:button @click="mode = null; stopWebcam();" variant="ghost" icon="arrow-left" size="sm">Kembali</flux:button>
                         <button
+                            type="button"
                             @click="captureWebcam()"
                             class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors shadow-md shadow-indigo-200 active:scale-95"
                         >
