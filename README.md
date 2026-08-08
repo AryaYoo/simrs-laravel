@@ -95,8 +95,14 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
   - **Cetak Aturan Pakai**: Membuka lembar pencetakan etiket/aturan pakai obat per item.
   - **Verifikasi**: Mengubah status transaksi menjadi *Sudah Dibayar* (Lunas) dengan konfirmasi SweetAlert.
   - **Hapus Penjualan**: Menghapus data transaksi (header & detail) secara permanen dari database dengan konfirmasi SweetAlert.
+- [x] **Daftar Resep Dokter**: Halaman pengelolaan resep obat dokter dengan 2 Tab (Rawat Jalan & Rawat Inap):
+  - **Tab Rawat Jalan**: Menampilkan tabel compact 11 kolom (`Action`, `No. Resep`, `Tgl Peresepan`, `No. Rawat`, `No. RM & Nama Pasien`, `Dokter`, `Status`, `Poli`, `Jenis Bayar`, `Tgl & Jam Validasi`, `Penyerahan & Jam Penyerahan`).
+  - **Tab Rawat Inap**: Placeholder state untuk pengembangan resep rawat inap.
+  - **Search & Filter**: Pencarian cepat multi-kolom (No. Resep, No. Rawat, RM, Pasien, Dokter DPJP, Poli) dan filter rentang tanggal.
+  - **Detail Resep Modal**: Popup interaktif yang menampilkan rincian item obat peresepan dokter beserta jumlah dan aturan pakai.
 - [x] **Repository Pattern Farmasi**: `PenjualanRepository` mengelola query `getList()`, `getDetail()`, `savePenjualan()`, `deletePenjualan()`, dan `verifikasiPenjualan()`.
-- [x] **Model Farmasi**: `KodeSatuan` (tabel `kodesatuan`), relasi `DetailJual` → `KodeSatuan` & `DataBarang`.
+- [x] **Model Farmasi**: `ResepObat`, `ResepDokter`, `KodeSatuan` (tabel `kodesatuan`), relasi `DetailJual` → `KodeSatuan` & `DataBarang`.
+
 
 
 ### 🌉 Bridging & Integrasi
