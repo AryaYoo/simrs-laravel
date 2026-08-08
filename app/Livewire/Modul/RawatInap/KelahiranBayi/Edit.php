@@ -328,7 +328,12 @@ class Edit extends Component
                 'mikonium' => $this->mikonium ?: '-',
             ]);
 
+            // Sync nm_ibu ke tabel pasien (record bayi) agar cetak SKL menampilkan nama ibu terbaru
+            \App\Models\Pasien::where('no_rkm_medis', $this->no_rkm_medis)
+                ->update(['nm_ibu' => $this->nm_ibu]);
+
             // Update last SKL number
+
             if (!empty($this->no_skl)) {
                 $parts = explode('/', $this->no_skl);
                 if (!empty($parts) && is_numeric($parts[0])) {
