@@ -9,6 +9,7 @@
         .swal2-container {
             z-index: 99999999 !important;
         }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 
@@ -482,16 +483,31 @@
                                 </p>
                             </div>
                         </a>
-                        <form method="POST" action="{{ route('logout') }}" :class="sidebarOpen ? 'w-full' : ''">
-                            @csrf
-                            <button type="submit" class="flex items-center justify-center transition-colors shadow-sm"
-                                :class="sidebarOpen ? 'w-full gap-1.5 rounded-lg text-[0.7rem] font-semibold py-2 hover:bg-white/20 bg-white/10' : 'w-9 h-9 rounded-full hover:bg-white/20 bg-white/10'"
-                                style="color: white; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;"
-                                title="{{ __('Log out') }}" data-test="logout-button">
-                                <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
-                                <span x-show="sidebarOpen" class="ml-1">{{ __('Log out') }}</span>
+                        <div :class="sidebarOpen ? 'w-full flex items-center gap-2' : 'flex flex-col items-center gap-2'">
+                            <form method="POST" action="{{ route('logout') }}" :class="sidebarOpen ? 'flex-1' : ''">
+                                @csrf
+                                <button type="submit" class="flex items-center justify-center transition-colors shadow-sm"
+                                    :class="sidebarOpen ? 'w-full gap-1.5 rounded-lg text-[0.7rem] font-semibold py-2 hover:bg-white/20 bg-white/10' : 'w-9 h-9 rounded-full hover:bg-white/20 bg-white/10'"
+                                    style="color: white; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;"
+                                    title="{{ __('Log out') }}" data-test="logout-button">
+                                    <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
+                                    <span x-show="sidebarOpen" class="ml-1">{{ __('Log out') }}</span>
+                                </button>
+                            </form>
+
+                            {{-- Tombol Notes --}}
+                            <button type="button"
+                                @click="window.dispatchEvent(new CustomEvent('toggle-floating-notes'))"
+                                class="flex items-center justify-center transition-colors shadow-sm w-9 h-9 rounded-full hover:bg-white/20 bg-white/10 flex-shrink-0"
+                                style="color: white; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; position: relative;"
+                                title="Catatan Personal">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                </svg>
+                                {{-- Dot merah kecil kalau ada catatan --}}
+                                <span id="notes-dot" class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400" style="display:none;"></span>
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -863,6 +879,169 @@
         });
     </script>
     @stack('scripts')
+    {{-- ===== FLOATING NOTES ===== --}}
+    <div
+        x-data="{
+            open: false,
+            minimized: false,
+            content: '',
+            posX: null,
+            posY: null,
+            dragging: false,
+            dragOffsetX: 0,
+            dragOffsetY: 0,
+
+            init() {
+                this.content   = localStorage.getItem('floating_notes_content') || '';
+                this.open      = false;
+                this.minimized = false;
+                const savedX   = localStorage.getItem('floating_notes_x');
+                const savedY   = localStorage.getItem('floating_notes_y');
+                if (savedX && savedY) {
+                    this.posX = parseInt(savedX);
+                    this.posY = parseInt(savedY);
+                } else {
+                    this.posX = window.innerWidth  - 320;
+                    this.posY = window.innerHeight - 400;
+                }
+                this.syncDot();
+            },
+
+            syncDot() {
+                const dot = document.getElementById('notes-dot');
+                if (dot) dot.style.display = this.content.trim() !== '' ? 'block' : 'none';
+            },
+
+            toggle() {
+                if (!this.open) {
+                    this.open = true;
+                    this.minimized = false;
+                    // Selalu buka di tengah layar
+                    this.posX = Math.round((window.innerWidth  - 300) / 2);
+                    this.posY = Math.round((window.innerHeight - 300) / 2);
+                } else {
+                    this.open = false;
+                }
+            },
+
+            close() {
+                this.open = false;
+                // Hapus posisi tersimpan agar buka berikutnya selalu ke tengah
+                localStorage.removeItem('floating_notes_x');
+                localStorage.removeItem('floating_notes_y');
+                this.posX = null;
+                this.posY = null;
+            },
+
+            toggleMinimize() {
+                this.minimized = !this.minimized;
+            },
+
+            saveContent() {
+                localStorage.setItem('floating_notes_content', this.content);
+                this.syncDot();
+            },
+
+            startDrag(e) {
+                if (e.target.closest('textarea') || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+                this.dragging = true;
+                this.dragOffsetX = e.clientX - this.posX;
+                this.dragOffsetY = e.clientY - this.posY;
+                e.preventDefault();
+            },
+
+            onDrag(e) {
+                if (!this.dragging) return;
+                this.posX = Math.max(0, Math.min(e.clientX - this.dragOffsetX, window.innerWidth  - 280));
+                this.posY = Math.max(0, Math.min(e.clientY - this.dragOffsetY, window.innerHeight - 36));
+            },
+
+            stopDrag() {
+                if (this.dragging) {
+                    this.dragging = false;
+                    localStorage.setItem('floating_notes_x', this.posX);
+                    localStorage.setItem('floating_notes_y', this.posY);
+                }
+            },
+
+            charCount() { return this.content.length; }
+        }"
+        x-init="init()"
+        @toggle-floating-notes.window="toggle()"
+        @mousemove.window="onDrag($event)"
+        @mouseup.window="stopDrag()"
+        x-show="open"
+        x-cloak
+        :style="posX !== null ? `position: fixed; z-index: 99998; left: ${posX}px; top: ${posY}px;` : 'position: fixed; z-index: 99998; right: 16px; bottom: 80px;'"
+    >
+        {{-- Panel Floating Notes --}}
+        <div
+            class="flex flex-col rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden"
+            style="width: 300px; background: #fff;"
+        >
+            {{-- Header / Drag Handle --}}
+            <div
+                @mousedown="startDrag($event)"
+                class="flex items-center justify-between px-3.5 py-2.5 cursor-move select-none flex-shrink-0"
+                style="background: linear-gradient(135deg, #4C5C2D 0%, #6b7f3a 100%);"
+            >
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-white/80 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>
+                    <span class="text-white font-bold text-xs">Catatan Personal</span>
+                    <span x-show="content.trim() !== ''" class="text-[10px] text-white/60 font-mono" x-text="`${charCount()} karakter`"></span>
+                </div>
+                <div class="flex items-center gap-1">
+                    {{-- Minimize --}}
+                    <button type="button" @click.stop="toggleMinimize()"
+                        class="p-1 rounded hover:bg-white/20 text-white/80 hover:text-white transition-colors"
+                        :title="minimized ? 'Perbesar' : 'Minimize'">
+                        <svg x-show="!minimized" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                        </svg>
+                        <svg x-show="minimized" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                        </svg>
+                    </button>
+                    {{-- Close --}}
+                    <button type="button" @click.stop="close()"
+                        class="p-1 rounded hover:bg-white/20 text-white/70 hover:text-red-300 transition-colors"
+                        title="Tutup">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Body --}}
+            <div x-show="!minimized"
+                x-transition:enter="transition ease-out duration-150"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+            >
+                <textarea
+                    x-model="content"
+                    @input="saveContent()"
+                    @mousedown.stop
+                    placeholder="Tulis catatan personal di sini..."
+                    class="block w-full resize-none border-0 outline-none p-3 text-xs text-neutral-800 leading-relaxed"
+                    style="height: 220px; font-family: 'Inter', system-ui, sans-serif; background: #fffef5;"
+                ></textarea>
+                <div class="px-3 py-1.5 border-t border-neutral-100 flex items-center justify-between bg-neutral-50">
+                    <span class="text-[10px] text-neutral-400 flex items-center gap-1">
+                        <span style="color: #4C5C2D; font-size: 8px;">●</span>
+                        Tersimpan otomatis ke browser
+                    </span>
+                    <span class="text-[10px] font-mono text-neutral-400" x-text="`${charCount()} karakter`"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- ===== END FLOATING NOTES ===== --}}
+
 </body>
 
 </html>
