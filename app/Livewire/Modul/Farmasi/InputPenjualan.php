@@ -45,6 +45,58 @@ class InputPenjualan extends Component
     public function updatedNip()     { $this->resetPage(); }
     public function updatedPerPage() { $this->resetPage(); }
 
+    public function deletePenjualan(string $notaJual): void
+    {
+        try {
+            $success = PenjualanRepository::deletePenjualan($notaJual);
+            if ($success) {
+                $this->dispatch('swal', [
+                    'title' => 'Berhasil!',
+                    'text'  => "Transaksi Penjualan {$notaJual} berhasil dihapus.",
+                    'icon'  => 'success',
+                ]);
+            } else {
+                $this->dispatch('swal', [
+                    'title' => 'Gagal!',
+                    'text'  => "Transaksi Penjualan {$notaJual} tidak ditemukan.",
+                    'icon'  => 'error',
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal Hapus!',
+                'text'  => 'Error: ' . $e->getMessage(),
+                'icon'  => 'error',
+            ]);
+        }
+    }
+
+    public function verifikasiPenjualan(string $notaJual): void
+    {
+        try {
+            $success = PenjualanRepository::verifikasiPenjualan($notaJual);
+            if ($success) {
+                $this->dispatch('swal', [
+                    'title' => 'Terverifikasi!',
+                    'text'  => "Transaksi {$notaJual} telah diverifikasi (Sudah Dibayar).",
+                    'icon'  => 'success',
+                ]);
+            } else {
+                $this->dispatch('swal', [
+                    'title' => 'Gagal!',
+                    'text'  => "Transaksi Penjualan {$notaJual} tidak ditemukan.",
+                    'icon'  => 'error',
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal Verifikasi!',
+                'text'  => 'Error: ' . $e->getMessage(),
+                'icon'  => 'error',
+            ]);
+        }
+    }
+
     public function render()
     {
         $penjualans  = PenjualanRepository::getList(
@@ -63,3 +115,4 @@ class InputPenjualan extends Component
         ]);
     }
 }
+

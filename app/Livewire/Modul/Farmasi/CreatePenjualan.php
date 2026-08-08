@@ -362,8 +362,11 @@ class CreatePenjualan extends Component
                 'kd_bangsal'   => $this->kd_bangsal,
                 'kd_rek'       => $this->kd_rek,
                 'nama_bayar'   => $this->nama_bayar,
+                'jumlah_bayar' => $this->jumlah_bayar,
+                'tagihan'      => $this->tagihan,
                 'cart'         => $this->cart,
             ];
+
 
             $no_nota = PenjualanRepository::savePenjualan($data);
 

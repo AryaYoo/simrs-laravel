@@ -195,12 +195,15 @@
                         <span class="text-[10px] font-extrabold uppercase tracking-wider block" :class="$wire.kembali >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'">
                             <span x-text="$wire.kembali >= 0 ? 'Kembalian' : 'Kurang Bayar'"></span>
                         </span>
-                        <span class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Uang kembalian kasir</span>
+                        <span class="text-xs font-medium" :class="$wire.kembali >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                            <span x-text="$wire.kembali >= 0 ? 'Uang kembalian kasir (Lunas)' : 'Status: Belum Lunas'"></span>
+                        </span>
                     </div>
                     <div class="text-2xl font-black font-mono" :class="$wire.kembali >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-600 dark:text-rose-400'">
-                        Rp <span x-text="formatRupiah(Math.abs($wire.kembali))"></span>
+                        <span x-text="$wire.kembali < 0 ? '- Rp ' + formatRupiah(Math.abs($wire.kembali)) : 'Rp ' + formatRupiah($wire.kembali)"></span>
                     </div>
                 </div>
+
 
             </div>
 

@@ -359,25 +359,93 @@
                     </div>
                 </div>
 
-                {{-- Modal Body (Dikosongkan) --}}
-                <div class="overflow-y-auto flex-1 p-8 bg-white dark:bg-neutral-900">
-                    <div
-                        class="py-16 flex flex-col items-center justify-center text-center gap-3 border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl bg-neutral-50/50 dark:bg-neutral-800/30">
-                        <div
-                            class="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#F1F5E9] text-[#4C5C2D] shadow-sm">
-                            <flux:icon name="squares-2x2" class="w-7 h-7" />
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold text-neutral-700 dark:text-neutral-200">Sub Menu Penjualan
-                            </h3>
-                            <p class="text-xs text-neutral-400 dark:text-neutral-500 mt-1 max-w-sm">
-                                Tombol sub menu untuk nota <span
-                                    class="font-mono font-semibold text-neutral-700 dark:text-neutral-300"
-                                    x-text="activeItem.notaJual"></span> belum diisi.
-                            </p>
-                        </div>
+                {{-- Modal Body: 4 Action Buttons --}}
+                <div class="overflow-y-auto flex-1 p-6 bg-white dark:bg-neutral-900">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {{-- 1. Cetak Ulang Nota --}}
+                        <button type="button"
+                            @click="window.open('/modul/farmasi/penjualan/' + encodeURIComponent(activeItem.notaJual) + '/cetak-nota', '_blank')"
+                            class="flex items-center gap-4 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-100/60 dark:hover:bg-amber-900/40 transition-all text-left group shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                                <flux:icon name="printer" class="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-neutral-800 dark:text-neutral-100 text-sm">Cetak Ulang Nota</h4>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Cetak ulang struk / nota transaksi fisik</p>
+                            </div>
+                        </button>
+
+                        {{-- 2. Cetak Aturan Pakai --}}
+                        <button type="button"
+                            @click="window.open('/modul/farmasi/penjualan/' + encodeURIComponent(activeItem.notaJual) + '/cetak-aturan-pakai', '_blank')"
+                            class="flex items-center gap-4 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-100/60 dark:hover:bg-indigo-900/40 transition-all text-left group shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                                <flux:icon name="document-text" class="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-neutral-800 dark:text-neutral-100 text-sm">Cetak Aturan Pakai</h4>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Cetak etiket / aturan pakai obat pasien</p>
+                            </div>
+                        </button>
+
+                        {{-- 3. Verifikasi --}}
+                        <button type="button"
+                            @click="
+                                menuModalOpen = false;
+                                Swal.fire({
+                                    title: 'Verifikasi Penjualan?',
+                                    text: 'Ubah status transaksi ' + activeItem.notaJual + ' menjadi Sudah Dibayar.',
+                                    icon: 'question',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#059669',
+                                    cancelButtonColor: '#6b7280',
+                                    confirmButtonText: 'Ya, Verifikasi!'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $wire.verifikasiPenjualan(activeItem.notaJual);
+                                    }
+                                });
+                            "
+                            class="flex items-center gap-4 p-4 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 transition-all text-left group shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                                <flux:icon name="check-badge" class="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-neutral-800 dark:text-neutral-100 text-sm">Verifikasi</h4>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Tandai status transaksi lunas / verifikasi</p>
+                            </div>
+                        </button>
+
+                        {{-- 4. Hapus Penjualan --}}
+                        <button type="button"
+                            @click="
+                                menuModalOpen = false;
+                                Swal.fire({
+                                    title: 'Hapus Penjualan?',
+                                    text: 'Transaksi ' + activeItem.notaJual + ' akan dihapus permanen dari database.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#dc2626',
+                                    cancelButtonColor: '#6b7280',
+                                    confirmButtonText: 'Ya, Hapus!'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $wire.deletePenjualan(activeItem.notaJual);
+                                    }
+                                });
+                            "
+                            class="flex items-center gap-4 p-4 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-100/60 dark:hover:bg-rose-900/40 transition-all text-left group shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-rose-600 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                                <flux:icon name="trash" class="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-rose-700 dark:text-rose-400 text-sm">Hapus Penjualan</h4>
+                                <p class="text-xs text-rose-500 dark:text-rose-400/80 mt-0.5">Hapus record header & detail transaksi</p>
+                            </div>
+                        </button>
                     </div>
                 </div>
+
 
             </div>
         </div>

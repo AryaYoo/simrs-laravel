@@ -197,6 +197,8 @@ class PenjualanRepository
             // Generate Nota Jual: PJYYYYMMDDXXX
             $nota_jual = self::generateNoNota($data['tgl_jual']);
 
+            $isPaid = (float)($data['jumlah_bayar'] ?? 0) >= (float)($data['tagihan'] ?? 0);
+
             // Insert Header
             Penjualan::create([
                 'nota_jual'    => $nota_jual,
@@ -208,11 +210,12 @@ class PenjualanRepository
                 'jns_jual'     => $data['jns_jual'],
                 'ongkir'       => $data['ongkir'],
                 'ppn'          => $data['ppn'],
-                'status'       => 'Sudah Dibayar', // default paid
+                'status'       => $isPaid ? 'Sudah Dibayar' : 'Belum Dibayar',
                 'kd_bangsal'   => $data['kd_bangsal'],
                 'kd_rek'       => $data['kd_rek'],
                 'nama_bayar'   => $data['nama_bayar'],
             ]);
+
 
             // Insert Details
             foreach ($data['cart'] as $item) {
@@ -249,4 +252,25 @@ class PenjualanRepository
             return $nota_jual;
         });
     }
+
+    /**
+     * Hapus data transaksi penjualan (header dan detail).
+     */
+    public static function deletePenjualan(string $notaJual): bool
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($notaJual) {
+            DetailJual::where('nota_jual', $notaJual)->delete();
+            return Penjualan::where('nota_jual', $notaJual)->delete() > 0;
+        });
+    }
+
+    /**
+     * Verifikasi status transaksi penjualan menjadi 'Sudah Dibayar'.
+     */
+    public static function verifikasiPenjualan(string $notaJual): bool
+    {
+        return Penjualan::where('nota_jual', $notaJual)
+            ->update(['status' => 'Sudah Dibayar']) > 0;
+    }
 }
+

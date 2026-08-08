@@ -89,13 +89,14 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
   - Tabel paginated dengan kolom: Sub Menu Penjualan, No. Nota, Tanggal, Petugas, Pasien, Keterangan, Jenis Jual, PPN, Asal Stok, Ongkos Kirim, Akun Bayar, Status.
   - **Pencarian** berdasarkan Nama Pasien, No. RM, atau No. Nota.
   - **Filter** berdasarkan rentang tanggal (Dari–Sampai) dan Petugas.
-  - Kolom "Sub Menu Penjualan" berisi dua tombol berdampingan: ikon Grid (`squares-2x2`) untuk pop-up Sub Menu (modal Alpine.js, konten dikosongkan) dan ikon Mata (`eye`) untuk membuka Halaman Detail Transaksi.
-- [x] **Detail Penjualan Obat & BHP**: Halaman khusus (`/modul/farmasi/penjualan/{nota_jual}`) yang menampilkan:
-  - Banner ringkasan header transaksi: No. Nota, Tanggal, Pasien & No. RM, Petugas, Jenis Jual (badge warna), Status, Asal Stok, Akun Bayar, Keterangan, PPN, Ongkos Kirim.
-  - Tabel detail item 15 kolom: No., Kode Barang, Nama Barang, Jumlah, Satuan, Harga, Subtotal, Diskon (%), Potongan, Tambahan, Embalase, Tuslah, Total, Aturan Pakai, No. Batch.
-  - Baris footer total (sum) per kolom numerik dan ringkasan Grand Total.
-- [x] **Repository Pattern Farmasi**: `PenjualanRepository` mengelola query `getList()` (search, filter, pagination) dan `getDetail()` (header, detail item, kalkulasi sum).
+- [x] **Sub Menu Penjualan Obat & BHP**: Modal interaktif pada kolom action yang menyediakan 4 fitur utama per nota penjualan:
+  - **Cetak Ulang Nota**: Membuka pratinjau cetak struk/nota fisik ber-kop resmi.
+  - **Cetak Aturan Pakai**: Membuka lembar pencetakan etiket/aturan pakai obat per item.
+  - **Verifikasi**: Mengubah status transaksi menjadi *Sudah Dibayar* (Lunas) dengan konfirmasi SweetAlert.
+  - **Hapus Penjualan**: Menghapus data transaksi (header & detail) secara permanen dari database dengan konfirmasi SweetAlert.
+- [x] **Repository Pattern Farmasi**: `PenjualanRepository` mengelola query `getList()`, `getDetail()`, `savePenjualan()`, `deletePenjualan()`, dan `verifikasiPenjualan()`.
 - [x] **Model Farmasi**: `KodeSatuan` (tabel `kodesatuan`), relasi `DetailJual` → `KodeSatuan` & `DataBarang`.
+
 
 ### 🌉 Bridging & Integrasi
 - [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.
