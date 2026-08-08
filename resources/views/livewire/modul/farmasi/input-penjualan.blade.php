@@ -1,10 +1,18 @@
 <div class="flex flex-col gap-6 pb-8" x-data="{
     menuModalOpen: false,
+    verifikasiModalOpen: false,
     searchQuery: '',
-    activeItem: { notaJual: '', nmPasien: '', noRM: '' },
-    openMenu(notaJual, nmPasien, noRM) {
-        this.activeItem = { notaJual: notaJual, nmPasien: nmPasien, noRM: noRM };
+    selectedNamaBayar: '',
+    activeItem: { notaJual: '', nmPasien: '', noRM: '', namaBayar: '' },
+    openMenu(notaJual, nmPasien, noRM, namaBayar) {
+        this.activeItem = { notaJual: notaJual, nmPasien: nmPasien, noRM: noRM, namaBayar: namaBayar };
+        this.selectedNamaBayar = namaBayar || ($wire.listAkunBayar.length > 0 ? $wire.listAkunBayar[0].nama_bayar : '');
         this.menuModalOpen = true;
+    },
+    openVerifikasiModal() {
+        this.menuModalOpen = false;
+        this.selectedNamaBayar = this.activeItem.namaBayar || ($wire.listAkunBayar.length > 0 ? $wire.listAkunBayar[0].nama_bayar : '');
+        this.verifikasiModalOpen = true;
     }
 }">
 
@@ -179,7 +187,7 @@
                                 <div class="inline-flex items-center justify-center gap-1">
                                     {{-- Tombol Pop-up Sub Menu --}}
                                     <button type="button"
-                                        @click="openMenu('{{ $row->nota_jual }}', '{{ addslashes($row->nm_pasien ?? '-') }}', '{{ $row->no_rkm_medis ?? '-' }}')"
+                                        @click="openMenu('{{ $row->nota_jual }}', '{{ addslashes($row->nm_pasien ?? '-') }}', '{{ $row->no_rkm_medis ?? '-' }}', '{{ addslashes($row->nama_bayar ?? '') }}')"
                                         class="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 transition-colors"
                                         title="Sub Menu Penjualan">
                                         <flux:icon name="squares-2x2" class="w-4 h-4" />
@@ -359,61 +367,37 @@
                     </div>
                 </div>
 
-                {{-- Modal Body: 4 Action Buttons --}}
+                {{-- Modal Body: 4 Action Buttons (Konsisten dengan Sub Menu Layanan Rawat Jalan) --}}
                 <div class="overflow-y-auto flex-1 p-6 bg-white dark:bg-neutral-900">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {{-- 1. Cetak Ulang Nota --}}
-                        <button type="button"
-                            @click="window.open('/modul/farmasi/penjualan/' + encodeURIComponent(activeItem.notaJual) + '/cetak-nota', '_blank')"
-                            class="flex items-center gap-4 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-100/60 dark:hover:bg-amber-900/40 transition-all text-left group shadow-sm">
-                            <div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                                <flux:icon name="printer" class="w-6 h-6 text-white" />
+                        <a :href="'/modul/farmasi/penjualan/' + encodeURIComponent(activeItem.notaJual) + '/cetak-nota'"
+                            target="_blank"
+                            class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
+                                <flux:icon name="printer" class="w-4.5 h-4.5" />
                             </div>
-                            <div>
-                                <h4 class="font-bold text-neutral-800 dark:text-neutral-100 text-sm">Cetak Ulang Nota</h4>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Cetak ulang struk / nota transaksi fisik</p>
-                            </div>
-                        </button>
+                            <span class="text-[11px] font-semibold leading-tight flex-1 line-clamp-2">Cetak Ulang Nota</span>
+                        </a>
 
                         {{-- 2. Cetak Aturan Pakai --}}
-                        <button type="button"
-                            @click="window.open('/modul/farmasi/penjualan/' + encodeURIComponent(activeItem.notaJual) + '/cetak-aturan-pakai', '_blank')"
-                            class="flex items-center gap-4 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-100/60 dark:hover:bg-indigo-900/40 transition-all text-left group shadow-sm">
-                            <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                                <flux:icon name="document-text" class="w-6 h-6 text-white" />
+                        <a :href="'/modul/farmasi/penjualan/' + encodeURIComponent(activeItem.notaJual) + '/cetak-aturan-pakai'"
+                            target="_blank"
+                            class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
+                                <flux:icon name="document-text" class="w-4.5 h-4.5" />
                             </div>
-                            <div>
-                                <h4 class="font-bold text-neutral-800 dark:text-neutral-100 text-sm">Cetak Aturan Pakai</h4>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Cetak etiket / aturan pakai obat pasien</p>
-                            </div>
-                        </button>
+                            <span class="text-[11px] font-semibold leading-tight flex-1 line-clamp-2">Cetak Aturan Pakai</span>
+                        </a>
 
                         {{-- 3. Verifikasi --}}
                         <button type="button"
-                            @click="
-                                menuModalOpen = false;
-                                Swal.fire({
-                                    title: 'Verifikasi Penjualan?',
-                                    text: 'Ubah status transaksi ' + activeItem.notaJual + ' menjadi Sudah Dibayar.',
-                                    icon: 'question',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#059669',
-                                    cancelButtonColor: '#6b7280',
-                                    confirmButtonText: 'Ya, Verifikasi!'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        $wire.verifikasiPenjualan(activeItem.notaJual);
-                                    }
-                                });
-                            "
-                            class="flex items-center gap-4 p-4 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 transition-all text-left group shadow-sm">
-                            <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                                <flux:icon name="check-badge" class="w-6 h-6 text-white" />
+                            @click="openVerifikasiModal()"
+                            class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm text-left">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
+                                <flux:icon name="check-badge" class="w-4.5 h-4.5" />
                             </div>
-                            <div>
-                                <h4 class="font-bold text-neutral-800 dark:text-neutral-100 text-sm">Verifikasi</h4>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Tandai status transaksi lunas / verifikasi</p>
-                            </div>
+                            <span class="text-[11px] font-semibold leading-tight flex-1 line-clamp-2">Verifikasi</span>
                         </button>
 
                         {{-- 4. Hapus Penjualan --}}
@@ -434,18 +418,94 @@
                                     }
                                 });
                             "
-                            class="flex items-center gap-4 p-4 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-100/60 dark:hover:bg-rose-900/40 transition-all text-left group shadow-sm">
-                            <div class="w-12 h-12 rounded-xl bg-rose-600 text-white flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                                <flux:icon name="trash" class="w-6 h-6 text-white" />
+                            class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-rose-500 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition-all shadow-sm text-left">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-rose-600 group-hover:text-white transition-colors flex-shrink-0">
+                                <flux:icon name="trash" class="w-4.5 h-4.5" />
                             </div>
-                            <div>
-                                <h4 class="font-bold text-rose-700 dark:text-rose-400 text-sm">Hapus Penjualan</h4>
-                                <p class="text-xs text-rose-500 dark:text-rose-400/80 mt-0.5">Hapus record header & detail transaksi</p>
-                            </div>
+                            <span class="text-[11px] font-semibold leading-tight flex-1 line-clamp-2 text-rose-600 dark:text-rose-400">Hapus Penjualan</span>
                         </button>
                     </div>
                 </div>
 
+
+
+            </div>
+        </div>
+    </template>
+
+    {{-- Modal Popup Verifikasi Penjualan --}}
+    <template x-teleport="body">
+        <div x-show="verifikasiModalOpen" x-cloak
+            class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6">
+
+            {{-- Backdrop --}}
+            <div x-show="verifikasiModalOpen" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0" @click="verifikasiModalOpen = false"
+                class="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm"></div>
+
+            {{-- Modal Panel --}}
+            <div x-show="verifikasiModalOpen" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                class="relative w-full max-w-md flex flex-col bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden z-10"
+                @click.stop>
+
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-5 py-3.5 border-b border-neutral-200 dark:border-neutral-700 bg-[#4C5C2D] text-white">
+                    <div>
+                        <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                            <flux:icon name="check-badge" class="w-4 h-4 text-white" />
+                            Verifikasi Penjualan
+                        </h3>
+                        <p class="text-[11px] text-white/80 mt-0.5" x-text="activeItem.notaJual + ' • ' + activeItem.nmPasien"></p>
+                    </div>
+                    <button type="button" @click="verifikasiModalOpen = false" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+                        <flux:icon name="x-mark" class="w-4 h-4" />
+                    </button>
+                </div>
+
+                {{-- Body --}}
+                <div class="p-5 bg-white dark:bg-neutral-900">
+                    <div class="flex items-center gap-3">
+                        <label class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 shrink-0">Akun Bayar :</label>
+                        
+                        <div class="flex-1 flex items-center gap-1.5">
+                            <select x-model="selectedNamaBayar" class="w-full bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-3 py-2 font-semibold shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                <template x-for="akun in $wire.listAkunBayar" :key="akun.nama_bayar">
+                                    <option :value="akun.nama_bayar" x-text="akun.nama_bayar" :selected="akun.nama_bayar === selectedNamaBayar"></option>
+                                </template>
+                            </select>
+                            
+                            <button type="button" @click="$wire.loadListAkunBayar()" class="p-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg border border-neutral-300 dark:border-neutral-600 transition-colors shadow-sm" title="Refresh Akun Bayar">
+                                <flux:icon name="arrow-path" class="w-3.5 h-3.5" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer Action Buttons (Simpan & Tutup) --}}
+                <div class="px-5 py-3.5 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700 flex justify-end items-center gap-2">
+                    <button type="button"
+                        @click="
+                            verifikasiModalOpen = false;
+                            $wire.verifikasiPenjualan(activeItem.notaJual, selectedNamaBayar);
+                        "
+                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#4C5C2D] hover:bg-[#3d4b24] text-white font-semibold text-xs transition-colors shadow-sm">
+                        <flux:icon name="circle-stack" class="w-3.5 h-3.5" />
+                        Simpan
+                    </button>
+
+                    <button type="button" @click="verifikasiModalOpen = false"
+                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-700 dark:text-neutral-200 font-semibold text-xs transition-colors">
+                        <flux:icon name="x-mark" class="w-3.5 h-3.5 text-rose-500" />
+                        Tutup
+                    </button>
+                </div>
 
             </div>
         </div>

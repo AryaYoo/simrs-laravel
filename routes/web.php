@@ -103,8 +103,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/farmasi/penjualan/{nota_jual}/cetak-nota', [\App\Http\Controllers\Farmasi\CetakPenjualanController::class, 'cetakNota'])->name('modul.farmasi.penjualan.cetak-nota')->where('nota_jual', '[^/]+');
     Route::get('modul/farmasi/penjualan/{nota_jual}/cetak-aturan-pakai', [\App\Http\Controllers\Farmasi\CetakPenjualanController::class, 'cetakAturanPakai'])->name('modul.farmasi.penjualan.cetak-aturan-pakai')->where('nota_jual', '[^/]+');
     Route::get('modul/farmasi/penjualan/{nota_jual}', \App\Livewire\Modul\Farmasi\DetailPenjualan::class)->name('modul.farmasi.detail-penjualan')->where('nota_jual', '.*');
-    Route::get('modul/farmasi/data-penjualan', \App\Livewire\Modul\Farmasi\DataPenjualan::class)->name('modul.farmasi.data-penjualan');
     Route::get('modul/farmasi/penyerahan-darah', \App\Livewire\Modul\Farmasi\PenyerahanDarah::class)->name('modul.farmasi.penyerahan-darah');
+
     Route::get('modul/farmasi/daftar-resep-dokter', \App\Livewire\Modul\Farmasi\DaftarResepDokter::class)->name('modul.farmasi.daftar-resep-dokter');
     Route::get('modul/farmasi/no-resep', \App\Livewire\Modul\Farmasi\NoResep::class)->name('modul.farmasi.no-resep');
 

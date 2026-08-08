@@ -265,12 +265,21 @@ class PenjualanRepository
     }
 
     /**
-     * Verifikasi status transaksi penjualan menjadi 'Sudah Dibayar'.
+     * Verifikasi status transaksi penjualan menjadi 'Sudah Dibayar' dan update Akun Bayar.
      */
-    public static function verifikasiPenjualan(string $notaJual): bool
+    public static function verifikasiPenjualan(string $notaJual, string $namaBayar = ''): bool
     {
+        $updateData = ['status' => 'Sudah Dibayar'];
+        if (!empty($namaBayar)) {
+            $updateData['nama_bayar'] = $namaBayar;
+            $akun = \App\Models\AkunBayar::where('nama_bayar', $namaBayar)->first();
+            if ($akun) {
+                $updateData['kd_rek'] = $akun->kd_rek;
+            }
+        }
         return Penjualan::where('nota_jual', $notaJual)
-            ->update(['status' => 'Sudah Dibayar']) > 0;
+            ->update($updateData) > 0;
     }
+
 }
 

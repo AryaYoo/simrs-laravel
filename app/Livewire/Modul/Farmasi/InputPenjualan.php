@@ -28,6 +28,8 @@ class InputPenjualan extends Component
     #[Url(history: true)]
     public int    $perPage = 20;
 
+    public array $listAkunBayar = [];
+
     public function mount(): void
     {
         // Hanya isi nilai default jika tidak ada di URL
@@ -37,6 +39,12 @@ class InputPenjualan extends Component
         if (! $this->sampai) {
             $this->sampai = now()->format('Y-m-d');
         }
+        $this->loadListAkunBayar();
+    }
+
+    public function loadListAkunBayar(): void
+    {
+        $this->listAkunBayar = \App\Models\AkunBayar::all()->toArray();
     }
 
     public function updatedSearch()  { $this->resetPage(); }
@@ -71,10 +79,10 @@ class InputPenjualan extends Component
         }
     }
 
-    public function verifikasiPenjualan(string $notaJual): void
+    public function verifikasiPenjualan(string $notaJual, string $namaBayar = ''): void
     {
         try {
-            $success = PenjualanRepository::verifikasiPenjualan($notaJual);
+            $success = PenjualanRepository::verifikasiPenjualan($notaJual, $namaBayar);
             if ($success) {
                 $this->dispatch('swal', [
                     'title' => 'Terverifikasi!',
@@ -96,6 +104,7 @@ class InputPenjualan extends Component
             ]);
         }
     }
+
 
     public function render()
     {
