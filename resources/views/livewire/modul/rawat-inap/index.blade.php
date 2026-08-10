@@ -447,6 +447,7 @@
         <flux:table :paginate="$regPeriksas">
             <flux:table.columns>
                 <flux:table.column>Menu</flux:table.column>
+                <flux:table.column align="center">{{ __('Action') }}</flux:table.column>
                 <flux:table.column>{{ __('No. Rawat') }}</flux:table.column>
                 <flux:table.column>{{ __('No. RM') }}</flux:table.column>
                 <flux:table.column>{{ __('Nama Pasien') }}</flux:table.column>
@@ -454,8 +455,6 @@
                 <flux:table.column>{{ __('Penanggung Jawab') }}</flux:table.column>
                 <flux:table.column>{{ __('Jenis Bayar') }}</flux:table.column>
                 <flux:table.column>{{ __('Kamar') }}</flux:table.column>
-                <flux:table.column align="center">{{ __('Perawatan/Tindakan') }}</flux:table.column>
-                <flux:table.column>{{ __('Action') }}</flux:table.column>
             </flux:table.columns>
 
             <flux:table.rows>
@@ -468,6 +467,16 @@
                                 class="flex items-center justify-center shrink-0 [:where(&)]:size-6 w-5 h-5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 transition-colors">
                                 <flux:icon name="squares-2x2" class="w-4 h-4" />
                             </button>
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            <div class="flex items-center justify-center gap-1">
+                                <flux:button icon="eye" size="xs"
+                                    :href="route('modul.rawat-inap.show', str_replace('/', '-', $reg->no_rawat))"
+                                    target="_blank" variant="ghost" title="Lihat Detail Pasien" />
+                                <flux:button icon="document-text" size="xs"
+                                    :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))"
+                                    target="_blank" variant="ghost" title="Perawatan / Tindakan" />
+                            </div>
                         </flux:table.cell>
                         <flux:table.cell class="font-medium tracking-tight">{{ $reg->no_rawat }}</flux:table.cell>
                         <flux:table.cell>{{ $reg->no_rkm_medis }}</flux:table.cell>
@@ -503,24 +512,10 @@
                             @endif
                         </flux:table.cell>
                         <flux:table.cell>{{ $reg->permintaanRanap->kd_kamar ?? '-' }}</flux:table.cell>
-                        <flux:table.cell>
-                            <div class="flex justify-center text-center">
-                                <flux:button icon="document-text" size="xs"
-                                    :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))"
-                                    target="_blank" variant="ghost" />
-                            </div>
-                        </flux:table.cell>
-                        <flux:table.cell>
-                            <div class="flex justify-center">
-                                <flux:button icon="eye" size="xs"
-                                    :href="route('modul.rawat-inap.show', str_replace('/', '-', $reg->no_rawat))"
-                                    target="_blank" variant="ghost" />
-                            </div>
-                        </flux:table.cell>
                     </flux:table.row>
                 @empty
                     <flux:table.row>
-                        <flux:table.cell colspan="10">
+                        <flux:table.cell colspan="9">
                             <div
                                 class="flex flex-col items-center justify-center py-12 text-neutral-400 dark:text-neutral-500">
                                 <flux:icon name="calendar" class="w-12 h-12 mb-3 opacity-40" />

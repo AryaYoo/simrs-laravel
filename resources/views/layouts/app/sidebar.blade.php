@@ -486,7 +486,24 @@
                         <div :class="sidebarOpen ? 'w-full flex items-center gap-2' : 'flex flex-col items-center gap-2'">
                             <form method="POST" action="{{ route('logout') }}" :class="sidebarOpen ? 'flex-1' : ''">
                                 @csrf
-                                <button type="submit" class="flex items-center justify-center transition-colors shadow-sm"
+                                <button type="button"
+                                    @click="
+                                        Swal.fire({
+                                            title: 'Konfirmasi Keluar',
+                                            text: 'Apakah Anda yakin ingin keluar dari aplikasi?',
+                                            icon: 'question',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#4C5C2D',
+                                            cancelButtonColor: '#6b7280',
+                                            confirmButtonText: 'Ya, Keluar',
+                                            cancelButtonText: 'Batal'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $el.closest('form').submit();
+                                            }
+                                        });
+                                    "
+                                    class="flex items-center justify-center transition-colors shadow-sm"
                                     :class="sidebarOpen ? 'w-full gap-1.5 rounded-lg text-[0.7rem] font-semibold py-2 hover:bg-white/20 bg-white/10' : 'w-9 h-9 rounded-full hover:bg-white/20 bg-white/10'"
                                     style="color: white; border: 1px solid rgba(255,255,255,0.05); cursor: pointer;"
                                     title="{{ __('Log out') }}" data-test="logout-button">
@@ -560,7 +577,23 @@
                             <flux:menu.separator />
                             <form method="POST" action="{{ route('logout') }}" class="w-full">
                                 @csrf
-                                <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
+                                <flux:menu.item as="button" type="button" icon="arrow-right-start-on-rectangle"
+                                    @click="
+                                        Swal.fire({
+                                            title: 'Konfirmasi Keluar',
+                                            text: 'Apakah Anda yakin ingin keluar dari aplikasi?',
+                                            icon: 'question',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#4C5C2D',
+                                            cancelButtonColor: '#6b7280',
+                                            confirmButtonText: 'Ya, Keluar',
+                                            cancelButtonText: 'Batal'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                $el.closest('form').submit();
+                                            }
+                                        });
+                                    "
                                     class="w-full cursor-pointer" data-test="logout-button">
                                     {{ __('Log out') }}
                                 </flux:menu.item>
@@ -804,7 +837,24 @@
                         </a>
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
-                            <button type="submit" class="flex items-center gap-1.5 w-full rounded-lg text-[0.7rem] font-semibold py-2 px-3 hover:bg-white/20 bg-white/10"
+                            <button type="button"
+                                @click="
+                                    Swal.fire({
+                                        title: 'Konfirmasi Keluar',
+                                        text: 'Apakah Anda yakin ingin keluar dari aplikasi?',
+                                        icon: 'question',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#4C5C2D',
+                                        cancelButtonColor: '#6b7280',
+                                        confirmButtonText: 'Ya, Keluar',
+                                        cancelButtonText: 'Batal'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            $el.closest('form').submit();
+                                        }
+                                    });
+                                "
+                                class="flex items-center gap-1.5 w-full rounded-lg text-[0.7rem] font-semibold py-2 px-3 hover:bg-white/20 bg-white/10"
                                 style="color:white; border:1px solid rgba(255,255,255,0.05); cursor:pointer;">
                                 <flux:icon name="arrow-right-start-on-rectangle" class="size-4" />
                                 {{ __('Log out') }}
