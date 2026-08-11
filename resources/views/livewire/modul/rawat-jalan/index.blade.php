@@ -216,7 +216,7 @@
             {
                 label: 'Akses Cepat',
                 items: [
-                    { label: 'Perawatan/Tindakan', url: 'action', target: '_blank' },
+                    { label: 'Perawatan/Tindakan', url: 'action' },
                     { label: 'Antrian Masuk Poli', url: '#' },
                     { label: 'Kamar Inap', url: '#' },
                 ]
@@ -450,10 +450,9 @@
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.index') }}" wire:navigate
-                class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+            <button type="button" onclick="history.length > 1 ? history.back() : window.location.href = '{{ route('modul.rawat-jalan.index') }}'" class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
                 <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
-            </a>
+            </button>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
@@ -633,7 +632,7 @@
                         x-bind:class="showBpjsColor ? '{{ $rowClassWithGreen }}' : '{{ $rowClassWithoutGreen }}'">
                         <flux:table.cell>
                             <button type="button"
-                                @click="openMenu('{{ $reg->no_rawat }}', '{{ $reg->pasien->nm_pasien ?? '' }}')"
+                                @click="openMenu('{{ $reg->no_rawat }}', '{{ addslashes($reg->pasien->nm_pasien ?? '') }}')"
                                 class="flex items-center justify-center shrink-0 [:where(&)]:size-6 w-5 h-5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 transition-colors">
                                 <flux:icon name="squares-2x2" class="w-4 h-4" />
                             </button>
@@ -642,10 +641,10 @@
                             <div class="flex items-center justify-center gap-1">
                                 <flux:button icon="eye" size="xs"
                                     :href="route('modul.rawat-jalan.show', str_replace('/', '-', $reg->no_rawat))"
-                                    target="_blank" variant="ghost" title="Lihat Detail Pasien" />
+                                    variant="ghost" title="Lihat Detail Pasien" />
                                 <flux:button icon="document-text" size="xs"
                                     :href="route('modul.rawat-jalan.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))"
-                                    target="_blank" variant="ghost" title="Perawatan / Tindakan" />
+                                    variant="ghost" title="Perawatan / Tindakan" />
                             </div>
                         </flux:table.cell>
                         <flux:table.cell class="font-medium tracking-tight">{{ $reg->no_rawat }}</flux:table.cell>
@@ -853,7 +852,6 @@
                                                     <template x-if="!item.children || item.children.length === 0">
                                                         <div class="h-full flex flex-col">
                                                             <a :href="getMenuUrl(item.url)"
-                                                                :target="(!item.url || item.url === '#') ? '_self' : '_blank'"
                                                                 class="group w-full h-[72px] flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all shadow-sm">
                                                                 <div
                                                                     class="w-9 h-9 rounded-lg flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-[#4C5C2D] group-hover:text-white transition-colors flex-shrink-0">
@@ -897,7 +895,6 @@
                                                                 <template
                                                                     x-if="!child.children || child.children.length === 0">
                                                                     <a :href="getMenuUrl(child.url)"
-                                                                        :target="(!child.url || child.url === '#') ? '_self' : '_blank'"
                                                                         class="flex items-center gap-3 p-3 h-full rounded-xl border border-neutral-100 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] hover:bg-[#4C5C2D]/5 transition-all group/child">
                                                                         <div class="flex-shrink-0 w-7 h-7 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-500 group-hover/child:bg-[#4C5C2D] group-hover/child:text-white transition-colors"
                                                                             x-text="idx + 1"></div>

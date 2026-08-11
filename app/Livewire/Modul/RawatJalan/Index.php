@@ -4,6 +4,7 @@ namespace App\Livewire\Modul\RawatJalan;
 
 use App\Models\RegPeriksa;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,18 +13,36 @@ class Index extends Component
 {
     use WithPagination;
 
+    #[Url(as: 'search', except: '')]
     public string $search = '';
+
+    #[Url(as: 'dari', except: '')]
     public string $dari = '';
+
+    #[Url(as: 'sampai', except: '')]
     public string $sampai = '';
+
+    #[Url(as: 'filter', except: '')]
     public string $filterType = '';
+
+    #[Url(as: 'dokter', except: '')]
     public string $kd_dokter = '';
+
+    #[Url(as: 'poli', except: '')]
     public string $kd_poli = '';
+
+    #[Url(as: 'per_page', except: 20)]
     public int $perPage = 20;
 
     public function mount()
     {
-        $this->dari   = now()->format('Y-m-d');
-        $this->sampai = now()->format('Y-m-d');
+        // Hanya set default jika tidak ada nilai dari URL params
+        if (!$this->dari) {
+            $this->dari = now()->format('Y-m-d');
+        }
+        if (!$this->sampai) {
+            $this->sampai = now()->format('Y-m-d');
+        }
     }
 
     public function updatedSearch()   { $this->resetPage(); }
@@ -87,12 +106,12 @@ class Index extends Component
         return view('livewire.modul.rawat-jalan.index', [
             'regPeriksas' => $regPeriksas,
             'summary' => [
-                'total' => $counts->total ?? 0,
-                'bpjs' => $counts->bpjs ?? 0,
-                'umum' => $counts->umum ?? 0,
+                'total'   => $counts->total ?? 0,
+                'bpjs'    => $counts->bpjs ?? 0,
+                'umum'    => $counts->umum ?? 0,
                 'lainnya' => max(0, ($counts->total ?? 0) - ($counts->bpjs ?? 0) - ($counts->umum ?? 0)),
             ],
-            'dokters' => \App\Models\Dokter::where('status', '1')->orderBy('nm_dokter')->get(),
+            'dokters'     => \App\Models\Dokter::where('status', '1')->orderBy('nm_dokter')->get(),
             'polikliniks' => \App\Models\Poliklinik::where('status', '1')->orderBy('nm_poli')->get(),
         ]);
     }

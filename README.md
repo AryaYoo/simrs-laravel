@@ -449,14 +449,14 @@ Dapat diakses di: [https://github.com/AryaYoo/simrs-laravel.git](https://github.
 
 ## 📜 SOP (Standard Operating Procedure)
 
-### Navigasi Sub Menu Layanan Rawat Jalan
-Ketentuan dalam membuka halaman dari tombol-tombol di dalam **Sub Menu Layanan Rawat Jalan**:
+### Navigasi Sub Menu Layanan Rawat Jalan & Rawat Inap
+Ketentuan dalam membuka halaman dari tombol-tombol di dalam **Sub Menu Layanan Rawat Jalan** maupun **Layanan Rawat Inap**:
 
-1. **Dari Halaman Daftar Pasien Rawat Jalan (Halaman Utama / Index)**
-   Jika sub menu dibuka dari halaman daftar pasien, maka setiap tombol yang diklik harus mengarahkan ke halaman tujuan dengan membuka **tab browser baru** (`target="_blank"`).
+1. **Dari Halaman Daftar Pasien (Halaman Utama / Index)**
+   Setiap tombol yang diklik mengarahkan ke halaman tujuan pada **tab browser yang sama** (`target="_self"`). State filter (tanggal, dokter, poli, status, pencarian, halaman) tersimpan di URL query params sehingga tetap utuh saat user menekan tombol **Back** di browser.
 
-2. **Dari Halaman Perawatan & Tindakan Rawat Jalan (Halaman Detail)**
-   Jika sub menu dibuka dari halaman detail pasien ini, maka setiap tombol yang diklik harus mengarahkan ke halaman tujuan pada **tab browser yang sama** (`target="_self"`).
+2. **Dari Halaman Perawatan & Tindakan (Halaman Detail)**
+   Jika sub menu dibuka dari halaman detail pasien ini, maka setiap tombol yang diklik harus mengarahkan ke halaman tujuan pada **tab browser yang sama** (`target="_self"`). Selain itu, tombol **Back** pada aplikasi menggunakan fungsi riwayat browser (`history.back()`) agar kembali tanpa mereset filter halaman utama.
 
 ### Aturan Kunci (Lock) Modifikasi Data Perawatan & Tindakan
 Terdapat pembatasan dalam mengubah (menambah, mengedit, atau menghapus) data pemeriksaan, tindakan, catatan, diagnosa, dan prosedur pada form Perawatan & Tindakan Rawat Jalan berdasarkan status periksa pasien:

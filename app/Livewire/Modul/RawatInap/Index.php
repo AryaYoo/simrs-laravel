@@ -4,6 +4,7 @@ namespace App\Livewire\Modul\RawatInap;
 
 use App\Models\RegPeriksa;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,17 +13,32 @@ class Index extends Component
 {
     use WithPagination;
 
+    #[Url(as: 'search', except: '')]
     public string $search = '';
+
+    #[Url(as: 'dari', except: '')]
     public string $dari = '';
+
+    #[Url(as: 'sampai', except: '')]
     public string $sampai = '';
+
+    #[Url(as: 'filter', except: '')]
     public string $filterType = '';
+
+    #[Url(as: 'status', except: 'belum_pulang')]
     public string $statusFilter = 'belum_pulang';
+
+    #[Url(as: 'per_page', except: 20)]
     public int $perPage = 20;
 
     public function mount()
     {
-        $this->dari   = now()->format('Y-m-d');
-        $this->sampai = now()->format('Y-m-d');
+        if (!$this->dari) {
+            $this->dari = now()->format('Y-m-d');
+        }
+        if (!$this->sampai) {
+            $this->sampai = now()->format('Y-m-d');
+        }
     }
 
     public function updatedSearch()  { $this->resetPage(); }

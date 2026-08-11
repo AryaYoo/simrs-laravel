@@ -42,10 +42,9 @@
     {{-- Header / Breadcrumb --}}
     <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $no_rawat)) }}"
-                class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+            <button type="button" onclick="history.length > 1 ? history.back() : window.location.href = '{{ route('modul.index') }}'" class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
                 <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
-            </a>
+            </button>
             <div class="flex-1">
                 <nav class="text-xs text-neutral-400 mb-0.5">
                     <span>Modul</span>

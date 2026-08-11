@@ -4,7 +4,7 @@
         activeSubMenu: null,
         activePatient: { noRawat: '', noRawatSlug: '', nmPasien: '' },
         isAdmin: {{ auth()->user()->role === 'admin' ? 'true' : 'false' }},
-        openInNewTab: true,
+        openInNewTab: false,
         cols: 2,
         init() {
             this.updateCols();
@@ -347,10 +347,9 @@
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="{{ route('modul.index') }}" wire:navigate
-                class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+            <button type="button" onclick="history.length > 1 ? history.back() : window.location.href = '{{ route('modul.rawat-inap.index') }}'" class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
                 <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
-            </a>
+            </button>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">
                     <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
@@ -463,7 +462,7 @@
                     <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''">
                         <flux:table.cell>
                             <button type="button"
-                                @click="openMenu('{{ $reg->no_rawat }}', '{{ $reg->pasien->nm_pasien ?? '' }}')"
+                                @click="openMenu('{{ $reg->no_rawat }}', '{{ addslashes($reg->pasien->nm_pasien ?? '') }}')"
                                 class="flex items-center justify-center shrink-0 [:where(&)]:size-6 w-5 h-5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-500 transition-colors">
                                 <flux:icon name="squares-2x2" class="w-4 h-4" />
                             </button>
@@ -472,10 +471,10 @@
                             <div class="flex items-center justify-center gap-1">
                                 <flux:button icon="eye" size="xs"
                                     :href="route('modul.rawat-inap.show', str_replace('/', '-', $reg->no_rawat))"
-                                    target="_blank" variant="ghost" title="Lihat Detail Pasien" />
+                                    variant="ghost" title="Lihat Detail Pasien" />
                                 <flux:button icon="document-text" size="xs"
                                     :href="route('modul.rawat-inap.perawatan-tindakan', str_replace('/', '-', $reg->no_rawat))"
-                                    target="_blank" variant="ghost" title="Perawatan / Tindakan" />
+                                    variant="ghost" title="Perawatan / Tindakan" />
                             </div>
                         </flux:table.cell>
                         <flux:table.cell class="font-medium tracking-tight">{{ $reg->no_rawat }}</flux:table.cell>
