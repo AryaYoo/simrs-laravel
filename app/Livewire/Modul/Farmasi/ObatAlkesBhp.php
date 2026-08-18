@@ -63,11 +63,14 @@ class ObatAlkesBhp extends Component
         $this->menit_validasi = $now->format('i');
         $this->detik_validasi = $now->format('s');
 
-        // Initial default Depo / Kamar jika ada di database bangsal
-        $firstBangsal = Bangsal::where('status', '1')->first();
-        if ($firstBangsal) {
-            $this->kd_depo = $firstBangsal->kd_bangsal;
-            $this->nm_depo = $firstBangsal->nm_bangsal;
+        // Default Depo / Kamar di AP (Apotek)
+        $apBangsal = Bangsal::where('kd_bangsal', 'AP')->first();
+        if ($apBangsal) {
+            $this->kd_depo = $apBangsal->kd_bangsal;
+            $this->nm_depo = $apBangsal->nm_bangsal;
+        } else {
+            $this->kd_depo = 'AP';
+            $this->nm_depo = 'Apotek';
         }
 
         if ($this->no_resep) {
