@@ -289,15 +289,13 @@ class ObatAlkesBhpRepository
             $status      = (str_contains(strtolower($tarif), 'bpjs') || str_contains(strtolower($tarif), 'ranap')) ? 'Ranap' : 'Ralan';
             $listObat    = $payload['list_obat'] ?? [];
 
-            // 1. Update status resep_obat ke "Sudah Dilayani"
+            // 1. Update tgl & jam validasi resep_obat (tgl_perawatan & jam)
             if (!empty($noResep)) {
                 DB::table('resep_obat')
                     ->where('no_resep', $noResep)
                     ->update([
-                        'tgl_perawatan'  => $tglValidasi,
-                        'jam'            => $jamValidasi,
-                        'tgl_penyerahan' => $tglValidasi,
-                        'jam_penyerahan' => $jamValidasi,
+                        'tgl_perawatan' => $tglValidasi,
+                        'jam'           => $jamValidasi,
                     ]);
             }
 

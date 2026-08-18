@@ -354,8 +354,8 @@ class ObatAlkesBhp extends Component
             ]);
 
             $this->dispatch('swal', [
-                'title' => 'Berhasil Disimpan!',
-                'text'  => 'Data validasi obat berhasil disimpan dan status permohonan resep diubah menjadi "Sudah Dilayani".',
+                'title' => 'Validasi Berhasil Disimpan!',
+                'text'  => 'Data validasi obat berhasil disimpan. Tanggal & Jam Validasi telah terbarui.',
                 'icon'  => 'success',
             ]);
         } catch (\Throwable $e) {
