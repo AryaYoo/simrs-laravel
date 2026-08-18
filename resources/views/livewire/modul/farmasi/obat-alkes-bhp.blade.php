@@ -185,27 +185,37 @@
 
     </div>
 
-    {{-- Tabs Navigation: Umum & Racikan --}}
-    <div class="border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-2 mt-2">
-        <button type="button"
-            wire:click="setTab('umum')"
-            class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 {{ $activeTab === 'umum' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
-            <flux:icon name="beaker" class="w-4 h-4" />
-            <span>Umum</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold {{ $activeTab === 'umum' ? 'bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#8CC7C4]/20 dark:text-[#8CC7C4]' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400' }}">
-                {{ count($listObatUmum) }}
-            </span>
-        </button>
+    {{-- Tabs Navigation & Tombol Tambah Obat --}}
+    <div class="border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between gap-2 mt-2">
+        <div class="flex items-center gap-2">
+            <button type="button"
+                wire:click="setTab('umum')"
+                class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 {{ $activeTab === 'umum' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
+                <flux:icon name="beaker" class="w-4 h-4" />
+                <span>Umum</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold {{ $activeTab === 'umum' ? 'bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#8CC7C4]/20 dark:text-[#8CC7C4]' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400' }}">
+                    {{ count($listObatUmum) }}
+                </span>
+            </button>
 
-        <button type="button"
-            wire:click="setTab('racikan')"
-            class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 {{ $activeTab === 'racikan' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
-            <flux:icon name="square-3-stack-3d" class="w-4 h-4" />
-            <span>Racikan</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
-                {{ count($listObatRacikan) }}
-            </span>
-        </button>
+            <button type="button"
+                wire:click="setTab('racikan')"
+                class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 {{ $activeTab === 'racikan' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
+                <flux:icon name="square-3-stack-3d" class="w-4 h-4" />
+                <span>Racikan</span>
+                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                    {{ count($listObatRacikan) }}
+                </span>
+            </button>
+        </div>
+
+        @if($activeTab === 'umum')
+            <button type="button" wire:click="openObatModal"
+                class="mb-1 px-3 py-1.5 rounded-lg bg-[#4C5C2D] hover:bg-[#3D4A24] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors">
+                <flux:icon name="plus" class="w-3.5 h-3.5 text-white" />
+                <span>Tambah Obat</span>
+            </button>
+        @endif
     </div>
 
     {{-- Content Table per Tab --}}
@@ -225,7 +235,7 @@
                             <th class="px-2 py-2 whitespace-nowrap">Jenis Obat</th>
                             <th class="px-1.5 py-2 text-center whitespace-nowrap">Emb</th>
                             <th class="px-1.5 py-2 text-center whitespace-nowrap">Tsl</th>
-                            <th class="px-1.5 py-2 text-center whitespace-nowrap">Stok</th>
+                            <th class="px-1.5 py-2 text-center whitespace-nowrap">Stok ({{ $kd_depo }})</th>
                             <th class="px-2 py-2 whitespace-nowrap">Aturan Pakai</th>
                             <th class="px-1.5 py-2 whitespace-nowrap">I.F.</th>
                             <th class="px-1.5 py-2 whitespace-nowrap">Kategori</th>
@@ -233,6 +243,7 @@
                             <th class="px-1.5 py-2 whitespace-nowrap">No.Batch</th>
                             <th class="px-1.5 py-2 whitespace-nowrap">No.Faktur</th>
                             <th class="px-1.5 py-2 whitespace-nowrap">Kadaluarsa</th>
+                            <th class="px-1.5 py-2 text-center whitespace-nowrap w-8">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60 font-medium">
@@ -245,7 +256,7 @@
 
                                 {{-- Jumlah (FORM EDITABLE) --}}
                                 <td class="px-1 py-1 text-center whitespace-nowrap">
-                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.jumlah"
+                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.jumlah" wire:change="recalculateTotal"
                                         class="w-12 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 font-bold text-center focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
@@ -276,17 +287,17 @@
 
                                 {{-- Emb / Embalase (FORM EDITABLE) --}}
                                 <td class="px-1 py-1 text-center whitespace-nowrap">
-                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.embalase"
+                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.embalase" wire:change="recalculateTotal"
                                         class="w-12 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Tsl / Tuslah (FORM EDITABLE) --}}
                                 <td class="px-1 py-1 text-center whitespace-nowrap">
-                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.tuslah"
+                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.tuslah" wire:change="recalculateTotal"
                                         class="w-12 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
-                                {{-- Stok --}}
+                                {{-- Stok Depo --}}
                                 <td class="px-1.5 py-1 text-center font-mono font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
                                     {{ number_format($item['stok'], 0, ',', '.') }}
                                 </td>
@@ -328,10 +339,18 @@
                                 <td class="px-1.5 py-1 whitespace-nowrap text-neutral-500 text-[10px]">
                                     {{ $item['kadaluarsa'] }}
                                 </td>
+
+                                {{-- Hapus Item --}}
+                                <td class="px-1.5 py-1 text-center whitespace-nowrap">
+                                    <button type="button" wire:click="removeObatUmum({{ $index }})"
+                                        class="p-1 rounded text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors" title="Hapus Item Obat">
+                                        <flux:icon name="trash" class="w-3.5 h-3.5" />
+                                    </button>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="17" class="px-4 py-10 text-center text-neutral-400 dark:text-neutral-500">
+                                <td colspan="18" class="px-4 py-10 text-center text-neutral-400 dark:text-neutral-500">
                                     <flux:icon name="beaker" class="w-8 h-8 mx-auto mb-2 opacity-50" />
                                     <p class="text-xs font-semibold">Tidak ada item obat umum pada resep ini.</p>
                                 </td>
@@ -412,6 +431,98 @@
                 {{-- Modal Footer --}}
                 <div class="px-4 py-2.5 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
                     <button type="button" wire:click="closeBangsalModal" class="px-4 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 text-neutral-700 dark:text-neutral-200 font-semibold text-xs transition-colors">
+                        Tutup
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    @endif
+
+    {{-- MODAL LOOKUP TAMBAH OBAT (Tampilkan Sesuai Depo) --}}
+    @if($isObatModalOpen)
+        <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+            <div class="relative w-full max-w-3xl bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+                
+                {{-- Modal Header --}}
+                <div class="flex items-center justify-between px-5 py-3.5 bg-[#4C5C2D] text-white">
+                    <div>
+                        <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                            <flux:icon name="beaker" class="w-4 h-4 text-white" />
+                            Tambah Data Obat, Alkes dan BHP Medis
+                        </h3>
+                        <p class="text-[11px] text-white/80 mt-0.5 font-mono">
+                            Depo Aktif: <strong class="text-white">{{ $nm_depo }} ({{ $kd_depo }})</strong>
+                        </p>
+                    </div>
+                    <button type="button" wire:click="closeObatModal" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+                        <flux:icon name="x-mark" class="w-5 h-5" />
+                    </button>
+                </div>
+
+                {{-- Modal Body --}}
+                <div class="p-5 space-y-4">
+                    {{-- Search Bar --}}
+                    <div class="relative">
+                        <input type="text" wire:model.live.debounce.300ms="searchObatModal" placeholder="Cari Kode Barang, Nama Obat, atau Kategori..."
+                            class="w-full bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs pl-8 pr-3 py-2 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                        <flux:icon name="magnifying-glass" class="w-4 h-4 absolute left-2.5 top-2.5 text-neutral-400" />
+                    </div>
+
+                    {{-- Tabel Hasil Cari Obat --}}
+                    <div class="max-h-96 overflow-y-auto border border-neutral-200 dark:border-neutral-700 rounded-lg">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold uppercase text-[10px] sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 w-28 font-mono">Kode</th>
+                                    <th class="px-4 py-2 border-b border-neutral-200 dark:border-neutral-700">Nama Barang / Obat</th>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700">Satuan</th>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-right">Harga (Rp)</th>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-center">Stok (Depo)</th>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-center w-20">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60 font-medium">
+                                @forelse($listObatSearch as $o)
+                                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
+                                        <td class="px-3 py-2 font-mono text-neutral-600 dark:text-neutral-400">
+                                            {{ $o['kode_brng'] }}
+                                        </td>
+                                        <td class="px-4 py-2 font-bold text-neutral-800 dark:text-neutral-100">
+                                            {{ $o['nama_brng'] }}
+                                            <span class="block text-[10px] text-neutral-400 font-normal">{{ $o['kategori'] }}</span>
+                                        </td>
+                                        <td class="px-3 py-2 text-neutral-600 dark:text-neutral-400">
+                                            {{ $o['satuan'] }}
+                                        </td>
+                                        <td class="px-3 py-2 text-right font-mono font-bold text-neutral-800 dark:text-neutral-200">
+                                            {{ number_format($o['harga'], 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-3 py-2 text-center font-mono font-bold {{ $o['stok'] > 0 ? 'text-emerald-600' : 'text-red-500' }}">
+                                            {{ number_format($o['stok'], 0, ',', '.') }}
+                                        </td>
+                                        <td class="px-3 py-2 text-center">
+                                            <button type="button" wire:click="addObatFromModal('{{ $o['kode_brng'] }}')"
+                                                class="px-2.5 py-1 rounded bg-[#4C5C2D] hover:bg-[#3D4A24] text-white text-[11px] font-bold transition-colors">
+                                                + Pilih
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="p-6 text-center text-neutral-400 italic text-xs">
+                                            Data obat tidak ditemukan di depo {{ $nm_depo }}.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="px-5 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
+                    <button type="button" wire:click="closeObatModal" class="px-4 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 text-neutral-700 dark:text-neutral-200 font-semibold text-xs transition-colors">
                         Tutup
                     </button>
                 </div>
