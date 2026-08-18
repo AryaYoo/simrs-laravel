@@ -113,7 +113,7 @@
                                             title="Lihat Detail Item Resep">
                                             <flux:icon name="eye" class="w-3.5 h-3.5" />
                                         </button>
-                                        <a href="{{ route('modul.farmasi.obat-alkes-bhp') }}"
+                                        <a href="{{ route('modul.farmasi.obat-alkes-bhp', ['no_resep' => $row->no_resep]) }}"
                                             wire:navigate
                                             class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-emerald-500/10 hover:bg-emerald-600 text-emerald-600 hover:text-white transition-colors dark:bg-emerald-500/20 dark:text-emerald-400"
                                             title="Validasi Data Obat, Alkes dan BHP Medis">
