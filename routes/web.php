@@ -106,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/farmasi/penyerahan-darah', \App\Livewire\Modul\Farmasi\PenyerahanDarah::class)->name('modul.farmasi.penyerahan-darah');
 
     Route::get('modul/farmasi/daftar-resep-dokter', \App\Livewire\Modul\Farmasi\DaftarResepDokter::class)->name('modul.farmasi.daftar-resep-dokter');
+    Route::get('modul/farmasi/obat-alkes-bhp', \App\Livewire\Modul\Farmasi\ObatAlkesBhp::class)->name('modul.farmasi.obat-alkes-bhp');
     Route::get('modul/farmasi/no-resep', \App\Livewire\Modul\Farmasi\NoResep::class)->name('modul.farmasi.no-resep');
 
 

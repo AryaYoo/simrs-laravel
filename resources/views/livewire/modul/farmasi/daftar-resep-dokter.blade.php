@@ -104,14 +104,22 @@
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60">
                         @forelse($reseps as $row)
                             <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
-                                {{-- 1. Action (Tombol Detail) --}}
+                                {{-- 1. Action (Tombol Detail & Validasi) --}}
                                 <td class="px-3 py-2 text-center whitespace-nowrap">
-                                    <button type="button"
-                                        wire:click="showDetail('{{ $row->no_resep }}')"
-                                        class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#4C5C2D]/10 hover:bg-[#4C5C2D] text-[#4C5C2D] hover:text-white transition-colors"
-                                        title="Lihat Detail Item Resep">
-                                        <flux:icon name="eye" class="w-3.5 h-3.5" />
-                                    </button>
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button type="button"
+                                            wire:click="showDetail('{{ $row->no_resep }}')"
+                                            class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#4C5C2D]/10 hover:bg-[#4C5C2D] text-[#4C5C2D] hover:text-white transition-colors"
+                                            title="Lihat Detail Item Resep">
+                                            <flux:icon name="eye" class="w-3.5 h-3.5" />
+                                        </button>
+                                        <a href="{{ route('modul.farmasi.obat-alkes-bhp') }}"
+                                            wire:navigate
+                                            class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-emerald-500/10 hover:bg-emerald-600 text-emerald-600 hover:text-white transition-colors dark:bg-emerald-500/20 dark:text-emerald-400"
+                                            title="Validasi Data Obat, Alkes dan BHP Medis">
+                                            <flux:icon name="check-badge" class="w-3.5 h-3.5" />
+                                        </a>
+                                    </div>
                                 </td>
 
                                 {{-- 2. No Resep --}}
