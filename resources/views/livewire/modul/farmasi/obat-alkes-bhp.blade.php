@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-6 pb-8">
-    {{-- Header & Breadcrumb dengan Tombol Back (SOP #8: history.back()) --}}
+    {{-- Header & Breadcrumb dengan Tombol Back (SOP #8: history.back()) dan Tombol Simpan --}}
     <div class="flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-3">
             <button type="button" onclick="history.back()" class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm" title="Kembali">
@@ -19,6 +19,11 @@
                     Data Obat, Alkes dan BHP Medis
                 </h1>
             </div>
+        </div>
+        <div>
+            <flux:button wire:click="save" variant="primary" icon="check" class="!bg-[#4C5C2D] !border-[#4C5C2D] hover:!bg-[#3D4A24] h-9 px-5 text-xs font-bold shadow-sm">
+                Simpan Data
+            </flux:button>
         </div>
     </div>
 
@@ -206,9 +211,10 @@
                                     <input type="checkbox" checked class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
-                                {{-- Jumlah --}}
-                                <td class="px-3 py-2 text-center font-bold text-neutral-800 dark:text-neutral-100 whitespace-nowrap">
-                                    {{ number_format($item['jumlah'], 0, ',', '.') }}
+                                {{-- Jumlah (FORM EDITABLE) --}}
+                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.jumlah"
+                                        class="w-16 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 font-bold text-center focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Kode Barang --}}
@@ -236,14 +242,16 @@
                                     {{ $item['jenis_obat'] }}
                                 </td>
 
-                                {{-- Emb --}}
-                                <td class="px-3 py-2 text-center font-mono text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
-                                    {{ number_format($item['embalase'], 0, ',', '.') }}
+                                {{-- Emb / Embalase (FORM EDITABLE) --}}
+                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.embalase"
+                                        class="w-16 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
-                                {{-- Tsl --}}
-                                <td class="px-3 py-2 text-center font-mono text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
-                                    {{ number_format($item['tuslah'], 0, ',', '.') }}
+                                {{-- Tsl / Tuslah (FORM EDITABLE) --}}
+                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                    <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.tuslah"
+                                        class="w-16 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Stok --}}
@@ -251,9 +259,10 @@
                                     {{ number_format($item['stok'], 0, ',', '.') }}
                                 </td>
 
-                                {{-- Aturan Pakai --}}
-                                <td class="px-4 py-2 text-neutral-700 dark:text-neutral-300 font-semibold whitespace-nowrap">
-                                    {{ $item['aturan_pakai'] }}
+                                {{-- Aturan Pakai (FORM EDITABLE) --}}
+                                <td class="px-4 py-2 whitespace-nowrap">
+                                    <input type="text" wire:model.live="listObatUmum.{{ $index }}.aturan_pakai" placeholder="Contoh: 3 x 1 Tablet"
+                                        class="w-full min-w-[140px] bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2.5 py-1 font-medium focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- I.F. --}}
@@ -271,14 +280,16 @@
                                     {{ $item['golongan'] }}
                                 </td>
 
-                                {{-- No.Batch --}}
-                                <td class="px-3 py-2 font-mono text-neutral-500 whitespace-nowrap">
-                                    {{ $item['no_batch'] }}
+                                {{-- No.Batch (FORM EDITABLE) --}}
+                                <td class="px-3 py-2 whitespace-nowrap">
+                                    <input type="text" wire:model.live="listObatUmum.{{ $index }}.no_batch" placeholder="No. Batch"
+                                        class="w-24 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
-                                {{-- No.Faktur --}}
-                                <td class="px-3 py-2 font-mono text-neutral-500 whitespace-nowrap">
-                                    {{ $item['no_faktur'] }}
+                                {{-- No.Faktur (FORM EDITABLE) --}}
+                                <td class="px-3 py-2 whitespace-nowrap">
+                                    <input type="text" wire:model.live="listObatUmum.{{ $index }}.no_faktur" placeholder="No. Faktur"
+                                        class="w-24 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Kadaluarsa --}}

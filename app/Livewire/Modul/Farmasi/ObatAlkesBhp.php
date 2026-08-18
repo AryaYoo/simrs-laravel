@@ -107,6 +107,11 @@ class ObatAlkesBhp extends Component
         $this->activeTab = $tab;
     }
 
+    public function save(): void
+    {
+        // Placeholder function save dikosongkan terlebih dahulu
+    }
+
     public function render()
     {
         return view('livewire.modul.farmasi.obat-alkes-bhp');
