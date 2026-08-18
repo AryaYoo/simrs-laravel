@@ -463,13 +463,7 @@
                         </p>
                     </div>
                     <div class="flex items-center gap-2">
-                        @if(count($selectedObatModal) > 0)
-                            <button type="button" wire:click="addSelectedObatFromModal"
-                                class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5">
-                                <flux:icon name="check" class="w-4 h-4" />
-                                <span>Tambahkan {{ count($selectedObatModal) }} Obat Terpilih</span>
-                            </button>
-                        @endif
+
                         <button type="button" wire:click="closeObatModal" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
                             <flux:icon name="x-mark" class="w-5 h-5" />
                         </button>
