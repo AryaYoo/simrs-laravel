@@ -236,19 +236,47 @@ class ObatAlkesBhp extends Component
     {
         $search = trim($this->searchObatModal);
 
+        // Gunakan pola join lengkap sesuai FK tabel databarang
         $query = \Illuminate\Support\Facades\DB::table('databarang')
             ->leftJoin('kodesatuan', 'databarang.kode_sat', '=', 'kodesatuan.kode_sat')
             ->leftJoin('kategori_barang', 'databarang.kode_kategori', '=', 'kategori_barang.kode')
+            ->leftJoin('golongan_barang', 'databarang.kode_golongan', '=', 'golongan_barang.kode')
+            ->leftJoin('industrifarmasi', 'databarang.kode_industri', '=', 'industrifarmasi.kode_industri')
+            ->leftJoin('jenis', 'databarang.kdjns', '=', 'jenis.kdjns')
+            ->leftJoin('gudangbarang', function($join) {
+                $join->on('databarang.kode_brng', '=', 'gudangbarang.kode_brng')
+                     ->where('gudangbarang.kd_bangsal', '=', $this->kd_depo);
+            })
             ->where('databarang.status', '1')
             ->select(
                 'databarang.kode_brng',
                 'databarang.nama_brng',
                 'databarang.kode_sat',
-                'databarang.stok',
                 'databarang.ralan',
                 'databarang.h_beli',
-                'databarang.kode_kategori',
+                'databarang.beliluar',
                 'kategori_barang.nama as nama_kategori',
+                'golongan_barang.nama as nama_golongan',
+                'industrifarmasi.nama_industri',
+                'jenis.nama as nama_jenis',
+                'gudangbarang.stok as stok_depo',
+                'gudangbarang.no_batch',
+                'gudangbarang.no_faktur',
+            )
+            ->groupBy(
+                'databarang.kode_brng',
+                'databarang.nama_brng',
+                'databarang.kode_sat',
+                'databarang.ralan',
+                'databarang.h_beli',
+                'databarang.beliluar',
+                'kategori_barang.nama',
+                'golongan_barang.nama',
+                'industrifarmasi.nama_industri',
+                'jenis.nama',
+                'gudangbarang.stok',
+                'gudangbarang.no_batch',
+                'gudangbarang.no_faktur',
             );
 
         if ($search !== '') {
@@ -256,7 +284,8 @@ class ObatAlkesBhp extends Component
             $query->where(function($q) use ($s) {
                 $q->where('databarang.kode_brng', 'like', $s)
                   ->orWhere('databarang.nama_brng', 'like', $s)
-                  ->orWhere('kategori_barang.nama', 'like', $s);
+                  ->orWhere('kategori_barang.nama', 'like', $s)
+                  ->orWhere('jenis.nama', 'like', $s);
             });
         }
 
@@ -264,23 +293,22 @@ class ObatAlkesBhp extends Component
         $res = [];
 
         foreach ($items as $brng) {
-            // Cek stok depo spesifik dari gudangbarang
-            $gudang = GudangBarang::where('kode_brng', $brng->kode_brng)
-                ->where('kd_bangsal', $this->kd_depo)
-                ->first();
-
-            $stokDepo = $gudang ? floatval($gudang->stok) : floatval($brng->stok ?? 0);
+            $stokDepo = floatval($brng->stok_depo ?? 0);
+            // Harga sesuai tarif aktif (ralan default)
             $harga = floatval($brng->ralan ?? ($brng->h_beli ?? 0));
 
             $res[] = [
-                'kode_brng' => $brng->kode_brng,
-                'nama_brng' => $brng->nama_brng,
-                'satuan'    => $brng->kode_sat ?? '-',
-                'harga'     => $harga,
-                'stok'      => $stokDepo,
-                'kategori'  => $brng->nama_kategori ?? '-',
-                'no_batch'  => $gudang->no_batch ?? '-',
-                'no_faktur' => $gudang->no_faktur ?? '-',
+                'kode_brng'    => $brng->kode_brng,
+                'nama_brng'    => $brng->nama_brng,
+                'satuan'       => $brng->kode_sat ?? '-',
+                'harga'        => $harga,
+                'stok'         => $stokDepo,
+                'jenis_obat'   => $brng->nama_jenis ?? '-',
+                'kategori'     => $brng->nama_kategori ?? '-',
+                'golongan'     => $brng->nama_golongan ?? '-',
+                'industri'     => $brng->nama_industri ?? '-',
+                'no_batch'     => $brng->no_batch ?? '-',
+                'no_faktur'    => $brng->no_faktur ?? '-',
             ];
         }
 
@@ -311,14 +339,33 @@ class ObatAlkesBhp extends Component
 
         $addedCount = 0;
         foreach ($this->selectedObatModal as $kodeBrng) {
-            $brng = DataBarang::find($kodeBrng);
-            if ($brng) {
+            // Ambil data dengan join lengkap agar dapat nama kategori, jenis, industri, golongan
+            $brngData = \Illuminate\Support\Facades\DB::table('databarang')
+                ->leftJoin('kategori_barang', 'databarang.kode_kategori', '=', 'kategori_barang.kode')
+                ->leftJoin('golongan_barang', 'databarang.kode_golongan', '=', 'golongan_barang.kode')
+                ->leftJoin('industrifarmasi', 'databarang.kode_industri', '=', 'industrifarmasi.kode_industri')
+                ->leftJoin('jenis', 'databarang.kdjns', '=', 'jenis.kdjns')
+                ->where('databarang.kode_brng', $kodeBrng)
+                ->select(
+                    'databarang.kode_brng',
+                    'databarang.nama_brng',
+                    'databarang.kode_sat',
+                    'databarang.ralan',
+                    'databarang.h_beli',
+                    'kategori_barang.nama as nama_kategori',
+                    'golongan_barang.nama as nama_golongan',
+                    'industrifarmasi.nama_industri',
+                    'jenis.nama as nama_jenis',
+                )
+                ->first();
+
+            if ($brngData) {
                 $gudang = GudangBarang::where('kode_brng', $kodeBrng)
                     ->where('kd_bangsal', $this->kd_depo)
                     ->first();
 
-                $stokDepo = $gudang ? floatval($gudang->stok) : floatval($brng->stok ?? 0);
-                $harga = floatval($brng->ralan ?? ($brng->h_beli ?? 0));
+                $stokDepo = $gudang ? floatval($gudang->stok) : 0;
+                $harga = floatval($brngData->ralan ?? ($brngData->h_beli ?? 0));
 
                 $found = false;
                 foreach ($this->listObatUmum as &$existing) {
@@ -331,19 +378,19 @@ class ObatAlkesBhp extends Component
 
                 if (!$found) {
                     $this->listObatUmum[] = [
-                        'kode_brng'    => $brng->kode_brng,
-                        'nama_brng'    => $brng->nama_brng,
+                        'kode_brng'    => $brngData->kode_brng,
+                        'nama_brng'    => $brngData->nama_brng,
                         'jumlah'       => 1,
-                        'satuan'       => $brng->kode_sat ?? '-',
+                        'satuan'       => $brngData->kode_sat ?? '-',
                         'harga'        => $harga,
-                        'jenis_obat'   => $brng->kategori ?? 'SPECIAL',
+                        'jenis_obat'   => $brngData->nama_jenis ?? '-',
                         'embalase'     => 0,
                         'tuslah'       => 0,
                         'stok'         => $stokDepo,
                         'aturan_pakai' => '-',
-                        'industri'     => '-',
-                        'kategori'     => $brng->kategori ?? '-',
-                        'golongan'     => '-',
+                        'industri'     => $brngData->nama_industri ?? '-',
+                        'kategori'     => $brngData->nama_kategori ?? '-',
+                        'golongan'     => $brngData->nama_golongan ?? '-',
                         'no_batch'     => $gudang->no_batch ?? '-',
                         'no_faktur'    => $gudang->no_faktur ?? '-',
                         'kadaluarsa'   => '-',
