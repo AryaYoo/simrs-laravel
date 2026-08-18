@@ -157,20 +157,20 @@
     <div class="border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-2 mt-2">
         <button type="button"
             wire:click="setTab('umum')"
-            class="px-5 py-2.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 {{ $activeTab === 'umum' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
+            class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 {{ $activeTab === 'umum' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
             <flux:icon name="beaker" class="w-4 h-4" />
             <span>Umum</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $activeTab === 'umum' ? 'bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#8CC7C4]/20 dark:text-[#8CC7C4]' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400' }}">
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold {{ $activeTab === 'umum' ? 'bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#8CC7C4]/20 dark:text-[#8CC7C4]' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400' }}">
                 {{ count($listObatUmum) }}
             </span>
         </button>
 
         <button type="button"
             wire:click="setTab('racikan')"
-            class="px-5 py-2.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 {{ $activeTab === 'racikan' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
+            class="px-4 py-2 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 {{ $activeTab === 'racikan' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
             <flux:icon name="square-3-stack-3d" class="w-4 h-4" />
             <span>Racikan</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
                 {{ count($listObatRacikan) }}
             </span>
         </button>
@@ -178,129 +178,129 @@
 
     {{-- Content Table per Tab --}}
     @if($activeTab === 'umum')
-        {{-- TAB UMUM TABLE --}}
+        {{-- TAB UMUM COMPACT TABLE --}}
         <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead class="bg-neutral-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 uppercase text-[10px] tracking-wider font-extrabold border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
+                <table class="w-full text-left border-collapse text-[11px]">
+                    <thead class="bg-neutral-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 uppercase text-[9px] tracking-tight font-extrabold border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
                         <tr>
-                            <th class="px-2 py-2.5 text-center w-8">K</th>
-                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Jumlah</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">Kode Barang</th>
-                            <th class="px-4 py-2.5 whitespace-nowrap min-w-[200px]">Nama Barang</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">Satuan</th>
-                            <th class="px-3 py-2.5 text-right whitespace-nowrap">Harga (Rp)</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">Jenis Obat</th>
-                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Emb</th>
-                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Tsl</th>
-                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Stok</th>
-                            <th class="px-4 py-2.5 whitespace-nowrap min-w-[150px]">Aturan Pakai</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">I.F.</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">Kategori</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">Golongan</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">No.Batch</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">No.Faktur</th>
-                            <th class="px-3 py-2.5 whitespace-nowrap">Kadaluarsa</th>
+                            <th class="px-1.5 py-2 text-center w-6">K</th>
+                            <th class="px-1.5 py-2 text-center whitespace-nowrap">Jumlah</th>
+                            <th class="px-2 py-2 whitespace-nowrap">Kode Barang</th>
+                            <th class="px-2 py-2 whitespace-nowrap">Nama Barang</th>
+                            <th class="px-1.5 py-2 whitespace-nowrap">Satuan</th>
+                            <th class="px-2 py-2 text-right whitespace-nowrap">Harga (Rp)</th>
+                            <th class="px-2 py-2 whitespace-nowrap">Jenis Obat</th>
+                            <th class="px-1.5 py-2 text-center whitespace-nowrap">Emb</th>
+                            <th class="px-1.5 py-2 text-center whitespace-nowrap">Tsl</th>
+                            <th class="px-1.5 py-2 text-center whitespace-nowrap">Stok</th>
+                            <th class="px-2 py-2 whitespace-nowrap">Aturan Pakai</th>
+                            <th class="px-1.5 py-2 whitespace-nowrap">I.F.</th>
+                            <th class="px-1.5 py-2 whitespace-nowrap">Kategori</th>
+                            <th class="px-1.5 py-2 whitespace-nowrap">Golongan</th>
+                            <th class="px-1.5 py-2 whitespace-nowrap">No.Batch</th>
+                            <th class="px-1.5 py-2 whitespace-nowrap">No.Faktur</th>
+                            <th class="px-1.5 py-2 whitespace-nowrap">Kadaluarsa</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60 font-medium">
                         @forelse($listObatUmum as $index => $item)
                             <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
                                 {{-- K (Checkbox) --}}
-                                <td class="px-2 py-2 text-center">
-                                    <input type="checkbox" checked class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                <td class="px-1.5 py-1 text-center">
+                                    <input type="checkbox" checked class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D] w-3 h-3">
                                 </td>
 
                                 {{-- Jumlah (FORM EDITABLE) --}}
-                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                <td class="px-1 py-1 text-center whitespace-nowrap">
                                     <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.jumlah"
-                                        class="w-16 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 font-bold text-center focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                        class="w-12 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 font-bold text-center focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Kode Barang --}}
-                                <td class="px-3 py-2 font-mono text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
+                                <td class="px-2 py-1 font-mono text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
                                     {{ $item['kode_brng'] }}
                                 </td>
 
                                 {{-- Nama Barang --}}
-                                <td class="px-4 py-2 font-bold text-neutral-800 dark:text-neutral-100 whitespace-nowrap">
+                                <td class="px-2 py-1 font-bold text-neutral-800 dark:text-neutral-100 whitespace-nowrap">
                                     {{ $item['nama_brng'] }}
                                 </td>
 
                                 {{-- Satuan --}}
-                                <td class="px-3 py-2 text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
+                                <td class="px-1.5 py-1 text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
                                     {{ $item['satuan'] }}
                                 </td>
 
                                 {{-- Harga(Rp) --}}
-                                <td class="px-3 py-2 text-right font-mono font-bold text-neutral-800 dark:text-neutral-200 whitespace-nowrap">
+                                <td class="px-2 py-1 text-right font-mono font-bold text-neutral-800 dark:text-neutral-200 whitespace-nowrap">
                                     {{ number_format($item['harga'], 0, ',', '.') }}
                                 </td>
 
                                 {{-- Jenis Obat --}}
-                                <td class="px-3 py-2 text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
+                                <td class="px-2 py-1 text-neutral-600 dark:text-neutral-400 whitespace-nowrap text-[10px]">
                                     {{ $item['jenis_obat'] }}
                                 </td>
 
                                 {{-- Emb / Embalase (FORM EDITABLE) --}}
-                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                <td class="px-1 py-1 text-center whitespace-nowrap">
                                     <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.embalase"
-                                        class="w-16 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                        class="w-12 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Tsl / Tuslah (FORM EDITABLE) --}}
-                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                <td class="px-1 py-1 text-center whitespace-nowrap">
                                     <input type="number" step="any" wire:model.live="listObatUmum.{{ $index }}.tuslah"
-                                        class="w-16 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                        class="w-12 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 text-center font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Stok --}}
-                                <td class="px-3 py-2 text-center font-mono font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
+                                <td class="px-1.5 py-1 text-center font-mono font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
                                     {{ number_format($item['stok'], 0, ',', '.') }}
                                 </td>
 
                                 {{-- Aturan Pakai (FORM EDITABLE) --}}
-                                <td class="px-4 py-2 whitespace-nowrap">
-                                    <input type="text" wire:model.live="listObatUmum.{{ $index }}.aturan_pakai" placeholder="Contoh: 3 x 1 Tablet"
-                                        class="w-full min-w-[140px] bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2.5 py-1 font-medium focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                <td class="px-1.5 py-1 whitespace-nowrap">
+                                    <input type="text" wire:model.live="listObatUmum.{{ $index }}.aturan_pakai" placeholder="Aturan Pakai"
+                                        class="w-32 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1.5 py-0.5 font-medium focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- I.F. --}}
-                                <td class="px-3 py-2 text-neutral-500 whitespace-nowrap">
+                                <td class="px-1.5 py-1 text-neutral-500 whitespace-nowrap text-[10px]">
                                     {{ $item['industri'] }}
                                 </td>
 
                                 {{-- Kategori --}}
-                                <td class="px-3 py-2 text-neutral-600 dark:text-neutral-400 whitespace-nowrap">
+                                <td class="px-1.5 py-1 text-neutral-600 dark:text-neutral-400 whitespace-nowrap text-[10px]">
                                     {{ $item['kategori'] }}
                                 </td>
 
                                 {{-- Golongan --}}
-                                <td class="px-3 py-2 text-neutral-500 whitespace-nowrap">
+                                <td class="px-1.5 py-1 text-neutral-500 whitespace-nowrap text-[10px]">
                                     {{ $item['golongan'] }}
                                 </td>
 
                                 {{-- No.Batch (FORM EDITABLE) --}}
-                                <td class="px-3 py-2 whitespace-nowrap">
+                                <td class="px-1 py-1 whitespace-nowrap">
                                     <input type="text" wire:model.live="listObatUmum.{{ $index }}.no_batch" placeholder="No. Batch"
-                                        class="w-24 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                        class="w-20 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- No.Faktur (FORM EDITABLE) --}}
-                                <td class="px-3 py-2 whitespace-nowrap">
+                                <td class="px-1 py-1 whitespace-nowrap">
                                     <input type="text" wire:model.live="listObatUmum.{{ $index }}.no_faktur" placeholder="No. Faktur"
-                                        class="w-24 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-2 py-1 font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                                        class="w-20 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-[11px] px-1 py-0.5 font-mono focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                                 </td>
 
                                 {{-- Kadaluarsa --}}
-                                <td class="px-3 py-2 whitespace-nowrap text-neutral-500">
+                                <td class="px-1.5 py-1 whitespace-nowrap text-neutral-500 text-[10px]">
                                     {{ $item['kadaluarsa'] }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="17" class="px-4 py-12 text-center text-neutral-400 dark:text-neutral-500">
-                                    <flux:icon name="beaker" class="w-10 h-10 mx-auto mb-2 opacity-50" />
+                                <td colspan="17" class="px-4 py-10 text-center text-neutral-400 dark:text-neutral-500">
+                                    <flux:icon name="beaker" class="w-8 h-8 mx-auto mb-2 opacity-50" />
                                     <p class="text-xs font-semibold">Tidak ada item obat umum pada resep ini.</p>
                                 </td>
                             </tr>
