@@ -234,10 +234,11 @@ class ObatAlkesBhp extends Component
 
     public function loadListObatSearch(): void
     {
-        $query = DataBarang::query()->where('status', '1');
+        $query = DataBarang::query()->where('status', '!=', '0');
 
-        if (!empty($this->searchObatModal)) {
-            $s = "%{$this->searchObatModal}%";
+        $search = trim($this->searchObatModal);
+        if ($search !== '') {
+            $s = "%{$search}%";
             $query->where(function($q) use ($s) {
                 $q->where('kode_brng', 'like', $s)
                   ->orWhere('nama_brng', 'like', $s)
@@ -245,7 +246,7 @@ class ObatAlkesBhp extends Component
             });
         }
 
-        $items = $query->orderBy('nama_brng')->limit(40)->get();
+        $items = $query->orderBy('nama_brng')->limit(50)->get();
         $res = [];
 
         foreach ($items as $brng) {
@@ -364,6 +365,13 @@ class ObatAlkesBhp extends Component
 
     public function render()
     {
+        if ($this->isObatModalOpen) {
+            $this->loadListObatSearch();
+        }
+        if ($this->isBangsalModalOpen) {
+            $this->loadListBangsal();
+        }
+
         return view('livewire.modul.farmasi.obat-alkes-bhp');
     }
 }
