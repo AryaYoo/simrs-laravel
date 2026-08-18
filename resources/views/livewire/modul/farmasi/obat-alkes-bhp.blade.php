@@ -511,10 +511,13 @@
                             </thead>
                             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60 font-medium">
                                 @forelse($listObatSearch as $o)
-                                    <tr class="hover:bg-amber-50/60 dark:hover:bg-neutral-700/40 transition-colors {{ in_array($o['kode_brng'], $selectedObatModal) ? 'bg-amber-50/80 dark:bg-neutral-800' : '' }}">
+                                    {{-- wire:key wajib ada agar Livewire melacak baris berdasarkan kode_brng, bukan posisi DOM --}}
+                                    <tr wire:key="obat-search-{{ $o['kode_brng'] }}"
+                                        class="hover:bg-amber-50/60 dark:hover:bg-neutral-700/40 transition-colors {{ in_array($o['kode_brng'], $selectedObatModal) ? 'bg-amber-50/80 dark:bg-neutral-800' : '' }}">
                                         {{-- Multi Select Checkbox --}}
                                         <td class="px-3 py-2 text-center">
-                                            <input type="checkbox" wire:model.live="selectedObatModal" value="{{ $o['kode_brng'] }}"
+                                            <input wire:key="chk-{{ $o['kode_brng'] }}" type="checkbox"
+                                                wire:model.live="selectedObatModal" value="{{ $o['kode_brng'] }}"
                                                 class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D] w-4 h-4 cursor-pointer">
                                         </td>
 
