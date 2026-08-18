@@ -93,14 +93,14 @@
                 </div>
             </div>
 
-            {{-- Tarif & No.Resep --}}
+            {{-- Tarif (Rawat Jalan, Beli Luar, Karyawan, Utama/BPJS) & No.Resep --}}
             <div class="md:col-span-6 flex items-center gap-4 flex-wrap sm:flex-nowrap">
                 <div class="flex items-center gap-2 flex-1">
                     <label class="w-12 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">Tarif :</label>
-                    <select wire:model="tarif" class="w-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-3 py-1.5 font-medium shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
-                        <option value="Rawat Jalan">Rawat Jalan</option>
-                        <option value="Rawat Inap">Rawat Inap</option>
-                        <option value="Bebas">Bebas</option>
+                    <select wire:model="tarif" class="w-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-3 py-1.5 font-semibold shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                        @foreach($optionsTarif as $opt)
+                            <option value="{{ $opt }}">{{ $opt }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -136,15 +136,15 @@
                 </div>
             </div>
 
-            {{-- Depo --}}
+            {{-- Depo / Kamar --}}
             <div class="md:col-span-5 flex items-center gap-2">
                 <label class="w-14 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">Depo :</label>
                 <div class="flex items-center gap-2 flex-1">
-                    <input type="text" wire:model="kd_depo" readonly
-                        class="w-16 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-3 py-1.5 font-bold text-center shadow-inner focus:outline-none">
-                    <input type="text" wire:model="nm_depo" readonly
-                        class="flex-1 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-4 py-1.5 font-bold shadow-inner focus:outline-none">
-                    <button type="button" class="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors">
+                    <input type="text" wire:model="kd_depo" readonly wire:click="openBangsalModal"
+                        class="w-16 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-3 py-1.5 font-bold text-center shadow-inner cursor-pointer focus:outline-none">
+                    <input type="text" wire:model="nm_depo" readonly wire:click="openBangsalModal"
+                        class="flex-1 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-4 py-1.5 font-bold shadow-inner cursor-pointer focus:outline-none">
+                    <button type="button" wire:click="openBangsalModal" class="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors" title="Pilih Kamar / Depo">
                         <flux:icon name="paper-clip" class="w-4 h-4" />
                     </button>
                 </div>
@@ -317,6 +317,74 @@
             </div>
             <h3 class="text-base font-bold text-neutral-700 dark:text-neutral-200">Data Resep Racikan</h3>
             <p class="text-xs text-neutral-400 max-w-md mt-1">Belum ada item resep racikan terdaftar pada resep ini.</p>
+        </div>
+    @endif
+
+    {{-- MODAL LOOKUP DEPO / KAMAR --}}
+    @if($isBangsalModalOpen)
+        <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+            <div class="relative w-full max-w-lg bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+                
+                {{-- Modal Header --}}
+                <div class="flex items-center justify-between px-5 py-3.5 bg-[#4C5C2D] text-white">
+                    <h3 class="font-mono font-bold text-white text-sm flex items-center gap-2">
+                        <flux:icon name="building-office" class="w-4 h-4 text-white" />
+                        :: [ Kamar / Depo ] ::
+                    </h3>
+                    <button type="button" wire:click="closeBangsalModal" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+                        <flux:icon name="x-mark" class="w-5 h-5" />
+                    </button>
+                </div>
+
+                {{-- Modal Body --}}
+                <div class="p-4 space-y-3">
+                    {{-- Search Bar --}}
+                    <div class="relative">
+                        <input type="text" wire:model.live.debounce.300ms="searchBangsalModal" placeholder="Cari Kode atau Nama Kamar..."
+                            class="w-full bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs pl-8 pr-3 py-2 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                        <flux:icon name="magnifying-glass" class="w-4 h-4 absolute left-2.5 top-2.5 text-neutral-400" />
+                    </div>
+
+                    {{-- Tabel Kamar / Depo --}}
+                    <div class="max-h-80 overflow-y-auto border border-neutral-200 dark:border-neutral-700 rounded-lg">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold uppercase text-[10px] sticky top-0 z-10">
+                                <tr>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 w-32 font-mono">Kode Kamar</th>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700">Nama Kamar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60">
+                                @forelse($listBangsal as $b)
+                                    <tr wire:click="selectBangsal('{{ $b['kd_bangsal'] }}', '{{ addslashes($b['nm_bangsal']) }}')"
+                                        class="hover:bg-amber-50 dark:hover:bg-neutral-700/50 cursor-pointer transition-colors">
+                                        <td class="px-3 py-2 font-mono font-bold text-neutral-800 dark:text-neutral-200">
+                                            {{ $b['kd_bangsal'] }}
+                                        </td>
+                                        <td class="px-3 py-2 text-neutral-700 dark:text-neutral-300">
+                                            {{ $b['nm_bangsal'] }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="p-4 text-center text-neutral-400 italic text-xs">
+                                            Data Kamar / Depo tidak ditemukan.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="px-4 py-2.5 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
+                    <button type="button" wire:click="closeBangsalModal" class="px-4 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 text-neutral-700 dark:text-neutral-200 font-semibold text-xs transition-colors">
+                        Tutup
+                    </button>
+                </div>
+
+            </div>
         </div>
     @endif
 </div>

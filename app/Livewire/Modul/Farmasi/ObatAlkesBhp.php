@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Modul\Farmasi;
 
+use App\Models\Bangsal;
 use App\Models\ResepDokter;
 use App\Models\ResepObat;
 use Livewire\Attributes\Layout;
@@ -25,15 +26,29 @@ class ObatAlkesBhp extends Component
     public string $menit_validasi = '';
     public string $detik_validasi = '';
 
+    // Options Tarif sesuai rujukan: Rawat Jalan, Beli Luar, Karyawan, Utama/BPJS
     public string $tarif = 'Rawat Jalan';
+    public array $optionsTarif = [
+        'Rawat Jalan',
+        'Beli Luar',
+        'Karyawan',
+        'Utama/BPJS',
+    ];
+
     public bool $use_no_resep = true;
 
     public float $total = 0;
     public float $ppn = 0;
     public float $total_ppn = 0;
 
+    // Depo / Kamar Fields
     public string $kd_depo = 'AP';
     public string $nm_depo = 'Apotek';
+
+    // Lookup Depo / Kamar Modal
+    public bool $isBangsalModalOpen = false;
+    public string $searchBangsalModal = '';
+    public array $listBangsal = [];
 
     // List Data
     public array $listObatUmum = [];
@@ -48,6 +63,13 @@ class ObatAlkesBhp extends Component
         $this->menit_validasi = $now->format('i');
         $this->detik_validasi = $now->format('s');
 
+        // Initial default Depo / Kamar jika ada di database bangsal
+        $firstBangsal = Bangsal::where('status', '1')->first();
+        if ($firstBangsal) {
+            $this->kd_depo = $firstBangsal->kd_bangsal;
+            $this->nm_depo = $firstBangsal->nm_bangsal;
+        }
+
         if ($this->no_resep) {
             $resep = ResepObat::with([
                 'regPeriksa.pasien',
@@ -60,7 +82,7 @@ class ObatAlkesBhp extends Component
                 $this->nm_pasien = $resep->regPeriksa->pasien->nm_pasien ?? '';
 
                 if ($resep->status === 'ranap') {
-                    $this->tarif = 'Rawat Inap';
+                    $this->tarif = 'Utama/BPJS';
                 } else {
                     $this->tarif = 'Rawat Jalan';
                 }
@@ -105,6 +127,44 @@ class ObatAlkesBhp extends Component
     public function setTab(string $tab): void
     {
         $this->activeTab = $tab;
+    }
+
+    // Modal Depo / Kamar Lookup
+    public function openBangsalModal(): void
+    {
+        $this->searchBangsalModal = '';
+        $this->loadListBangsal();
+        $this->isBangsalModalOpen = true;
+    }
+
+    public function closeBangsalModal(): void
+    {
+        $this->isBangsalModalOpen = false;
+    }
+
+    public function updatedSearchBangsalModal(): void
+    {
+        $this->loadListBangsal();
+    }
+
+    public function loadListBangsal(): void
+    {
+        $query = Bangsal::query()->where('status', '1');
+        if (!empty($this->searchBangsalModal)) {
+            $s = "%{$this->searchBangsalModal}%";
+            $query->where(function($q) use ($s) {
+                $q->where('kd_bangsal', 'like', $s)
+                  ->orWhere('nm_bangsal', 'like', $s);
+            });
+        }
+        $this->listBangsal = $query->orderBy('nm_bangsal')->limit(50)->get()->toArray();
+    }
+
+    public function selectBangsal(string $kd, string $nm): void
+    {
+        $this->kd_depo = $kd;
+        $this->nm_depo = $nm;
+        $this->isBangsalModalOpen = false;
     }
 
     public function save(): void
