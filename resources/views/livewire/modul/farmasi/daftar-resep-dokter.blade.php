@@ -155,9 +155,18 @@
 
                                 {{-- 7. Status --}}
                                 <td class="px-3 py-2 text-center whitespace-nowrap">
-                                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                                        {{ $row->status }}
-                                    </span>
+                                    @php
+                                        $terlayani = ($row->tgl_perawatan && $row->tgl_perawatan !== '0000-00-00') || ($row->tgl_penyerahan && $row->tgl_penyerahan !== '0000-00-00');
+                                    @endphp
+                                    @if($terlayani)
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                            Sudah
+                                        </span>
+                                    @else
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                                            Belum
+                                        </span>
+                                    @endif
                                 </td>
 
                                 {{-- 8. Poli --}}
