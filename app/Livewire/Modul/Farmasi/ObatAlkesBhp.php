@@ -129,18 +129,35 @@ class ObatAlkesBhp extends Component
     // KALKULASI — Total
     // ─────────────────────────────────────────────
 
+    public function updatedListObatUmum(): void
+    {
+        $this->recalculateTotal();
+    }
+
+    public function updatedPpn(): void
+    {
+        $this->recalculateTotal();
+    }
+
     public function recalculateTotal(): void
     {
         $subtotal = 0;
         foreach ($this->listObatUmum as $item) {
+            // Jika item tidak tercentang, lewati dari perhitungan total
+            if (isset($item['tercentang']) && !$item['tercentang']) {
+                continue;
+            }
+
             $h   = floatval($item['harga'] ?? 0);
             $j   = floatval($item['jumlah'] ?? 0);
             $emb = floatval($item['embalase'] ?? 0);
             $tsl = floatval($item['tuslah'] ?? 0);
+
             $subtotal += ($h * $j) + $emb + $tsl;
         }
+
         $this->total     = $subtotal;
-        $this->total_ppn = $this->total + $this->ppn;
+        $this->total_ppn = $this->total + floatval($this->ppn ?? 0);
     }
 
     // ─────────────────────────────────────────────
@@ -249,6 +266,7 @@ class ObatAlkesBhp extends Component
 
             if (!$found) {
                 $this->listObatUmum[] = [
+                    'tercentang'   => true,
                     'kode_brng'    => $detail['kode_brng'],
                     'nama_brng'    => $detail['nama_brng'],
                     'jumlah'       => 1,

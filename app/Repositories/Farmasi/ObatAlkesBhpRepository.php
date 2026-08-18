@@ -98,6 +98,7 @@ class ObatAlkesBhpRepository
             $detail = self::getObatDetail($item->kode_brng, $kd_depo);
 
             $result[] = [
+                'tercentang'   => true,
                 'kode_brng'    => $item->kode_brng,
                 'nama_brng'    => $barang->nama_brng ?? $item->kode_brng,
                 'jumlah'       => $jml,

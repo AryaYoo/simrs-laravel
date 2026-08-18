@@ -164,7 +164,9 @@
 
                 <div class="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-neutral-200/80 dark:border-neutral-700">
                     <span class="text-xs text-neutral-500 dark:text-neutral-400">PPN:</span>
-                    <span class="text-xs font-mono font-bold text-neutral-800 dark:text-neutral-100">Rp {{ number_format($ppn, 0, ',', '.') }}</span>
+                    <span class="text-xs font-mono font-bold text-neutral-800 dark:text-neutral-100">Rp</span>
+                    <input type="number" step="any" wire:model.live="ppn"
+                        class="w-16 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded text-xs px-1.5 py-0.5 font-mono font-bold text-center focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                 </div>
 
                 <div class="flex items-center gap-1.5 bg-[#4C5C2D]/10 dark:bg-[#8CC7C4]/10 px-3 py-1.5 rounded-lg border border-[#4C5C2D]/20 dark:border-[#8CC7C4]/20">
@@ -256,7 +258,7 @@
                             <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
                                 {{-- K (Checkbox) --}}
                                 <td class="px-1.5 py-1 text-center">
-                                    <input type="checkbox" checked class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D] w-3 h-3">
+                                    <input type="checkbox" wire:model.live="listObatUmum.{{ $index }}.tercentang" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D] w-3.5 h-3.5 cursor-pointer">
                                 </td>
 
                                 {{-- Jumlah (FORM EDITABLE) --}}
