@@ -63,7 +63,39 @@
         {{-- Baris 2: Tanggal, Tarif, No.Resep --}}
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-xs">
             {{-- Tanggal & Jam --}}
-            <div class="md:col-span-6 flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <div class="md:col-span-6 flex items-center gap-2 flex-wrap sm:flex-nowrap"
+                x-data="{
+                    isLive: true,
+                    timer: null,
+                    startTimer() {
+                        this.stopTimer();
+                        this.timer = setInterval(() => {
+                            if (!this.isLive) return;
+                            const now = new Date();
+                            const yyyy = now.getFullYear();
+                            const mm = String(now.getMonth() + 1).padStart(2, '0');
+                            const dd = String(now.getDate()).padStart(2, '0');
+                            $wire.tgl_validasi = `${yyyy}-${mm}-${dd}`;
+                            $wire.jam_validasi = String(now.getHours()).padStart(2, '0');
+                            $wire.menit_validasi = String(now.getMinutes()).padStart(2, '0');
+                            $wire.detik_validasi = String(now.getSeconds()).padStart(2, '0');
+                        }, 1000);
+                    },
+                    stopTimer() {
+                        if (this.timer) {
+                            clearInterval(this.timer);
+                            this.timer = null;
+                        }
+                    },
+                    toggleLive(checked) {
+                        this.isLive = checked;
+                        if (this.isLive) {
+                            this.startTimer();
+                        } else {
+                            this.stopTimer();
+                        }
+                    }
+                }" x-init="startTimer()">
                 <label class="w-20 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">Tanggal :</label>
                 <div class="flex items-center gap-1.5 flex-1">
                     <input type="date" wire:model="tgl_validasi"
@@ -87,8 +119,8 @@
                         @endfor
                     </select>
 
-                    <label class="flex items-center gap-1 cursor-pointer ml-1">
-                        <input type="checkbox" checked class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]">
+                    <label class="flex items-center gap-1 cursor-pointer ml-1" title="Real-time Clock Timer">
+                        <input type="checkbox" x-model="isLive" @change="toggleLive($event.target.checked)" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]">
                     </label>
                 </div>
             </div>
