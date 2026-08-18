@@ -439,34 +439,49 @@
         </div>
     @endif
 
-    {{-- MODAL LOOKUP TAMBAH OBAT (Tampilkan Sesuai Depo) --}}
+    {{-- MODAL LOOKUP TAMBAH OBAT MULTIPLE SELECT (Tampilkan Sesuai Depo) --}}
     @if($isObatModalOpen)
         <div class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
-            <div class="relative w-full max-w-3xl bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+            <div class="relative w-full max-w-4xl bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 
                 {{-- Modal Header --}}
                 <div class="flex items-center justify-between px-5 py-3.5 bg-[#4C5C2D] text-white">
                     <div>
                         <h3 class="font-bold text-white text-sm flex items-center gap-2">
                             <flux:icon name="beaker" class="w-4 h-4 text-white" />
-                            Tambah Data Obat, Alkes dan BHP Medis
+                            Tambah Data Obat, Alkes dan BHP Medis (Multiple Select)
                         </h3>
                         <p class="text-[11px] text-white/80 mt-0.5 font-mono">
                             Depo Aktif: <strong class="text-white">{{ $nm_depo }} ({{ $kd_depo }})</strong>
                         </p>
                     </div>
-                    <button type="button" wire:click="closeObatModal" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
-                        <flux:icon name="x-mark" class="w-5 h-5" />
-                    </button>
+                    <div class="flex items-center gap-2">
+                        @if(count($selectedObatModal) > 0)
+                            <button type="button" wire:click="addSelectedObatFromModal"
+                                class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5">
+                                <flux:icon name="check" class="w-4 h-4" />
+                                <span>Tambahkan {{ count($selectedObatModal) }} Obat Terpilih</span>
+                            </button>
+                        @endif
+                        <button type="button" wire:click="closeObatModal" class="p-1 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+                            <flux:icon name="x-mark" class="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Modal Body --}}
                 <div class="p-5 space-y-4">
-                    {{-- Search Bar --}}
-                    <div class="relative">
-                        <input type="text" wire:model.live.debounce.300ms="searchObatModal" placeholder="Cari Kode Barang, Nama Obat, atau Kategori..."
-                            class="w-full bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs pl-8 pr-3 py-2 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
-                        <flux:icon name="magnifying-glass" class="w-4 h-4 absolute left-2.5 top-2.5 text-neutral-400" />
+                    {{-- Search Bar & Action --}}
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex-1">
+                            <input type="text" wire:model.live.debounce.300ms="searchObatModal" placeholder="Cari Kode Barang, Nama Obat, atau Kategori..."
+                                class="w-full bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs pl-8 pr-3 py-2 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
+                            <flux:icon name="magnifying-glass" class="w-4 h-4 absolute left-2.5 top-2.5 text-neutral-400" />
+                        </div>
+                        <button type="button" wire:click="toggleSelectAllObatModal"
+                            class="px-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-xs font-semibold hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors whitespace-nowrap">
+                            Select / Unselect All
+                        </button>
                     </div>
 
                     {{-- Tabel Hasil Cari Obat --}}
@@ -474,17 +489,28 @@
                         <table class="w-full text-left border-collapse text-xs">
                             <thead class="bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-bold uppercase text-[10px] sticky top-0 z-10">
                                 <tr>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-center w-10">
+                                        <input type="checkbox" wire:click="toggleSelectAllObatModal"
+                                            @if(count($selectedObatModal) > 0 && count(array_intersect($selectedObatModal, array_column($listObatSearch, 'kode_brng'))) === count($listObatSearch)) checked @endif
+                                            class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D] w-3.5 h-3.5">
+                                    </th>
                                     <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 w-28 font-mono">Kode</th>
                                     <th class="px-4 py-2 border-b border-neutral-200 dark:border-neutral-700">Nama Barang / Obat</th>
                                     <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700">Satuan</th>
                                     <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-right">Harga (Rp)</th>
                                     <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-center">Stok (Depo)</th>
-                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-center w-20">Aksi</th>
+                                    <th class="px-3 py-2 border-b border-neutral-200 dark:border-neutral-700 text-center w-24">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60 font-medium">
                                 @forelse($listObatSearch as $o)
-                                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
+                                    <tr class="hover:bg-amber-50/60 dark:hover:bg-neutral-700/40 transition-colors {{ in_array($o['kode_brng'], $selectedObatModal) ? 'bg-amber-50/80 dark:bg-neutral-800' : '' }}">
+                                        {{-- Multi Select Checkbox --}}
+                                        <td class="px-3 py-2 text-center">
+                                            <input type="checkbox" wire:model.live="selectedObatModal" value="{{ $o['kode_brng'] }}"
+                                                class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D] w-4 h-4 cursor-pointer">
+                                        </td>
+
                                         <td class="px-3 py-2 font-mono text-neutral-600 dark:text-neutral-400">
                                             {{ $o['kode_brng'] }}
                                         </td>
@@ -510,7 +536,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="p-6 text-center text-neutral-400 italic text-xs">
+                                        <td colspan="7" class="p-6 text-center text-neutral-400 italic text-xs">
                                             Data obat tidak ditemukan di depo {{ $nm_depo }}.
                                         </td>
                                     </tr>
@@ -521,10 +547,21 @@
                 </div>
 
                 {{-- Modal Footer --}}
-                <div class="px-5 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700 flex justify-end">
-                    <button type="button" wire:click="closeObatModal" class="px-4 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 text-neutral-700 dark:text-neutral-200 font-semibold text-xs transition-colors">
-                        Tutup
-                    </button>
+                <div class="px-5 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-200 dark:border-neutral-700 flex items-center justify-between">
+                    <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+                        Terpilih: <strong class="text-[#4C5C2D] dark:text-[#8CC7C4]">{{ count($selectedObatModal) }}</strong> obat
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button type="button" wire:click="closeObatModal" class="px-4 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 text-neutral-700 dark:text-neutral-200 font-semibold text-xs transition-colors">
+                            Batal
+                        </button>
+                        <button type="button" wire:click="addSelectedObatFromModal"
+                            @if(empty($selectedObatModal)) disabled @endif
+                            class="px-4 py-1.5 rounded-lg bg-[#4C5C2D] hover:bg-[#3D4A24] disabled:opacity-50 text-white font-bold text-xs transition-colors shadow-sm flex items-center gap-1.5">
+                            <flux:icon name="plus" class="w-4 h-4" />
+                            <span>Tambahkan ({{ count($selectedObatModal) }}) Obat Terpilih</span>
+                        </button>
+                    </div>
                 </div>
 
             </div>

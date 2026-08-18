@@ -57,6 +57,7 @@ class ObatAlkesBhp extends Component
     public bool $isObatModalOpen = false;
     public string $searchObatModal = '';
     public array $listObatSearch = [];
+    public array $selectedObatModal = [];
 
     // List Data
     public array $listObatUmum = [];
@@ -216,6 +217,7 @@ class ObatAlkesBhp extends Component
     public function openObatModal(): void
     {
         $this->searchObatModal = '';
+        $this->selectedObatModal = [];
         $this->loadListObatSearch();
         $this->isObatModalOpen = true;
     }
@@ -243,7 +245,7 @@ class ObatAlkesBhp extends Component
             });
         }
 
-        $items = $query->orderBy('nama_brng')->limit(30)->get();
+        $items = $query->orderBy('nama_brng')->limit(40)->get();
         $res = [];
 
         foreach ($items as $brng) {
@@ -270,57 +272,81 @@ class ObatAlkesBhp extends Component
         $this->listObatSearch = $res;
     }
 
+    public function toggleSelectAllObatModal(): void
+    {
+        $allKodes = array_column($this->listObatSearch, 'kode_brng');
+        if (count(array_intersect($this->selectedObatModal, $allKodes)) === count($allKodes)) {
+            $this->selectedObatModal = array_diff($this->selectedObatModal, $allKodes);
+        } else {
+            $this->selectedObatModal = array_values(array_unique(array_merge($this->selectedObatModal, $allKodes)));
+        }
+    }
+
     public function addObatFromModal(string $kodeBrng): void
     {
-        $brng = DataBarang::find($kodeBrng);
-        if ($brng) {
-            $gudang = GudangBarang::where('kode_brng', $kodeBrng)
-                ->where('kd_bangsal', $this->kd_depo)
-                ->first();
+        $this->selectedObatModal = [$kodeBrng];
+        $this->addSelectedObatFromModal();
+    }
 
-            $stokDepo = $gudang ? floatval($gudang->stok) : floatval($brng->stok ?? 0);
-            $harga = floatval($brng->ralan ?? ($brng->h_beli ?? 0));
-
-            // Cek jika obat sudah ada di list, maka tambahkan jumlahnya
-            $found = false;
-            foreach ($this->listObatUmum as &$existing) {
-                if ($existing['kode_brng'] === $kodeBrng) {
-                    $existing['jumlah'] += 1;
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-                $this->listObatUmum[] = [
-                    'kode_brng'    => $brng->kode_brng,
-                    'nama_brng'    => $brng->nama_brng,
-                    'jumlah'       => 1,
-                    'satuan'       => $brng->kode_sat ?? '-',
-                    'harga'        => $harga,
-                    'jenis_obat'   => $brng->kategori ?? 'SPECIAL',
-                    'embalase'     => 0,
-                    'tuslah'       => 0,
-                    'stok'         => $stokDepo,
-                    'aturan_pakai' => '-',
-                    'industri'     => '-',
-                    'kategori'     => $brng->kategori ?? '-',
-                    'golongan'     => '-',
-                    'no_batch'     => $gudang->no_batch ?? '-',
-                    'no_faktur'    => $gudang->no_faktur ?? '-',
-                    'kadaluarsa'   => '-',
-                ];
-            }
-
-            $this->recalculateTotal();
-            $this->isObatModalOpen = false;
-
-            $this->dispatch('swal', [
-                'title' => 'Obat Ditambahkan!',
-                'text'  => $brng->nama_brng . ' berhasil ditambahkan ke daftar obat.',
-                'icon'  => 'success',
-            ]);
+    public function addSelectedObatFromModal(): void
+    {
+        if (empty($this->selectedObatModal)) {
+            return;
         }
+
+        $addedCount = 0;
+        foreach ($this->selectedObatModal as $kodeBrng) {
+            $brng = DataBarang::find($kodeBrng);
+            if ($brng) {
+                $gudang = GudangBarang::where('kode_brng', $kodeBrng)
+                    ->where('kd_bangsal', $this->kd_depo)
+                    ->first();
+
+                $stokDepo = $gudang ? floatval($gudang->stok) : floatval($brng->stok ?? 0);
+                $harga = floatval($brng->ralan ?? ($brng->h_beli ?? 0));
+
+                $found = false;
+                foreach ($this->listObatUmum as &$existing) {
+                    if ($existing['kode_brng'] === $kodeBrng) {
+                        $existing['jumlah'] += 1;
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    $this->listObatUmum[] = [
+                        'kode_brng'    => $brng->kode_brng,
+                        'nama_brng'    => $brng->nama_brng,
+                        'jumlah'       => 1,
+                        'satuan'       => $brng->kode_sat ?? '-',
+                        'harga'        => $harga,
+                        'jenis_obat'   => $brng->kategori ?? 'SPECIAL',
+                        'embalase'     => 0,
+                        'tuslah'       => 0,
+                        'stok'         => $stokDepo,
+                        'aturan_pakai' => '-',
+                        'industri'     => '-',
+                        'kategori'     => $brng->kategori ?? '-',
+                        'golongan'     => '-',
+                        'no_batch'     => $gudang->no_batch ?? '-',
+                        'no_faktur'    => $gudang->no_faktur ?? '-',
+                        'kadaluarsa'   => '-',
+                    ];
+                }
+                $addedCount++;
+            }
+        }
+
+        $this->recalculateTotal();
+        $this->selectedObatModal = [];
+        $this->isObatModalOpen = false;
+
+        $this->dispatch('swal', [
+            'title' => 'Obat Ditambahkan!',
+            'text'  => $addedCount . ' obat terpilih berhasil ditambahkan ke daftar.',
+            'icon'  => 'success',
+        ]);
     }
 
     public function removeObatUmum(int $index): void
