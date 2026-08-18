@@ -234,19 +234,33 @@ class ObatAlkesBhp extends Component
 
     public function loadListObatSearch(): void
     {
-        $query = DataBarang::query()->where('status', '!=', '0');
-
         $search = trim($this->searchObatModal);
+
+        $query = \Illuminate\Support\Facades\DB::table('databarang')
+            ->leftJoin('kodesatuan', 'databarang.kode_sat', '=', 'kodesatuan.kode_sat')
+            ->leftJoin('kategori_barang', 'databarang.kode_kategori', '=', 'kategori_barang.kode')
+            ->where('databarang.status', '1')
+            ->select(
+                'databarang.kode_brng',
+                'databarang.nama_brng',
+                'databarang.kode_sat',
+                'databarang.stok',
+                'databarang.ralan',
+                'databarang.h_beli',
+                'databarang.kode_kategori',
+                'kategori_barang.nama as nama_kategori',
+            );
+
         if ($search !== '') {
             $s = "%{$search}%";
             $query->where(function($q) use ($s) {
-                $q->where('kode_brng', 'like', $s)
-                  ->orWhere('nama_brng', 'like', $s)
-                  ->orWhere('kategori', 'like', $s);
+                $q->where('databarang.kode_brng', 'like', $s)
+                  ->orWhere('databarang.nama_brng', 'like', $s)
+                  ->orWhere('kategori_barang.nama', 'like', $s);
             });
         }
 
-        $items = $query->orderBy('nama_brng')->limit(50)->get();
+        $items = $query->orderBy('databarang.nama_brng')->limit(50)->get();
         $res = [];
 
         foreach ($items as $brng) {
@@ -264,7 +278,7 @@ class ObatAlkesBhp extends Component
                 'satuan'    => $brng->kode_sat ?? '-',
                 'harga'     => $harga,
                 'stok'      => $stokDepo,
-                'kategori'  => $brng->kategori ?? '-',
+                'kategori'  => $brng->nama_kategori ?? '-',
                 'no_batch'  => $gudang->no_batch ?? '-',
                 'no_faktur' => $gudang->no_faktur ?? '-',
             ];
