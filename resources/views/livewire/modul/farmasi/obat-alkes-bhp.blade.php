@@ -21,9 +21,27 @@
             </div>
         </div>
         <div>
-            <flux:button wire:click="save" variant="primary" icon="check" class="!bg-[#4C5C2D] !border-[#4C5C2D] hover:!bg-[#3D4A24] h-9 px-5 text-xs font-bold shadow-sm">
-                Simpan Data
-            </flux:button>
+            <button type="button"
+                @click="
+                    Swal.fire({
+                        title: 'Simpan Data Obat & BHP?',
+                        text: 'Apakah data validasi ini sudah benar dan siap disimpan?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4C5C2D',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Simpan!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $wire.save();
+                        }
+                    });
+                "
+                class="flex items-center gap-1.5 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white h-9 px-5 text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer">
+                <flux:icon name="check" class="w-4 h-4 text-white" />
+                <span>Simpan Data</span>
+            </button>
         </div>
     </div>
 

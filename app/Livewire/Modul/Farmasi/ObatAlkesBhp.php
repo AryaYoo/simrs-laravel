@@ -313,11 +313,57 @@ class ObatAlkesBhp extends Component
     }
 
     // ─────────────────────────────────────────────
-    // SIMPAN — Placeholder
+    // SIMPAN — Validasi & Update Status
     // ─────────────────────────────────────────────
 
     public function save(): void
     {
-        // TODO: Implementasi penyimpanan data validasi farmasi
+        if (empty($this->no_rawat)) {
+            $this->dispatch('swal', [
+                'title' => 'Peringatan',
+                'text'  => 'No. Rawat tidak boleh kosong.',
+                'icon'  => 'warning',
+            ]);
+            return;
+        }
+
+        $checkedObat = array_filter($this->listObatUmum, function ($item) {
+            return !isset($item['tercentang']) || $item['tercentang'] === true;
+        });
+
+        if (empty($checkedObat)) {
+            $this->dispatch('swal', [
+                'title' => 'Peringatan',
+                'text'  => 'Pilih minimal satu obat/BHP yang tercentang untuk disimpan.',
+                'icon'  => 'warning',
+            ]);
+            return;
+        }
+
+        try {
+            ObatAlkesBhpRepository::saveValidasi([
+                'no_resep'       => $this->no_resep,
+                'no_rawat'       => $this->no_rawat,
+                'tgl_validasi'   => $this->tgl_validasi,
+                'jam_validasi'   => $this->jam_validasi,
+                'menit_validasi' => $this->menit_validasi,
+                'detik_validasi' => $this->detik_validasi,
+                'kd_depo'        => $this->kd_depo,
+                'tarif'          => $this->tarif,
+                'list_obat'      => $this->listObatUmum,
+            ]);
+
+            $this->dispatch('swal', [
+                'title' => 'Berhasil Disimpan!',
+                'text'  => 'Data validasi obat berhasil disimpan dan status permohonan resep diubah menjadi "Sudah Dilayani".',
+                'icon'  => 'success',
+            ]);
+        } catch (\Throwable $e) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal Menyimpan',
+                'text'  => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'icon'  => 'error',
+            ]);
+        }
     }
 }

@@ -268,4 +268,88 @@ class ObatAlkesBhpRepository
 
         return $listObatUmum;
     }
+
+    /**
+     * Simpan data validasi farmasi, kurangi stok gudang, dan update status resep ke "Sudah Dilayani".
+     */
+    public static function saveValidasi(array $payload): bool
+    {
+        return DB::transaction(function () use ($payload) {
+            $noResep     = $payload['no_resep'] ?? null;
+            $noRawat     = $payload['no_rawat'] ?? '';
+            $tglValidasi = $payload['tgl_validasi'] ?? date('Y-m-d');
+            $jamValidasi = sprintf(
+                '%02d:%02d:%02d',
+                intval($payload['jam_validasi'] ?? 0),
+                intval($payload['menit_validasi'] ?? 0),
+                intval($payload['detik_validasi'] ?? 0)
+            );
+            $kdDepo      = $payload['kd_depo'] ?? 'AP';
+            $tarif       = $payload['tarif'] ?? 'Rawat Jalan';
+            $status      = (str_contains(strtolower($tarif), 'bpjs') || str_contains(strtolower($tarif), 'ranap')) ? 'Ranap' : 'Ralan';
+            $listObat    = $payload['list_obat'] ?? [];
+
+            // 1. Update status resep_obat ke "Sudah Dilayani"
+            if (!empty($noResep)) {
+                DB::table('resep_obat')
+                    ->where('no_resep', $noResep)
+                    ->update([
+                        'tgl_perawatan'  => $tglValidasi,
+                        'jam'            => $jamValidasi,
+                        'tgl_penyerahan' => $tglValidasi,
+                        'jam_penyerahan' => $jamValidasi,
+                    ]);
+            }
+
+            // 2. Simpan detail pemberian obat & kurangi stok gudang
+            foreach ($listObat as $item) {
+                if (isset($item['tercentang']) && !$item['tercentang']) {
+                    continue; // Skip item yang uncheck
+                }
+
+                $kodeBrng = $item['kode_brng'];
+                $jml      = floatval($item['jumlah'] ?? 0);
+                if ($jml <= 0) {
+                    continue;
+                }
+
+                $harga    = floatval($item['harga'] ?? 0);
+                $embalase = floatval($item['embalase'] ?? 0);
+                $tuslah   = floatval($item['tuslah'] ?? 0);
+                $total    = ($harga * $jml) + $embalase + $tuslah;
+                $noBatch  = !empty($item['no_batch']) && $item['no_batch'] !== '-' ? $item['no_batch'] : '-';
+                $noFaktur = !empty($item['no_faktur']) && $item['no_faktur'] !== '-' ? $item['no_faktur'] : '-';
+
+                // Insert / update ke detail_pemberian_obat
+                DB::table('detail_pemberian_obat')->updateOrInsert(
+                    [
+                        'tgl_perawatan' => $tglValidasi,
+                        'jam'           => $jamValidasi,
+                        'no_rawat'      => $noRawat,
+                        'kode_brng'     => $kodeBrng,
+                        'no_batch'      => $noBatch,
+                        'no_faktur'     => $noFaktur,
+                    ],
+                    [
+                        'h_beli'     => $harga,
+                        'biaya_obat' => $harga,
+                        'jml'        => $jml,
+                        'embalase'   => $embalase,
+                        'tuslah'     => $tuslah,
+                        'total'      => $total,
+                        'status'     => $status,
+                        'kd_bangsal' => $kdDepo,
+                    ]
+                );
+
+                // Update stok di gudangbarang
+                DB::table('gudangbarang')
+                    ->where('kode_brng', $kodeBrng)
+                    ->where('kd_bangsal', $kdDepo)
+                    ->decrement('stok', $jml);
+            }
+
+            return true;
+        });
+    }
 }
