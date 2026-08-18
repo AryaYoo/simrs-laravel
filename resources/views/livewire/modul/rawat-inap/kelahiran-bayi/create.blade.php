@@ -24,7 +24,7 @@
     <div class="grid grid-cols-1 gap-8 max-w-5xl mx-auto w-full px-4 lg:px-0">
         
         {{-- Section 1: Identitas & Pendaftaran --}}
-        <div id="section-1" class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden scroll-mt-24">
+        <div id="section-1" class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm scroll-mt-24 relative">
             <div class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-3">
                 <div class="w-6 h-6 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center">
                     <span class="text-[#4C5C2D] font-bold text-xs">1</span>
