@@ -28,42 +28,42 @@
     </div>
 
     {{-- Form Header Atas --}}
-    <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 p-5 shadow-sm space-y-4">
+    <div class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200/80 dark:border-neutral-700 p-5 shadow-sm space-y-4">
         
         {{-- Baris 1: No.Rawat, No.RM, Nama Pasien --}}
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-xs">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
             {{-- No. Rawat --}}
-            <div class="md:col-span-4 flex items-center gap-2">
-                <label class="w-20 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">No.Rawat :</label>
+            <div class="md:col-span-4 flex items-center gap-2.5">
+                <label class="w-20 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shrink-0">No. Rawat :</label>
                 <div class="relative flex-1">
                     <input type="text" wire:model="no_rawat" readonly placeholder="2026/04/09/000019"
-                        class="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-4 py-1.5 font-mono font-bold shadow-inner focus:outline-none">
+                        class="w-full bg-neutral-100 dark:bg-neutral-900/60 border border-neutral-300 dark:border-neutral-700 text-[#4C5C2D] dark:text-[#8CC7C4] rounded-lg text-xs px-3 py-2 font-mono font-bold cursor-not-allowed shadow-sm focus:outline-none">
                 </div>
             </div>
 
             {{-- No. RM --}}
-            <div class="md:col-span-3 flex items-center gap-2">
-                <label class="w-16 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">No.RM :</label>
+            <div class="md:col-span-3 flex items-center gap-2.5">
+                <label class="w-16 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shrink-0">No. RM :</label>
                 <div class="relative flex-1">
                     <input type="text" wire:model="no_rkm_medis" readonly placeholder="007362"
-                        class="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-4 py-1.5 font-mono font-bold shadow-inner focus:outline-none">
+                        class="w-full bg-neutral-100 dark:bg-neutral-900/60 border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg text-xs px-3 py-2 font-mono font-bold cursor-not-allowed shadow-sm focus:outline-none">
                 </div>
             </div>
 
             {{-- Nama Pasien --}}
-            <div class="md:col-span-5 flex items-center gap-2">
-                <label class="w-24 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">Nama Pasien :</label>
+            <div class="md:col-span-5 flex items-center gap-2.5">
+                <label class="w-24 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shrink-0">Nama Pasien :</label>
                 <div class="relative flex-1">
                     <input type="text" wire:model="nm_pasien" readonly placeholder="EMI WIJAYANTI"
-                        class="w-full bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-4 py-1.5 font-bold uppercase shadow-inner focus:outline-none">
+                        class="w-full bg-neutral-100 dark:bg-neutral-900/60 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-3 py-2 font-bold uppercase cursor-not-allowed shadow-sm focus:outline-none truncate">
                 </div>
             </div>
         </div>
 
-        {{-- Baris 2: Tanggal, Tarif, No.Resep --}}
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-xs">
-            {{-- Tanggal & Jam --}}
-            <div class="md:col-span-6 flex items-center gap-2 flex-wrap sm:flex-nowrap"
+        {{-- Baris 2: Tanggal & Waktu, Tarif, No.Resep --}}
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+            {{-- Tanggal & Jam Real-Time --}}
+            <div class="md:col-span-6 flex items-center gap-2.5 flex-wrap sm:flex-nowrap"
                 x-data="{
                     isLive: true,
                     timer: null,
@@ -96,39 +96,42 @@
                         }
                     }
                 }" x-init="startTimer()">
-                <label class="w-20 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">Tanggal :</label>
+                <label class="w-20 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shrink-0">Tanggal :</label>
                 <div class="flex items-center gap-1.5 flex-1">
                     <input type="date" wire:model="tgl_validasi"
                         class="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-2.5 py-1.5 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                     
-                    <select wire:model="jam_validasi" class="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-2 py-1.5 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
-                        @for($h=0; $h<24; $h++)
-                            <option value="{{ sprintf('%02d', $h) }}">{{ sprintf('%02d', $h) }}</option>
-                        @endfor
-                    </select>
-                    <span>:</span>
-                    <select wire:model="menit_validasi" class="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-2 py-1.5 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
-                        @for($m=0; $m<60; $m++)
-                            <option value="{{ sprintf('%02d', $m) }}">{{ sprintf('%02d', $m) }}</option>
-                        @endfor
-                    </select>
-                    <span>:</span>
-                    <select wire:model="detik_validasi" class="bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-2 py-1.5 shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
-                        @for($s=0; $s<60; $s++)
-                            <option value="{{ sprintf('%02d', $s) }}">{{ sprintf('%02d', $s) }}</option>
-                        @endfor
-                    </select>
+                    <div class="flex items-center gap-1 bg-neutral-50 dark:bg-neutral-900/80 p-1 rounded-lg border border-neutral-200 dark:border-neutral-700">
+                        <select wire:model="jam_validasi" class="bg-transparent border-0 text-neutral-800 dark:text-neutral-100 text-xs p-0 focus:ring-0 font-semibold cursor-pointer">
+                            @for($h=0; $h<24; $h++)
+                                <option value="{{ sprintf('%02d', $h) }}" class="bg-white dark:bg-neutral-800">{{ sprintf('%02d', $h) }}</option>
+                            @endfor
+                        </select>
+                        <span class="text-neutral-400 font-bold text-xs">:</span>
+                        <select wire:model="menit_validasi" class="bg-transparent border-0 text-neutral-800 dark:text-neutral-100 text-xs p-0 focus:ring-0 font-semibold cursor-pointer">
+                            @for($m=0; $m<60; $m++)
+                                <option value="{{ sprintf('%02d', $m) }}" class="bg-white dark:bg-neutral-800">{{ sprintf('%02d', $m) }}</option>
+                            @endfor
+                        </select>
+                        <span class="text-neutral-400 font-bold text-xs">:</span>
+                        <select wire:model="detik_validasi" class="bg-transparent border-0 text-neutral-800 dark:text-neutral-100 text-xs p-0 focus:ring-0 font-semibold cursor-pointer">
+                            @for($s=0; $s<60; $s++)
+                                <option value="{{ sprintf('%02d', $s) }}" class="bg-white dark:bg-neutral-800">{{ sprintf('%02d', $s) }}</option>
+                            @endfor
+                        </select>
+                    </div>
 
-                    <label class="flex items-center gap-1 cursor-pointer ml-1" title="Real-time Clock Timer">
+                    <label class="flex items-center gap-1.5 cursor-pointer ml-1 text-xs font-semibold text-neutral-600 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors" title="Toggle Real-time Clock Timer">
                         <input type="checkbox" x-model="isLive" @change="toggleLive($event.target.checked)" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]">
+                        <span class="text-[11px]" x-text="isLive ? 'Live' : 'Paused'"></span>
                     </label>
                 </div>
             </div>
 
-            {{-- Tarif (Rawat Jalan, Beli Luar, Karyawan, Utama/BPJS) & No.Resep --}}
+            {{-- Tarif & No.Resep --}}
             <div class="md:col-span-6 flex items-center gap-4 flex-wrap sm:flex-nowrap">
                 <div class="flex items-center gap-2 flex-1">
-                    <label class="w-12 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">Tarif :</label>
+                    <label class="w-12 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shrink-0">Tarif :</label>
                     <select wire:model="tarif" class="w-full bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-lg text-xs px-3 py-1.5 font-semibold shadow-sm focus:border-[#4C5C2D] focus:ring-[#4C5C2D]">
                         @foreach($optionsTarif as $opt)
                             <option value="{{ $opt }}">{{ $opt }}</option>
@@ -136,13 +139,13 @@
                     </select>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <label class="flex items-center gap-1.5 font-semibold text-neutral-700 dark:text-neutral-200 cursor-pointer">
+                <div class="flex items-center gap-2 shrink-0">
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-200 cursor-pointer">
                         <input type="checkbox" wire:model="use_no_resep" class="rounded border-neutral-300 text-[#4C5C2D] focus:ring-[#4C5C2D]">
-                        <span>No.Resep</span>
+                        <span>No. Resep</span>
                     </label>
                     @if($no_resep)
-                        <span class="bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#8CC7C4]/20 dark:text-[#8CC7C4] font-mono font-bold px-2.5 py-1 rounded-full text-xs border border-[#4C5C2D]/20">
+                        <span class="bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#8CC7C4]/20 dark:text-[#8CC7C4] font-mono font-bold px-3 py-1 rounded-lg text-xs border border-[#4C5C2D]/20 shadow-sm">
                             {{ $no_resep }}
                         </span>
                     @endif
@@ -150,33 +153,35 @@
             </div>
         </div>
 
-        {{-- Baris 3: Total, PPN, Total+PPN, Depo --}}
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-xs pt-1 border-t border-neutral-100 dark:border-neutral-700/60">
-            {{-- Total, PPN, Total+PPN --}}
-            <div class="md:col-span-7 flex items-center gap-4 flex-wrap">
-                <div class="flex items-center gap-1.5">
-                    <span class="font-semibold text-neutral-600 dark:text-neutral-400">Total :</span>
-                    <span class="font-mono font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($total, 0, ',', '.') }}</span>
+        {{-- Baris 3: Total Summary Badges & Depo Picker --}}
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center pt-3 border-t border-neutral-100 dark:border-neutral-700/60">
+            {{-- Total Summary Badges --}}
+            <div class="md:col-span-6 flex items-center gap-3 flex-wrap">
+                <div class="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-neutral-200/80 dark:border-neutral-700">
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">Total:</span>
+                    <span class="text-xs font-mono font-bold text-neutral-800 dark:text-neutral-100">Rp {{ number_format($total, 0, ',', '.') }}</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="font-semibold text-neutral-600 dark:text-neutral-400">PPN :</span>
-                    <span class="font-mono font-bold text-neutral-800 dark:text-neutral-100">{{ number_format($ppn, 0, ',', '.') }}</span>
+
+                <div class="flex items-center gap-1.5 bg-neutral-50 dark:bg-neutral-900/60 px-3 py-1.5 rounded-lg border border-neutral-200/80 dark:border-neutral-700">
+                    <span class="text-xs text-neutral-500 dark:text-neutral-400">PPN:</span>
+                    <span class="text-xs font-mono font-bold text-neutral-800 dark:text-neutral-100">Rp {{ number_format($ppn, 0, ',', '.') }}</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="font-semibold text-neutral-600 dark:text-neutral-400">Total+PPN :</span>
-                    <span class="font-mono font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">{{ number_format($total_ppn, 0, ',', '.') }}</span>
+
+                <div class="flex items-center gap-1.5 bg-[#4C5C2D]/10 dark:bg-[#8CC7C4]/10 px-3 py-1.5 rounded-lg border border-[#4C5C2D]/20 dark:border-[#8CC7C4]/20">
+                    <span class="text-xs font-semibold text-[#4C5C2D] dark:text-[#8CC7C4]">Total + PPN:</span>
+                    <span class="text-xs font-mono font-bold text-[#4C5C2D] dark:text-[#8CC7C4]">Rp {{ number_format($total_ppn, 0, ',', '.') }}</span>
                 </div>
             </div>
 
-            {{-- Depo / Kamar --}}
-            <div class="md:col-span-5 flex items-center gap-2">
-                <label class="w-14 font-semibold text-neutral-600 dark:text-neutral-300 flex-shrink-0">Depo :</label>
-                <div class="flex items-center gap-2 flex-1">
-                    <input type="text" wire:model="kd_depo" readonly wire:click="openBangsalModal"
-                        class="w-16 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-3 py-1.5 font-bold text-center shadow-inner cursor-pointer focus:outline-none">
-                    <input type="text" wire:model="nm_depo" readonly wire:click="openBangsalModal"
-                        class="flex-1 bg-neutral-50 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-800 dark:text-neutral-100 rounded-full text-xs px-4 py-1.5 font-bold shadow-inner cursor-pointer focus:outline-none">
-                    <button type="button" wire:click="openBangsalModal" class="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-600 transition-colors" title="Pilih Kamar / Depo">
+            {{-- Depo / Kamar Picker --}}
+            <div class="md:col-span-6 flex items-center gap-2.5">
+                <label class="w-14 text-xs font-semibold text-neutral-600 dark:text-neutral-300 shrink-0">Depo :</label>
+                <div class="flex gap-1.5 flex-1">
+                    <div class="flex-1 flex rounded-lg shadow-sm overflow-hidden cursor-pointer border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-[#4C5C2D] transition-colors" wire:click="openBangsalModal">
+                        <input type="text" wire:model="kd_depo" placeholder="Kode" readonly class="w-16 bg-neutral-100 dark:bg-neutral-800 text-xs px-2.5 py-1.5 font-bold text-center text-[#4C5C2D] dark:text-[#8CC7C4] cursor-pointer border-r border-neutral-300 dark:border-neutral-700 focus:ring-0">
+                        <input type="text" wire:model="nm_depo" placeholder="Pilih Depo / Kamar..." readonly class="flex-1 bg-transparent text-xs px-3 py-1.5 font-semibold text-neutral-800 dark:text-neutral-100 cursor-pointer focus:ring-0 truncate">
+                    </div>
+                    <button type="button" wire:click="openBangsalModal" class="flex-shrink-0 px-2.5 py-1.5 bg-[#F1F5E9] dark:bg-[#4C5C2D]/30 hover:bg-[#e2ebd3] text-[#4C5C2D] dark:text-[#8CC7C4] rounded-lg border border-[#4C5C2D]/40 transition-colors shadow-sm flex items-center gap-1" title="Pilih Kamar / Depo">
                         <flux:icon name="paper-clip" class="w-4 h-4" />
                     </button>
                 </div>
