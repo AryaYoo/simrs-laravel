@@ -353,17 +353,20 @@ class ObatAlkesBhp extends Component
                 'list_obat'      => $this->listObatUmum,
             ]);
 
-            $this->dispatch('swal', [
+            session()->flash('swal', [
                 'title' => 'Validasi Berhasil Disimpan!',
                 'text'  => 'Data validasi obat berhasil disimpan. Tanggal & Jam Validasi telah terbarui.',
                 'icon'  => 'success',
             ]);
+
+            return $this->redirect(route('modul.farmasi.daftar-resep-dokter'), navigate: true);
         } catch (\Throwable $e) {
             $this->dispatch('swal', [
                 'title' => 'Gagal Menyimpan',
                 'text'  => 'Terjadi kesalahan: ' . $e->getMessage(),
                 'icon'  => 'error',
             ]);
+            return null;
         }
     }
 }

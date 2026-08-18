@@ -912,7 +912,6 @@
             Livewire.on('swal', (event) => {
                 const data = event[0];
                 
-                // Hapus delay yang membuat popup terkesan lambat
                 setTimeout(() => {
                     Swal.fire({
                         title: data.title ?? '',
@@ -921,11 +920,24 @@
                         icon: data.icon ?? 'success',
                         confirmButtonColor: '#4C5C2D',
                         confirmButtonText: data.confirmButtonText ?? 'OK',
-                        timer: data.timer ?? undefined, // Tambahkan timer agar bisa auto-close
+                        timer: data.timer ?? undefined,
                         timerProgressBar: data.timer ? true : false
                     });
                 }, 10);
             });
+
+            @if(session()->has('swal'))
+                const sessionSwal = @json(session('swal'));
+                setTimeout(() => {
+                    Swal.fire({
+                        title: sessionSwal.title ?? '',
+                        text: sessionSwal.text ?? '',
+                        icon: sessionSwal.icon ?? 'success',
+                        confirmButtonColor: '#4C5C2D',
+                        confirmButtonText: sessionSwal.confirmButtonText ?? 'OK'
+                    });
+                }, 100);
+            @endif
         });
     </script>
     @stack('scripts')
