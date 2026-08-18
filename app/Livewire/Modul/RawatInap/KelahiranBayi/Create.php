@@ -15,6 +15,7 @@ class Create extends Component
     public string $nm_pasien = '';
     public string $nama_bayi_skl = '';
     public string $nm_ibu = '';
+    public string $no_rkm_medis_ibu = ''; // No. RM ibu — kunci pasti unik, hindari ambiguitas nama duplikat
     public string $umur_ibu = '';
     public string $nama_ayah = '';
     public string $umur_ayah = '';
@@ -159,7 +160,7 @@ class Create extends Component
 
     public function resetPasien()
     {
-        $this->reset(['no_rkm_medis', 'nm_pasien', 'nama_bayi_skl', 'nm_ibu', 'jk', 'tgl_lahir', 'tgl_daftar', 'alamat', 'umur']);
+        $this->reset(['no_rkm_medis', 'no_rkm_medis_ibu', 'nm_pasien', 'nama_bayi_skl', 'nm_ibu', 'jk', 'tgl_lahir', 'tgl_daftar', 'alamat', 'umur']);
     }
 
     public function updatedSearchPenolong()
@@ -205,6 +206,7 @@ class Create extends Component
     {
         $ibu = \App\Models\Pasien::find($noRkmMedis);
         if ($ibu) {
+            $this->no_rkm_medis_ibu = $ibu->no_rkm_medis; // Simpan No. RM ibu untuk lookup akurat saat cetak SKL
             $this->nm_ibu = $ibu->nm_pasien;
             $this->umur_ibu = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
             $this->alamat = $ibu->alamat;
@@ -255,7 +257,8 @@ class Create extends Component
             $n10Total = intval($this->f10) + intval($this->u10) + intval($this->t10) + intval($this->r10) + intval($this->w10);
 
             \App\Models\PasienBayi::create([
-                'no_rkm_medis' => $this->no_rkm_medis,
+                'no_rkm_medis'      => $this->no_rkm_medis,
+                'no_rkm_medis_ibu'  => $this->no_rkm_medis_ibu ?: null,
                 'nama_bayi_skl' => $this->nama_bayi_skl ?: null,
                 'umur_ibu' => $this->umur_ibu,
                 'nama_ayah' => $this->nama_ayah,

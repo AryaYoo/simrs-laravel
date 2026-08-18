@@ -23,12 +23,27 @@ class CetakSklController extends Controller
             ->first();
 
         // Get mother's pasien record to fetch correct no_ktp and pekerjaan.
-        // The baby's pasien record stores nm_ibu (mother's name), which we match
-        // against nm_pasien in the pasien table to find the mother's full record.
+        //
+        // FIX: Prioritaskan lookup by no_rkm_medis_ibu (unique primary key) jika tersedia.
+        // Ini menghindari ambiguitas ketika ada beberapa pasien dengan nama yang sama
+        // (contoh: 3 pasien bernama "Irmawati" dengan No. RM berbeda).
+        //
+        // Fallback ke nama (+ filter jk='P') hanya untuk data LAMA yang belum
+        // punya no_rkm_medis_ibu (diisi sebelum kolom ini ditambahkan).
         $ibunya = null;
-        if ($pasienRaw && !empty($pasienRaw->nm_ibu) && $pasienRaw->nm_ibu !== '-') {
+        $noRkmIbu = $bayi->no_rkm_medis_ibu ?? null;
+
+        if (!empty($noRkmIbu)) {
+            // ✅ Data baru: lookup tepat by No. RM ibu — dijamin tidak salah orang
+            $ibunya = DB::table('pasien')
+                ->where('no_rkm_medis', $noRkmIbu)
+                ->select('no_ktp', 'pekerjaan', 'no_rkm_medis')
+                ->first();
+        } elseif ($pasienRaw && !empty($pasienRaw->nm_ibu) && $pasienRaw->nm_ibu !== '-') {
+            // ⚠️  Data lama: fallback ke nama, tambah filter jk='P' agar lebih aman
             $ibunya = DB::table('pasien')
                 ->where('nm_pasien', $pasienRaw->nm_ibu)
+                ->where('jk', 'P')
                 ->select('no_ktp', 'pekerjaan', 'no_rkm_medis')
                 ->first();
         }
