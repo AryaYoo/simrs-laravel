@@ -316,7 +316,7 @@ class ObatAlkesBhp extends Component
     // SIMPAN — Validasi & Update Status
     // ─────────────────────────────────────────────
 
-    public function save(): void
+    public function save()
     {
         if (empty($this->no_rawat)) {
             $this->dispatch('swal', [
