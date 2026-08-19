@@ -181,7 +181,7 @@ class PenyerahanResepJalan extends Component
             // Insert / update tabel bukti_penyerahan_resep_obat
             DB::table('bukti_penyerahan_resep_obat')->updateOrInsert(
                 ['no_resep' => $this->no_resep],
-                ['foto'     => $dbPath]
+                ['photo'    => $dbPath]
             );
 
             // Update tgl_penyerahan dan jam_penyerahan di resep_obat
