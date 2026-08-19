@@ -119,7 +119,7 @@ class PenyerahanResepJalan extends Component
     /**
      * Simpan evidence foto ke file & DB
      */
-    public function simpan(): void
+    public function simpan()
     {
         if (empty($this->capturedImage)) {
             $this->dispatch('swal', [
