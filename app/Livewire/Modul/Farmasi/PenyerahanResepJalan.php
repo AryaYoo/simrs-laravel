@@ -152,8 +152,10 @@ class PenyerahanResepJalan extends Component
             $filename  = $this->no_resep . '.jpeg';
             $dbPath    = 'pages/upload/' . $filename;
 
-            // Direktori simpan: dari env KHANZA_UPLOAD_PATH, fallback ke public/pages/upload
-            $uploadDir = env('KHANZA_UPLOAD_PATH', public_path('pages/upload'));
+            // Direktori simpan: dari env KHANZA_PENYERAHAN_PATH
+            // Produksi: /var/www/html/webapps/penyerahanresep/pages/upload
+            // Dev fallback: public/pages/upload
+            $uploadDir = env('KHANZA_PENYERAHAN_PATH', public_path('pages/upload'));
             if (!file_exists($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
