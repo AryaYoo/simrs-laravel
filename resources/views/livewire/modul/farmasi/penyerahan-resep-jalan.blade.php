@@ -181,10 +181,49 @@
             x-init="startCamera()"
             class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden"
         >
-            <div class="flex items-center gap-2 px-5 py-3 border-b border-neutral-100 dark:border-neutral-700"
+            <div class="flex items-center justify-between gap-2 px-5 py-2.5 border-b border-neutral-100 dark:border-neutral-700"
                  style="background: linear-gradient(90deg, #4C5C2D10 0%, transparent 100%);">
-                <flux:icon name="camera" class="w-4 h-4 text-[#4C5C2D]" />
-                <h2 class="text-sm font-bold text-[#4C5C2D] dark:text-[#8aad6a] tracking-wide uppercase">Ambil Evidence Foto</h2>
+                <div class="flex items-center gap-2">
+                    <flux:icon name="camera" class="w-4 h-4 text-[#4C5C2D]" />
+                    <h2 class="text-sm font-bold text-[#4C5C2D] dark:text-[#8aad6a] tracking-wide uppercase">Ambil Evidence Foto</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                    {{-- Ambil Evidence --}}
+                    <button
+                        type="button"
+                        @click="capturePhoto()"
+                        :disabled="!hasPermission"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white transition-all shadow-sm hover:shadow active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                        style="background: linear-gradient(135deg, #4C5C2D 0%, #3D4A24 100%);"
+                    >
+                        <flux:icon name="camera" class="w-3.5 h-3.5" />
+                        Ambil Evidence
+                    </button>
+
+                    {{-- Simpan --}}
+                    <button
+                        type="button"
+                        wire:click="simpan"
+                        wire:loading.attr="disabled"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm hover:shadow active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                        :class="capturedSrc
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'"
+                        :disabled="!capturedSrc"
+                    >
+                        <span wire:loading wire:target="simpan" class="inline-flex items-center gap-1">
+                            <svg class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            ...
+                        </span>
+                        <span wire:loading.remove wire:target="simpan" class="inline-flex items-center gap-1">
+                            <flux:icon name="cloud-arrow-up" class="w-3.5 h-3.5" />
+                            Simpan
+                        </span>
+                    </button>
+                </div>
             </div>
 
             <div class="p-5 flex flex-col gap-5">
@@ -249,45 +288,6 @@
                             </div>
                         </template>
                     </div>
-                </div>
-
-                {{-- Tombol Aksi --}}
-                <div class="flex items-center justify-between gap-3 pt-4 border-t border-neutral-100 dark:border-neutral-700 flex-wrap">
-                    {{-- Ambil Evidence --}}
-                    <button
-                        type="button"
-                        @click="capturePhoto()"
-                        :disabled="!hasPermission"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all shadow-md hover:shadow-lg active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-                        style="background: linear-gradient(135deg, #4C5C2D 0%, #3D4A24 100%);"
-                    >
-                        <flux:icon name="camera" class="w-4 h-4" />
-                        Ambil Evidence
-                    </button>
-
-                    {{-- Simpan --}}
-                    <button
-                        type="button"
-                        wire:click="simpan"
-                        wire:loading.attr="disabled"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all shadow-md hover:shadow-lg active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-                        :class="capturedSrc
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                            : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'"
-                        :disabled="!capturedSrc"
-                    >
-                        <span wire:loading wire:target="simpan" class="inline-flex items-center gap-2">
-                            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                            </svg>
-                            Menyimpan...
-                        </span>
-                        <span wire:loading.remove wire:target="simpan" class="inline-flex items-center gap-2">
-                            <flux:icon name="cloud-arrow-up" class="w-4 h-4" />
-                            Simpan
-                        </span>
-                    </button>
                 </div>
 
             </div>
