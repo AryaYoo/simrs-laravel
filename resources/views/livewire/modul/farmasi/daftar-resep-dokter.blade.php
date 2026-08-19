@@ -32,8 +32,8 @@
             class="px-4 py-2.5 text-xs font-bold transition-all border-b-2 flex items-center gap-2 {{ $activeTab === 'ranap' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200' }}">
             <flux:icon name="building-office-2" class="w-4 h-4" />
             <span>Rawat Inap</span>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
-                0
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold {{ $activeTab === 'ranap' ? 'bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#8CC7C4]/20 dark:text-[#8CC7C4]' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400' }}">
+                {{ number_format($countRanap, 0, ',', '.') }}
             </span>
         </button>
     </div>
@@ -73,13 +73,132 @@
 
     {{-- Content Table --}}
     @if($activeTab === 'ranap')
-        {{-- Rawat Inap Empty Placeholder --}}
-        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
-            <div class="w-16 h-16 rounded-2xl bg-neutral-100 dark:bg-neutral-700 text-neutral-400 flex items-center justify-center mb-3">
-                <flux:icon name="building-office-2" class="w-8 h-8" />
+        {{-- Rawat Inap (Permintaan Resep Pulang) Table --}}
+        <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-neutral-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 uppercase text-[10px] tracking-wider font-extrabold border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-10">
+                        <tr>
+                            <th class="px-3 py-2.5 text-center w-16">Action</th>
+                            <th class="px-3 py-2.5">No. Permintaan</th>
+                            <th class="px-3 py-2.5 whitespace-nowrap">Tgl Permintaan</th>
+                            <th class="px-3 py-2.5 whitespace-nowrap">No. Rawat</th>
+                            <th class="px-3 py-2.5">No. RM & Nama Pasien</th>
+                            <th class="px-3 py-2.5">Dokter Yang Meminta</th>
+                            <th class="px-3 py-2.5 text-center">Status</th>
+                            <th class="px-3 py-2.5">Ruang/Kamar</th>
+                            <th class="px-3 py-2.5">Jenis Bayar</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-700/60">
+                        @forelse($reseps as $row)
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700/40 transition-colors">
+                                {{-- 1. Action --}}
+                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button type="button"
+                                            wire:click="showDetail('{{ $row->no_permintaan }}')"
+                                            class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-[#4C5C2D]/10 hover:bg-[#4C5C2D] text-[#4C5C2D] hover:text-white transition-colors"
+                                            title="Lihat Detail Item Permintaan Resep Pulang">
+                                            <flux:icon name="eye" class="w-3.5 h-3.5" />
+                                        </button>
+                                        {{-- Validasi --}}
+                                        <a href="{{ route('modul.farmasi.obat-alkes-bhp', ['no_resep' => $row->no_permintaan]) }}"
+                                            wire:navigate
+                                            class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-emerald-500/10 hover:bg-emerald-600 text-emerald-600 hover:text-white transition-colors dark:bg-emerald-500/20 dark:text-emerald-400"
+                                            title="Validasi Data Obat, Alkes dan BHP Medis">
+                                            <flux:icon name="check-badge" class="w-3.5 h-3.5" />
+                                        </a>
+                                        {{-- Penyerahan --}}
+                                        <a href="{{ route('modul.farmasi.penyerahan-resep-jalan', ['no_resep' => $row->no_permintaan]) }}"
+                                            wire:navigate
+                                            class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-sky-500/10 hover:bg-sky-600 text-sky-600 hover:text-white transition-colors dark:bg-sky-500/20 dark:text-sky-400"
+                                            title="Penyerahan Resep Obat">
+                                            <flux:icon name="paper-airplane" class="w-3.5 h-3.5" />
+                                        </a>
+                                    </div>
+                                </td>
+
+                                {{-- 2. No Permintaan --}}
+                                <td class="px-3 py-2 font-mono font-bold text-neutral-900 dark:text-neutral-100 whitespace-nowrap">
+                                    {{ $row->no_permintaan }}
+                                </td>
+
+                                {{-- 3. Tgl Permintaan --}}
+                                <td class="px-3 py-2 whitespace-nowrap text-neutral-700 dark:text-neutral-300">
+                                    <div class="font-semibold">{{ $row->tgl_permintaan ? \Carbon\Carbon::parse($row->tgl_permintaan)->format('d/m/Y') : '-' }}</div>
+                                    <div class="text-[10px] text-neutral-400 font-mono">{{ $row->jam ?? '' }}</div>
+                                </td>
+
+                                {{-- 4. No Rawat --}}
+                                <td class="px-3 py-2 font-mono text-neutral-600 dark:text-neutral-400 whitespace-nowrap text-[11px]">
+                                    {{ $row->no_rawat }}
+                                </td>
+
+                                {{-- 5. No RM & Nama Pasien --}}
+                                <td class="px-3 py-2">
+                                    <div class="font-bold text-neutral-800 dark:text-neutral-100 leading-tight">
+                                        {{ $row->regPeriksa->pasien->nm_pasien ?? '-' }}
+                                    </div>
+                                    <div class="text-[10px] font-mono text-neutral-500 dark:text-neutral-400 mt-0.5">
+                                        RM: {{ $row->regPeriksa->no_rkm_medis ?? '-' }}
+                                    </div>
+                                </td>
+
+                                {{-- 6. Dokter Yang Meminta --}}
+                                <td class="px-3 py-2 text-neutral-700 dark:text-neutral-300 font-medium">
+                                    {{ $row->dokter->nm_dokter ?? ($row->kd_dokter ?: '-') }}
+                                </td>
+
+                                {{-- 7. Status --}}
+                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                    @if(strtolower($row->status) === 'sudah')
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                            Sudah Terlayani
+                                        </span>
+                                    @else
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                                            Belum Terlayani
+                                        </span>
+                                    @endif
+                                </td>
+
+                                {{-- 8. Ruang/Kamar --}}
+                                <td class="px-3 py-2 text-neutral-700 dark:text-neutral-300 font-medium whitespace-nowrap">
+                                    @php
+                                        $lastKamar = $row->regPeriksa->kamarInap->sortByDesc(function($ki) {
+                                            return $ki->tgl_masuk . ' ' . $ki->jam_masuk;
+                                        })->first();
+                                        $ruang = $lastKamar?->kamar?->bangsal?->nm_bangsal ?? '-';
+                                    @endphp
+                                    {{ $ruang }}
+                                </td>
+
+                                {{-- 9. Jenis Bayar --}}
+                                <td class="px-3 py-2 whitespace-nowrap">
+                                    <span class="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
+                                        {{ $row->regPeriksa->penjab->png_jawab ?? '-' }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="px-4 py-12 text-center text-neutral-400 dark:text-neutral-500">
+                                    <flux:icon name="clipboard-document-list" class="w-10 h-10 mx-auto mb-2 opacity-50" />
+                                    <p class="text-xs font-semibold">Tidak ada data permintaan resep pulang yang ditemukan.</p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-            <h3 class="text-base font-bold text-neutral-700 dark:text-neutral-200">Data Resep Rawat Inap</h3>
-            <p class="text-xs text-neutral-400 max-w-md mt-1">Belum ada data resep dokter untuk kategori Rawat Inap.</p>
+
+            {{-- Pagination --}}
+            @if($reseps->hasPages())
+                <div class="px-4 py-3 border-t border-neutral-100 dark:border-neutral-700">
+                    {{ $reseps->links() }}
+                </div>
+            @endif
         </div>
     @else
         {{-- Rawat Jalan Compact Table --}}
@@ -238,7 +357,11 @@
                     <div>
                         <h3 class="font-bold text-white text-base flex items-center gap-2">
                             <flux:icon name="clipboard-document-list" class="w-5 h-5 text-white" />
-                            Detail Resep {{ $activeResep['no_resep'] }}
+                            @if($isRanapDetail)
+                                Detail Permintaan Resep Pulang {{ $activeResep['no_permintaan'] }}
+                            @else
+                                Detail Resep {{ $activeResep['no_resep'] }}
+                            @endif
                         </h3>
                         <p class="text-xs text-white/80 mt-0.5">
                             Pasien: {{ $activeResep['reg_periksa']['pasien']['nm_pasien'] ?? '-' }} (RM: {{ $activeResep['reg_periksa']['no_rkm_medis'] ?? '-' }})
@@ -252,8 +375,21 @@
                 {{-- Body: Table Item Resep --}}
                 <div class="p-6 space-y-4 max-h-[65vh] overflow-y-auto">
                     <div class="grid grid-cols-2 gap-3 text-xs p-3 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
-                        <div><span class="text-neutral-400">Dokter DPJP:</span> <strong class="text-neutral-800 dark:text-neutral-200 block">{{ $activeResep['dokter']['nm_dokter'] ?? '-' }}</strong></div>
-                        <div><span class="text-neutral-400">Poliklinik:</span> <strong class="text-neutral-800 dark:text-neutral-200 block">{{ $activeResep['reg_periksa']['poliklinik']['nm_poli'] ?? '-' }}</strong></div>
+                        <div><span class="text-neutral-400">Dokter DPJP / Yang Meminta:</span> <strong class="text-neutral-800 dark:text-neutral-200 block">{{ $activeResep['dokter']['nm_dokter'] ?? '-' }}</strong></div>
+                        <div>
+                            @if($isRanapDetail)
+                                <span class="text-neutral-400">Kamar Terakhir:</span> 
+                                @php
+                                    $lastKamar = collect($activeResep['reg_periksa']['kamar_inap'] ?? [])->sortByDesc(function($ki) {
+                                        return $ki['tgl_masuk'] . ' ' . $ki['jam_masuk'];
+                                    })->first();
+                                    $ruang = $lastKamar['kamar']['bangsal']['nm_bangsal'] ?? '-';
+                                @endphp
+                                <strong class="text-neutral-800 dark:text-neutral-200 block">{{ $ruang }}</strong>
+                            @else
+                                <span class="text-neutral-400">Poliklinik:</span> <strong class="text-neutral-800 dark:text-neutral-200 block">{{ $activeResep['reg_periksa']['poliklinik']['nm_poli'] ?? '-' }}</strong>
+                            @endif
+                        </div>
                         <div><span class="text-neutral-400">No. Rawat:</span> <strong class="font-mono text-neutral-800 dark:text-neutral-200 block">{{ $activeResep['no_rawat'] }}</strong></div>
                         <div><span class="text-neutral-400">Jenis Bayar:</span> <strong class="text-neutral-800 dark:text-neutral-200 block">{{ $activeResep['reg_periksa']['penjab']['png_jawab'] ?? '-' }}</strong></div>
                     </div>
@@ -265,28 +401,49 @@
                                 <th class="p-2 border border-neutral-200 dark:border-neutral-700 w-8 text-center">No</th>
                                 <th class="p-2 border border-neutral-200 dark:border-neutral-700">Nama Barang / Obat</th>
                                 <th class="p-2 border border-neutral-200 dark:border-neutral-700 text-center w-16">Jumlah</th>
-                                <th class="p-2 border border-neutral-200 dark:border-neutral-700">Aturan Pakai</th>
+                                <th class="p-2 border border-neutral-200 dark:border-neutral-700">Aturan Pakai / Dosis</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($activeResep['detail'] ?? [] as $idx => $d)
-                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40">
-                                    <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-center font-mono">{{ $idx + 1 }}</td>
-                                    <td class="p-2 border border-neutral-200 dark:border-neutral-700 font-medium">
-                                        {{ $d['barang']['nama_brng'] ?? $d['kode_brng'] }}
-                                    </td>
-                                    <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-center font-bold">
-                                        {{ number_format($d['jml'] ?? 0, 0, ',', '.') }}
-                                    </td>
-                                    <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">
-                                        {{ $d['aturan_pakai'] ?: '-' }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="p-4 text-center text-neutral-400 italic">Belum ada item obat terdaftar pada resep ini.</td>
-                                </tr>
-                            @endforelse
+                            @if($isRanapDetail)
+                                @forelse($activeResep['detail_permintaan'] ?? [] as $idx => $d)
+                                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40">
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-center font-mono">{{ $idx + 1 }}</td>
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 font-medium">
+                                            {{ $d['barang']['nama_brng'] ?? $d['kode_brng'] }}
+                                        </td>
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-center font-bold">
+                                            {{ number_format($d['jml'] ?? 0, 0, ',', '.') }}
+                                        </td>
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">
+                                            {{ $d['dosis'] ?: '-' }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="p-4 text-center text-neutral-400 italic">Belum ada item obat terdaftar pada permintaan resep pulang ini.</td>
+                                    </tr>
+                                @endforelse
+                            @else
+                                @forelse($activeResep['detail'] ?? [] as $idx => $d)
+                                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/40">
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-center font-mono">{{ $idx + 1 }}</td>
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 font-medium">
+                                            {{ $d['barang']['nama_brng'] ?? $d['kode_brng'] }}
+                                        </td>
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-center font-bold">
+                                            {{ number_format($d['jml'] ?? 0, 0, ',', '.') }}
+                                        </td>
+                                        <td class="p-2 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300">
+                                            {{ $d['aturan_pakai'] ?: '-' }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="p-4 text-center text-neutral-400 italic">Belum ada item obat terdaftar pada resep ini.</td>
+                                    </tr>
+                                @endforelse
+                            @endif
                         </tbody>
                     </table>
                 </div>

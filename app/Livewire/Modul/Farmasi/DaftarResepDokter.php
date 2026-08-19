@@ -52,19 +52,37 @@ class DaftarResepDokter extends Component
     public function updatedSampai()  { $this->resetPage(); }
     public function updatedPerPage() { $this->resetPage(); }
 
+    public bool $isRanapDetail = false;
+
     public function showDetail(string $noResep): void
     {
-        $resep = ResepObat::with([
-            'dokter',
-            'regPeriksa.pasien',
-            'regPeriksa.poliklinik',
-            'regPeriksa.penjab',
-            'detail.barang',
-        ])->find($noResep);
+        if ($this->activeTab === 'ranap') {
+            $resep = \App\Models\PermintaanResepPulang::with([
+                'dokter',
+                'regPeriksa.pasien',
+                'regPeriksa.penjab',
+                'detailPermintaan.barang',
+            ])->find($noResep);
 
-        if ($resep) {
-            $this->activeResep = $resep->toArray();
-            $this->detailModalOpen = true;
+            if ($resep) {
+                $this->isRanapDetail = true;
+                $this->activeResep = $resep->toArray();
+                $this->detailModalOpen = true;
+            }
+        } else {
+            $resep = ResepObat::with([
+                'dokter',
+                'regPeriksa.pasien',
+                'regPeriksa.poliklinik',
+                'regPeriksa.penjab',
+                'detail.barang',
+            ])->find($noResep);
+
+            if ($resep) {
+                $this->isRanapDetail = false;
+                $this->activeResep = $resep->toArray();
+                $this->detailModalOpen = true;
+            }
         }
     }
 
@@ -72,6 +90,7 @@ class DaftarResepDokter extends Component
     {
         $this->detailModalOpen = false;
         $this->activeResep = null;
+        $this->isRanapDetail = false;
     }
 
     public function render()
@@ -117,6 +136,39 @@ class DaftarResepDokter extends Component
             $reseps = $query->orderByDesc('tgl_peresepan')
                 ->orderByDesc('jam_peresepan')
                 ->paginate($this->perPage);
+        } elseif ($this->activeTab === 'ranap') {
+            $query = \App\Models\PermintaanResepPulang::with([
+                'dokter',
+                'regPeriksa.pasien',
+                'regPeriksa.penjab',
+                'regPeriksa.kamarInap.kamar.bangsal',
+            ]);
+
+            if ($this->dari) {
+                $query->whereDate('tgl_permintaan', '>=', $this->dari);
+            }
+            if ($this->sampai) {
+                $query->whereDate('tgl_permintaan', '<=', $this->sampai);
+            }
+
+            if ($this->search) {
+                $like = "%{$this->search}%";
+                $query->where(function ($q) use ($like) {
+                    $q->where('no_permintaan', 'like', $like)
+                      ->orWhere('no_rawat', 'like', $like)
+                      ->orWhereHas('dokter', function ($qd) use ($like) {
+                          $qd->where('nm_dokter', 'like', $like);
+                      })
+                      ->orWhereHas('regPeriksa.pasien', function ($qp) use ($like) {
+                          $qp->where('nm_pasien', 'like', $like)
+                            ->orWhere('no_rkm_medis', 'like', $like);
+                      });
+                });
+            }
+
+            $reseps = $query->orderByDesc('tgl_permintaan')
+                ->orderByDesc('jam')
+                ->paginate($this->perPage);
         }
 
         // Tab counts
@@ -128,6 +180,15 @@ class DaftarResepDokter extends Component
             $countRalanQuery->whereDate('tgl_peresepan', '<=', $this->sampai);
         }
         $countRalan = $countRalanQuery->count();
+
+        $countRanapQuery = \App\Models\PermintaanResepPulang::query();
+        if ($this->dari) {
+            $countRanapQuery->whereDate('tgl_permintaan', '>=', $this->dari);
+        }
+        if ($this->sampai) {
+            $countRanapQuery->whereDate('tgl_permintaan', '<=', $this->sampai);
+        }
+        $countRanap = $countRanapQuery->count();
 
         return view('livewire.modul.farmasi.daftar-resep-dokter', [
             'reseps'     => $reseps,
