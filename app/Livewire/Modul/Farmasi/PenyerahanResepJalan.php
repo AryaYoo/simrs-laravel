@@ -184,6 +184,14 @@ class PenyerahanResepJalan extends Component
                 ['foto'     => $dbPath]
             );
 
+            // Update tgl_penyerahan dan jam_penyerahan di resep_obat
+            DB::table('resep_obat')
+                ->where('no_resep', $this->no_resep)
+                ->update([
+                    'tgl_penyerahan' => now()->format('Y-m-d'),
+                    'jam_penyerahan' => now()->format('H:i:s'),
+                ]);
+
             session()->flash('swal', [
                 'title' => 'Berhasil!',
                 'text'  => 'Evidence penyerahan resep berhasil disimpan.',
