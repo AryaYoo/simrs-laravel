@@ -161,7 +161,22 @@ class PenyerahanResepJalan extends Component
             }
 
             $fullPath = rtrim($uploadDir, '/\\') . DIRECTORY_SEPARATOR . $filename;
-            file_put_contents($fullPath, $imageData);
+
+            // Kompresi server-side via PHP GD (quality 75)
+            // Client-side sudah dikompresi di canvas.toDataURL('image/jpeg', 0.75)
+            if (function_exists('imagecreatefromstring')) {
+                $gdImage = imagecreatefromstring($imageData);
+                if ($gdImage !== false) {
+                    imagejpeg($gdImage, $fullPath, 75);
+                    imagedestroy($gdImage);
+                } else {
+                    // Fallback: simpan binary langsung
+                    file_put_contents($fullPath, $imageData);
+                }
+            } else {
+                // GD tidak tersedia, simpan binary langsung
+                file_put_contents($fullPath, $imageData);
+            }
 
             // Insert / update tabel bukti_penyerahan_resep_obat
             DB::table('bukti_penyerahan_resep_obat')->updateOrInsert(

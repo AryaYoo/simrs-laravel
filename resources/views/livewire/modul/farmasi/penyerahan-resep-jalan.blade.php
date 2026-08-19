@@ -172,7 +172,7 @@
                 canvas.width  = video.videoWidth  || 640;
                 canvas.height = video.videoHeight || 480;
                 canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.75); // kompresi ~75%
                 this.capturedSrc = dataUrl;
                 // Kirim ke Livewire
                 $wire.setCapturedImage(dataUrl);
