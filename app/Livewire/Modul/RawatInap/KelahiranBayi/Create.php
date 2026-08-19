@@ -306,6 +306,17 @@ class Create extends Component
                 'mikonium' => $this->mikonium ?: '-',
             ]);
 
+            // Sync nm_ibu, alamat, jk, tgl_lahir, tgl_daftar & umur ke tabel pasien (record bayi) agar data induk sinkron
+            \App\Models\Pasien::where('no_rkm_medis', $this->no_rkm_medis)
+                ->update([
+                    'nm_ibu'     => $this->nm_ibu,
+                    'alamat'     => $this->alamat,
+                    'jk'         => $this->jk,
+                    'tgl_lahir'  => $this->tgl_lahir,
+                    'tgl_daftar' => $this->tgl_daftar,
+                    'umur'       => $this->umur,
+                ]);
+
             // Update last SKL number
             if (!empty($this->no_skl)) {
                 $parts = explode('/', $this->no_skl);
