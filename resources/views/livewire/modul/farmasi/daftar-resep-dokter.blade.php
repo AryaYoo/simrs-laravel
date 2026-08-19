@@ -119,6 +119,12 @@
                                             title="Validasi Data Obat, Alkes dan BHP Medis">
                                             <flux:icon name="check-badge" class="w-3.5 h-3.5" />
                                         </a>
+                                        <a href="{{ route('modul.farmasi.penyerahan-resep-jalan', ['no_resep' => $row->no_resep]) }}"
+                                            wire:navigate
+                                            class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-sky-500/10 hover:bg-sky-600 text-sky-600 hover:text-white transition-colors dark:bg-sky-500/20 dark:text-sky-400"
+                                            title="Penyerahan Resep Obat Rawat Jalan">
+                                            <flux:icon name="paper-airplane" class="w-3.5 h-3.5" />
+                                        </a>
                                     </div>
                                 </td>
 
