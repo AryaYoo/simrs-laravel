@@ -110,6 +110,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/farmasi/obat-alkes-bhp/{no_resep?}', \App\Livewire\Modul\Farmasi\ObatAlkesBhp::class)->name('modul.farmasi.obat-alkes-bhp')->where('no_resep', '.*');
     Route::get('modul/farmasi/no-resep', \App\Livewire\Modul\Farmasi\NoResep::class)->name('modul.farmasi.no-resep');
 
+    Route::get('modul/laboratorium', \App\Livewire\Modul\Laboratorium\Index::class)->name('modul.laboratorium.index');
+
 
     Route::get('modul/pasien', \App\Livewire\Modul\Pasien\Index::class)->name('modul.pasien.index');
     Route::get('modul/pasien/{no_rkm_medis}/edit', \App\Livewire\Modul\Pasien\Edit::class)->name('modul.pasien.edit')->where('no_rkm_medis', '.*');

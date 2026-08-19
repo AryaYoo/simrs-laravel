@@ -360,6 +360,18 @@
                         </div>
                     </div>
 
+                    {{-- Laboratorium (Standalone) --}}
+                    <a href="{{ route('modul.laboratorium.index') }}" wire:navigate
+                        class="flex items-center rounded-md text-sm font-medium transition-colors mb-1"
+                        :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                        style="color: white; text-decoration: none; background-color: {{ request()->routeIs('modul.laboratorium*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }};"
+                        onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                        onmouseout="this.style.backgroundColor='{{ request()->routeIs('modul.laboratorium*') ? 'rgba(255, 255, 255, 0.2)' : 'transparent' }}'"
+                        title="Laboratorium">
+                        <flux:icon name="beaker" class="w-4 h-4 flex-shrink-0" />
+                        <span x-show="sidebarOpen">Laboratorium</span>
+                    </a>
+
                     {{-- Casemix with Dropdown --}}
                     <div class="flex flex-col mb-1" :class="sidebarOpen ? 'w-full' : 'w-full items-center'">
                         <div class="flex items-center rounded-md text-sm font-medium transition-colors group"
@@ -783,6 +795,16 @@
                                 </a>
                             </div>
                         </div>
+
+                        {{-- Laboratorium (Standalone) --}}
+                        <a href="{{ route('modul.laboratorium.index') }}" wire:navigate @click="mobileMenuOpen=false"
+                            class="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            style="color:white; text-decoration:none; background-color:{{ request()->routeIs('modul.laboratorium*') ? 'rgba(255,255,255,0.2)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('modul.laboratorium*') ? 'rgba(255,255,255,0.2)' : 'transparent' }}'">
+                            <flux:icon name="beaker" class="w-4 h-4 flex-shrink-0" />
+                            <span>Laboratorium</span>
+                        </a>
 
                         {{-- Casemix --}}
                         <div x-data="{ open: {{ request()->is('modul/casemix*') ? 'true' : 'false' }} }">

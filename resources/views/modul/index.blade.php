@@ -5,6 +5,7 @@
         ['title' => 'Pasien','icon' => 'identification', 'route' => route('modul.pasien.index')],
         ['title' => 'Rawat Inap','icon' => 'home', 'route' => route('modul.rawat-inap.index')],
         ['title' => 'Rawat Jalan','icon' => 'calendar-days', 'route' => route('modul.rawat-jalan.index')],
+        ['title' => 'Laboratorium', 'icon' => 'beaker', 'route' => route('modul.laboratorium.index')],
     ];
     $casemixModules = [
         ['title' => 'Casemix Rawat Jalan', 'icon' => 'clipboard-document-check', 'route' => route('modul.casemix-rawat-jalan.index')],
