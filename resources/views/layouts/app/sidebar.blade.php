@@ -327,6 +327,13 @@
                                 <span>Penjualan Obat & BHP</span>
                             </a>
 
+                            <a href="{{ Route::has('modul.farmasi.penerimaan-obat-bhp') ? route('modul.farmasi.penerimaan-obat-bhp') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.penerimaan-obat-bhp*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.penerimaan-obat-bhp*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="inbox-arrow-down" class="w-3.5 h-3.5" />
+                                <span>Penerimaan Obat & BHP</span>
+                            </a>
+
 
                             @if(auth()->user()?->role === 'admin')
                             <a href="{{ Route::has('modul.farmasi.penyerahan-darah') ? route('modul.farmasi.penyerahan-darah') : '#' }}" wire:navigate
@@ -770,6 +777,11 @@
                                     class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
                                     style="color:{{ request()->routeIs('modul.farmasi.input-penjualan*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
                                     <flux:icon name="shopping-bag" class="w-3.5 h-3.5" /><span>Input Penjualan Obat & BHP</span>
+                                </a>
+                                <a href="{{ Route::has('modul.farmasi.penerimaan-obat-bhp') ? route('modul.farmasi.penerimaan-obat-bhp') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.penerimaan-obat-bhp*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="inbox-arrow-down" class="w-3.5 h-3.5" /><span>Penerimaan Obat & BHP</span>
                                 </a>
                                 @if(auth()->user()?->role === 'admin')
                                 <a href="{{ Route::has('modul.farmasi.penyerahan-darah') ? route('modul.farmasi.penyerahan-darah') : '#' }}" wire:navigate @click="mobileMenuOpen=false"

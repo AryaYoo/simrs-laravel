@@ -84,12 +84,13 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 
 
 ### 💊 Modul Farmasi
-- [x] **Sidebar Farmasi**: Dropdown navigasi Farmasi ditambahkan di bawah dropdown Rawat Inap pada sidebar (desktop & mobile), berisi sub-menu: Penjualan Obat & BHP, Data Penyerahan Darah, Daftar Resep Dokter, No. Resep, dan Semua Modul Farmasi.
+- [x] **Sidebar Farmasi**: Dropdown navigasi Farmasi ditambahkan di bawah dropdown Rawat Inap pada sidebar (desktop & mobile), berisi sub-menu: Penjualan Obat & BHP, Penerimaan Obat & BHP, Data Penyerahan Darah, Daftar Resep Dokter, No. Resep, dan Semua Modul Farmasi.
 
 - [x] **Penjualan Obat & BHP**: Halaman daftar transaksi penjualan obat dengan fitur:
   - Tabel paginated dengan kolom: Sub Menu Penjualan, No. Nota, Tanggal, Petugas, Pasien, Keterangan, Jenis Jual, PPN, Asal Stok, Ongkos Kirim, Akun Bayar, Status.
   - **Pencarian** berdasarkan Nama Pasien, No. RM, atau No. Nota.
   - **Filter** berdasarkan rentang tanggal (Dari–Sampai) dan Petugas.
+- [x] **Penerimaan Obat & BHP (`/modul/farmasi/penerimaan-obat-bhp`)**: Halaman modul penerimaan dan pengadaan obat/BHP medis dari supplier (tabel `pemesanan` & `detailpesan`).
 - [x] **Sub Menu Penjualan Obat & BHP**: Modal interaktif pada kolom action yang menyediakan 4 fitur utama per nota penjualan:
   - **Cetak Ulang Nota**: Membuka pratinjau cetak struk/nota fisik ber-kop resmi.
   - **Cetak Aturan Pakai**: Membuka lembar pencetakan etiket/aturan pakai obat per item.

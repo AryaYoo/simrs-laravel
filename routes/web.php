@@ -114,6 +114,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/farmasi/data-barang/create', \App\Livewire\Modul\Farmasi\CreateDataBarang::class)->name('modul.farmasi.data-barang.create');
     Route::get('modul/farmasi/data-barang/{kode_brng}/edit', \App\Livewire\Modul\Farmasi\EditDataBarang::class)->name('modul.farmasi.data-barang.edit')->where('kode_brng', '.*');
     Route::get('modul/farmasi/data-barang/{kode_brng}', \App\Livewire\Modul\Farmasi\DetailDataBarang::class)->name('modul.farmasi.data-barang.detail')->where('kode_brng', '.*');
+    Route::get('modul/farmasi/penerimaan-obat-bhp', \App\Livewire\Modul\Farmasi\PenerimaanObatBhp::class)->name('modul.farmasi.penerimaan-obat-bhp');
     Route::get('modul/farmasi/resep-pulang', \App\Livewire\Modul\Farmasi\ResepPulang::class)->name('modul.farmasi.resep-pulang');
     Route::get('modul/farmasi/resep-pulang/cetak-aturan-pakai', [\App\Http\Controllers\Farmasi\CetakResepPulangController::class, 'cetakAturanPakai'])->name('modul.farmasi.resep-pulang.cetak-aturan-pakai');
     Route::get('modul/farmasi/stock-opname', \App\Livewire\Modul\Farmasi\StockOpname::class)->name('modul.farmasi.stock-opname');
