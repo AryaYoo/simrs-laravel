@@ -97,10 +97,9 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
   - **Hapus Penjualan**: Menghapus data transaksi (header & detail) secara permanen dari database dengan konfirmasi SweetAlert.
 - [x] **Daftar Resep Dokter**: Halaman pengelolaan resep obat dokter dengan 2 Tab (Rawat Jalan & Rawat Inap):
   - **Tab Rawat Jalan**: Menampilkan tabel compact 11 kolom (`Action`, `No. Resep`, `Tgl Peresepan`, `No. Rawat`, `No. RM & Nama Pasien`, `Dokter`, `Status`, `Poli`, `Jenis Bayar`, `Tgl & Jam Validasi`, `Penyerahan & Jam Penyerahan`).
-  - **Tab Rawat Inap**: Placeholder state untuk pengembangan resep rawat inap.
+  - **Tab Rawat Inap (Permintaan Resep Pulang)**: Menampilkan tabel daftar permintaan resep obat pulang pasien rawat inap (`permintaan_resep_pulang` & `detail_permintaan_resep_pulang`) dengan filter tanggal, pencarian, status pelayanan, dan modal rincian item obat.
   - **Search & Filter**: Pencarian cepat multi-kolom (No. Resep, No. Rawat, RM, Pasien, Dokter DPJP, Poli) dan filter rentang tanggal.
   - **Detail Resep Modal**: Popup interaktif yang menampilkan rincian item obat peresepan dokter beserta jumlah dan aturan pakai.
-- [x] **Permintaan Resep Pulang (`/modul/farmasi/permintaan-resep-pulang`)**: Akses langsung ke daftar permintaan resep obat pulang pasien rawat inap (`permintaan_resep_pulang` & `detail_permintaan_resep_pulang`) dengan filter tanggal, pencarian, status pelayanan, dan modal rincian obat.
 - [x] **Repository Pattern Farmasi**: `PenjualanRepository`, `OpnameRepository`, `ResepPulangRepository`, dan `DataBarangRepository` mengelola seluruh query bisnis farmasi secara terpisah dari layer UI Livewire.
 - [x] **Model Farmasi**: `ResepObat`, `ResepDokter`, `KodeSatuan`, `Opname`, `GudangBarang`, `Jenis`, `KategoriBarang`, `GolonganBarang`, `ResepPulang`, `IndustriFarmasi`, relasi `DataBarang`.
 - [x] **Data Obat, Alkes & BHP**: Modul master data obat, alat kesehatan, dan bahan medis habis pakai (tabel `databarang`):
