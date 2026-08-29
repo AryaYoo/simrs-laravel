@@ -3,6 +3,7 @@
     $farmasiModules = [
         ['title' => 'Penjualan Obat & BHP', 'icon' => 'shopping-bag', 'route' => route('modul.farmasi.input-penjualan')],
         ['title' => 'Daftar Resep Dokter', 'icon' => 'clipboard-document-list', 'route' => route('modul.farmasi.daftar-resep-dokter')],
+        ['title' => 'Permintaan Resep Pulang', 'icon' => 'document-arrow-down', 'route' => route('modul.farmasi.permintaan-resep-pulang')],
         ['title' => 'Resep Pulang', 'icon' => 'arrow-right-start-on-rectangle', 'route' => route('modul.farmasi.resep-pulang')],
         ['title' => 'Obat, Alkes & BHP', 'icon' => 'beaker', 'route' => route('modul.farmasi.data-barang')],
         ['title' => 'No. Resep', 'icon' => 'hashtag', 'route' => route('modul.farmasi.no-resep')],

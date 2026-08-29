@@ -13,6 +13,7 @@ class DaftarResepDokter extends Component
 {
     use WithPagination;
 
+    #[Url(history: true, as: 'tab')]
     public string $activeTab = 'ralan'; // 'ralan' or 'ranap'
 
     #[Url(history: true)]
@@ -33,6 +34,9 @@ class DaftarResepDokter extends Component
 
     public function mount(): void
     {
+        if (request()->routeIs('modul.farmasi.permintaan-resep-pulang') || request()->query('tab') === 'ranap') {
+            $this->activeTab = 'ranap';
+        }
         if (! $this->dari) {
             $this->dari = now()->format('Y-m-d');
         }
