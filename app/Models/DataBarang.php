@@ -40,4 +40,24 @@ class DataBarang extends Model
         'kode_kategori',
         'kode_golongan',
     ];
+
+    public function satuanKecil()
+    {
+        return $this->belongsTo(KodeSatuan::class, 'kode_sat', 'kode_sat');
+    }
+
+    public function jenis()
+    {
+        return $this->belongsTo(Jenis::class, 'kdjns', 'kdjns');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(KategoriBarang::class, 'kode_kategori', 'kode');
+    }
+
+    public function golongan()
+    {
+        return $this->belongsTo(GolonganBarang::class, 'kode_golongan', 'kode');
+    }
 }

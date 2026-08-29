@@ -100,8 +100,13 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
   - **Tab Rawat Inap**: Placeholder state untuk pengembangan resep rawat inap.
   - **Search & Filter**: Pencarian cepat multi-kolom (No. Resep, No. Rawat, RM, Pasien, Dokter DPJP, Poli) dan filter rentang tanggal.
   - **Detail Resep Modal**: Popup interaktif yang menampilkan rincian item obat peresepan dokter beserta jumlah dan aturan pakai.
-- [x] **Repository Pattern Farmasi**: `PenjualanRepository` mengelola query `getList()`, `getDetail()`, `savePenjualan()`, `deletePenjualan()`, dan `verifikasiPenjualan()`.
-- [x] **Model Farmasi**: `ResepObat`, `ResepDokter`, `KodeSatuan` (tabel `kodesatuan`), relasi `DetailJual` → `KodeSatuan` & `DataBarang`.
+- [x] **Repository Pattern Farmasi**: `PenjualanRepository` dan `OpnameRepository` mengelola seluruh query bisnis farmasi secara terpisah dari layer UI Livewire.
+- [x] **Model Farmasi**: `ResepObat`, `ResepDokter`, `KodeSatuan`, `Opname`, `GudangBarang`, `Jenis`, `KategoriBarang`, `GolonganBarang`, relasi `DataBarang`.
+- [x] **Stock Opname**: Modul manajemen dan pencatatan penyesuaian stok opname obat & BHP:
+  - **Daftar Stock Opname**: Tabel data compact 17 kolom (`Action`, `Kode Barang`, `Nama Barang`, `Harga Beli`, `Satuan`, `Tanggal`, `Stok`, `Real`, `Selisih`, `Lebih`, `Total Real`, `Nominal Hilang`, `Nominal Lebih`, `Keterangan`, `Nama Lokasi`, `No. Batch`, `No. Faktur`).
+  - **Pencarian & Filter Lanjutan**: Filter rentang tanggal, Lokasi (Bangsal), Jenis, Kategori, Golongan, pencarian teks, serta tombol Reset Filter.
+  - **Summary Info Bar**: Ringkasan akumulasi data dinamis (Record, Real, Hilang, Lebih).
+  - **Input Stok Opname**: Formulir opname interaktif dengan modal pop-up lokasi, auto-load stok per bangsal, kalkulasi selisih/lebih/nominal instan (Alpine.js), dan sinkronisasi otomatis ke `opname`, `gudangbarang`, serta kartu stok `riwayat_barang_medis`.
 
 
 

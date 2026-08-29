@@ -98,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/casemix/kustom-laporan-operasi/{no_rawat}/{tanggal?}/detail', \App\Livewire\Modul\Casemix\KustomLaporanOperasiDetail::class)->name('modul.casemix.kustom-laporan-operasi.detail')->where(['no_rawat' => '[^/]+', 'tanggal' => '.*']);
 
     // Farmasi Routes
+    Route::view('modul/farmasi', 'modul.farmasi.index')->name('modul.farmasi.index');
     Route::get('modul/farmasi/input-penjualan', \App\Livewire\Modul\Farmasi\InputPenjualan::class)->name('modul.farmasi.input-penjualan');
     Route::get('modul/farmasi/penjualan/create', \App\Livewire\Modul\Farmasi\CreatePenjualan::class)->name('modul.farmasi.create-penjualan');
     Route::get('modul/farmasi/penjualan/{nota_jual}/cetak-nota', [\App\Http\Controllers\Farmasi\CetakPenjualanController::class, 'cetakNota'])->name('modul.farmasi.penjualan.cetak-nota')->where('nota_jual', '[^/]+');
@@ -109,6 +110,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/farmasi/penyerahan-resep-jalan/{no_resep?}', \App\Livewire\Modul\Farmasi\PenyerahanResepJalan::class)->name('modul.farmasi.penyerahan-resep-jalan')->where('no_resep', '.*');
     Route::get('modul/farmasi/obat-alkes-bhp/{no_resep?}', \App\Livewire\Modul\Farmasi\ObatAlkesBhp::class)->name('modul.farmasi.obat-alkes-bhp')->where('no_resep', '.*');
     Route::get('modul/farmasi/no-resep', \App\Livewire\Modul\Farmasi\NoResep::class)->name('modul.farmasi.no-resep');
+    Route::get('modul/farmasi/stock-opname', \App\Livewire\Modul\Farmasi\StockOpname::class)->name('modul.farmasi.stock-opname');
+    Route::get('modul/farmasi/stock-opname/create', \App\Livewire\Modul\Farmasi\InputStockOpname::class)->name('modul.farmasi.input-stock-opname');
 
     Route::get('modul/laboratorium', \App\Livewire\Modul\Laboratorium\Index::class)->name('modul.laboratorium.index');
 
