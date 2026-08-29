@@ -41,6 +41,11 @@ class DataBarang extends Model
         'kode_golongan',
     ];
 
+    public function satuanBesar()
+    {
+        return $this->belongsTo(KodeSatuan::class, 'kode_satbesar', 'kode_sat');
+    }
+
     public function satuanKecil()
     {
         return $this->belongsTo(KodeSatuan::class, 'kode_sat', 'kode_sat');
@@ -59,5 +64,10 @@ class DataBarang extends Model
     public function golongan()
     {
         return $this->belongsTo(GolonganBarang::class, 'kode_golongan', 'kode');
+    }
+
+    public function industri()
+    {
+        return $this->belongsTo(IndustriFarmasi::class, 'kode_industri', 'kode_industri');
     }
 }

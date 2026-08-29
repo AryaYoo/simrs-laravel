@@ -1,15 +1,22 @@
 <div class="flex flex-col gap-6 pb-8">
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between flex-wrap gap-3">
-        <div>
-            <nav class="text-xs text-neutral-400 mb-0.5">
-                <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
-                <span class="mx-1">/</span>
-                <a href="{{ route('modul.farmasi.index') }}" wire:navigate class="hover:underline">Farmasi</a>
-                <span class="mx-1">/</span>
-                <span>Stock Opname</span>
-            </nav>
-            <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Stock Opname</h1>
+        <div class="flex items-center gap-3">
+            <button type="button" onclick="history.length > 1 ? history.back() : window.location.href = '{{ route('modul.farmasi.index') }}'"
+                class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm"
+                title="Kembali">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
+            </button>
+            <div>
+                <nav class="text-xs text-neutral-400 mb-0.5">
+                    <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
+                    <span class="mx-1">/</span>
+                    <a href="{{ route('modul.farmasi.index') }}" wire:navigate class="hover:underline">Farmasi</a>
+                    <span class="mx-1">/</span>
+                    <span>Stock Opname</span>
+                </nav>
+                <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Stock Opname</h1>
+            </div>
         </div>
 
         {{-- Tombol Input Stok Opname --}}

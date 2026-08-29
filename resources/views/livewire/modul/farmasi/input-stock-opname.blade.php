@@ -23,10 +23,10 @@ x-on:swal:error.window="
     {{-- Header / Breadcrumb --}}
     <div class="flex items-center justify-between flex-wrap gap-3">
         <div class="flex items-center gap-3">
-            <button type="button" onclick="history.back()"
-                class="flex items-center justify-center w-9 h-9 rounded-lg bg-[#4C5C2D] text-white hover:bg-[#3d4b24] transition-colors shadow-sm"
+            <button type="button" onclick="history.length > 1 ? history.back() : window.location.href = '{{ route('modul.farmasi.stock-opname') }}'"
+                class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm"
                 title="Kembali">
-                <flux:icon name="chevron-left" class="w-5 h-5" />
+                <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
             </button>
             <div>
                 <nav class="text-xs text-neutral-400 mb-0.5">
@@ -46,12 +46,6 @@ x-on:swal:error.window="
 
         {{-- Action Buttons --}}
         <div class="flex items-center gap-2">
-            <button type="button" onclick="history.back()"
-                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700/50 shadow-sm transition-colors">
-                <flux:icon name="arrow-left" class="w-4 h-4" />
-                Kembali
-            </button>
-
             @if($kd_bangsal)
                 <button type="button" wire:click="save"
                     wire:loading.attr="disabled"

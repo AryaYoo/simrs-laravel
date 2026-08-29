@@ -100,8 +100,18 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
   - **Tab Rawat Inap**: Placeholder state untuk pengembangan resep rawat inap.
   - **Search & Filter**: Pencarian cepat multi-kolom (No. Resep, No. Rawat, RM, Pasien, Dokter DPJP, Poli) dan filter rentang tanggal.
   - **Detail Resep Modal**: Popup interaktif yang menampilkan rincian item obat peresepan dokter beserta jumlah dan aturan pakai.
-- [x] **Repository Pattern Farmasi**: `PenjualanRepository` dan `OpnameRepository` mengelola seluruh query bisnis farmasi secara terpisah dari layer UI Livewire.
-- [x] **Model Farmasi**: `ResepObat`, `ResepDokter`, `KodeSatuan`, `Opname`, `GudangBarang`, `Jenis`, `KategoriBarang`, `GolonganBarang`, relasi `DataBarang`.
+- [x] **Repository Pattern Farmasi**: `PenjualanRepository`, `OpnameRepository`, `ResepPulangRepository`, dan `DataBarangRepository` mengelola seluruh query bisnis farmasi secara terpisah dari layer UI Livewire.
+- [x] **Model Farmasi**: `ResepObat`, `ResepDokter`, `KodeSatuan`, `Opname`, `GudangBarang`, `Jenis`, `KategoriBarang`, `GolonganBarang`, `ResepPulang`, `IndustriFarmasi`, relasi `DataBarang`.
+- [x] **Data Obat, Alkes & BHP**: Modul master data obat, alat kesehatan, dan bahan medis habis pakai (tabel `databarang`):
+  - **Tabel Data Compact**: Menampilkan kolom Action (Detail, Edit, Hapus), Nama Barang & Kode, Kategori & Golongan, Industri Farmasi, Satuan Besar, Satuan Kecil, Kapasitas, Kadaluarsa (indikator merah jika lewat tempo), dan Kandungan.
+  - **Pencarian & Multi-Filter**: Filter Jenis, Kategori, Golongan, Status (Aktif/Non-Aktif), dan Reset Filter instan.
+  - **Halaman Tambah Barang (`/modul/farmasi/data-barang/create`)**: Formulir penambahan master barang baru dengan alur vertikal lapang 4-seksi, navigasi sekuensial enter, auto-generate kode barang (`generateNextKode`), struktur tarif komprehensif, dan sticky header action.
+  - **Halaman Edit Barang (`/modul/farmasi/data-barang/{kode_brng}/edit`)**: Formulir perubahan data master obat/BHP dengan proteksi kunci primer (`kode_brng` readonly), alur sekuensial enter, dan pembaruan instan ke database.
+  - **Halaman Detail Data Barang (`/modul/farmasi/data-barang/{kode_brng}`)**: Halaman spesifikasi komprehensif susunan vertikal 4-domain yang menyajikan Kode Barang, I.F., Nama Barang, Kandungan, Satuan Besar & Isi, Satuan Kecil & Kapasitas, Jenis, Kategori, Golongan, Harga Dasar, Harga Beli, Harga Ralan, serta matriks lengkap 8 tingkat tarif rawat inap (Kelas 1, Kelas 2, Kelas 3, Utama/BPJS, VIP, VVIP, Apotek Luar, Obat Bebas, Karyawan), Stok Minimal, dan Tanggal Kadaluwarsa.
+- [x] **Resep Pulang**: Modul pengelolaan daftar resep obat pulang pasien rawat inap/jalan:
+  - **Tabel Data Compact**: Menampilkan kolom Action (Hapus via SweetAlert & Cetak Aturan Pakai), Pasien / No. Rawat / No. RM, Nama Obat & Kode, Tanggal & Jam, Jumlah + Satuan, Harga, Total, Dosis/Aturan Pakai, No. Batch, dan No. Faktur.
+  - **Pencarian & Filter**: Pencarian multi-kolom (Pasien, RM, No. Rawat, Obat, Dosis) dan filter rentang tanggal.
+  - **Cetak Etiket / Aturan Pakai**: Cetak lembar etiket aturan pakai obat resep pulang dengan header instansi resmi dan format cetak langsung (`window.print()`).
 - [x] **Stock Opname**: Modul manajemen dan pencatatan penyesuaian stok opname obat & BHP:
   - **Daftar Stock Opname**: Tabel data compact 17 kolom (`Action`, `Kode Barang`, `Nama Barang`, `Harga Beli`, `Satuan`, `Tanggal`, `Stok`, `Real`, `Selisih`, `Lebih`, `Total Real`, `Nominal Hilang`, `Nominal Lebih`, `Keterangan`, `Nama Lokasi`, `No. Batch`, `No. Faktur`).
   - **Pencarian & Filter Lanjutan**: Filter rentang tanggal, Lokasi (Bangsal), Jenis, Kategori, Golongan, pencarian teks, serta tombol Reset Filter.

@@ -110,6 +110,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/farmasi/penyerahan-resep-jalan/{no_resep?}', \App\Livewire\Modul\Farmasi\PenyerahanResepJalan::class)->name('modul.farmasi.penyerahan-resep-jalan')->where('no_resep', '.*');
     Route::get('modul/farmasi/obat-alkes-bhp/{no_resep?}', \App\Livewire\Modul\Farmasi\ObatAlkesBhp::class)->name('modul.farmasi.obat-alkes-bhp')->where('no_resep', '.*');
     Route::get('modul/farmasi/no-resep', \App\Livewire\Modul\Farmasi\NoResep::class)->name('modul.farmasi.no-resep');
+    Route::get('modul/farmasi/data-barang', \App\Livewire\Modul\Farmasi\DataBarang::class)->name('modul.farmasi.data-barang');
+    Route::get('modul/farmasi/data-barang/create', \App\Livewire\Modul\Farmasi\CreateDataBarang::class)->name('modul.farmasi.data-barang.create');
+    Route::get('modul/farmasi/data-barang/{kode_brng}/edit', \App\Livewire\Modul\Farmasi\EditDataBarang::class)->name('modul.farmasi.data-barang.edit')->where('kode_brng', '.*');
+    Route::get('modul/farmasi/data-barang/{kode_brng}', \App\Livewire\Modul\Farmasi\DetailDataBarang::class)->name('modul.farmasi.data-barang.detail')->where('kode_brng', '.*');
+    Route::get('modul/farmasi/resep-pulang', \App\Livewire\Modul\Farmasi\ResepPulang::class)->name('modul.farmasi.resep-pulang');
+    Route::get('modul/farmasi/resep-pulang/cetak-aturan-pakai', [\App\Http\Controllers\Farmasi\CetakResepPulangController::class, 'cetakAturanPakai'])->name('modul.farmasi.resep-pulang.cetak-aturan-pakai');
     Route::get('modul/farmasi/stock-opname', \App\Livewire\Modul\Farmasi\StockOpname::class)->name('modul.farmasi.stock-opname');
     Route::get('modul/farmasi/stock-opname/create', \App\Livewire\Modul\Farmasi\InputStockOpname::class)->name('modul.farmasi.input-stock-opname');
 
