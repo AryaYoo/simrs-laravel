@@ -79,9 +79,11 @@ class Create extends Component
     public string $searchPenolong = '';
     public array $penolongList = [];
     
-    // Search Ibu
+    // Search & Modal Ibu
     public string $searchIbu = '';
     public array $ibuList = [];
+    public bool $showIbuModal = false;
+    public string $ibu_pekerjaan = ''; // Pekerjaan ibu dari record pasien, untuk preview
 
     public function mount()
     {
@@ -185,6 +187,20 @@ class Create extends Component
         $this->penolongList = [];
     }
 
+    public function openIbuModal(): void
+    {
+        $this->searchIbu = '';
+        $this->ibuList = [];
+        $this->showIbuModal = true;
+    }
+
+    public function closeIbuModal(): void
+    {
+        $this->searchIbu = '';
+        $this->ibuList = [];
+        $this->showIbuModal = false;
+    }
+
     public function updatedSearchIbu()
     {
         if (strlen($this->searchIbu) >= 3) {
@@ -194,7 +210,7 @@ class Create extends Component
                     $q->where('no_rkm_medis', 'like', "%{$this->searchIbu}%")
                       ->orWhere('nm_pasien', 'like', "%{$this->searchIbu}%");
                 })
-                ->limit(5)
+                ->limit(10)
                 ->get()
                 ->toArray();
         } else {
@@ -207,12 +223,14 @@ class Create extends Component
         $ibu = \App\Models\Pasien::find($noRkmMedis);
         if ($ibu) {
             $this->no_rkm_medis_ibu = $ibu->no_rkm_medis; // Simpan No. RM ibu untuk lookup akurat saat cetak SKL
-            $this->nm_ibu = $ibu->nm_pasien;
-            $this->umur_ibu = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
-            $this->alamat = $ibu->alamat;
+            $this->nm_ibu           = $ibu->nm_pasien;
+            $this->umur_ibu         = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
+            $this->alamat           = $ibu->alamat;
+            $this->ibu_pekerjaan    = $ibu->pekerjaan ?? '-'; // Untuk preview di form
         }
         $this->searchIbu = '';
         $this->ibuList = [];
+        $this->showIbuModal = false;
     }
 
     public function save()

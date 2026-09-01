@@ -102,44 +102,50 @@
                 {{-- Ibu & Ayah --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- Ibu --}}
-                    <div class="space-y-4 bg-neutral-50/50 dark:bg-neutral-900/10 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                    <div class="space-y-3 bg-neutral-50/50 dark:bg-neutral-900/10 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xs font-bold text-[#4C5C2D] uppercase tracking-wider">Informasi Ibu</h3>
-                            <div x-data="{ openSearch: false }" class="relative">
-                                <flux:button size="xs" variant="ghost" icon="link" class="h-6 text-[10px] px-2 text-[#4C5C2D] bg-[#4C5C2D]/10 hover:bg-[#4C5C2D]/20" @click="openSearch = !openSearch">
-                                    Attach Pasien
-                                </flux:button>
-                                
-                                <div x-show="openSearch" @click.away="openSearch = false" x-cloak
-                                     class="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 p-2">
-                                    <flux:input wire:model.live.debounce.300ms="searchIbu" placeholder="Cari No. RM / Nama Ibu..." icon="magnifying-glass" class="mb-2" />
-                                    
-                                    @if(!empty($ibuList))
-                                        <div class="max-h-48 overflow-y-auto rounded-lg border border-neutral-100 dark:border-neutral-700">
-                                            @foreach($ibuList as $ibu)
-                                                <button type="button" @click="openSearch = false; $wire.selectIbu('{{ $ibu['no_rkm_medis'] }}')"
-                                                    class="w-full text-left px-3 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b last:border-0 border-neutral-100">
-                                                    <p class="text-xs font-bold text-neutral-800 dark:text-neutral-200">{{ $ibu['nm_pasien'] }}</p>
-                                                    <p class="text-[10px] text-neutral-500">RM: {{ $ibu['no_rkm_medis'] }} | Usia: {{ $ibu['umur'] }}</p>
-                                                </button>
-                                            @endforeach
-                                        </div>
-                                    @elseif(strlen($searchIbu) >= 3)
-                                        <div class="p-3 text-center text-xs text-neutral-500">Data pasien tidak ditemukan.</div>
-                                    @endif
+                            <flux:button wire:click="openIbuModal" size="xs" variant="ghost" icon="link" class="h-6 text-[10px] px-2 text-[#4C5C2D] bg-[#4C5C2D]/10 hover:bg-[#4C5C2D]/20">
+                                {{ empty($no_rkm_medis_ibu) ? 'Attach Pasien' : 'Ganti' }}
+                            </flux:button>
+                        </div>
+
+                        @if(empty($no_rkm_medis_ibu))
+                            {{-- Empty state --}}
+                            <div class="border border-dashed border-[#4C5C2D]/30 rounded-xl p-5 flex flex-col items-center justify-center text-center gap-1.5 min-h-[90px]">
+                                <flux:icon name="user-circle" class="w-6 h-6 text-[#4C5C2D]/40" />
+                                <p class="text-xs font-semibold text-[#4C5C2D]/60">Belum ada ibu yang di-attach</p>
+                                <p class="text-[10px] text-neutral-400">Klik tombol <strong>Attach Pasien</strong> untuk memilih dari daftar pasien</p>
+                            </div>
+                            @error('umur_ibu') <span class="text-[10px] text-red-500 font-medium">{{ $message }}</span> @enderror
+                        @else
+                            {{-- Preview card read-only --}}
+                            <div class="bg-white dark:bg-neutral-800 border border-[#4C5C2D]/20 rounded-xl p-3.5 space-y-2.5">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-9 h-9 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <flux:icon name="user" class="w-5 h-5 text-[#4C5C2D]" />
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-neutral-800 dark:text-neutral-100 uppercase">{{ $nm_ibu }}</p>
+                                        <p class="text-[10px] font-mono text-[#4C5C2D] font-semibold mt-0.5">No. RM: {{ $no_rkm_medis_ibu }}</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-1 border-t border-neutral-100 dark:border-neutral-700">
+                                    <div>
+                                        <p class="text-[9px] text-neutral-400 uppercase tracking-wider font-bold">Umur</p>
+                                        <p class="text-xs text-neutral-700 dark:text-neutral-300">{{ $umur_ibu ? $umur_ibu . ' Tahun' : '-' }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[9px] text-neutral-400 uppercase tracking-wider font-bold">Pekerjaan</p>
+                                        <p class="text-xs text-neutral-700 dark:text-neutral-300">{{ $ibu_pekerjaan ?: '-' }}</p>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <p class="text-[9px] text-neutral-400 uppercase tracking-wider font-bold">Alamat</p>
+                                        <p class="text-xs text-neutral-700 dark:text-neutral-300">{{ $alamat ?: '-' }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="col-span-2">
-                                <flux:input label="Ibu Bayi" wire:model="nm_ibu" placeholder="Nama Ibu Kandung" />
-                            </div>
-                            <div>
-                                <flux:input label="Umur Ibu" wire:model="umur_ibu" placeholder="Contoh: 33" />
-                                @error('umur_ibu') <span class="text-[10px] text-red-500 font-medium">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                        <flux:input label="Alamat Ibu" wire:model="alamat" placeholder="Alamat lengkap Ibu Kandung" />
+                        @endif
                     </div>
 
                     {{-- Ayah --}}
@@ -566,5 +572,99 @@
                 <flux:icon name="heart" class="w-5 h-5" />
             </button>
         </div>
+    </div>    {{-- ============================================================
+         MODAL FULL-SCREEN: Pilih Pasien Ibu
+    ============================================================ --}}
+    @if($showIbuModal)
+    <div class="fixed inset-0 z-50 flex flex-col bg-white dark:bg-neutral-900"
+         x-data x-trap.noscroll="true">
+
+        {{-- Modal Header --}}
+        <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-[#4C5C2D]/10 flex items-center justify-center">
+                    <flux:icon name="users" class="w-4 h-4 text-[#4C5C2D]" />
+                </div>
+                <div>
+                    <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-100">Pilih Pasien Ibu</h2>
+                    <p class="text-[10px] text-neutral-500">Cari berdasarkan No. RM atau Nama — hanya menampilkan pasien perempuan (jk = P)</p>
+                </div>
+            </div>
+            <button wire:click="closeIbuModal" class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-700 transition-colors">
+                <flux:icon name="x-mark" class="w-5 h-5" />
+            </button>
+        </div>
+
+        {{-- Search Bar --}}
+        <div class="px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/50 flex-shrink-0">
+            <flux:input wire:model.live.debounce.300ms="searchIbu"
+                        placeholder="Ketik minimal 3 karakter untuk mencari (No. RM atau Nama)..."
+                        icon="magnifying-glass"
+                        autofocus />
+        </div>
+
+        {{-- Patient List --}}
+        <div class="flex-1 overflow-y-auto px-6 py-4">
+            @if(strlen($searchIbu) < 3)
+                <div class="flex flex-col items-center justify-center py-20 text-center text-neutral-400 gap-3">
+                    <flux:icon name="magnifying-glass" class="w-10 h-10 opacity-30" />
+                    <p class="text-sm font-medium">Mulai mengetik untuk mencari pasien</p>
+                    <p class="text-xs">Minimal 3 karakter</p>
+                </div>
+            @elseif(empty($ibuList))
+                <div class="flex flex-col items-center justify-center py-20 text-center text-neutral-400 gap-3">
+                    <flux:icon name="user-slash" class="w-10 h-10 opacity-30" />
+                    <p class="text-sm font-medium">Pasien tidak ditemukan</p>
+                    <p class="text-xs">Coba kata kunci lain</p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    @foreach($ibuList as $ibu)
+                        <div class="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 flex flex-col gap-3 hover:border-[#4C5C2D]/40 hover:shadow-md transition-all">
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 rounded-full bg-[#4C5C2D]/10 flex items-center justify-center flex-shrink-0">
+                                    <flux:icon name="user" class="w-5 h-5 text-[#4C5C2D]" />
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-neutral-800 dark:text-neutral-100 uppercase truncate">{{ $ibu['nm_pasien'] }}</p>
+                                    <p class="text-[10px] font-mono text-[#4C5C2D] font-semibold">No. RM: {{ $ibu['no_rkm_medis'] }}</p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px] border-t border-neutral-100 dark:border-neutral-700 pt-2">
+                                <div>
+                                    <span class="text-neutral-400 uppercase font-bold">Umur</span>
+                                    <p class="text-neutral-700 dark:text-neutral-300 truncate">{{ $ibu['umur'] ?: '-' }}</p>
+                                </div>
+                                <div>
+                                    <span class="text-neutral-400 uppercase font-bold">Pekerjaan</span>
+                                    <p class="text-neutral-700 dark:text-neutral-300 truncate">{{ $ibu['pekerjaan'] ?: '-' }}</p>
+                                </div>
+                                <div class="col-span-2">
+                                    <span class="text-neutral-400 uppercase font-bold">Alamat</span>
+                                    <p class="text-neutral-700 dark:text-neutral-300 line-clamp-2">{{ $ibu['alamat'] ?: '-' }}</p>
+                                </div>
+                            </div>
+                            <button wire:click="selectIbu('{{ $ibu['no_rkm_medis'] }}')"
+                                    class="w-full mt-auto py-2 px-3 bg-[#4C5C2D] hover:bg-[#3D4A24] text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                                <flux:icon name="check" class="w-3.5 h-3.5" />
+                                Pilih Pasien Ini
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
+        {{-- Modal Footer --}}
+        <div class="flex items-center justify-between px-6 py-3 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 flex-shrink-0">
+            <p class="text-[10px] text-neutral-400">
+                @if(!empty($ibuList))
+                    Menampilkan {{ count($ibuList) }} data pasien
+                @endif
+            </p>
+            <flux:button wire:click="closeIbuModal" variant="ghost" size="sm">Batal</flux:button>
+        </div>
     </div>
+    @endif
+
 </div>

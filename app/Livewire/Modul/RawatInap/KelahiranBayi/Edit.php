@@ -80,8 +80,11 @@ class Edit extends Component
     public array $penolongList = [];
 
     // Search Ibu
+    // Search & Modal Ibu
     public string $searchIbu = '';
     public array $ibuList = [];
+    public bool $showIbuModal = false;
+    public string $ibu_pekerjaan = ''; // Pekerjaan ibu dari record pasien, untuk preview
 
     public function mount($no_rkm_medis)
     {
@@ -128,6 +131,12 @@ class Edit extends Component
         $this->keterangan = $bayi->keterangan;
         $this->no_skl = $bayi->no_skl ?? '';
         $this->no_rkm_medis_ibu = $bayi->no_rkm_medis_ibu ?? ''; // Load No. RM ibu untuk referensi akurat
+
+        // Load preview pekerjaan ibu jika no_rkm_medis_ibu tersedia
+        if (!empty($bayi->no_rkm_medis_ibu)) {
+            $ibuRecord = \App\Models\Pasien::find($bayi->no_rkm_medis_ibu);
+            $this->ibu_pekerjaan = $ibuRecord?->pekerjaan ?? '-';
+        }
 
         $this->f1 = $bayi->f1 ?: '0';
         $this->u1 = $bayi->u1 ?: '0';
@@ -211,6 +220,20 @@ class Edit extends Component
         $this->penolongList = [];
     }
 
+    public function openIbuModal(): void
+    {
+        $this->searchIbu = '';
+        $this->ibuList = [];
+        $this->showIbuModal = true;
+    }
+
+    public function closeIbuModal(): void
+    {
+        $this->searchIbu = '';
+        $this->ibuList = [];
+        $this->showIbuModal = false;
+    }
+
     public function updatedSearchIbu()
     {
         if (strlen($this->searchIbu) >= 3) {
@@ -220,7 +243,7 @@ class Edit extends Component
                     $q->where('no_rkm_medis', 'like', "%{$this->searchIbu}%")
                       ->orWhere('nm_pasien', 'like', "%{$this->searchIbu}%");
                 })
-                ->limit(5)
+                ->limit(10)
                 ->get()
                 ->toArray();
         } else {
@@ -233,12 +256,14 @@ class Edit extends Component
         $ibu = \App\Models\Pasien::find($noRkmMedis);
         if ($ibu) {
             $this->no_rkm_medis_ibu = $ibu->no_rkm_medis; // Simpan No. RM ibu untuk lookup akurat saat cetak SKL
-            $this->nm_ibu = $ibu->nm_pasien;
-            $this->umur_ibu = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
-            $this->alamat = $ibu->alamat;
+            $this->nm_ibu           = $ibu->nm_pasien;
+            $this->umur_ibu         = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
+            $this->alamat           = $ibu->alamat;
+            $this->ibu_pekerjaan    = $ibu->pekerjaan ?? '-'; // Untuk preview di form
         }
         $this->searchIbu = '';
         $this->ibuList = [];
+        $this->showIbuModal = false;
     }
 
     public function save()
