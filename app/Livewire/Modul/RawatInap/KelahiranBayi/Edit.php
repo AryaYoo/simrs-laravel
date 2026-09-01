@@ -85,6 +85,7 @@ class Edit extends Component
     public array $ibuList = [];
     public bool $showIbuModal = false;
     public string $ibu_pekerjaan = ''; // Pekerjaan ibu dari record pasien, untuk preview
+    public string $ibu_umur_display = ''; // Format umur asli dari pasien (misal: 20 Th 8 Bl 17 Hr)
 
     public function mount($no_rkm_medis)
     {
@@ -135,7 +136,8 @@ class Edit extends Component
         // Load preview pekerjaan ibu jika no_rkm_medis_ibu tersedia
         if (!empty($bayi->no_rkm_medis_ibu)) {
             $ibuRecord = \App\Models\Pasien::find($bayi->no_rkm_medis_ibu);
-            $this->ibu_pekerjaan = $ibuRecord?->pekerjaan ?? '-';
+            $this->ibu_pekerjaan    = $ibuRecord?->pekerjaan ?? '-';
+            $this->ibu_umur_display = $ibuRecord?->umur ?? '';
         }
 
         $this->f1 = $bayi->f1 ?: '0';
@@ -260,6 +262,7 @@ class Edit extends Component
             $this->umur_ibu         = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
             $this->alamat           = $ibu->alamat;
             $this->ibu_pekerjaan    = $ibu->pekerjaan ?? '-'; // Untuk preview di form
+            $this->ibu_umur_display = $ibu->umur ?? ''; // Format asli untuk ditampilkan di preview
         }
         $this->searchIbu = '';
         $this->ibuList = [];

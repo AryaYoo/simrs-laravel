@@ -90,7 +90,7 @@
                                 <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-1 border-t border-neutral-100 dark:border-neutral-700">
                                     <div>
                                         <p class="text-[9px] text-neutral-400 uppercase tracking-wider font-bold">Umur</p>
-                                        <p class="text-xs text-neutral-700 dark:text-neutral-300">{{ $umur_ibu ? $umur_ibu . ' Tahun' : '-' }}</p>
+                                        <p class="text-xs text-neutral-700 dark:text-neutral-300">{{ $ibu_umur_display ?: '-' }}</p>
                                     </div>
                                     <div>
                                         <p class="text-[9px] text-neutral-400 uppercase tracking-wider font-bold">Pekerjaan</p>
