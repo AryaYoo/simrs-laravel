@@ -894,7 +894,7 @@
         </div>
 
         {{-- Floating Support Button (Ticketing IT) --}}
-        <div class="fixed bottom-6 right-6 z-[9999] lg:bottom-8 lg:right-8">
+        <div class="fixed bottom-6 right-6 z-[9999] lg:bottom-8 lg:right-8 print:hidden no-print">
             <a href="http://192.168.100.177/mastolongmas/public/login" target="_blank"
                 class="flex items-center justify-start h-12 w-12 hover:w-36 rounded-full shadow-lg transition-all duration-300 ease-in-out group border border-white/10 backdrop-blur-md overflow-hidden"
                 style="background-color: rgba(24, 24, 27, 0.8); color: white; text-decoration: none;"

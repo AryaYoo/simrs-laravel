@@ -13,7 +13,7 @@
                 font-family: Arial, sans-serif !important;
                 font-size: 11pt !important;
             }
-            .screen-only, header, nav, aside, footer, button, .no-print {
+            .screen-only, header, nav, aside, footer, button, .no-print, .print\:hidden, [title="Ticketing IT"], div[class*="z-[9999]"] {
                 display: none !important;
             }
             .print-only {
