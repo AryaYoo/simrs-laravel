@@ -446,6 +446,35 @@ Secara standar spesifikasi HTML, tombol `<button>` yang berada di dalam `<form>`
 <button type="button" @click="showModal = false"><flux:icon name="x-mark" /></button>
 ```
 
+### 16. Standar Penyediaan SOP & Panduan Operasional pada Setiap Fitur (WAJIB!)
+
+> [!IMPORTANT]
+> **Setiap fitur / modul yang dikembangkan di SIMRS LaraLite WAJIB menyediakan halaman SOP (Standard Operating Procedure) & Panduan Penggunaan yang dapat diakses secara interaktif di web serta dapat diekspor/dicetak menjadi dokumen PDF resmi rumah sakit.**
+
+#### Ketentuan Standar SOP Fitur:
+1. **Akses Tombol di Halaman Utama Modul (Web Entry Point):**
+   - Pada header halaman utama modul (Daftar / Index), sediakan tombol akses cepat SOP dengan icon buku (`icon="book-open"`).
+   - Lengkapi tombol dengan **Tooltip Interaktif** (menjelaskan ringkasan isi panduan saat hover).
+
+2. **Halaman Spesifik SOP (Web View):**
+   - Buat komponen Livewire mandiri (misal: `Sop.php` dan `sop.blade.php`).
+   - Tampilan interaktif berbasis tab yang mencakup:
+     - **Ikhtisar & Tujuan Fitur:** Penjelasan fungsi modul, integrasi data, dan poin keunggulan sistem.
+     - **SOP Langkah Demi Langkah (Step-by-Step):** Petunjuk kronologis alur input dan validasi data (misal: wajib attach pasien, pemilihan pegawai/penolong, pengisian klinis).
+     - **SOP Output / Cetak Dokumen:** Tata cara verifikasi dan penerbitan dokumen resmi (SKL, Resume, Etiket, Nota, dsb).
+     - **SOP Koreksi / Sinkronisasi Data:** Prosedur jika ada perubahan data master (misal: update data pasien di FO -> re-attach di ruangan).
+     - **FAQ / Pertanyaan Umum:** Solusi untuk kendala dan kasus operasional umum.
+
+3. **Standar Cetak & Export PDF (`@media print`):**
+   - Setiap halaman SOP wajib menyediakan tombol **"Cetak / Export PDF"** (`window.print()`).
+   - Layout dokumen cetak harus mengikuti standar dokumen resmi rumah sakit:
+     - **Kop Surat Resmi:** Menampilkan logo dan identitas instansi dari tabel `setting_cetak_web`.
+     - **Tabel Metadata Dokumen:** Mencantumkan *No. Dokumen*, *Tanggal Terbit*, *Status Revisi*, dan *Unit Terkait*.
+     - **Konten Komprehensif:** Merender seluruh bagian SOP secara runtut dan terstruktur.
+     - **Lembar Pengesahan:** Memuat kolom tanda tangan Kepala Ruangan / Unit, Kepala Rekam Medis, dan Direktur Rumah Sakit.
+     - **Kebersihan Dokumen Cetak:** Semua elemen web non-cetak (navigasi, breadcrumbs, tombol, sidebar, elemen floating seperti tombol Bantuan IT) **WAJIB** disembunyikan menggunakan kelas `print:hidden no-print` dan aturan `@media print`.
+
+---
 
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
@@ -465,6 +494,9 @@ Dapat diakses di: [https://github.com/AryaYoo/simrs-laravel.git](https://github.
 
 ## 📜 SOP (Standard Operating Procedure)
 
+### Ketersediaan SOP di Setiap Fitur
+Setiap modul diwajibkan memiliki halaman SOP tersendiri yang dapat diakses via ikon buku pada toolbar daftar data modul, menyajikan panduan interaktif di web serta format cetak/ekspor PDF resmi rumah sakit.
+
 ### Navigasi Sub Menu Layanan Rawat Jalan & Rawat Inap
 Ketentuan dalam membuka halaman dari tombol-tombol di dalam **Sub Menu Layanan Rawat Jalan** maupun **Layanan Rawat Inap**:
 
@@ -478,3 +510,4 @@ Ketentuan dalam membuka halaman dari tombol-tombol di dalam **Sub Menu Layanan R
 Terdapat pembatasan dalam mengubah (menambah, mengedit, atau menghapus) data pemeriksaan, tindakan, catatan, diagnosa, dan prosedur pada form Perawatan & Tindakan Rawat Jalan berdasarkan status periksa pasien:
 - Kunci pengubahan data **hanya berlaku** jika status periksa pasien adalah **"Batal"**.
 - Jika status periksa pasien adalah **"Sudah"** (Sudah Diperiksa), data masih dapat diubah/dimodifikasi karena pemeriksaan telah selesai dilakukan namun pengguna mungkin perlu menyesuaikan data rekam medis.
+
