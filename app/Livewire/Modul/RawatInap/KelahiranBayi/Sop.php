@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Modul\RawatInap\KelahiranBayi;
 
+use App\Models\SettingCetakWeb;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 
@@ -17,6 +18,7 @@ class Sop extends Component
 
     public function render()
     {
-        return view('livewire.modul.rawat-inap.kelahiran-bayi.sop');
+        $setting = SettingCetakWeb::first();
+        return view('livewire.modul.rawat-inap.kelahiran-bayi.sop', compact('setting'));
     }
 }
