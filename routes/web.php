@@ -26,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('modul/rawat-inap', \App\Livewire\Modul\RawatInap\Index::class)->name('modul.rawat-inap.index');
     Route::get('modul/rawat-inap/kelahiran-bayi', \App\Livewire\Modul\RawatInap\KelahiranBayi\Index::class)->name('modul.rawat-inap.kelahiran-bayi');
+    Route::get('modul/rawat-inap/kelahiran-bayi/sop', \App\Livewire\Modul\RawatInap\KelahiranBayi\Sop::class)->name('modul.rawat-inap.kelahiran-bayi.sop');
     Route::get('modul/rawat-inap/kelahiran-bayi/settings', \App\Livewire\Modul\RawatInap\KelahiranBayi\SklSettings::class)->name('modul.rawat-inap.kelahiran-bayi.settings');
     Route::get('modul/rawat-inap/kelahiran-bayi/create', \App\Livewire\Modul\RawatInap\KelahiranBayi\Create::class)->name('modul.rawat-inap.kelahiran-bayi.create');
     Route::get('modul/rawat-inap/permintaan-ranap', \App\Livewire\Modul\RawatInap\PermintaanRanap\Index::class)->name('modul.rawat-inap.permintaan-ranap');

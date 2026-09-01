@@ -17,6 +17,25 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
+            {{-- SOP & Panduan Button with Tooltip --}}
+            <div x-data="{ tooltip: false }" class="relative inline-block">
+                <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.sop')" icon="book-open" variant="ghost" wire:navigate
+                             @mouseenter="tooltip = true" @mouseleave="tooltip = false"
+                             class="!text-[#4C5C2D] hover:!bg-[#4C5C2D]/10" title="SOP & Panduan Kelahiran Bayi" />
+                <div x-show="tooltip" x-cloak
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="absolute right-0 top-full mt-2 w-56 p-2.5 bg-neutral-900 text-white text-[11px] rounded-xl shadow-xl z-50 pointer-events-none text-center">
+                    <p class="font-bold text-white mb-0.5">SOP & Panduan Kelahiran Bayi</p>
+                    <p class="text-neutral-300 text-[10px]">Petunjuk alur input bayi, relasi data ibu, dan cetak SKL</p>
+                    <div class="absolute -top-1 right-3.5 w-2 h-2 bg-neutral-900 rotate-45"></div>
+                </div>
+            </div>
+
             <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.settings')" icon="cog-6-tooth" variant="ghost" wire:navigate title="Pengaturan SKL" />
             <flux:button :href="route('modul.rawat-inap.kelahiran-bayi.create')" icon="plus" wire:navigate class="!bg-[#4C5C2D] !border-[#4C5C2D] !text-white hover:!bg-[#3E4A25]">
                 Tambah Bayi
