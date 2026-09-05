@@ -17,6 +17,7 @@ class SuratKeteranganRawatInap extends Model
         'no_rawat',
         'tanggalawal',
         'tanggalakhir',
+        'dpjp_keterangan_inap',
     ];
 
     public function regPeriksa()

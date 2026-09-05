@@ -360,9 +360,29 @@ class Create extends Component
             return $this->redirect(route('modul.rawat-inap.kelahiran-bayi'), navigate: true);
 
         } catch (\Exception $e) {
+            $message = $e->getMessage();
+
+            // Deteksi duplikat no_skl
+            if (str_contains($message, 'Duplicate entry') && str_contains($message, 'no_skl')) {
+                $text = "Nomor SKL <strong>{$this->no_skl}</strong> sudah digunakan oleh data lain. "
+                      . "Silakan buka menu <em>Pengaturan SKL</em> untuk menyesuaikan nomor urut terakhir.";
+            }
+            // Deteksi duplikat no_rkm_medis (bayi sudah pernah didaftarkan)
+            elseif (str_contains($message, 'Duplicate entry') && str_contains($message, 'no_rkm_medis')) {
+                $text = "No. RM Bayi <strong>{$this->no_rkm_medis}</strong> sudah terdaftar sebagai data kelahiran bayi.";
+            }
+            // Error duplikat lainnya
+            elseif (str_contains($message, 'Duplicate entry')) {
+                $text = "Terdapat data duplikat yang mencegah penyimpanan. Periksa kembali data yang dimasukkan.";
+            }
+            // Error umum
+            else {
+                $text = "Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.";
+            }
+
             $this->dispatch('swal', [
                 'title' => 'Gagal Menyimpan!',
-                'text'  => 'Error: ' . $e->getMessage(),
+                'html'  => $text,
                 'icon'  => 'error',
             ]);
         }
