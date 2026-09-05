@@ -95,6 +95,9 @@ class CetakSkriController extends Controller
                 ->first();
             if ($spesialis) {
                 $nm_sps = $spesialis->nm_sps;
+                if (stripos($nm_sps, 'obsgyn') !== false || stripos($nm_sps, 'kebidanan') !== false || strcasecmp(trim($dpjp->kd_sps), 'S0012') === 0) {
+                    $nm_sps = 'Dokter Spesialis Obstetri dan Gynecology';
+                }
             }
         }
 
