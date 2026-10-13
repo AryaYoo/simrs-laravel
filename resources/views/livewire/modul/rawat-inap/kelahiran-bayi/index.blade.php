@@ -278,15 +278,15 @@
                         </div>
                         <div>
                             <p class="text-[10px] text-neutral-500 mb-0.5">Umur Ibu</p>
-                            <p class="text-xs font-semibold">{{ $detailBayi['umur_ibu'] }} Tahun</p>
+                            <p class="text-xs font-semibold">{{ !empty($detailBayi['umur_ibu']) ? $detailBayi['umur_ibu'] . ' Tahun' : '-' }}</p>
                         </div>
                         <div>
                             <p class="text-[10px] text-neutral-500 mb-0.5">Nama Ayah</p>
-                            <p class="text-xs font-semibold">{{ $detailBayi['nama_ayah'] }}</p>
+                            <p class="text-xs font-semibold">{{ $detailBayi['nama_ayah'] ?: '-' }}</p>
                         </div>
                         <div>
                             <p class="text-[10px] text-neutral-500 mb-0.5">Umur Ayah</p>
-                            <p class="text-xs font-semibold">{{ $detailBayi['umur_ayah'] }} Tahun</p>
+                            <p class="text-xs font-semibold">{{ !empty($detailBayi['umur_ayah']) ? $detailBayi['umur_ayah'] . ' Tahun' : '-' }}</p>
                         </div>
                         <div class="col-span-2 md:col-span-4">
                             <p class="text-[10px] text-neutral-500 mb-0.5">Alamat</p>

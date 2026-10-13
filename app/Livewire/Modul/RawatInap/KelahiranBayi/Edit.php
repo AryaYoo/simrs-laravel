@@ -106,9 +106,18 @@ class Edit extends Component
         $this->umur = $bayi->pasien->umur ?? '';
 
         $this->nama_bayi_skl = $bayi->nama_bayi_skl ?? '';
-        $this->umur_ibu = $bayi->umur_ibu;
+        $umurIbu = trim(preg_replace('/\b(tahun|thn|th)\b/i', '', (string)$bayi->umur_ibu));
+        if (is_numeric($umurIbu) && (int)$umurIbu > 120) {
+            $umurIbu = substr($umurIbu, 0, 2);
+        }
+        $this->umur_ibu = $umurIbu;
         $this->nama_ayah = $bayi->nama_ayah;
-        $this->umur_ayah = $bayi->umur_ayah;
+
+        $umurAyah = trim(preg_replace('/\b(tahun|thn|th)\b/i', '', (string)$bayi->umur_ayah));
+        if (is_numeric($umurAyah) && (int)$umurAyah > 120) {
+            $umurAyah = substr($umurAyah, 0, 2);
+        }
+        $this->umur_ayah = $umurAyah;
         $this->panjang_badan = $bayi->panjang_badan;
         $this->berat_badan = $bayi->berat_badan;
         $this->lingkar_dada = $bayi->lingkar_dada;
@@ -259,10 +268,20 @@ class Edit extends Component
         if ($ibu) {
             $this->no_rkm_medis_ibu = $ibu->no_rkm_medis; // Simpan No. RM ibu untuk lookup akurat saat cetak SKL
             $this->nm_ibu           = $ibu->nm_pasien;
-            $this->umur_ibu         = preg_replace('/[^0-9]/', '', $ibu->umur); // Ambil angkanya saja
             $this->alamat           = $ibu->alamat;
             $this->ibu_pekerjaan    = $ibu->pekerjaan ?? '-'; // Untuk preview di form
             $this->ibu_umur_display = $ibu->umur ?? ''; // Format asli untuk ditampilkan di preview
+
+            // Format umur ibu (hanya ambil tahunnya saja)
+            if (!empty($ibu->tgl_lahir) && $ibu->tgl_lahir !== '0000-00-00') {
+                $this->umur_ibu = (string) \Carbon\Carbon::parse($ibu->tgl_lahir)->age;
+            } elseif (preg_match('/^(\d+)\s*(?:Th|Tahun)/i', trim($ibu->umur), $matches)) {
+                $this->umur_ibu = $matches[1];
+            } elseif (preg_match('/^(\d+)/', trim($ibu->umur), $matches)) {
+                $this->umur_ibu = $matches[1];
+            } else {
+                $this->umur_ibu = '';
+            }
         }
         $this->searchIbu = '';
         $this->ibuList = [];
@@ -309,14 +328,22 @@ class Edit extends Component
             $n5Total = intval($this->f5) + intval($this->u5) + intval($this->t5) + intval($this->r5) + intval($this->w5);
             $n10Total = intval($this->f10) + intval($this->u10) + intval($this->t10) + intval($this->r10) + intval($this->w10);
 
-            $bayi = \App\Models\PasienBayi::findOrFail($this->no_rkm_medis);
+            $umurIbu = trim(preg_replace('/\b(tahun|thn|th)\b/i', '', (string)$this->umur_ibu));
+            if (is_numeric($umurIbu) && (int)$umurIbu > 120) {
+                $umurIbu = substr($umurIbu, 0, 2);
+            }
+
+            $umurAyah = trim(preg_replace('/\b(tahun|thn|th)\b/i', '', (string)$this->umur_ayah));
+            if (is_numeric($umurAyah) && (int)$umurAyah > 120) {
+                $umurAyah = substr($umurAyah, 0, 2);
+            }
 
             $bayi->update([
                 'no_rkm_medis_ibu'  => $this->no_rkm_medis_ibu ?: null,
-                'nama_bayi_skl' => $this->nama_bayi_skl ?: null,
-                'umur_ibu' => $this->umur_ibu,
+                'nama_bayi_skl'     => $this->nama_bayi_skl ?: null,
+                'umur_ibu'          => $umurIbu,
                 'nama_ayah' => $this->nama_ayah,
-                'umur_ayah' => $this->umur_ayah,
+                'umur_ayah' => $umurAyah,
                 'berat_badan' => $this->berat_badan,
                 'panjang_badan' => $this->panjang_badan,
                 'lingkar_kepala' => $this->lingkar_kepala,

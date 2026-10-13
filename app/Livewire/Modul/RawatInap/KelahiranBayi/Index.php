@@ -46,6 +46,28 @@ class Index extends Component
     {
         $bayi = PasienBayi::with(['pasien', 'pegawai'])->find($noRkmMedis);
         if ($bayi) {
+            $umurIbu = trim(preg_replace('/\b(tahun|thn|th)\b/i', '', (string)$bayi->umur_ibu));
+            if (is_numeric($umurIbu) && (int)$umurIbu > 120) {
+                // Jika data lama menyimpan gabungan tahun+bulan+hari (misal 30313 dari 30 Th 3 Bl 13 Hr)
+                // Coba cari data ibu di tabel pasien terlebih dahulu
+                $ibuPasien = !empty($bayi->pasien?->nm_ibu)
+                    ? \App\Models\Pasien::where('nm_pasien', $bayi->pasien->nm_ibu)->where('jk', 'P')->first()
+                    : null;
+
+                if ($ibuPasien && !empty($ibuPasien->tgl_lahir) && $ibuPasien->tgl_lahir !== '0000-00-00') {
+                    $umurIbu = (string) \Carbon\Carbon::parse($ibuPasien->tgl_lahir)->age;
+                } elseif ($ibuPasien && preg_match('/^(\d+)\s*(?:Th|Tahun)/i', trim($ibuPasien->umur), $m)) {
+                    $umurIbu = $m[1];
+                } else {
+                    $umurIbu = substr($umurIbu, 0, 2);
+                }
+            }
+
+            $umurAyah = trim(preg_replace('/\b(tahun|thn|th)\b/i', '', (string)$bayi->umur_ayah));
+            if (is_numeric($umurAyah) && (int)$umurAyah > 120) {
+                $umurAyah = substr($umurAyah, 0, 2);
+            }
+
             $this->detailBayi = null; // reset dulu agar Livewire re-render
             $this->detailBayi = [
                 'no_rkm_medis'       => $bayi->no_rkm_medis,
@@ -56,9 +78,9 @@ class Index extends Component
                 'tgl_daftar'         => $bayi->pasien->tgl_daftar ?? '-',
                 'alamat'             => $bayi->pasien->alamat ?? '-',
                 'umur'               => $bayi->pasien->umur ?? '-',
-                'umur_ibu'           => $bayi->umur_ibu,
+                'umur_ibu'           => $umurIbu,
                 'nama_ayah'          => $bayi->nama_ayah,
-                'umur_ayah'          => $bayi->umur_ayah,
+                'umur_ayah'          => $umurAyah,
                 'panjang_badan'      => $bayi->panjang_badan,
                 'berat_badan'        => $bayi->berat_badan,
                 'lingkar_kepala'     => $bayi->lingkar_kepala,

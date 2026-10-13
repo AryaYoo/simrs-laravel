@@ -112,7 +112,7 @@
                                 @error('nama_ayah') <span class="text-[10px] text-red-500 font-medium">{{ $message }}</span> @enderror
                             </div>
                             <div>
-                                <flux:input label="Umur Ayah" wire:model="umur_ayah" placeholder="34" />
+                                <flux:input label="Umur Ayah (Tahun)" wire:model="umur_ayah" placeholder="34" />
                                 @error('umur_ayah') <span class="text-[10px] text-red-500 font-medium">{{ $message }}</span> @enderror
                             </div>
                         </div>
