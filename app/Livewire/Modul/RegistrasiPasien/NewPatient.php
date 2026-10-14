@@ -3,6 +3,7 @@
 namespace App\Livewire\Modul\RegistrasiPasien;
 
 use App\Models\Pasien;
+use App\Services\GeminiKtpService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -148,229 +149,110 @@ class NewPatient extends Component
         $this->processKtpOcr();
     }
 
+    /**
+     * Proses KTP dari base64 (mode webcam capture).
+     * Menggunakan Gemini Vision API untuk auto-fill data form.
+     */
     public function processKtpFromBase64($base64Image)
     {
-        // Hapus header data URL jika ada (e.g. "data:image/png;base64,")
-        $base64Image = preg_replace('/^data:image\/\w+;base64,/', '', $base64Image);
+        // Deteksi MIME type dari data URI header
+        $mimeType = 'image/jpeg';
+        if (preg_match('/^data:(image\/[\w]+);base64,/', $base64Image, $mimeMatch)) {
+            $mimeType = $mimeMatch[1];
+        }
+        $base64Image = preg_replace('/^data:image\/[\w]+;base64,/', '', $base64Image);
 
-        $apiKeySetting = AppSetting::where('setting_key', 'GOOGLE_VISION_API_KEY')->first();
-        if (!$apiKeySetting || empty($apiKeySetting->setting_value)) {
+        $gemini = new GeminiKtpService();
+
+        if (!$gemini->isConfigured()) {
             $this->dispatch('swal', [
-                'title' => 'API Key Belum Diset',
-                'text'  => 'Silakan atur Google Vision API Key di menu Pengaturan Aplikasi.',
+                'title' => 'Gemini API Belum Diset',
+                'text'  => 'Isi GEMINI_API_KEY di file .env untuk menggunakan fitur Scan KTP otomatis.',
                 'icon'  => 'warning',
             ]);
             return;
         }
 
-        $apiKey = $apiKeySetting->setting_value;
+        $result = $gemini->extractFromBase64($base64Image, $mimeType);
 
-        try {
-            $response = Http::post("https://vision.googleapis.com/v1/images:annotate?key={$apiKey}", [
-                'requests' => [[
-                    'image'    => ['content' => $base64Image],
-                    'features' => [['type' => 'TEXT_DETECTION']],
-                ]]
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                if (isset($data['responses'][0]['textAnnotations'][0]['description'])) {
-                    $this->parseKtpText($data['responses'][0]['textAnnotations'][0]['description']);
-                    $this->dispatch('swal', [
-                        'title' => 'Berhasil!',
-                        'text'  => 'Data KTP berhasil diekstrak dari webcam.',
-                        'icon'  => 'success',
-                    ]);
-                } else {
-                    $this->dispatch('swal', [
-                        'title' => 'Gagal Membaca',
-                        'text'  => 'KTP tidak terdeteksi. Coba dekatkan KTP ke kamera.',
-                        'icon'  => 'warning',
-                    ]);
-                }
-            }
-        } catch (\Exception $e) {
+        if (!$result['success']) {
             $this->dispatch('swal', [
-                'title' => 'Gagal!',
-                'text'  => substr($e->getMessage(), 0, 150),
-                'icon'  => 'error',
+                'title' => 'Gagal Membaca KTP',
+                'text'  => $result['error'],
+                'icon'  => 'warning',
             ]);
+            return;
         }
+
+        $this->applyKtpData($result['data']);
+
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text'  => 'Data KTP berhasil diekstrak oleh Gemini AI dan diisi ke dalam form.',
+            'icon'  => 'success',
+        ]);
     }
 
+    /**
+     * Proses KTP dari file upload.
+     * Menggunakan Gemini Vision API untuk auto-fill data form.
+     */
     public function processKtpOcr()
     {
-        // Ambil Key dari Setting
-        $apiKeySetting = AppSetting::where('setting_key', 'GOOGLE_VISION_API_KEY')->first();
-        if (!$apiKeySetting || empty($apiKeySetting->setting_value)) {
+        $gemini = new GeminiKtpService();
+
+        if (!$gemini->isConfigured()) {
             $this->dispatch('swal', [
-                'title' => 'API Key Belum Diset',
-                'text'  => 'Silakan atur Google Vision API Key di menu Pengaturan Aplikasi (Master Data).',
+                'title' => 'Gemini API Belum Diset',
+                'text'  => 'Isi GEMINI_API_KEY di file .env untuk menggunakan fitur Scan KTP otomatis.',
                 'icon'  => 'warning',
             ]);
             return;
         }
 
-        $apiKey = $apiKeySetting->setting_value;
         $imageData = base64_encode(file_get_contents($this->ktp_image->getRealPath()));
+        $mimeType  = $this->ktp_image->getMimeType() ?: 'image/jpeg';
 
-        try {
-            $response = Http::post("https://vision.googleapis.com/v1/images:annotate?key={$apiKey}", [
-                'requests' => [
-                    [
-                        'image' => [
-                            'content' => $imageData
-                        ],
-                        'features' => [
-                            [
-                                'type' => 'TEXT_DETECTION'
-                            ]
-                        ]
-                    ]
-                ]
-            ]);
+        $result = $gemini->extractFromBase64($imageData, $mimeType);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                
-                if (isset($data['responses'][0]['textAnnotations'][0]['description'])) {
-                    $rawText = $data['responses'][0]['textAnnotations'][0]['description'];
-                    $this->parseKtpText($rawText);
-                    $this->hitungUmur(); // Pastikan umur terhitung setelah tgl_lahir diisi OCR
-
-                    $this->dispatch('swal', [
-                        'title' => 'Berhasil!',
-                        'text'  => 'Data KTP berhasil diekstrak dan diisi ke dalam form.',
-                        'icon'  => 'success',
-                    ]);
-                } else {
-                    $this->dispatch('swal', [
-                        'title' => 'Gagal Membaca KTP',
-                        'text'  => 'Tidak ada teks yang terdeteksi di foto.',
-                        'icon'  => 'error',
-                    ]);
-                }
-            } else {
-                $this->dispatch('swal', [
-                    'title' => 'API Error',
-                    'text'  => 'Terjadi kesalahan saat menghubungi API Google Vision.',
-                    'icon'  => 'error',
-                ]);
-            }
-        } catch (\Exception $e) {
+        if (!$result['success']) {
             $this->dispatch('swal', [
-                'title' => 'Gagal!',
-                'text'  => 'Proses unggah gagal: ' . substr($e->getMessage(), 0, 150),
+                'title' => 'Gagal Membaca KTP',
+                'text'  => $result['error'],
                 'icon'  => 'error',
             ]);
+            return;
         }
+
+        $this->applyKtpData($result['data']);
+
+        $this->dispatch('swal', [
+            'title' => 'Berhasil!',
+            'text'  => 'Data KTP berhasil diekstrak oleh Gemini AI dan diisi ke dalam form.',
+            'icon'  => 'success',
+        ]);
     }
 
-    private function parseKtpText($text)
+    /**
+     * Terapkan data KTP hasil ekstraksi Gemini ke property Livewire.
+     * Hanya mengisi field yang berhasil diekstrak (tidak null).
+     */
+    private function applyKtpData(array $data): void
     {
-        $lines = explode("\n", $text);
-        
-        $nik_found = false;
+        if (!empty($data['nik']))             $this->no_ktp    = $data['nik'];
+        if (!empty($data['nama']))            $this->nm_pasien = $data['nama'];
+        if (!empty($data['tempat_lahir']))    $this->tmp_lahir = $data['tempat_lahir'];
+        if (!empty($data['tanggal_lahir']))   $this->tgl_lahir = $data['tanggal_lahir'];
+        if (!empty($data['jenis_kelamin']))   $this->jk        = $data['jenis_kelamin'];
+        if (!empty($data['alamat']))          $this->alamat    = $data['alamat'];
+        if (!empty($data['agama']))           $this->agama     = $data['agama'];
+        if (!empty($data['status_perkawinan'])) $this->stts_nikah = $data['status_perkawinan'];
+        if (!empty($data['pekerjaan']))       $this->pekerjaan = $data['pekerjaan'];
+        if (!empty($data['golongan_darah']))  $this->gol_darah = $data['golongan_darah'];
 
-        foreach ($lines as $i => $line) {
-            $line = trim($line);
-            if (empty($line)) continue;
-
-            // Cari NIK
-            if (preg_match('/(?:^|\D)(\d{16})(?:\D|$)/', $line, $matches) || preg_match('/NIK\s*:\s*(\d{16})/i', $line, $matches)) {
-                $this->no_ktp = $matches[1];
-                $nik_found = true;
-            }
-
-            // Cari Nama
-            if (str_contains(strtolower($line), 'nama')) {
-                $nama = trim(preg_replace('/nama|\:|:/i', '', $line));
-                if (empty($nama) && isset($lines[$i+1])) {
-                    $nama = trim($lines[$i+1]);
-                }
-                if(strlen($nama) > 2) $this->nm_pasien = substr(strtoupper($nama), 0, 40);
-            }
-            
-            // Cari Agama
-            if (str_contains(strtolower($line), 'agama')) {
-                $agamaText = strtoupper($line);
-                if (str_contains($agamaText, 'ISLAM')) $this->agama = 'ISLAM';
-                elseif (str_contains($agamaText, 'KRISTEN')) $this->agama = 'KRISTEN';
-                elseif (str_contains($agamaText, 'KATHOLIK') || str_contains($agamaText, 'KATOLIK')) $this->agama = 'KATOLIK';
-                elseif (str_contains($agamaText, 'HINDU')) $this->agama = 'HINDU';
-                elseif (str_contains($agamaText, 'BUDHA') || str_contains($agamaText, 'BUDDHA')) $this->agama = 'BUDHA';
-            }
-
-            // Status Perkawinan
-            if (str_contains(strtolower($line), 'status perkawinan') || str_contains(strtolower($line), 'perkawinan')) {
-                $statusText = strtoupper(trim(preg_replace('/status\s*perkawinan|\:|:/i', '', strtolower($line))));
-                if (empty($statusText) && isset($lines[$i+1])) {
-                    $statusText = strtoupper(trim($lines[$i+1]));
-                }
-                
-                if (str_contains($statusText, 'BELUM')) $this->stts_nikah = 'BELUM MENIKAH';
-                elseif (str_contains($statusText, 'KAWIN')) $this->stts_nikah = 'MENIKAH';
-                elseif (str_contains($statusText, 'CERAI HIDUP') || str_contains($statusText, 'JANDA') || str_contains($statusText, 'DUDHA')) $this->stts_nikah = 'JANDA';
-            }
-            
-            // Tempat Tgl Lahir
-            if (str_contains(strtolower($line), 'tempat/tgl') || str_contains(strtolower($line), 'lahir')) {
-                $ttl = trim(preg_replace('/tempat\/tgl\s*lahir|\:|:/i', '', strtolower($line)));
-                if (empty($ttl) && isset($lines[$i+1])) {
-                    $ttl = trim($lines[$i+1]);
-                }
-
-                if (str_contains($ttl, ',')) {
-                    $parts = explode(',', $ttl);
-                    if(strlen(trim($parts[0])) > 2) {
-                        $this->tmp_lahir = substr(strtoupper(trim($parts[0])), 0, 15);
-                    }
-                    $dateStr = trim($parts[1] ?? ''); 
-                    if (preg_match('/(\d{2})[- \/]+(\d{2})[- \/]+(\d{4})/', $dateStr, $dMatch)) {
-                        $this->tgl_lahir = $dMatch[3] . '-' . $dMatch[2] . '-' . $dMatch[1];
-                    }
-                }
-            }
-
-            // Jenis Kelamin
-            if (str_contains(strtolower($line), 'jenis kelamin') || str_contains(strtolower($line), 'kelamin')) {
-                $jkText = strtolower($line);
-                if (str_contains($jkText, 'laki')) $this->jk = 'L';
-                elseif (str_contains($jkText, 'perempuan')) $this->jk = 'P';
-            }
-
-            // Alamat
-            if (str_contains(strtolower($line), 'alamat')) {
-                $alamat = trim(preg_replace('/alamat|\:|:/i', '', $line));
-                if (empty($alamat) && isset($lines[$i+1])) {
-                    $alamat = trim($lines[$i+1]);
-                }
-                if(strlen($alamat) > 5) $this->alamat = strtoupper($alamat);
-            }
-
-            // Pekerjaan
-            if (str_contains(strtolower($line), 'pekerjaan')) {
-                $pekerjaan = trim(preg_replace('/pekerjaan|\:|:/i', '', $line));
-                if (empty($pekerjaan) && isset($lines[$i+1])) {
-                    $pekerjaan = trim($lines[$i+1]);
-                }
-                if(strlen($pekerjaan) > 2) $this->pekerjaan = strtoupper($pekerjaan);
-            }
-
-            // Golongan Darah
-            if (str_contains(strtolower($line), 'gol. darah') || str_contains(strtolower($line), 'gol darah')) {
-                $goldarahText = strtoupper($line);
-                if (preg_match('/\b(A|B|AB|O)\b/', $goldarahText, $matches)) {
-                    $this->gol_darah = $matches[1];
-                }
-            }
-        }
-        
-        if (!$nik_found) {
-            if (preg_match('/(?:^|\D)(\d{16})(?:\D|$)/', $text, $matches)) {
-                $this->no_ktp = $matches[1];
-            }
+        // Hitung ulang umur setelah tgl_lahir diisi
+        if (!empty($data['tanggal_lahir'])) {
+            $this->hitungUmur();
         }
     }
 
