@@ -324,6 +324,8 @@ class Edit extends Component
         ]);
 
         try {
+            $bayi = \App\Models\PasienBayi::findOrFail($this->no_rkm_medis);
+
             $n1Total = intval($this->f1) + intval($this->u1) + intval($this->t1) + intval($this->r1) + intval($this->w1);
             $n5Total = intval($this->f5) + intval($this->u5) + intval($this->t5) + intval($this->r5) + intval($this->w5);
             $n10Total = intval($this->f10) + intval($this->u10) + intval($this->t10) + intval($this->r10) + intval($this->w10);
