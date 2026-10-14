@@ -142,11 +142,30 @@ class NewPatient extends Component
 
     public function updatedKtpImage()
     {
-        $this->validate([
-            'ktp_image' => 'image|max:2048',
-        ]);
+        try {
+            $this->validate([
+                'ktp_image' => 'image|max:10240', // Maksimal 10MB
+            ], [
+                'ktp_image.image' => 'File harus berupa gambar (JPG, PNG, WEBP).',
+                'ktp_image.max'   => 'Ukuran foto KTP maksimal 10MB.',
+            ]);
 
-        $this->processKtpOcr();
+            $this->processKtpOcr();
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            $errorMsg = collect($ve->errors())->flatten()->first() ?? 'Validasi gambar gagal.';
+            $this->dispatch('swal', [
+                'title' => 'Foto KTP Tidak Valid',
+                'text'  => $errorMsg,
+                'icon'  => 'warning',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('updatedKtpImage Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            $this->dispatch('swal', [
+                'title' => 'Gagal Memproses KTP',
+                'text'  => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'icon'  => 'error',
+            ]);
+        }
     }
 
     /**
@@ -155,42 +174,51 @@ class NewPatient extends Component
      */
     public function processKtpFromBase64($base64Image)
     {
-        // Deteksi MIME type dari data URI header
-        $mimeType = 'image/jpeg';
-        if (preg_match('/^data:(image\/[\w]+);base64,/', $base64Image, $mimeMatch)) {
-            $mimeType = $mimeMatch[1];
-        }
-        $base64Image = preg_replace('/^data:image\/[\w]+;base64,/', '', $base64Image);
+        try {
+            // Deteksi MIME type dari data URI header
+            $mimeType = 'image/jpeg';
+            if (preg_match('/^data:(image\/[\w]+);base64,/', $base64Image, $mimeMatch)) {
+                $mimeType = $mimeMatch[1];
+            }
+            $base64Image = preg_replace('/^data:image\/[\w]+;base64,/', '', $base64Image);
 
-        $gemini = new GeminiKtpService();
+            $gemini = new GeminiKtpService();
 
-        if (!$gemini->isConfigured()) {
+            if (!$gemini->isConfigured()) {
+                $this->dispatch('swal', [
+                    'title' => 'Gemini API Belum Diset',
+                    'text'  => 'Isi GEMINI_API_KEY di file .env server untuk menggunakan fitur Scan KTP otomatis.',
+                    'icon'  => 'warning',
+                ]);
+                return;
+            }
+
+            $result = $gemini->extractFromBase64($base64Image, $mimeType);
+
+            if (!$result['success']) {
+                $this->dispatch('swal', [
+                    'title' => 'Gagal Membaca KTP',
+                    'text'  => $result['error'],
+                    'icon'  => 'warning',
+                ]);
+                return;
+            }
+
+            $this->applyKtpData($result['data']);
+
             $this->dispatch('swal', [
-                'title' => 'Gemini API Belum Diset',
-                'text'  => 'Isi GEMINI_API_KEY di file .env untuk menggunakan fitur Scan KTP otomatis.',
-                'icon'  => 'warning',
+                'title' => 'Berhasil!',
+                'text'  => 'Data KTP berhasil diekstrak oleh Gemini AI dan diisi ke dalam form.',
+                'icon'  => 'success',
             ]);
-            return;
-        }
-
-        $result = $gemini->extractFromBase64($base64Image, $mimeType);
-
-        if (!$result['success']) {
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('processKtpFromBase64 Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $this->dispatch('swal', [
-                'title' => 'Gagal Membaca KTP',
-                'text'  => $result['error'],
-                'icon'  => 'warning',
+                'title' => 'Gagal Memproses KTP',
+                'text'  => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
+                'icon'  => 'error',
             ]);
-            return;
         }
-
-        $this->applyKtpData($result['data']);
-
-        $this->dispatch('swal', [
-            'title' => 'Berhasil!',
-            'text'  => 'Data KTP berhasil diekstrak oleh Gemini AI dan diisi ke dalam form.',
-            'icon'  => 'success',
-        ]);
     }
 
     /**
@@ -199,38 +227,68 @@ class NewPatient extends Component
      */
     public function processKtpOcr()
     {
-        $gemini = new GeminiKtpService();
+        try {
+            $gemini = new GeminiKtpService();
 
-        if (!$gemini->isConfigured()) {
+            if (!$gemini->isConfigured()) {
+                $this->dispatch('swal', [
+                    'title' => 'Gemini API Belum Diset',
+                    'text'  => 'Isi GEMINI_API_KEY di file .env server untuk menggunakan fitur Scan KTP otomatis.',
+                    'icon'  => 'warning',
+                ]);
+                return;
+            }
+
+            if (!$this->ktp_image) {
+                return;
+            }
+
+            // Baca file bytes secara aman
+            $fileBytes = null;
+            if (method_exists($this->ktp_image, 'get')) {
+                $fileBytes = $this->ktp_image->get();
+            } elseif (method_exists($this->ktp_image, 'getRealPath') && file_exists($this->ktp_image->getRealPath())) {
+                $fileBytes = file_get_contents($this->ktp_image->getRealPath());
+            }
+
+            if (empty($fileBytes)) {
+                $this->dispatch('swal', [
+                    'title' => 'File Tidak Terbaca',
+                    'text'  => 'File foto KTP gagal dimuat ke memori server. Coba pilih file lagi.',
+                    'icon'  => 'error',
+                ]);
+                return;
+            }
+
+            $imageData = base64_encode($fileBytes);
+            $mimeType  = method_exists($this->ktp_image, 'getMimeType') ? ($this->ktp_image->getMimeType() ?: 'image/jpeg') : 'image/jpeg';
+
+            $result = $gemini->extractFromBase64($imageData, $mimeType);
+
+            if (!$result['success']) {
+                $this->dispatch('swal', [
+                    'title' => 'Gagal Membaca KTP',
+                    'text'  => $result['error'],
+                    'icon'  => 'error',
+                ]);
+                return;
+            }
+
+            $this->applyKtpData($result['data']);
+
             $this->dispatch('swal', [
-                'title' => 'Gemini API Belum Diset',
-                'text'  => 'Isi GEMINI_API_KEY di file .env untuk menggunakan fitur Scan KTP otomatis.',
-                'icon'  => 'warning',
+                'title' => 'Berhasil!',
+                'text'  => 'Data KTP berhasil diekstrak oleh Gemini AI dan diisi ke dalam form.',
+                'icon'  => 'success',
             ]);
-            return;
-        }
-
-        $imageData = base64_encode(file_get_contents($this->ktp_image->getRealPath()));
-        $mimeType  = $this->ktp_image->getMimeType() ?: 'image/jpeg';
-
-        $result = $gemini->extractFromBase64($imageData, $mimeType);
-
-        if (!$result['success']) {
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('processKtpOcr Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $this->dispatch('swal', [
-                'title' => 'Gagal Membaca KTP',
-                'text'  => $result['error'],
+                'title' => 'Gagal Memproses KTP',
+                'text'  => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
                 'icon'  => 'error',
             ]);
-            return;
         }
-
-        $this->applyKtpData($result['data']);
-
-        $this->dispatch('swal', [
-            'title' => 'Berhasil!',
-            'text'  => 'Data KTP berhasil diekstrak oleh Gemini AI dan diisi ke dalam form.',
-            'icon'  => 'success',
-        ]);
     }
 
     /**
@@ -252,7 +310,11 @@ class NewPatient extends Component
 
         // Hitung ulang umur setelah tgl_lahir diisi
         if (!empty($data['tanggal_lahir'])) {
-            $this->hitungUmur();
+            try {
+                $this->hitungUmur();
+            } catch (\Throwable $e) {
+                // Ignore umur parsing error
+            }
         }
     }
 

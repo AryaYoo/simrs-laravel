@@ -36,6 +36,17 @@
                 this.showModal = false;
             },
             async startWebcam() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    if (confirm('Kamera browser langsung hanya diizinkan pada koneksi aman (HTTPS) atau localhost.\n\nKarena diakses melalui IP (' + window.location.hostname + '), browser membatasi WebRTC.\n\nKlik OK untuk membuka kamera / pemilih file perangkat, atau Batal.')) {
+                        this.closeModal();
+                        if (this.$refs.cameraInput) {
+                            this.$refs.cameraInput.click();
+                        } else {
+                            this.$refs.fileInput.click();
+                        }
+                    }
+                    return;
+                }
                 this.mode = 'webcam';
                 await $nextTick();
                 try {
@@ -89,6 +100,7 @@
 
         {{-- Hidden Inputs & Canvas --}}
         <input type="file" x-ref="fileInput" wire:model.live="ktp_image" accept="image/*" class="hidden" />
+        <input type="file" x-ref="cameraInput" wire:model.live="ktp_image" accept="image/*" capture="environment" class="hidden" />
         <canvas x-ref="canvasEl" class="hidden"></canvas>
 
         {{-- ===== MODAL POPUP (Reuse same as new.blade.php) ===== --}}

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 namespace App\Services;
 
@@ -19,8 +19,8 @@ class GeminiKtpService
 
     public function __construct()
     {
-        $this->apiKey = config('gemini.api_key', '');
-        $this->model  = config('gemini.model', 'gemini-1.5-flash');
+        $this->apiKey = (string) (config('gemini.api_key') ?: env('GEMINI_API_KEY', ''));
+        $this->model  = (string) (config('gemini.model') ?: env('GEMINI_MODEL', 'gemini-1.5-flash'));
     }
 
     /**
@@ -44,7 +44,7 @@ class GeminiKtpService
             return [
                 'success' => false,
                 'data'    => null,
-                'error'   => 'GEMINI_API_KEY belum dikonfigurasi di file .env.',
+                'error'   => 'GEMINI_API_KEY belum dikonfigurasi di file .env server.',
             ];
         }
 
@@ -78,7 +78,8 @@ class GeminiKtpService
         try {
             $url = "{$this->baseUrl}/{$this->model}:generateContent?key={$this->apiKey}";
 
-            $response = Http::timeout(30)
+            $response = Http::withoutVerifying()
+                ->timeout(45)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post($url, $payload);
 
@@ -90,7 +91,7 @@ class GeminiKtpService
                 return [
                     'success' => false,
                     'data'    => null,
-                    'error'   => "Gemini API error: {$errorMsg}",
+                    'error'   => "Gemini API error ({$response->status()}): {$errorMsg}",
                 ];
             }
 
@@ -127,8 +128,8 @@ class GeminiKtpService
                 'data'    => $normalized,
                 'error'   => null,
             ];
-        } catch (\Exception $e) {
-            Log::error('GeminiKtpService: Exception', ['message' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            Log::error('GeminiKtpService: Throwable Exception', ['message' => $e->getMessage()]);
             return [
                 'success' => false,
                 'data'    => null,
