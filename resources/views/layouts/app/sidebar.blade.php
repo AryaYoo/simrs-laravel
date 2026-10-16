@@ -22,11 +22,20 @@
     <div x-data="{ 
             sidebarOpen: {{ isset($hideSidebar) && $hideSidebar ? 'false' : "localStorage.getItem('sidebarOpen') !== 'false'" }},
             mobileMenuOpen: false,
+            adminSectionOpen: localStorage.getItem('adminSectionOpen') !== 'false',
+            userSectionOpen: localStorage.getItem('userSectionOpen') !== 'false',
+            bridgingSectionOpen: localStorage.getItem('bridgingSectionOpen') !== 'false',
             frontOfficeOpen: {{ request()->routeIs('modul.registrasi-pasien*') || request()->routeIs('modul.pasien*') ? 'true' : 'false' }},
             rawatInapOpen: {{ request()->routeIs('modul.rawat-inap*') ? 'true' : 'false' }},
             farmasiOpen: {{ request()->routeIs('modul.farmasi*') || request()->is('modul/farmasi*') ? 'true' : 'false' }},
             casemixOpen: {{ request()->is('modul/casemix*') ? 'true' : 'false' }}
-         }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))" class="flex min-h-screen relative z-10">
+         }" 
+         x-init="
+            $watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val));
+            $watch('adminSectionOpen', val => localStorage.setItem('adminSectionOpen', val));
+            $watch('userSectionOpen', val => localStorage.setItem('userSectionOpen', val));
+            $watch('bridgingSectionOpen', val => localStorage.setItem('bridgingSectionOpen', val));
+         " class="flex min-h-screen relative z-10">
 
         {{-- ===== SIDEBAR ===== --}}
         <aside
@@ -64,17 +73,25 @@
                     </a>
                 </div>
 
-                {{-- Admin Menu Header --}}
-                <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
+                {{-- Admin Menu Header (Collapsible Accordion) --}}
+                <div x-show="sidebarOpen" 
+                    @click="adminSectionOpen = !adminSectionOpen"
+                    class="flex items-center justify-between cursor-pointer select-none px-4 py-2 hover:bg-white/10 transition-colors"
+                    title="{{ __('Klik untuk meminimalkan / membuka Admin Menu') }}">
                     <p
-                        style="color: rgba(255, 255, 255, 0.5); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+                        style="color: rgba(255, 255, 255, 0.6); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
                         {{ __('Admin Menu') }}
                     </p>
+                    <flux:icon name="chevron-down" class="w-3 h-3 text-white/60 transition-transform duration-200" :class="adminSectionOpen ? 'rotate-180' : ''" />
                 </div>
                 <div x-show="!sidebarOpen" class="h-4"></div>
 
                 {{-- Admin Navigation --}}
-                <nav class="pb-4" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                <nav x-show="!sidebarOpen || adminSectionOpen" 
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 -translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="pb-4" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
                     <a href="{{ route('admin.dashboard') }}" wire:navigate
                         class="flex items-center rounded-md text-sm font-medium transition-colors"
                         :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
@@ -152,17 +169,25 @@
             {{-- SECTION: MAIN (Dark Olive) - USER MENU --}}
             <div class="flex-1 flex flex-col" style="background-color: #4C5C2D; color: white; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
 
-                {{-- Main Menu Header --}}
-                <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
+                {{-- Main Menu Header (Collapsible Accordion) --}}
+                <div x-show="sidebarOpen" 
+                    @click="userSectionOpen = !userSectionOpen"
+                    class="flex items-center justify-between cursor-pointer select-none px-4 py-2 hover:bg-white/10 transition-colors"
+                    title="{{ __('Klik untuk meminimalkan / membuka User Menu') }}">
                     <p
-                        style="color: rgba(255,255,255,0.5); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+                        style="color: rgba(255,255,255,0.6); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
                         {{ __('User Menu') }}
                     </p>
+                    <flux:icon name="chevron-down" class="w-3 h-3 text-white/60 transition-transform duration-200" :class="userSectionOpen ? 'rotate-180' : ''" />
                 </div>
                 <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
 
                 {{-- Main Navigation --}}
-                <nav class="overflow-y-auto" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                <nav x-show="!sidebarOpen || userSectionOpen"
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 -translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="overflow-y-auto" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
                     {{-- Semua Modul (Standalone) --}}
                     <a href="{{ route('modul.index') }}" wire:navigate
                         class="flex items-center rounded-md text-sm font-medium transition-colors mb-1"
@@ -431,17 +456,25 @@
             <div class="flex-1 flex flex-col pt-4"
                 style="background-color: #3E4A25; border-top: 1px solid rgba(0,0,0,0.1);">
                 @if(auth()->user()->role === 'admin')
-                {{-- SECTION: BRIDGING (Integrated Style) --}}
-                <div x-show="sidebarOpen" style="padding: 0.75rem 1rem 0.25rem 1rem;">
+                {{-- SECTION: BRIDGING (Collapsible Accordion) --}}
+                <div x-show="sidebarOpen" 
+                    @click="bridgingSectionOpen = !bridgingSectionOpen"
+                    class="flex items-center justify-between cursor-pointer select-none px-4 py-2 hover:bg-white/10 transition-colors"
+                    title="{{ __('Klik untuk meminimalkan / membuka Bridging') }}">
                     <p
-                        style="color: rgba(255,255,255,0.4); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+                        style="color: rgba(255,255,255,0.5); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
                         {{ __('Bridging') }}
                     </p>
+                    <flux:icon name="chevron-down" class="w-3 h-3 text-white/50 transition-transform duration-200" :class="bridgingSectionOpen ? 'rotate-180' : ''" />
                 </div>
                 <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
 
                 {{-- Bridging Navigation --}}
-                <nav class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                <nav x-show="!sidebarOpen || bridgingSectionOpen" 
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 -translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
                     <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate
                         class="flex items-center rounded-md text-sm font-medium transition-colors"
                         :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
