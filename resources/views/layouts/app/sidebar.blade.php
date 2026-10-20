@@ -18,24 +18,29 @@
     <!-- Global Background Watermark -->
     <img src="{{ asset('logo.png') }}" class="fixed -bottom-16 -right-16 w-[30rem] h-auto opacity-[0.05] pointer-events-none" style="z-index: 0;" alt="" />
 
+    @php
+        $defaultSection = 'user';
+        if (auth()->user()?->role === 'admin') {
+            if (request()->routeIs('admin.*') || request()->routeIs('dashboard') || request()->routeIs('users.*') || request()->routeIs('master-data*')) {
+                $defaultSection = 'admin';
+            } elseif (request()->routeIs('bridging.*')) {
+                $defaultSection = 'bridging';
+            } else {
+                $defaultSection = 'user';
+            }
+        }
+    @endphp
+
     {{-- Wrapper dengan Alpine.js untuk toggle sidebar --}}
     <div x-data="{ 
-            sidebarOpen: {{ isset($hideSidebar) && $hideSidebar ? 'false' : "localStorage.getItem('sidebarOpen') !== 'false'" }},
+            sidebarOpen: {!! isset($hideSidebar) && $hideSidebar ? 'false' : "localStorage.getItem('sidebarOpen') !== 'false'" !!},
             mobileMenuOpen: false,
-            adminSectionOpen: localStorage.getItem('adminSectionOpen') !== 'false',
-            userSectionOpen: localStorage.getItem('userSectionOpen') !== 'false',
-            bridgingSectionOpen: localStorage.getItem('bridgingSectionOpen') !== 'false',
+            activeSection: '{{ $defaultSection }}',
             frontOfficeOpen: {{ request()->routeIs('modul.registrasi-pasien*') || request()->routeIs('modul.pasien*') ? 'true' : 'false' }},
             rawatInapOpen: {{ request()->routeIs('modul.rawat-inap*') ? 'true' : 'false' }},
             farmasiOpen: {{ request()->routeIs('modul.farmasi*') || request()->is('modul/farmasi*') ? 'true' : 'false' }},
             casemixOpen: {{ request()->is('modul/casemix*') ? 'true' : 'false' }}
-         }" 
-         x-init="
-            $watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val));
-            $watch('adminSectionOpen', val => localStorage.setItem('adminSectionOpen', val));
-            $watch('userSectionOpen', val => localStorage.setItem('userSectionOpen', val));
-            $watch('bridgingSectionOpen', val => localStorage.setItem('bridgingSectionOpen', val));
-         " class="flex min-h-screen relative z-10">
+         }" x-init="$watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))" class="flex min-h-screen relative z-10">
 
         {{-- ===== SIDEBAR ===== --}}
         <aside
@@ -73,25 +78,43 @@
                     </a>
                 </div>
 
-                {{-- Admin Menu Header (Collapsible Accordion) --}}
-                <div x-show="sidebarOpen" 
-                    @click="adminSectionOpen = !adminSectionOpen"
-                    class="flex items-center justify-between cursor-pointer select-none px-4 py-2 hover:bg-white/10 transition-colors"
-                    title="{{ __('Klik untuk meminimalkan / membuka Admin Menu') }}">
-                    <p
-                        style="color: rgba(255, 255, 255, 0.6); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-                        {{ __('Admin Menu') }}
-                    </p>
-                    <flux:icon name="chevron-down" class="w-3 h-3 text-white/60 transition-transform duration-200" :class="adminSectionOpen ? 'rotate-180' : ''" />
+                {{-- Admin Menu Header (Accordion) --}}
+                <div x-show="sidebarOpen" class="px-2 pt-2.5 pb-1">
+                    <button type="button" @click="activeSection = (activeSection === 'admin' ? '' : 'admin')"
+                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-white/10 transition-colors text-left focus:outline-none group cursor-pointer"
+                        style="background: transparent; border: none;">
+                        <div class="flex items-center gap-2">
+                            <flux:icon name="shield-check" class="w-3.5 h-3.5 opacity-80" />
+                            <span style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;"
+                                :style="activeSection === 'admin' ? 'color: rgba(255,255,255,0.95);' : 'color: rgba(255,255,255,0.5);'">
+                                {{ __('Admin Menu') }}
+                            </span>
+                        </div>
+                        <svg class="w-3.5 h-3.5 transition-transform duration-200"
+                            :class="activeSection === 'admin' ? 'rotate-180 text-white' : 'text-white/40 group-hover:text-white/70'"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
                 </div>
-                <div x-show="!sidebarOpen" class="h-4"></div>
+
+                {{-- Admin Menu Minimized Button --}}
+                <div x-show="!sidebarOpen" class="flex flex-col items-center py-2">
+                    <button type="button" @click="activeSection = (activeSection === 'admin' ? '' : 'admin')"
+                        class="w-10 h-10 flex flex-col items-center justify-center rounded-xl transition-all focus:outline-none relative group cursor-pointer"
+                        :class="activeSection === 'admin' ? 'bg-white/25 text-white shadow-md ring-2 ring-white/40' : 'bg-black/10 text-white/60 hover:text-white hover:bg-white/10 ring-1 ring-white/10'"
+                        title="{{ __('Admin Menu') }}">
+                        <flux:icon name="shield-check" class="w-5 h-5 flex-shrink-0" />
+                        <span x-show="activeSection === 'admin'" class="absolute -bottom-1 w-1.5 h-1.5 bg-white rounded-full ring-2 ring-[#6A7E3F]"></span>
+                    </button>
+                </div>
 
                 {{-- Admin Navigation --}}
-                <nav x-show="!sidebarOpen || adminSectionOpen" 
-                    x-transition:enter="transition ease-out duration-150"
+                <nav x-show="activeSection === 'admin'"
+                    x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 -translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="pb-4" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                    class="pb-3" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
                     <a href="{{ route('admin.dashboard') }}" wire:navigate
                         class="flex items-center rounded-md text-sm font-medium transition-colors"
                         :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
@@ -167,27 +190,55 @@
             @endif
 
             {{-- SECTION: MAIN (Dark Olive) - USER MENU --}}
-            <div class="flex-1 flex flex-col" style="background-color: #4C5C2D; color: white; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
+            <div class="flex flex-col" style="background-color: #4C5C2D; color: white; border-top: 1px solid rgba(255,255,255,0.08);">
 
-                {{-- Main Menu Header (Collapsible Accordion) --}}
-                <div x-show="sidebarOpen" 
-                    @click="userSectionOpen = !userSectionOpen"
-                    class="flex items-center justify-between cursor-pointer select-none px-4 py-2 hover:bg-white/10 transition-colors"
-                    title="{{ __('Klik untuk meminimalkan / membuka User Menu') }}">
-                    <p
-                        style="color: rgba(255,255,255,0.6); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+                {{-- User Menu Header (Accordion) --}}
+                @if(auth()->user()->role === 'admin')
+                <div x-show="sidebarOpen" class="px-2 pt-2.5 pb-1">
+                    <button type="button" @click="activeSection = (activeSection === 'user' ? '' : 'user')"
+                        class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-white/10 transition-colors text-left focus:outline-none group cursor-pointer"
+                        style="background: transparent; border: none;">
+                        <div class="flex items-center gap-2">
+                            <flux:icon name="squares-2x2" class="w-3.5 h-3.5 opacity-80" />
+                            <span style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;"
+                                :style="activeSection === 'user' ? 'color: rgba(255,255,255,0.95);' : 'color: rgba(255,255,255,0.5);'">
+                                {{ __('User Menu') }}
+                            </span>
+                        </div>
+                        <svg class="w-3.5 h-3.5 transition-transform duration-200"
+                            :class="activeSection === 'user' ? 'rotate-180 text-white' : 'text-white/40 group-hover:text-white/70'"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- User Menu Minimized Button --}}
+                <div x-show="!sidebarOpen" class="flex flex-col items-center py-2">
+                    <div class="w-8 h-px bg-white/10 mb-2"></div>
+                    <button type="button" @click="activeSection = (activeSection === 'user' ? '' : 'user')"
+                        class="w-10 h-10 flex flex-col items-center justify-center rounded-xl transition-all focus:outline-none relative group cursor-pointer"
+                        :class="activeSection === 'user' ? 'bg-white/25 text-white shadow-md ring-2 ring-white/40' : 'bg-black/10 text-white/60 hover:text-white hover:bg-white/10 ring-1 ring-white/10'"
+                        title="{{ __('User Menu') }}">
+                        <flux:icon name="squares-2x2" class="w-5 h-5 flex-shrink-0" />
+                        <span x-show="activeSection === 'user'" class="absolute -bottom-1 w-1.5 h-1.5 bg-white rounded-full ring-2 ring-[#4C5C2D]"></span>
+                    </button>
+                </div>
+                @else
+                <div x-show="sidebarOpen" class="px-4 pt-3 pb-1">
+                    <span style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); text-transform: uppercase;">
                         {{ __('User Menu') }}
-                    </p>
-                    <flux:icon name="chevron-down" class="w-3 h-3 text-white/60 transition-transform duration-200" :class="userSectionOpen ? 'rotate-180' : ''" />
+                    </span>
                 </div>
                 <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
+                @endif
 
                 {{-- Main Navigation --}}
-                <nav x-show="!sidebarOpen || userSectionOpen"
-                    x-transition:enter="transition ease-out duration-150"
+                <nav x-show="{{ auth()->user()->role === 'admin' ? "activeSection === 'user'" : 'true' }}"
+                    x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 -translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="overflow-y-auto" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                    class="overflow-y-auto pb-3" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
                     {{-- Semua Modul (Standalone) --}}
                     <a href="{{ route('modul.index') }}" wire:navigate
                         class="flex items-center rounded-md text-sm font-medium transition-colors mb-1"
@@ -453,42 +504,63 @@
             </div>
 
             {{-- SECONDARY ZONE: BRIDGING & FOOTER (Darker Olive Zone) --}}
-            <div class="flex-1 flex flex-col pt-4"
+            <div class="flex-1 flex flex-col justify-between"
                 style="background-color: #3E4A25; border-top: 1px solid rgba(0,0,0,0.1);">
                 @if(auth()->user()->role === 'admin')
-                {{-- SECTION: BRIDGING (Collapsible Accordion) --}}
-                <div x-show="sidebarOpen" 
-                    @click="bridgingSectionOpen = !bridgingSectionOpen"
-                    class="flex items-center justify-between cursor-pointer select-none px-4 py-2 hover:bg-white/10 transition-colors"
-                    title="{{ __('Klik untuk meminimalkan / membuka Bridging') }}">
-                    <p
-                        style="color: rgba(255,255,255,0.5); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-                        {{ __('Bridging') }}
-                    </p>
-                    <flux:icon name="chevron-down" class="w-3 h-3 text-white/50 transition-transform duration-200" :class="bridgingSectionOpen ? 'rotate-180' : ''" />
+                <div>
+                    {{-- Bridging Header (Accordion) --}}
+                    <div x-show="sidebarOpen" class="px-2 pt-2.5 pb-1">
+                        <button type="button" @click="activeSection = (activeSection === 'bridging' ? '' : 'bridging')"
+                            class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md hover:bg-white/10 transition-colors text-left focus:outline-none group cursor-pointer"
+                            style="background: transparent; border: none;">
+                            <div class="flex items-center gap-2">
+                                <flux:icon name="arrows-right-left" class="w-3.5 h-3.5 opacity-80" />
+                                <span style="font-size: 0.625rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;"
+                                    :style="activeSection === 'bridging' ? 'color: rgba(255,255,255,0.95);' : 'color: rgba(255,255,255,0.5);'">
+                                    {{ __('Bridging') }}
+                                </span>
+                            </div>
+                            <svg class="w-3.5 h-3.5 transition-transform duration-200"
+                                :class="activeSection === 'bridging' ? 'rotate-180 text-white' : 'text-white/40 group-hover:text-white/70'"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Bridging Minimized Button --}}
+                    <div x-show="!sidebarOpen" class="flex flex-col items-center py-2">
+                        <div class="w-8 h-px bg-white/10 mb-2"></div>
+                        <button type="button" @click="activeSection = (activeSection === 'bridging' ? '' : 'bridging')"
+                            class="w-10 h-10 flex flex-col items-center justify-center rounded-xl transition-all focus:outline-none relative group cursor-pointer"
+                            :class="activeSection === 'bridging' ? 'bg-white/25 text-white shadow-md ring-2 ring-white/40' : 'bg-black/10 text-white/60 hover:text-white hover:bg-white/10 ring-1 ring-white/10'"
+                            title="{{ __('Bridging') }}">
+                            <flux:icon name="arrows-right-left" class="w-5 h-5 flex-shrink-0" />
+                            <span x-show="activeSection === 'bridging'" class="absolute -bottom-1 w-1.5 h-1.5 bg-white rounded-full ring-2 ring-[#3E4A25]"></span>
+                        </button>
+                    </div>
+
+                    {{-- Bridging Navigation --}}
+                    <nav x-show="activeSection === 'bridging'"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 -translate-y-1"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
+                        <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate
+                            class="flex items-center rounded-md text-sm font-medium transition-colors"
+                            :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
+                            style="color: white; text-decoration: none; background-color: {{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }};"
+                            onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
+                            onmouseout="this.style.backgroundColor='{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }}'"
+                            title="{{ __('ERM BPJS') }}">
+                            <flux:icon name="document-text" class="w-4 h-4 flex-shrink-0" />
+                            <span x-show="sidebarOpen">{{ __('Rekam Medis (E-Claim)') }}</span>
+                        </a>
+                    </nav>
                 </div>
-                <div x-show="!sidebarOpen" class="w-8 h-px bg-white/10 mx-auto my-2"></div>
-
-                {{-- Bridging Navigation --}}
-                <nav x-show="!sidebarOpen || bridgingSectionOpen" 
-                    x-transition:enter="transition ease-out duration-150"
-                    x-transition:enter-start="opacity-0 -translate-y-1"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    class="mb-2" :class="sidebarOpen ? 'px-2' : 'px-2 flex flex-col items-center'">
-                    <a href="{{ route('bridging.erm-bpjs.index') }}" wire:navigate
-                        class="flex items-center rounded-md text-sm font-medium transition-colors"
-                        :class="sidebarOpen ? 'gap-2 px-3 py-2 w-full mb-0.5' : 'justify-center w-10 h-10 mb-2'"
-                        style="color: white; text-decoration: none; background-color: {{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }};"
-                        onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'"
-                        onmouseout="this.style.backgroundColor='{{ request()->routeIs('bridging.erm-bpjs*') ? 'rgba(255, 255, 255, 0.15)' : 'transparent' }}'"
-                        title="{{ __('ERM BPJS') }}">
-                        <flux:icon name="document-text" class="w-4 h-4 flex-shrink-0" />
-                        <span x-show="sidebarOpen">{{ __('Rekam Medis (E-Claim)') }}</span>
-                    </a>
-                </nav>
+                @else
+                <div></div>
                 @endif
-
-                <div class="flex-1"></div>
 
                 {{-- SECTION: FOOTER (Darker Olive) --}}
                 <div style="background-color: #2F381C; border-top: 1px solid rgba(255,255,255,0.05);">

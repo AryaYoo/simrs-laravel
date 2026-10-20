@@ -475,6 +475,47 @@ Secara standar spesifikasi HTML, tombol `<button>` yang berada di dalam `<form>`
      - **Lembar Pengesahan:** Memuat kolom tanda tangan Kepala Ruangan / Unit, Kepala Rekam Medis, dan Direktur Rumah Sakit.
      - **Kebersihan Dokumen Cetak:** Semua elemen web non-cetak (navigasi, breadcrumbs, tombol, sidebar, elemen floating seperti tombol Bantuan IT) **WAJIB** disembunyikan menggunakan kelas `print:hidden no-print` dan aturan `@media print`.
 
+
+
+### 17. Larangan Keras Format UTF-8 with BOM pada Seluruh File PHP / Config (KRITIKAL!)
+
+> [!CAUTION]
+> **DILARANG KERAS menyimpan file `.php`, `.blade.php`, atau file konfigurasi dalam format `UTF-8 with BOM`. Seluruh file WAJIB disimpan dalam format murni `UTF-8` (without BOM).**
+
+#### ⚠️ Kasus Nyata & Dampak Fatal (Kasus Sidebar Rusak & Livewire Crash):
+- **Pemicu:** Ketika membuat file konfigurasi baru (misal: `config/gemini.php`), editor teks tertentu tanpa sengaja menyimpannya dalam format **UTF-8 with BOM**.
+- **Mekanisme Bug:**
+  - File dengan BOM menyisipkan 3 byte tak terlihat (`\xEF\xBB\xBF`) persis sebelum tag pembuka `<?php`.
+  - Karena seluruh file di folder `config/*.php` otomatis di-load oleh kernel Laravel pada setiap HTTP request, 3 byte tak kasat mata ini langsung dicetak ke *output buffer* PHP sebelum header/body respon utama dikirim.
+- **Dampak pada JavaScript (Livewire & Flux UI):**
+  - Saat browser memuat script dinamis seperti `livewire.js` atau `flux.js`, server mengirimkan header `Content-Length: X` sesuai ukuran file asli.
+  - Karena ada 3 byte siluman di awal respon, 3 karakter terakhir penutup di ujung file JavaScript (`);\n`) **terpotong / buntung**.
+  - Browser melempar error:
+    ```text
+    SyntaxError: Unexpected end of input (pada flux.js)
+    SyntaxError: Invalid or unexpected token (pada livewire.js)
+    ```
+- **Gejala Visual di Layar Pengguna:**
+  - **Alpine.js mati total.**
+  - Semua dropdown submenu di sidebar (Front Office, Rawat Inap, Farmasi, Casemix) langsung terbuka bersamaan karena `x-show` tidak berjalan.
+  - Sidebar meluber ke bawah dan memicu scrollbar native abu-abu yang mengganggu.
+  - Binding class dinamis `:class="sidebarOpen ? 'gap-2 px-3 py-2 w-full' : '...'"` tidak dieksekusi, sehingga ikon dan teks saling menabrak tanpa padding.
+  - Tombol dengan handler `@click` (seperti tombol Logout / Keluar dan toggle sidebar) macet total dan tidak merespon klik.
+
+#### 🛡️ Langkah Pencegahan & Perbaikan:
+1. **Periksa Format Encoding:** Pastikan status bar di VS Code / editor Anda selalu menunjukkan **`UTF-8`**, BUKAN `UTF-8 with BOM`.
+2. **Perintah Cek BOM (via Terminal/CLI):**
+   Jika sistem mengalami error syntax JS misterius serupa, jalankan script pengecekan BOM:
+   ```bash
+   php -r "$dir=new RecursiveIteratorIterator(new RecursiveDirectoryIterator('.')); foreach($dir as $f){ if($f->isFile() && $f->getExtension()==='php' && !str_contains($f->getPathname(), 'vendor')){ $b=fread(fopen($f->getPathname(),'r'),3); if($b===\"\xEF\xBB\xBF\"){ echo 'File ber-BOM: '.$f->getPathname().PHP_EOL; } } }"
+   ```
+3. **Publish Aset Statis Livewire & Flux:**
+   Aset frontend Livewire dapat di-publish langsung ke folder `public/` agar dibaca sebagai file statis:
+   ```bash
+   php artisan livewire:publish --assets
+   php artisan optimize:clear
+   ```
+
 ---
 
 ## 📸 Panduan OCR KTP
