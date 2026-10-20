@@ -168,16 +168,36 @@
                     </div>
                 </div>
 
-                {{-- 12. Stok Minimal --}}
+                {{-- 12. Stok Saat Ini & Stok Minimal --}}
                 <div>
-                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Stok Minimal</label>
-                    <div class="px-3.5 py-2.5 text-xs font-bold text-right rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-900 dark:text-neutral-100">
-                        {{ number_format($barang->stokminimal, 1, '.', '') }}
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Stok Saat Ini (Total)</label>
+                    @php
+                        $curStok = (float)($barang->total_stok ?? 0);
+                        $minStok = (float)($barang->stokminimal ?? 0);
+                        $isKritis = ($minStok > 0 && $curStok <= $minStok);
+                    @endphp
+                    <div class="px-3.5 py-2.5 text-xs font-bold rounded-lg border {{ $isKritis ? 'border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-rose-300' : 'border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-900 dark:text-neutral-100' }} flex items-center justify-between">
+                        @if($isKritis)
+                            <span class="inline-flex items-center gap-1 text-[10px] text-red-600 dark:text-red-400 font-semibold">
+                                <flux:icon name="exclamation-triangle" class="w-3.5 h-3.5" />
+                                Stok Kritis
+                            </span>
+                        @else
+                            <span class="text-[10px] text-neutral-400 font-normal">Aktual</span>
+                        @endif
+                        <span class="font-mono text-xs">{{ number_format($curStok, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Stok Minimal (Ambang)</label>
+                    <div class="px-3.5 py-2.5 text-xs font-bold text-right rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-900 dark:text-neutral-100 font-mono">
+                        {{ number_format($barang->stokminimal, 0, ',', '.') }}
                     </div>
                 </div>
 
                 {{-- 13. Tanggal Kadaluwarsa --}}
-                <div class="lg:col-span-2">
+                <div>
                     <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Tanggal Kadaluwarsa</label>
                     <div class="px-3.5 py-2.5 text-xs font-mono font-semibold rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/60 text-neutral-900 dark:text-neutral-100">
                         {{ $barang->expire ? date('d-m-Y', strtotime($barang->expire)) : '-' }}

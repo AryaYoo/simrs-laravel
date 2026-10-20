@@ -323,8 +323,21 @@
                                 </td>
 
                                 {{-- Stok Depo --}}
-                                <td class="px-1.5 py-1 text-center font-mono font-bold text-emerald-700 dark:text-emerald-400 whitespace-nowrap">
-                                    {{ number_format($item['stok'], 0, ',', '.') }}
+                                @php
+                                    $itemStok = floatval($item['stok'] ?? 0);
+                                    $itemMin = floatval($item['stokminimal'] ?? 0);
+                                    $isItemKritis = ($itemMin > 0 && $itemStok <= $itemMin) || ($itemStok <= 0);
+                                @endphp
+                                <td class="px-1.5 py-1 text-center font-mono font-bold whitespace-nowrap">
+                                    @if($isItemKritis)
+                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800" title="{{ $itemStok <= 0 ? 'Stok Habis' : 'Stok Kritis (Min: ' . $itemMin . ')' }}">
+                                            {{ number_format($itemStok, 0, ',', '.') }}
+                                        </span>
+                                    @else
+                                        <span class="text-emerald-700 dark:text-emerald-400">
+                                            {{ number_format($itemStok, 0, ',', '.') }}
+                                        </span>
+                                    @endif
                                 </td>
 
                                 {{-- Aturan Pakai (FORM EDITABLE) --}}
@@ -546,8 +559,21 @@
                                         <td class="px-3 py-2 text-right font-mono font-bold text-neutral-800 dark:text-neutral-200">
                                             {{ number_format($o['harga'], 0, ',', '.') }}
                                         </td>
-                                        <td class="px-3 py-2 text-center font-mono font-bold {{ $o['stok'] > 0 ? 'text-emerald-600' : 'text-red-500' }}">
-                                            {{ number_format($o['stok'], 0, ',', '.') }}
+                                        @php
+                                            $modalStok = floatval($o['stok'] ?? 0);
+                                            $modalMin = floatval($o['stokminimal'] ?? 0);
+                                            $isModalKritis = ($modalMin > 0 && $modalStok <= $modalMin) || ($modalStok <= 0);
+                                        @endphp
+                                        <td class="px-3 py-2 text-center font-mono font-bold">
+                                            @if($isModalKritis)
+                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800" title="{{ $modalStok <= 0 ? 'Stok Habis' : 'Stok Kritis (Min: ' . $modalMin . ')' }}">
+                                                    {{ number_format($modalStok, 0, ',', '.') }}
+                                                </span>
+                                            @else
+                                                <span class="text-emerald-600 dark:text-emerald-400">
+                                                    {{ number_format($modalStok, 0, ',', '.') }}
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-3 py-2 text-center">
                                             <button type="button" wire:click="addObatFromModal('{{ $o['kode_brng'] }}')"

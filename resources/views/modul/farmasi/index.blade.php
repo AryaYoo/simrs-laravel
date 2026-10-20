@@ -8,6 +8,7 @@
         ['title' => 'Obat, Alkes & BHP', 'icon' => 'beaker', 'route' => route('modul.farmasi.data-barang')],
         ['title' => 'No. Resep', 'icon' => 'hashtag', 'route' => route('modul.farmasi.no-resep')],
         ['title' => 'Stock Opname', 'icon' => 'archive-box', 'route' => route('modul.farmasi.stock-opname')],
+        ['title' => 'Visite', 'icon' => 'user-plus', 'route' => route('modul.farmasi.visite')],
     ];
 
     if (auth()->user()?->role === 'admin') {

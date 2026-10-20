@@ -21,6 +21,16 @@ class NoResep extends Component
     public bool  $detailModalOpen = false;
     public ?array $activeResep    = null;
 
+    public function mount(): void
+    {
+        if (! $this->dari) {
+            $this->dari = now()->format('Y-m-d');
+        }
+        if (! $this->sampai) {
+            $this->sampai = now()->format('Y-m-d');
+        }
+    }
+
     public function updatedSearch()  { $this->resetPage(); }
     public function updatedDari()    { $this->resetPage(); }
     public function updatedSampai()  { $this->resetPage(); }

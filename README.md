@@ -105,11 +105,11 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Repository Pattern Farmasi**: `PenjualanRepository`, `OpnameRepository`, `ResepPulangRepository`, dan `DataBarangRepository` mengelola seluruh query bisnis farmasi secara terpisah dari layer UI Livewire.
 - [x] **Model Farmasi**: `ResepObat`, `ResepDokter`, `KodeSatuan`, `Opname`, `GudangBarang`, `Jenis`, `KategoriBarang`, `GolonganBarang`, `ResepPulang`, `IndustriFarmasi`, relasi `DataBarang`.
 - [x] **Data Obat, Alkes & BHP**: Modul master data obat, alat kesehatan, dan bahan medis habis pakai (tabel `databarang`):
-  - **Tabel Data Compact**: Menampilkan kolom Action (Detail, Edit, Hapus), Nama Barang & Kode, Kategori & Golongan, Industri Farmasi, Satuan Besar, Satuan Kecil, Kapasitas, Kadaluarsa (indikator merah jika lewat tempo), dan Kandungan.
-  - **Pencarian & Multi-Filter**: Filter Jenis, Kategori, Golongan, Status (Aktif/Non-Aktif), dan Reset Filter instan.
+  - **Tabel Data Compact**: Menampilkan kolom Action (Detail, Edit, Hapus), Nama Barang & Kode, Kategori & Golongan, Industri Farmasi, Satuan Besar, Satuan Kecil, Stok Total (dengan indikator badge merah berkedip saat stok $\le$ batas `stokminimal`), Kapasitas, Kadaluarsa (indikator merah jika lewat tempo), dan Kandungan.
+  - **Pencarian & Multi-Filter**: Filter Jenis, Kategori, Golongan, Status (Aktif/Non-Aktif), Filter Stok (Semua, ⚠️ Stok Kritis, ⛔ Stok Habis, ✅ Stok Aman), dan Reset Filter instan dengan retensi URL query params (`#[Url(history: true)]`).
   - **Halaman Tambah Barang (`/modul/farmasi/data-barang/create`)**: Formulir penambahan master barang baru dengan alur vertikal lapang 4-seksi, navigasi sekuensial enter, auto-generate kode barang (`generateNextKode`), struktur tarif komprehensif, dan sticky header action.
   - **Halaman Edit Barang (`/modul/farmasi/data-barang/{kode_brng}/edit`)**: Formulir perubahan data master obat/BHP dengan proteksi kunci primer (`kode_brng` readonly), alur sekuensial enter, dan pembaruan instan ke database.
-  - **Halaman Detail Data Barang (`/modul/farmasi/data-barang/{kode_brng}`)**: Halaman spesifikasi komprehensif susunan vertikal 4-domain yang menyajikan Kode Barang, I.F., Nama Barang, Kandungan, Satuan Besar & Isi, Satuan Kecil & Kapasitas, Jenis, Kategori, Golongan, Harga Dasar, Harga Beli, Harga Ralan, serta matriks lengkap 8 tingkat tarif rawat inap (Kelas 1, Kelas 2, Kelas 3, Utama/BPJS, VIP, VVIP, Apotek Luar, Obat Bebas, Karyawan), Stok Minimal, dan Tanggal Kadaluwarsa.
+  - **Halaman Detail Data Barang (`/modul/farmasi/data-barang/{kode_brng}`)**: Halaman spesifikasi komprehensif susunan vertikal 4-domain yang menyajikan Kode Barang, I.F., Nama Barang, Kandungan, Satuan Besar & Isi, Satuan Kecil & Kapasitas, Jenis, Kategori, Golongan, Harga Dasar, Harga Beli, Harga Ralan, serta matriks lengkap 8 tingkat tarif rawat inap (Kelas 1, Kelas 2, Kelas 3, Utama/BPJS, VIP, VVIP, Apotek Luar, Obat Bebas, Karyawan), Stok Saat Ini (disertai badge peringatan merah jika di bawah ambang minimal), Stok Minimal, dan Tanggal Kadaluwarsa.
 - [x] **Resep Pulang**: Modul pengelolaan daftar resep obat pulang pasien rawat inap/jalan:
   - **Tabel Data Compact**: Menampilkan kolom Action (Hapus via SweetAlert & Cetak Aturan Pakai), Pasien / No. Rawat / No. RM, Nama Obat & Kode, Tanggal & Jam, Jumlah + Satuan, Harga, Total, Dosis/Aturan Pakai, No. Batch, dan No. Faktur.
   - **Pencarian & Filter**: Pencarian multi-kolom (Pasien, RM, No. Rawat, Obat, Dosis) dan filter rentang tanggal.
@@ -119,8 +119,12 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
   - **Pencarian & Filter Lanjutan**: Filter rentang tanggal, Lokasi (Bangsal), Jenis, Kategori, Golongan, pencarian teks, serta tombol Reset Filter.
   - **Summary Info Bar**: Ringkasan akumulasi data dinamis (Record, Real, Hilang, Lebih).
   - **Input Stok Opname**: Formulir opname interaktif dengan modal pop-up lokasi, auto-load stok per bangsal, kalkulasi selisih/lebih/nominal instan (Alpine.js), dan sinkronisasi otomatis ke `opname`, `gudangbarang`, serta kartu stok `riwayat_barang_medis`.
-
-
+- [x] **Visite Farmasi (`/modul/farmasi/visite`)**: Modul rekam medis kunjungan visite pasien rawat inap untuk farmasi klinis:
+  - **Daftar Pasien Rawat Inap**: Tabel daftar pasien ranap dengan 4 ringkasan statistik (Total, BPJS, Umum, Lainnya), 3 tab status pasien (*Aktif / Belum Pulang*, *Sudah Pulang*, *Semua Pasien*), pencarian cepat, filter tanggal, dan tombol Action Visite per pasien.
+  - **Halaman Riwayat Visite Pasien (`/modul/farmasi/visite/{no_rawat}`)**: Menampilkan banner data identitas pasien dan tabel riwayat kunjungan visite dengan kolom: Tanggal Visite, Jam, Riwayat Pengobatan (maks. 4 kata + `...`), Interaksi Obat (maks. 4 kata + `...`), dan Action (Detail, Edit, Hapus via SweetAlert2).
+  - **Form Input & Edit Visite (Modal Alpine.js)**: Form SOAPIE lengkap mengadopsi standar pemeriksaan rawat inap (Tanggal, Jam, Lookup Petugas, Keluhan/Subjek, Pemeriksaan/Objek, Tanda-Tanda Vital, Kesadaran, Alergi, Penilaian/Asesmen, RTL/Plan, Instruksi, Evaluasi) dengan penambahan bidang khusus Farmasi Klinis: **Riwayat Pengobatan** dan **Interaksi Obat**, serta tombol **Isi Otomatis** dari rujukan data terakhir dan identitas login.
+  - **Modal Detail Visite**: Pop-up ringkasan komprehensif menampilkan identitas pasien, parameter tanda vital, SOAPIE, riwayat pengobatan, analisis interaksi obat, data petugas pemeriksa, serta shortcut tombol edit & hapus.
+  - **Skema Database Raw SQL**: Tabel `visite` disediakan via script inject `SQLinjectRSIAIBI/13_create_visite_table.sql`.
 
 ### 🌉 Bridging & Integrasi
 - [x] **BPJS ERM**: Bridging klaim dan data pelayanan untuk BPJS Kesehatan.

@@ -59,20 +59,20 @@ x-on:swal:toast.window="
     <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 flex flex-col gap-3">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
             {{-- Search --}}
-            <div class="relative lg:col-span-4">
+            <div class="relative lg:col-span-3" wire:key="filter-search-col">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <flux:icon name="magnifying-glass" class="w-4 h-4 text-neutral-400" />
                 </div>
-                <input type="text" wire:model.live.debounce.300ms="search"
+                <input type="text" wire:model.live.debounce.300ms="search" id="input_search_barang"
                     class="block w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
                            bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
                            placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/30 focus:border-[#4C5C2D] transition-colors"
-                    placeholder="Cari Nama Barang, Kode Barang, Letak..." />
+                    placeholder="Cari Nama, Kode, Letak..." />
             </div>
 
             {{-- Filter Jenis --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="kdjns"
+            <div class="lg:col-span-2" wire:key="filter-jenis-col">
+                <select wire:model.live="kdjns" id="select_kdjns"
                     class="block w-full py-2 px-3 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
                            bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
                            focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/30 focus:border-[#4C5C2D] transition-colors">
@@ -84,8 +84,8 @@ x-on:swal:toast.window="
             </div>
 
             {{-- Filter Kategori --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="kode_kategori"
+            <div class="lg:col-span-2" wire:key="filter-kategori-col">
+                <select wire:model.live="kode_kategori" id="select_kode_kategori"
                     class="block w-full py-2 px-3 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
                            bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
                            focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/30 focus:border-[#4C5C2D] transition-colors">
@@ -97,12 +97,12 @@ x-on:swal:toast.window="
             </div>
 
             {{-- Filter Golongan --}}
-            <div class="lg:col-span-2">
-                <select wire:model.live="kode_golongan"
-                    class="block w-full py-2 px-3 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
+            <div class="lg:col-span-1" wire:key="filter-golongan-col">
+                <select wire:model.live="kode_golongan" id="select_kode_golongan"
+                    class="block w-full py-2 px-2 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
                            bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
                            focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/30 focus:border-[#4C5C2D] transition-colors">
-                    <option value="">Semua Golongan</option>
+                    <option value="">Golongan</option>
                     @foreach($listGolongan as $gol)
                         <option value="{{ $gol->kode }}">{{ $gol->nama }}</option>
                     @endforeach
@@ -110,8 +110,8 @@ x-on:swal:toast.window="
             </div>
 
             {{-- Status --}}
-            <div class="lg:col-span-1">
-                <select wire:model.live="status"
+            <div class="lg:col-span-1" wire:key="filter-status-col">
+                <select wire:model.live="status" id="select_status"
                     class="block w-full py-2 px-2 text-sm rounded-lg border border-neutral-200 dark:border-neutral-700
                            bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
                            focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/30 focus:border-[#4C5C2D] transition-colors">
@@ -121,8 +121,20 @@ x-on:swal:toast.window="
                 </select>
             </div>
 
+            {{-- Filter Stok (Kritis, Habis, Aman) --}}
+            <div class="lg:col-span-2" wire:key="filter-stok-col">
+                <select wire:model.live="stok_filter" id="select_stok_filter" wire:key="select-stok-filter-elem"
+                    class="block w-full py-2 px-2.5 text-sm rounded-lg border {{ $stok_filter === 'kritis' ? 'border-red-500 font-bold text-red-600 dark:text-red-400 ring-2 ring-red-500/20' : 'border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100' }}
+                           bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/30 focus:border-[#4C5C2D] transition-colors">
+                    <option value="">Semua Stok</option>
+                    <option value="kritis">⚠️ Stok Kritis (≤ Min)</option>
+                    <option value="habis">⛔ Stok Habis (0)</option>
+                    <option value="aman">✅ Stok Aman (> Min)</option>
+                </select>
+            </div>
+
             {{-- Reset --}}
-            <div class="lg:col-span-1">
+            <div class="lg:col-span-1" wire:key="filter-reset-col">
                 <button type="button" wire:click="resetFilter"
                     class="inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 text-sm font-medium rounded-lg border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 hover:bg-neutral-100 dark:hover:bg-neutral-700/50 text-neutral-700 dark:text-neutral-200 transition-colors shadow-sm"
                     title="Reset Filter">
@@ -144,6 +156,7 @@ x-on:swal:toast.window="
                         <th class="px-3 py-2 font-semibold min-w-[130px]">Industri Farmasi</th>
                         <th class="px-3 py-2 font-semibold min-w-[130px]">Satuan Besar</th>
                         <th class="px-3 py-2 font-semibold min-w-[130px]">Satuan Kecil</th>
+                        <th class="px-3 py-2 font-semibold whitespace-nowrap text-center min-w-[95px]">Stok Total</th>
                         <th class="px-3 py-2 font-semibold whitespace-nowrap text-right min-w-[70px]">Kapasitas</th>
                         <th class="px-3 py-2 font-semibold whitespace-nowrap min-w-[95px]">Kadaluarsa</th>
                         <th class="px-3 py-2 font-semibold min-w-[130px]">Kandungan</th>
@@ -156,8 +169,12 @@ x-on:swal:toast.window="
                     @forelse($barangList as $b)
                         @php
                             $isNew = in_array($b->kode_brng, $newlyCreated);
+                            $totalStok = (float)($b->total_stok ?? 0);
+                            $stokMin = (float)($b->stokminimal ?? 0);
+                            $isKritis = ($stokMin > 0 && $totalStok <= $stokMin);
+                            $isHabis = ($totalStok <= 0);
                         @endphp
-                        <tr wire:key="brng-{{ $b->kode_brng }}" class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors {{ $isNew ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : '' }}">
+                        <tr wire:key="brng-{{ $b->kode_brng }}" class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors {{ $isNew ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : ($isKritis ? 'bg-red-50/20 dark:bg-red-950/10' : '') }}">
                             {{-- Action: Detail, Edit, Hapus --}}
                             <td class="px-2 py-1.5 text-center align-middle whitespace-nowrap">
                                 <div class="flex items-center justify-center gap-1">
@@ -210,6 +227,12 @@ x-on:swal:toast.window="
                                             Baru
                                         </span>
                                     @endif
+                                    @if($isKritis)
+                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800" title="Stok Kritis! Stok saat ini ({{ number_format($totalStok, 0, ',', '.') }}) mencapai batas minimal ({{ number_format($stokMin, 0, ',', '.') }})">
+                                            <flux:icon name="exclamation-triangle" class="w-2.5 h-2.5 text-rose-600 dark:text-rose-400" />
+                                            Kritis
+                                        </span>
+                                    @endif
                                     @if($b->status === '0')
                                         <span class="text-[9px] font-normal px-1 py-0.2 rounded bg-neutral-100 dark:bg-neutral-700 text-neutral-500">Non-Aktif</span>
                                     @endif
@@ -251,6 +274,37 @@ x-on:swal:toast.window="
                                 <div class="text-[10px] font-mono text-neutral-400">{{ $b->kode_sat ?: '-' }}</div>
                             </td>
 
+                            {{-- Stok Total & Stok Minimal --}}
+                            <td class="px-3 py-1.5 align-middle text-center whitespace-nowrap">
+                                @if($isKritis)
+                                    <div class="inline-flex flex-col items-center">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800 shadow-xs" title="Stok Kritis! Stok: {{ number_format($totalStok, 0, ',', '.') }}, Min: {{ number_format($stokMin, 0, ',', '.') }}">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
+                                            {{ number_format($totalStok, 0, ',', '.') }}
+                                        </span>
+                                        <span class="text-[9px] text-rose-600 dark:text-rose-400 font-semibold mt-0.5">Min: {{ number_format($stokMin, 0, ',', '.') }}</span>
+                                    </div>
+                                @elseif($isHabis)
+                                    <div class="inline-flex flex-col items-center">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700 font-mono">
+                                            0
+                                        </span>
+                                        @if($stokMin > 0)
+                                            <span class="text-[9px] text-neutral-400 mt-0.5">Min: {{ number_format($stokMin, 0, ',', '.') }}</span>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="inline-flex flex-col items-center">
+                                        <span class="font-bold text-neutral-800 dark:text-neutral-200 font-mono text-[11px]">
+                                            {{ number_format($totalStok, 0, ',', '.') }}
+                                        </span>
+                                        @if($stokMin > 0)
+                                            <span class="text-[9px] text-neutral-400 mt-0.5">Min: {{ number_format($stokMin, 0, ',', '.') }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </td>
+
                             {{-- Kapasitas --}}
                             <td class="px-3 py-1.5 align-middle whitespace-nowrap text-right font-semibold text-neutral-800 dark:text-neutral-200">
                                 {{ number_format($b->kapasitas, 0, ',', '.') }}
@@ -277,7 +331,7 @@ x-on:swal:toast.window="
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-4 py-8 text-center text-neutral-400 dark:text-neutral-500">
+                            <td colspan="10" class="px-4 py-8 text-center text-neutral-400 dark:text-neutral-500">
                                 <div class="flex flex-col items-center justify-center gap-2">
                                     <flux:icon name="inbox" class="w-8 h-8 text-neutral-300 dark:text-neutral-600" />
                                     <span>Data obat / barang tidak ditemukan</span>
@@ -355,8 +409,26 @@ x-on:swal:toast.window="
                         <div class="font-medium text-neutral-800 dark:text-neutral-200">{{ $selectedBarang->kapasitas }} (Isi: {{ $selectedBarang->isi }})</div>
                     </div>
                     <div>
-                        <span class="text-neutral-400">Stok Minimal:</span>
-                        <div class="font-medium text-neutral-800 dark:text-neutral-200">{{ number_format($selectedBarang->stokminimal, 0, ',', '.') }}</div>
+                        <span class="text-neutral-400">Total Stok Saat Ini:</span>
+                        @php
+                            $modalStok = (float)($selectedBarang->total_stok ?? 0);
+                            $modalMin = (float)($selectedBarang->stokminimal ?? 0);
+                            $modalKritis = ($modalMin > 0 && $modalStok <= $modalMin);
+                        @endphp
+                        <div class="mt-0.5">
+                            @if($modalKritis)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
+                                    <flux:icon name="exclamation-triangle" class="w-3.5 h-3.5 text-rose-600" />
+                                    {{ number_format($modalStok, 0, ',', '.') }} (Stok Kritis ≤ Min {{ number_format($modalMin, 0, ',', '.') }})
+                                </span>
+                            @else
+                                <span class="font-bold text-neutral-800 dark:text-neutral-200 font-mono">{{ number_format($modalStok, 0, ',', '.') }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-neutral-400">Stok Minimal (Ambang Batas):</span>
+                        <div class="font-medium text-neutral-800 dark:text-neutral-200 mt-0.5 font-mono">{{ number_format($selectedBarang->stokminimal, 0, ',', '.') }}</div>
                     </div>
                     <div>
                         <span class="text-neutral-400">Kategori / Golongan / Jenis:</span>

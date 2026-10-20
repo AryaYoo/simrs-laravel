@@ -70,4 +70,9 @@ class DataBarang extends Model
     {
         return $this->belongsTo(IndustriFarmasi::class, 'kode_industri', 'kode_industri');
     }
+
+    public function gudangBarang()
+    {
+        return $this->hasMany(GudangBarang::class, 'kode_brng', 'kode_brng');
+    }
 }

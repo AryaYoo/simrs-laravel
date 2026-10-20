@@ -120,6 +120,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/farmasi/resep-pulang/cetak-aturan-pakai', [\App\Http\Controllers\Farmasi\CetakResepPulangController::class, 'cetakAturanPakai'])->name('modul.farmasi.resep-pulang.cetak-aturan-pakai');
     Route::get('modul/farmasi/stock-opname', \App\Livewire\Modul\Farmasi\StockOpname::class)->name('modul.farmasi.stock-opname');
     Route::get('modul/farmasi/stock-opname/create', \App\Livewire\Modul\Farmasi\InputStockOpname::class)->name('modul.farmasi.input-stock-opname');
+    Route::get('modul/farmasi/visite', \App\Livewire\Modul\Farmasi\Visite::class)->name('modul.farmasi.visite');
+    Route::get('modul/farmasi/visite/{no_rawat}', \App\Livewire\Modul\Farmasi\VisitePatient::class)->name('modul.farmasi.visite.patient')->where('no_rawat', '.*');
 
     Route::get('modul/laboratorium', \App\Livewire\Modul\Laboratorium\Index::class)->name('modul.laboratorium.index');
 

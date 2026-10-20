@@ -20,6 +20,7 @@ class DataBarangRepository
         ?string $kode_kategori = null,
         ?string $kode_golongan = null,
         ?string $status = null,
+        ?string $stokFilter = null,
         int $perPage = 15
     ): LengthAwarePaginator {
         $query = DataBarang::with([
@@ -30,6 +31,7 @@ class DataBarangRepository
             'golongan',
             'industri',
         ])
+        ->withSum('gudangBarang as total_stok', 'stok')
         ->when($search, function ($q) use ($search) {
             $q->where(function ($sub) use ($search) {
                 $sub->where('kode_brng', 'like', "%{$search}%")
@@ -54,6 +56,16 @@ class DataBarangRepository
         })
         ->when($status !== null && $status !== '', function ($q) use ($status) {
             $q->where('status', $status);
+        })
+        ->when($stokFilter === 'kritis', function ($q) {
+            $q->where('stokminimal', '>', 0)
+              ->havingRaw('COALESCE(total_stok, 0) <= stokminimal');
+        })
+        ->when($stokFilter === 'habis', function ($q) {
+            $q->havingRaw('COALESCE(total_stok, 0) <= 0');
+        })
+        ->when($stokFilter === 'aman', function ($q) {
+            $q->havingRaw('COALESCE(total_stok, 0) > stokminimal');
         });
 
         $newItems = session('newly_created_barang', []);
@@ -76,7 +88,9 @@ class DataBarangRepository
             'kategori',
             'golongan',
             'industri',
-        ])->find($kode_brng);
+        ])
+        ->withSum('gudangBarang as total_stok', 'stok')
+        ->find($kode_brng);
     }
 
     public function delete(string $kode_brng): bool

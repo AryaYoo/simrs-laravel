@@ -1,0 +1,184 @@
+<div class="flex flex-col gap-6 pb-8">
+    {{-- Header / Breadcrumb --}}
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <button type="button" onclick="history.length > 1 ? history.back() : window.location.href = '{{ route('modul.farmasi.index') }}'" class="flex items-center justify-center w-10 h-8 rounded-md bg-[#4C5C2D] transition-colors hover:bg-[#3d4b24] shadow-sm">
+                <flux:icon name="chevron-left" class="w-5 h-5 text-white" />
+            </button>
+            <div>
+                <nav class="text-xs text-neutral-400 mb-0.5">
+                    <a href="{{ route('modul.index') }}" wire:navigate class="hover:underline">Modul</a>
+                    <span class="mx-1">/</span>
+                    <a href="{{ route('modul.farmasi.index') }}" wire:navigate class="hover:underline">Farmasi</a>
+                    <span class="mx-1">/</span>
+                    <span>Visite</span>
+                </nav>
+                <h1 class="text-xl font-bold text-neutral-800 dark:text-neutral-100">Daftar Pasien Visite</h1>
+            </div>
+        </div>
+    </div>
+
+    {{-- Summary Cards --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div wire:click="setFilter('')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === '' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === '' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Total
+                Pasien</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === '' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['total']) }}</span>
+        </div>
+
+        <div wire:click="setFilter('bpjs')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === 'bpjs' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === 'bpjs' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Pasien
+                BPJS</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === 'bpjs' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['bpjs']) }}</span>
+        </div>
+
+        <div wire:click="setFilter('umum')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === 'umum' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === 'umum' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Pasien
+                Umum</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === 'umum' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['umum']) }}</span>
+        </div>
+
+        <div wire:click="setFilter('lainnya')"
+            class="cursor-pointer transition-all duration-300 group rounded-xl border-2 p-3.5 flex flex-col shadow-sm {{ $filterType === 'lainnya' ? 'bg-[#4C5C2D] border-[#4C5C2D] shadow-lg scale-[1.02]' : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300' }}">
+            <span
+                class="text-xs font-semibold mb-0.5 transition-colors {{ $filterType === 'lainnya' ? 'text-white/80' : 'text-neutral-500 dark:text-neutral-400 group-hover:text-[#4C5C2D]' }}">Lainnya</span>
+            <span
+                class="text-xl font-bold transition-colors {{ $filterType === 'lainnya' ? 'text-white' : 'text-neutral-800 dark:text-neutral-100' }}">{{ number_format($summary['lainnya']) }}</span>
+        </div>
+    </div>
+
+    {{-- Main Container --}}
+    <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4">
+        {{-- Status Filter Tabs --}}
+        <div class="flex items-center gap-4 mb-6 pb-4 border-b border-neutral-100 dark:border-neutral-700">
+            <div class="flex items-center gap-1 p-1 bg-neutral-100 dark:bg-neutral-900 rounded-xl">
+                <button wire:click="$set('statusFilter', 'belum_pulang')"
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $statusFilter === 'belum_pulang' ? 'bg-white dark:bg-neutral-800 text-[#4C5C2D] shadow-sm' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200' }}">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        Aktif (Belum Pulang)
+                    </div>
+                </button>
+                <button wire:click="$set('statusFilter', 'sudah_pulang')"
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $statusFilter === 'sudah_pulang' ? 'bg-white dark:bg-neutral-800 text-[#4C5C2D] shadow-sm' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200' }}">
+                    Sudah Pulang
+                </button>
+                <button wire:click="$set('statusFilter', 'semua')"
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all {{ $statusFilter === 'semua' ? 'bg-white dark:bg-neutral-800 text-[#4C5C2D] shadow-sm' : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200' }}">
+                    Semua Pasien
+                </button>
+            </div>
+            <div class="hidden md:block h-4 w-px bg-neutral-200 dark:bg-neutral-700"></div>
+            <p class="hidden md:block text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                {{ $statusFilter === 'belum_pulang' ? 'Menampilkan pasien yang saat ini masih dirawat' : ($statusFilter === 'sudah_pulang' ? 'Menampilkan pasien yang sudah pulang dalam periode tanggal' : 'Menampilkan seluruh riwayat pasien dalam periode tanggal') }}
+            </p>
+        </div>
+
+        {{-- Search & Date Filters --}}
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+            <div class="flex-1">
+                <flux:input wire:model.live.debounce.300ms="search"
+                    placeholder="Cari No Rawat, No RM, atau Nama Pasien..." icon="magnifying-glass" />
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <label
+                    class="text-xs font-semibold text-neutral-500 dark:text-neutral-400 whitespace-nowrap">Dari</label>
+                <flux:input type="date" wire:model.live="dari" class="w-40" />
+                <span class="text-xs text-neutral-400">s/d</span>
+                <flux:input type="date" wire:model.live="sampai" class="w-40" />
+            </div>
+        </div>
+
+        {{-- Patients Table --}}
+        <flux:table :paginate="$regPeriksas">
+            <flux:table.columns>
+                <flux:table.column align="center">{{ __('Action') }}</flux:table.column>
+                <flux:table.column>{{ __('No. Rawat') }}</flux:table.column>
+                <flux:table.column>{{ __('No. RM') }}</flux:table.column>
+                <flux:table.column>{{ __('Nama Pasien') }}</flux:table.column>
+                <flux:table.column>{{ __('Alamat Pasien') }}</flux:table.column>
+                <flux:table.column>{{ __('Penanggung Jawab') }}</flux:table.column>
+                <flux:table.column>{{ __('Jenis Bayar') }}</flux:table.column>
+                <flux:table.column>{{ __('Kamar') }}</flux:table.column>
+            </flux:table.columns>
+
+            <flux:table.rows>
+                @forelse ($regPeriksas as $reg)
+                    @php
+                        $isBpjs = str_contains(strtoupper($reg->penjab->png_jawab ?? ''), 'BPJS');
+                        $kamarActive = $reg->kamarInap->firstWhere('tgl_keluar', '0000-00-00');
+                        $kamarDisplay = $kamarActive?->kd_kamar ?? $reg->kamarInap->first()?->kd_kamar ?? $reg->permintaanRanap->kd_kamar ?? '-';
+                    @endphp
+                    <flux:table.row :key="$reg->no_rawat" :class="$isBpjs ? 'bg-emerald-50 dark:bg-emerald-950/20' : ''">
+                        <flux:table.cell align="center">
+                            <flux:button size="xs" icon="user-plus"
+                                :href="route('modul.farmasi.visite.patient', str_replace('/', '-', $reg->no_rawat))"
+                                wire:navigate
+                                class="bg-[#4C5C2D] hover:bg-[#3d4b24] text-white font-medium"
+                                title="Buka Riwayat Visite Pasien">
+                                Visite
+                            </flux:button>
+                        </flux:table.cell>
+                        <flux:table.cell class="font-medium tracking-tight">{{ $reg->no_rawat }}</flux:table.cell>
+                        <flux:table.cell>{{ $reg->no_rkm_medis }}</flux:table.cell>
+                        <flux:table.cell>
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="font-medium text-neutral-800 dark:text-neutral-200">{{ $reg->pasien->nm_pasien ?? '-' }}</span>
+                                @if(($reg->pasien->jk ?? '') === 'L')
+                                    <span
+                                        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40"
+                                        title="Laki-laki">
+                                        <span class="w-1 h-1 rounded-full bg-blue-500"></span> L
+                                    </span>
+                                @elseif(($reg->pasien->jk ?? '') === 'P')
+                                    <span
+                                        class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 dark:bg-pink-950/30 text-pink-600 dark:text-pink-400 border border-pink-100 dark:border-pink-900/40"
+                                        title="Perempuan">
+                                        <span class="w-1 h-1 rounded-full bg-pink-500"></span> P
+                                    </span>
+                                @endif
+                            </div>
+                        </flux:table.cell>
+                        <flux:table.cell class="max-w-xs truncate">{{ $reg->pasien->alamat ?? '-' }}</flux:table.cell>
+                        <flux:table.cell>{{ $reg->p_jawab }}</flux:table.cell>
+                        <flux:table.cell>
+                            @if($isBpjs)
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+                                    {{ $reg->penjab->png_jawab ?? '-' }}
+                                </span>
+                            @else
+                                {{ $reg->penjab->png_jawab ?? '-' }}
+                            @endif
+                        </flux:table.cell>
+                        <flux:table.cell>{{ $kamarDisplay }}</flux:table.cell>
+                    </flux:table.row>
+                @empty
+                    <flux:table.row>
+                        <flux:table.cell colspan="8">
+                            <div
+                                class="flex flex-col items-center justify-center py-12 text-neutral-400 dark:text-neutral-500">
+                                <flux:icon name="calendar" class="w-12 h-12 mb-3 opacity-40" />
+                                <p class="text-sm font-medium">Tidak ada pasien rawat inap di periode ini</p>
+                            </div>
+                        </flux:table.cell>
+                    </flux:table.row>
+                @endforelse
+            </flux:table.rows>
+        </flux:table>
+    </div>
+</div>

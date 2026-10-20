@@ -108,6 +108,7 @@ class ObatAlkesBhpRepository
                 'embalase'     => 0,
                 'tuslah'       => 0,
                 'stok'         => $detail['stok'] ?? 0,
+                'stokminimal'  => $detail['stokminimal'] ?? 0,
                 'aturan_pakai' => $item->aturan_pakai ?: '-',
                 'industri'     => $detail['industri'] ?? '-',
                 'kategori'     => $detail['kategori'] ?? '-',
@@ -139,6 +140,7 @@ class ObatAlkesBhpRepository
                 'databarang.kode_sat',
                 'databarang.ralan',
                 'databarang.h_beli',
+                'databarang.stokminimal',
                 'kategori_barang.nama as nama_kategori',
                 'golongan_barang.nama as nama_golongan',
                 'industrifarmasi.nama_industri',
@@ -156,17 +158,18 @@ class ObatAlkesBhpRepository
             ->first();
 
         return [
-            'kode_brng'  => $brng->kode_brng,
-            'nama_brng'  => $brng->nama_brng,
-            'satuan'     => $brng->kode_sat ?? '-',
-            'harga'      => floatval($brng->ralan ?? ($brng->h_beli ?? 0)),
-            'jenis_obat' => $brng->nama_jenis ?? '-',
-            'kategori'   => $brng->nama_kategori ?? '-',
-            'golongan'   => $brng->nama_golongan ?? '-',
-            'industri'   => $brng->nama_industri ?? '-',
-            'stok'       => $gudang ? floatval($gudang->stok) : 0,
-            'no_batch'   => $gudang->no_batch ?? '-',
-            'no_faktur'  => $gudang->no_faktur ?? '-',
+            'kode_brng'   => $brng->kode_brng,
+            'nama_brng'   => $brng->nama_brng,
+            'satuan'      => $brng->kode_sat ?? '-',
+            'harga'       => floatval($brng->ralan ?? ($brng->h_beli ?? 0)),
+            'stokminimal' => floatval($brng->stokminimal ?? 0),
+            'jenis_obat'  => $brng->nama_jenis ?? '-',
+            'kategori'    => $brng->nama_kategori ?? '-',
+            'golongan'    => $brng->nama_golongan ?? '-',
+            'industri'    => $brng->nama_industri ?? '-',
+            'stok'        => $gudang ? floatval($gudang->stok) : 0,
+            'no_batch'    => $gudang->no_batch ?? '-',
+            'no_faktur'   => $gudang->no_faktur ?? '-',
         ];
     }
 
@@ -195,6 +198,7 @@ class ObatAlkesBhpRepository
                 'databarang.ralan',
                 'databarang.h_beli',
                 'databarang.beliluar',
+                'databarang.stokminimal',
                 'kategori_barang.nama as nama_kategori',
                 'golongan_barang.nama as nama_golongan',
                 'industrifarmasi.nama_industri',
@@ -210,6 +214,7 @@ class ObatAlkesBhpRepository
                 'databarang.ralan',
                 'databarang.h_beli',
                 'databarang.beliluar',
+                'databarang.stokminimal',
                 'kategori_barang.nama',
                 'golongan_barang.nama',
                 'industrifarmasi.nama_industri',
@@ -234,17 +239,18 @@ class ObatAlkesBhpRepository
 
         foreach ($items as $brng) {
             $result[] = [
-                'kode_brng'  => $brng->kode_brng,
-                'nama_brng'  => $brng->nama_brng,
-                'satuan'     => $brng->kode_sat ?? '-',
-                'harga'      => floatval($brng->ralan ?? ($brng->h_beli ?? 0)),
-                'stok'       => floatval($brng->stok_depo ?? 0),
-                'jenis_obat' => $brng->nama_jenis ?? '-',
-                'kategori'   => $brng->nama_kategori ?? '-',
-                'golongan'   => $brng->nama_golongan ?? '-',
-                'industri'   => $brng->nama_industri ?? '-',
-                'no_batch'   => $brng->no_batch ?? '-',
-                'no_faktur'  => $brng->no_faktur ?? '-',
+                'kode_brng'   => $brng->kode_brng,
+                'nama_brng'   => $brng->nama_brng,
+                'satuan'      => $brng->kode_sat ?? '-',
+                'harga'       => floatval($brng->ralan ?? ($brng->h_beli ?? 0)),
+                'stok'        => floatval($brng->stok_depo ?? 0),
+                'stokminimal' => floatval($brng->stokminimal ?? 0),
+                'jenis_obat'  => $brng->nama_jenis ?? '-',
+                'kategori'    => $brng->nama_kategori ?? '-',
+                'golongan'    => $brng->nama_golongan ?? '-',
+                'industri'    => $brng->nama_industri ?? '-',
+                'no_batch'    => $brng->no_batch ?? '-',
+                'no_faktur'   => $brng->no_faktur ?? '-',
             ];
         }
 

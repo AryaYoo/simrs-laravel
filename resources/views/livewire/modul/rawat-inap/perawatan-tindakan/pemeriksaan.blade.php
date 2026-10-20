@@ -19,6 +19,12 @@
             <flux:icon name="chat-bubble-bottom-center-text" class="w-4 h-4" />
             SBAR
         </button>
+        <button @click="activeSubTab = 'visite_farmasi'"
+            :class="activeSubTab === 'visite_farmasi' ? 'border-[#4C5C2D] text-[#4C5C2D] dark:text-[#8CC7C4] dark:border-[#8CC7C4]' : 'border-transparent text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-400 hover:border-neutral-300 dark:hover:border-neutral-600'"
+            class="px-4 py-2 border-b-2 font-medium text-sm transition-colors flex items-center gap-2">
+            <flux:icon name="beaker" class="w-4 h-4" />
+            Visite Farmasi
+        </button>
     </div>
 
     {{-- SOAPIE Content --}}
@@ -175,6 +181,11 @@
     {{-- SBAR Content --}}
     <div wire:ignore.self x-show="activeSubTab === 'sbar'" style="display: none;">
         <livewire:modul.rawat-inap.sub-rawat-inap.catatan-sbar.index :no_rawat="$regPeriksa->no_rawat" :isEmbedded="true" />
+    </div>
+
+    {{-- Visite Farmasi Content --}}
+    <div wire:ignore.self x-show="activeSubTab === 'visite_farmasi'" style="display: none;">
+        <livewire:modul.farmasi.visite-patient :no_rawat="$regPeriksa->no_rawat" :isEmbedded="true" :key="'visite-farmasi-pt-'.$regPeriksa->no_rawat" />
     </div>
 </div>
 

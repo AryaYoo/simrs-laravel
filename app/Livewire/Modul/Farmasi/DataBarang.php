@@ -14,22 +14,25 @@ class DataBarang extends Component
 {
     use WithPagination;
 
-    #[Url(history: true)]
+    #[Url(except: '')]
     public string $search = '';
 
-    #[Url(history: true)]
+    #[Url(except: '')]
     public string $kdjns = '';
 
-    #[Url(history: true)]
+    #[Url(except: '')]
     public string $kode_kategori = '';
 
-    #[Url(history: true)]
+    #[Url(except: '')]
     public string $kode_golongan = '';
 
-    #[Url(history: true)]
+    #[Url(except: '')]
     public string $status = '';
 
-    #[Url(history: true)]
+    #[Url(except: '')]
+    public string $stok_filter = '';
+
+    #[Url(except: 15)]
     public int $perPage = 15;
 
     // Modal Detail State
@@ -77,11 +80,12 @@ class DataBarang extends Component
     public function updatedKodeKategori(): void  { $this->resetPage(); }
     public function updatedKodeGolongan(): void  { $this->resetPage(); }
     public function updatedStatus(): void        { $this->resetPage(); }
+    public function updatedStokFilter(): void    { $this->resetPage(); }
     public function updatedPerPage(): void       { $this->resetPage(); }
 
     public function resetFilter(): void
     {
-        $this->reset(['search', 'kdjns', 'kode_kategori', 'kode_golongan', 'status']);
+        $this->reset(['search', 'kdjns', 'kode_kategori', 'kode_golongan', 'status', 'stok_filter']);
         $this->perPage = 15;
         $this->resetPage();
     }
@@ -281,6 +285,7 @@ class DataBarang extends Component
                 $this->kode_kategori,
                 $this->kode_golongan,
                 $this->status,
+                $this->stok_filter,
                 $this->perPage
             ),
             'listJenis'    => $this->repository->getMasterJenis(),

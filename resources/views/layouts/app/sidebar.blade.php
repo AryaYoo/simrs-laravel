@@ -427,6 +427,13 @@
                                 <span>No. Resep</span>
                             </a>
 
+                            <a href="{{ Route::has('modul.farmasi.visite') ? route('modul.farmasi.visite') : '#' }}" wire:navigate
+                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                style="color: {{ request()->routeIs('modul.farmasi.visite*') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.visite*') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
+                                <flux:icon name="user-plus" class="w-3.5 h-3.5" />
+                                <span>Visite</span>
+                            </a>
+
                             <a href="{{ Route::has('modul.farmasi.index') ? route('modul.farmasi.index') : '#' }}" wire:navigate
                                 class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
                                 style="color: {{ request()->routeIs('modul.farmasi.index') ? 'white' : 'rgba(255,255,255,0.7)' }}; background-color: {{ request()->routeIs('modul.farmasi.index') ? 'rgba(255,255,255,0.1)' : 'transparent' }}; text-decoration: none;">
@@ -892,6 +899,11 @@
                                     class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
                                     style="color:{{ request()->routeIs('modul.farmasi.no-resep*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
                                     <flux:icon name="hashtag" class="w-3.5 h-3.5" /><span>No. Resep</span>
+                                </a>
+                                <a href="{{ Route::has('modul.farmasi.visite') ? route('modul.farmasi.visite') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
+                                    class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
+                                    style="color:{{ request()->routeIs('modul.farmasi.visite*') ? 'white' : 'rgba(255,255,255,0.7)' }}; text-decoration:none;">
+                                    <flux:icon name="user-plus" class="w-3.5 h-3.5" /><span>Visite</span>
                                 </a>
                                 <a href="{{ Route::has('modul.farmasi.index') ? route('modul.farmasi.index') : '#' }}" wire:navigate @click="mobileMenuOpen=false"
                                     class="flex items-center gap-2 px-3 py-1.5 rounded-md text-[0.75rem] font-medium transition-colors hover:bg-white/10"
