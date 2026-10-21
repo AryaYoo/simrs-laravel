@@ -1190,7 +1190,10 @@
                 .replace(/\bS\.KOM\b/gi, 'Sarjana Komputer')
                 .replace(/\bS\.E\b/gi, 'Sarjana Ekonomi');
 
-            const kalimat = `${spokenName}, silahkan ${tujuan}`;
+            // Ubah ke huruf kecil agar mesin TTS tidak menganggap nama berhuruf kapital (ALL CAPS) sebagai singkatan/akronim
+            spokenName = spokenName.toLowerCase();
+
+            const kalimat = `${spokenName}, silakan ${tujuan.toLowerCase()}`;
             const utterance = new SpeechSynthesisUtterance(kalimat);
             utterance.lang = 'id-ID';
             utterance.rate = 0.9;
