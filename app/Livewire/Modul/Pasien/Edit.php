@@ -14,7 +14,7 @@ use App\Models\AppSetting;
 #[Layout('layouts.app', ['title' => 'Edit Data Pasien'])]
 class Edit extends Component
 {
-    use WithFileUploads, \App\Livewire\Concerns\WithOptimisticLocking;
+    use WithFileUploads, \App\Livewire\Concerns\WithOptimisticLocking, \App\Livewire\Concerns\WithKtpAddressMatching;
 
     public $ktp_image;
     
@@ -295,11 +295,13 @@ class Edit extends Component
         if (!empty($data['tempat_lahir']))      $this->tmp_lahir = $data['tempat_lahir'];
         if (!empty($data['tanggal_lahir']))     $this->tgl_lahir = $data['tanggal_lahir'];
         if (!empty($data['jenis_kelamin']))     $this->jk        = $data['jenis_kelamin'];
-        if (!empty($data['alamat']))            $this->alamat    = $data['alamat'];
         if (!empty($data['agama']))             $this->agama     = $data['agama'];
         if (!empty($data['status_perkawinan'])) $this->stts_nikah = $data['status_perkawinan'];
         if (!empty($data['pekerjaan']))         $this->pekerjaan = $data['pekerjaan'];
         if (!empty($data['golongan_darah']))    $this->gol_darah = $data['golongan_darah'];
+
+        // Terapkan alamat lengkap beserta wilayah (Kelurahan, Kecamatan, Kab/Kota, Provinsi)
+        $this->matchAndApplyWilayah($data);
 
         if (!empty($data['tanggal_lahir'])) {
             try {

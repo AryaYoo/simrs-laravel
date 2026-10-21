@@ -32,7 +32,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Master Pasien**: Manajemen identitas dengan integrasi data wilayah & penjamin.
 - [x] **Master Data Medis**: Pengelolaan data Dokter, Poliklinik, Penjamin, & Perujuk.
 - [x] **Master Wilayah**: Manajemen data Provinsi, Kabupaten, Kecamatan, & Kelurahan.
-- [x] **AI OCR KTP**: Ekstraksi otomatis data KTP menggunakan Google Vision API.
+- [x] **AI OCR KTP (Gemini AI)**: Ekstraksi otomatis data identitas e-KTP berbasis Gemini Vision AI yang dilengkapi auto-matching wilayah (Kelurahan, Kecamatan, Kabupaten/Kota, Provinsi), perapian format alamat & RT/RW, serta auto-sinkronisasi data penanggung jawab.
 - [x] **Dashboard Dinamis**: Monitoring real-time pasien inhouse, tren registrasi harian, distribusi penjamin, dan okupansi bed.
 
 ### 🛌 Modul Rawat Inap (Ranap)
@@ -524,9 +524,9 @@ Secara standar spesifikasi HTML, tombol `<button>` yang berada di dalam `<form>`
 
 ## 📸 Panduan OCR KTP
 Fitur AI untuk membaca KTP otomatis dapat diaktifkan melalui:
-1. Masuk ke **Master Data -> Pengaturan Aplikasi**.
-2. Masukkan **Google Cloud Vision API Key**.
-3. Pastikan layanan *Cloud Vision API* sudah aktif di Google Cloud Console Anda.
+1. Daftarkan API Key di [Google AI Studio](https://aistudio.google.com/).
+2. Masukkan `GEMINI_API_KEY=your_api_key` di file `.env` server atau melalui menu **Master Data -> Pengaturan Aplikasi**.
+3. Sistem secara otomatis menggunakan model Vision `gemini-1.5-flash` untuk mengekstrak identitas pasien dan memetakan wilayah secara instan.
 
 ---
 
