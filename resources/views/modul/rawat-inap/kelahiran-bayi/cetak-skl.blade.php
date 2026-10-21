@@ -561,13 +561,6 @@
                         {{ $labelAnakke }}
                     </td>
                 </tr>
-                @if(!empty($bayi->uk) && $bayi->uk !== '-')
-                <tr>
-                    <td class="label">Usia Kehamilan</td>
-                    <td class="colon">:</td>
-                    <td class="value">{{ $bayi->uk }} minggu</td>
-                </tr>
-                @endif
 
             </table>
 

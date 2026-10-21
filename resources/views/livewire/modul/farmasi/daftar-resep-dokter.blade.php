@@ -84,6 +84,7 @@
                             <th class="px-3 py-2.5 whitespace-nowrap">Tgl Permintaan</th>
                             <th class="px-3 py-2.5 whitespace-nowrap">No. Rawat</th>
                             <th class="px-3 py-2.5">No. RM & Nama Pasien</th>
+                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Panggil</th>
                             <th class="px-3 py-2.5">Dokter Yang Meminta</th>
                             <th class="px-3 py-2.5 text-center">Status</th>
                             <th class="px-3 py-2.5">Ruang/Kamar</th>
@@ -145,6 +146,17 @@
                                     </div>
                                 </td>
 
+                                {{-- Panggil Pasien (Sebelah Kanan Nama) --}}
+                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                    <button type="button"
+                                        onclick="panggilAntreanFarmasi('{{ addslashes($row->regPeriksa->pasien->nm_pasien ?? '') }}')"
+                                        class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-700 hover:text-white dark:text-amber-400 dark:hover:text-white border border-amber-300/50 dark:border-amber-600/40 shadow-xs transition-all duration-150 active:scale-95 group"
+                                        title="Panggil Pasien {{ $row->regPeriksa->pasien->nm_pasien ?? '' }}">
+                                        <flux:icon name="speaker-wave" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                                        <span class="text-xs font-semibold">Panggil</span>
+                                    </button>
+                                </td>
+
                                 {{-- 6. Dokter Yang Meminta --}}
                                 <td class="px-3 py-2 text-neutral-700 dark:text-neutral-300 font-medium">
                                     {{ $row->dokter->nm_dokter ?? ($row->kd_dokter ?: '-') }}
@@ -183,7 +195,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-4 py-12 text-center text-neutral-400 dark:text-neutral-500">
+                                <td colspan="10" class="px-4 py-12 text-center text-neutral-400 dark:text-neutral-500">
                                     <flux:icon name="clipboard-document-list" class="w-10 h-10 mx-auto mb-2 opacity-50" />
                                     <p class="text-xs font-semibold">Tidak ada data permintaan resep pulang yang ditemukan.</p>
                                 </td>
@@ -212,6 +224,7 @@
                             <th class="px-3 py-2.5 whitespace-nowrap">Tgl Peresepan</th>
                             <th class="px-3 py-2.5 whitespace-nowrap">No. Rawat</th>
                             <th class="px-3 py-2.5">No. RM & Nama Pasien</th>
+                            <th class="px-3 py-2.5 text-center whitespace-nowrap">Panggil</th>
                             <th class="px-3 py-2.5">Dokter</th>
                             <th class="px-3 py-2.5 text-center">Status</th>
                             <th class="px-3 py-2.5">Poli</th>
@@ -273,6 +286,17 @@
                                     </div>
                                 </td>
 
+                                {{-- Panggil Pasien (Sebelah Kanan Nama) --}}
+                                <td class="px-3 py-2 text-center whitespace-nowrap">
+                                    <button type="button"
+                                        onclick="panggilAntreanFarmasi('{{ addslashes($row->regPeriksa->pasien->nm_pasien ?? '') }}')"
+                                        class="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-700 hover:text-white dark:text-amber-400 dark:hover:text-white border border-amber-300/50 dark:border-amber-600/40 shadow-xs transition-all duration-150 active:scale-95 group"
+                                        title="Panggil Pasien {{ $row->regPeriksa->pasien->nm_pasien ?? '' }}">
+                                        <flux:icon name="speaker-wave" class="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                                        <span class="text-xs font-semibold">Panggil</span>
+                                    </button>
+                                </td>
+
                                 {{-- 6. Dokter DPJP --}}
                                 <td class="px-3 py-2 text-neutral-700 dark:text-neutral-300 font-medium">
                                     {{ $row->dokter->nm_dokter ?? ($row->kd_dokter ?: '-') }}
@@ -328,7 +352,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11" class="px-4 py-12 text-center text-neutral-400 dark:text-neutral-500">
+                                <td colspan="12" class="px-4 py-12 text-center text-neutral-400 dark:text-neutral-500">
                                     <flux:icon name="clipboard-document-list" class="w-10 h-10 mx-auto mb-2 opacity-50" />
                                     <p class="text-xs font-semibold">Tidak ada data resep dokter yang ditemukan.</p>
                                 </td>
@@ -367,9 +391,20 @@
                             Pasien: {{ $activeResep['reg_periksa']['pasien']['nm_pasien'] ?? '-' }} (RM: {{ $activeResep['reg_periksa']['no_rkm_medis'] ?? '-' }})
                         </p>
                     </div>
-                    <button type="button" wire:click="closeDetailModal" class="p-1.5 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
-                        <flux:icon name="x-mark" class="w-5 h-5" />
-                    </button>
+                    <div class="flex items-center gap-2">
+                        @if(!empty($activeResep['reg_periksa']['pasien']['nm_pasien']))
+                            <button type="button"
+                                onclick="panggilAntreanFarmasi('{{ addslashes($activeResep['reg_periksa']['pasien']['nm_pasien']) }}')"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-400 text-neutral-900 hover:bg-amber-300 text-xs font-bold transition-all shadow-sm active:scale-95"
+                                title="Panggil Pasien {{ $activeResep['reg_periksa']['pasien']['nm_pasien'] }}">
+                                <flux:icon name="speaker-wave" class="w-3.5 h-3.5" />
+                                <span>Panggil</span>
+                            </button>
+                        @endif
+                        <button type="button" wire:click="closeDetailModal" class="p-1.5 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
+                            <flux:icon name="x-mark" class="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Body: Table Item Resep --}}

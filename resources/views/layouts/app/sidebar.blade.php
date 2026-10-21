@@ -1079,6 +1079,170 @@
             @endif
         });
     </script>
+
+    <!-- Audio Chime & Pemanggilan Antrean Suara Farmasi -->
+    <script>
+        let hospitalAudioCtx = null;
+
+        function getHospitalAudioContext() {
+            if (!hospitalAudioCtx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    hospitalAudioCtx = new AudioCtx();
+                }
+            }
+            if (hospitalAudioCtx && hospitalAudioCtx.state === 'suspended') {
+                hospitalAudioCtx.resume();
+            }
+            return hospitalAudioCtx;
+        }
+
+        // Memainkan bunyi nada lonceng khas rumah sakit / klinik ("Dung" dua nada harmonis)
+        function playHospitalChime() {
+            return new Promise((resolve) => {
+                try {
+                    const ctx = getHospitalAudioContext();
+                    if (!ctx) return resolve();
+
+                    const now = ctx.currentTime;
+                    // Dua nada lonceng harmonis: D5 (587.33 Hz) dan A4 (440.00 Hz)
+                    const tones = [
+                        { freq: 587.33, start: 0, duration: 0.45 },
+                        { freq: 440.00, start: 0.30, duration: 0.75 }
+                    ];
+
+                    tones.forEach(tone => {
+                        const startTime = now + tone.start;
+                        const stopTime = startTime + tone.duration;
+
+                        // Nada Dasar
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(tone.freq, startTime);
+
+                        // Harmonik ke-2 (timbre lonceng akustik)
+                        const overtone = ctx.createOscillator();
+                        const overtoneGain = ctx.createGain();
+                        overtone.type = 'sine';
+                        overtone.frequency.setValueAtTime(tone.freq * 2, startTime);
+
+                        // Gain Envelope
+                        gain.gain.setValueAtTime(0.0001, startTime);
+                        gain.gain.linearRampToValueAtTime(0.35, startTime + 0.02);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, stopTime);
+
+                        overtoneGain.gain.setValueAtTime(0.0001, startTime);
+                        overtoneGain.gain.linearRampToValueAtTime(0.12, startTime + 0.02);
+                        overtoneGain.gain.exponentialRampToValueAtTime(0.0001, startTime + (tone.duration * 0.6));
+
+                        osc.connect(gain);
+                        overtone.connect(overtoneGain);
+                        gain.connect(ctx.destination);
+                        overtoneGain.connect(ctx.destination);
+
+                        osc.start(startTime);
+                        osc.stop(stopTime);
+                        overtone.start(startTime);
+                        overtone.stop(stopTime);
+                    });
+
+                    // Jeda setelah nada lonceng berbunyi sebelum suara berbicara
+                    setTimeout(() => {
+                        resolve();
+                    }, 1050);
+                } catch (e) {
+                    console.error('Error saat memutar audio chime:', e);
+                    resolve();
+                }
+            });
+        }
+
+        // Inisialisasi daftar suara TTS
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
+        // Mengucapkan kalimat pemanggilan via Web Speech API
+        function ucapkanPanggilanFarmasi(nama, tujuan = 'ke ruang farmasi') {
+            if (!('speechSynthesis' in window)) {
+                console.warn('Web Speech API tidak didukung pada browser ini.');
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+
+            let cleanName = (nama || '').trim();
+            if (!cleanName || cleanName === '-') return;
+
+            // Perhalus singkatan nama agar dibaca fasih oleh TTS bahasa Indonesia
+            let spokenName = cleanName
+                .replace(/^TN\.?\s+/i, 'Tuan ')
+                .replace(/^NY\.?\s+/i, 'Nyonya ')
+                .replace(/^NN\.?\s+/i, 'Nona ')
+                .replace(/^AN\.?\s+/i, 'Anak ')
+                .replace(/^BY\.?\s+NY\.?\s+/i, 'Bayi Nyonya ')
+                .replace(/^BY\.?\s+/i, 'Bayi ')
+                .replace(/\bS\.PD\b/gi, 'Sarjana Pendidikan')
+                .replace(/\bS\.KOM\b/gi, 'Sarjana Komputer')
+                .replace(/\bS\.E\b/gi, 'Sarjana Ekonomi');
+
+            const kalimat = `${spokenName}, silahkan ${tujuan}`;
+            const utterance = new SpeechSynthesisUtterance(kalimat);
+            utterance.lang = 'id-ID';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            const idVoice = voices.find(v => v.lang === 'id-ID' || v.lang === 'id_ID' || v.lang.startsWith('id') || (v.name && v.name.toLowerCase().includes('indonesia')));
+            if (idVoice) {
+                utterance.voice = idVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Fungsi Global untuk Tombol Panggil
+        window.panggilAntreanFarmasi = function(nama, tujuan = 'ke ruang farmasi') {
+            const cleanName = (nama || '').trim();
+            if (!cleanName || cleanName === '-') {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Nama Tidak Tersedia',
+                        text: 'Data nama pasien tidak ditemukan untuk dipanggil.',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+                return;
+            }
+
+            // Tampilkan Notifikasi Toast Status Pemanggilan
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Memanggil Pasien...',
+                    html: `<div class="font-bold text-[#4C5C2D] text-sm mt-1">${cleanName}</div><div class="text-xs text-neutral-500 mt-0.5">Silahkan ${tujuan}</div>`,
+                    icon: 'info',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4500,
+                    timerProgressBar: true
+                });
+            }
+
+            // Bunyikan "Dung" lalu sebut nama pasien
+            playHospitalChime().then(() => {
+                ucapkanPanggilanFarmasi(cleanName, tujuan);
+            });
+        };
+    </script>
     @stack('scripts')
     {{-- ===== FLOATING NOTES ===== --}}
     <div
