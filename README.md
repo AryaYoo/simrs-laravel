@@ -32,7 +32,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Master Pasien**: Manajemen identitas dengan integrasi data wilayah & penjamin.
 - [x] **Master Data Medis**: Pengelolaan data Dokter, Poliklinik, Penjamin, & Perujuk.
 - [x] **Master Wilayah**: Manajemen data Provinsi, Kabupaten, Kecamatan, & Kelurahan.
-- [x] **AI OCR KTP (Gemini AI)**: Ekstraksi otomatis data identitas e-KTP berbasis Gemini Vision AI yang dilengkapi auto-matching wilayah (Kelurahan, Kecamatan, Kabupaten/Kota, Provinsi), perapian format alamat & RT/RW, serta auto-sinkronisasi data penanggung jawab.
+- [x] **AI OCR KTP (Gemini AI)**: Ekstraksi otomatis data identitas e-KTP berbasis Gemini Vision AI yang dilengkapi auto-matching wilayah (Kelurahan, Kecamatan, Kabupaten/Kota, Provinsi), perapian format alamat & RT/RW, auto-sinkronisasi data penanggung jawab, opsi cepat tempel clipboard (**Ctrl + V**) saat modal scan dibuka, *highlight* tepian hijau otomatis pada kolom yang belum terisi (otomatis kembali ke warna default begitu diisi), serta *fallback* otomatis bahasa pasien ke Bahasa Indonesia.
 - [x] **Dashboard Dinamis**: Monitoring real-time pasien inhouse, tren registrasi harian, distribusi penjamin, dan okupansi bed.
 
 ### 🛌 Modul Rawat Inap (Ranap)
@@ -122,7 +122,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Visite Farmasi (`/modul/farmasi/visite`)**: Modul rekam medis kunjungan visite pasien rawat inap untuk farmasi klinis:
   - **Daftar Pasien Rawat Inap**: Tabel daftar pasien ranap dengan 4 ringkasan statistik (Total, BPJS, Umum, Lainnya), 3 tab status pasien (*Aktif / Belum Pulang*, *Sudah Pulang*, *Semua Pasien*), pencarian cepat, filter tanggal, dan tombol Action Visite per pasien.
   - **Halaman Riwayat Visite Pasien (`/modul/farmasi/visite/{no_rawat}`)**: Menampilkan banner data identitas pasien dan tabel riwayat kunjungan visite dengan kolom: Tanggal Visite, Jam, Riwayat Pengobatan (maks. 4 kata + `...`), Interaksi Obat (maks. 4 kata + `...`), dan Action (Detail, Edit, Hapus via SweetAlert2).
-  - **Form Input & Edit Visite (Modal Alpine.js)**: Form SOAPIE lengkap mengadopsi standar pemeriksaan rawat inap (Tanggal, Jam, Lookup Petugas, Keluhan/Subjek, Pemeriksaan/Objek, Tanda-Tanda Vital, Kesadaran, Alergi, Penilaian/Asesmen, RTL/Plan, Instruksi, Evaluasi) dengan penambahan bidang khusus Farmasi Klinis: **Riwayat Pengobatan** dan **Interaksi Obat**, serta tombol **Isi Otomatis** dari rujukan data terakhir dan identitas login.
+  - **Form Input & Edit Visite (Slide-In Panel Alpine.js)**: Form SOAPIE mengadopsi standar pemeriksaan rawat inap konsisten dengan slide-in panel kanan SBAR & ADIME (Tanggal, Jam, Lookup Petugas, Keluhan/Subjek, Pemeriksaan/Objek, Tanda-Tanda Vital, Kesadaran, Alergi, Penilaian/Asesmen, RTL/Plan, Instruksi, Evaluasi) dengan penambahan bidang khusus Farmasi Klinis: **Riwayat Pengobatan** dan **Interaksi Obat**, serta tombol **Isi Otomatis** dari rujukan data terakhir dan identitas login.
   - **Modal Detail Visite**: Pop-up ringkasan komprehensif menampilkan identitas pasien, parameter tanda vital, SOAPIE, riwayat pengobatan, analisis interaksi obat, data petugas pemeriksa, serta shortcut tombol edit & hapus.
   - **Skema Database Raw SQL**: Tabel `visite` disediakan via script inject `SQLinjectRSIAIBI/13_create_visite_table.sql`.
 
