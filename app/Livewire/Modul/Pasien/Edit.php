@@ -203,6 +203,7 @@ class Edit extends Component
             }
 
             $this->applyKtpData($result['data']);
+            $this->dispatch('ktp-autofilled');
 
             $this->dispatch('swal', [
                 'title' => 'Berhasil!',
@@ -269,6 +270,7 @@ class Edit extends Component
             }
 
             $this->applyKtpData($result['data']);
+            $this->dispatch('ktp-autofilled');
 
             $this->dispatch('swal', [
                 'title' => 'Berhasil!',
@@ -299,6 +301,16 @@ class Edit extends Component
         if (!empty($data['status_perkawinan'])) $this->stts_nikah = $data['status_perkawinan'];
         if (!empty($data['pekerjaan']))         $this->pekerjaan = $data['pekerjaan'];
         if (!empty($data['golongan_darah']))    $this->gol_darah = $data['golongan_darah'];
+
+        // Bahasa yang digunakan: jika tidak ada informasi di KTP, otomatis isi Bahasa Indonesia
+        $bahasaIndo = \App\Models\BahasaPasien::where('nama_bahasa', 'like', '%INDONESIA%')->first();
+        $idIndo = $bahasaIndo ? $bahasaIndo->id : 5;
+        if (!empty($data['bahasa'])) {
+            $match = \App\Models\BahasaPasien::where('nama_bahasa', 'like', '%' . $data['bahasa'] . '%')->first();
+            $this->bahasa_pasien = $match ? $match->id : $idIndo;
+        } else {
+            $this->bahasa_pasien = $idIndo;
+        }
 
         // Terapkan alamat lengkap beserta wilayah (Kelurahan, Kecamatan, Kab/Kota, Provinsi)
         $this->matchAndApplyWilayah($data);

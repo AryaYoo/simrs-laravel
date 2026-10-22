@@ -16,7 +16,72 @@
         </div>
     </div>
 
-    <form wire:submit="save" class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+    <style>
+        .ktp-highlight-empty,
+        [data-ktp-empty="true"] {
+            border-color: #10b981 !important;
+            border-width: 2px !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25) !important;
+            background-color: rgba(16, 185, 129, 0.04) !important;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+    </style>
+
+    <form
+        wire:submit="save"
+        x-ref="patientForm"
+        x-data="{
+            hasKtpHighlight: false,
+            emptyCount: 0,
+            highlightEmptyFields() {
+                const form = this.$refs.patientForm;
+                if (!form) return;
+                const fields = form.querySelectorAll('input:not([type=hidden]):not([type=file]):not([type=checkbox]):not([type=radio]):not([disabled]):not([readonly]), select:not([disabled]), textarea:not([disabled]):not([readonly])');
+                let count = 0;
+                fields.forEach(field => {
+                    if (field.closest('.ktp-scan-container')) return;
+                    const val = (field.value || '').trim();
+                    if (val === '') {
+                        field.classList.add('ktp-highlight-empty');
+                        field.setAttribute('data-ktp-empty', 'true');
+                        count++;
+                        const clearHighlight = () => {
+                            if ((field.value || '').trim() !== '') {
+                                field.classList.remove('ktp-highlight-empty');
+                                field.removeAttribute('data-ktp-empty');
+                                field.removeEventListener('input', clearHighlight);
+                                field.removeEventListener('change', clearHighlight);
+                                this.updateCount();
+                            }
+                        };
+                        field.addEventListener('input', clearHighlight);
+                        field.addEventListener('change', clearHighlight);
+                    } else {
+                        field.classList.remove('ktp-highlight-empty');
+                        field.removeAttribute('data-ktp-empty');
+                    }
+                });
+                this.emptyCount = count;
+                this.hasKtpHighlight = count > 0;
+            },
+            updateCount() {
+                const remaining = this.$refs.patientForm ? this.$refs.patientForm.querySelectorAll('.ktp-highlight-empty').length : 0;
+                this.emptyCount = remaining;
+                if (remaining === 0) this.hasKtpHighlight = false;
+            },
+            dismissHighlight() {
+                if (!this.$refs.patientForm) return;
+                this.$refs.patientForm.querySelectorAll('.ktp-highlight-empty').forEach(el => {
+                    el.classList.remove('ktp-highlight-empty');
+                    el.removeAttribute('data-ktp-empty');
+                });
+                this.hasKtpHighlight = false;
+                this.emptyCount = 0;
+            }
+        }"
+        @ktp-autofilled.window="setTimeout(() => highlightEmptyFields(), 250)"
+        class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+    >
         
     {{-- =================== MODAL SCAN KTP =================== --}}
     <div
@@ -61,6 +126,13 @@
                     this.stream = null;
                 }
             },
+            async processImageBase64(base64) {
+                this.isProcessing = true;
+                this.stopWebcam();
+                this.showModal = false;
+                await $wire.call('processKtpFromBase64', base64);
+                this.isProcessing = false;
+            },
             async captureWebcam() {
                 const video = this.$refs.videoEl;
                 const canvas = this.$refs.canvasEl;
@@ -68,33 +140,87 @@
                 canvas.height = video.videoHeight;
                 canvas.getContext('2d').drawImage(video, 0, 0);
                 const base64 = canvas.toDataURL('image/jpeg', 0.9);
-                this.isProcessing = true;
-                this.stopWebcam();
-                this.showModal = false;
-                await $wire.call('processKtpFromBase64', base64);
-                this.isProcessing = false;
+                await this.processImageBase64(base64);
+            },
+            handlePaste(event) {
+                if (this.isProcessing) return;
+                const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+                if (!items) return;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        event.preventDefault();
+                        const file = items[i].getAsFile();
+                        const reader = new FileReader();
+                        reader.onload = async (e) => {
+                            await this.processImageBase64(e.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                        break;
+                    }
+                }
+            },
+            async pasteFromClipboard() {
+                if (navigator.clipboard && navigator.clipboard.read) {
+                    try {
+                        const items = await navigator.clipboard.read();
+                        for (const item of items) {
+                            const imageType = item.types.find(t => t.startsWith('image/'));
+                            if (imageType) {
+                                const blob = await item.getType(imageType);
+                                const reader = new FileReader();
+                                reader.onload = async (e) => {
+                                    await this.processImageBase64(e.target.result);
+                                };
+                                reader.readAsDataURL(blob);
+                                return;
+                            }
+                        }
+                        alert('Tidak ada gambar di clipboard. Silakan salin (copy) gambar KTP terlebih dahulu lalu tekan Ctrl + V.');
+                    } catch (e) {
+                        alert('Akses clipboard otomatis dibatasi oleh browser. Silakan langsung tekan Ctrl + V pada keyboard Anda.');
+                    }
+                } else {
+                    alert('Silakan langsung tekan tombol Ctrl + V pada keyboard Anda untuk paste gambar KTP.');
+                }
             }
         }"
-        class="p-6 border-b border-neutral-100 dark:border-neutral-800 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20"
+        @paste.window="handlePaste($event)"
+        class="ktp-scan-container p-6 border-b border-neutral-100 dark:border-neutral-800 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20"
     >
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                 <h2 class="text-base font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
                     <flux:icon name="viewfinder-circle" class="w-5 h-5 text-indigo-500" />
                     Scan KTP (OCR)
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
+                        <kbd class="font-mono font-semibold">Ctrl + V</kbd> Aktif
+                    </span>
                 </h2>
-                <p class="text-sm text-neutral-500 mt-1">Scan atau unggah foto KTP untuk mengisi formulir secara otomatis.</p>
+                <p class="text-sm text-neutral-500 mt-1">
+                    Scan, unggah foto KTP, atau langsung tekan <kbd class="px-1.5 py-0.5 text-xs font-mono font-semibold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded shadow-xs">Ctrl + V</kbd> untuk menganalisis gambar dari clipboard.
+                </p>
             </div>
-            <button
-                type="button"
-                @click="openModal()"
-                x-bind:disabled="isProcessing"
-                x-bind:class="isProcessing ? 'opacity-60 cursor-not-allowed' : 'hover:bg-indigo-700 active:scale-95'"
-                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold transition-all shadow-sm"
-            >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.362a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-                <span x-text="isProcessing ? 'Memproses...' : 'Scan KTP'">Scan KTP</span>
-            </button>
+            <div class="flex items-center gap-2.5">
+                <button
+                    type="button"
+                    @click="pasteFromClipboard()"
+                    title="Paste gambar KTP dari clipboard"
+                    class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-sm font-semibold hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 transition-all shadow-xs"
+                >
+                    <flux:icon name="clipboard-document" class="w-4 h-4" />
+                    <span>Paste (Ctrl+V)</span>
+                </button>
+                <button
+                    type="button"
+                    @click="openModal()"
+                    x-bind:disabled="isProcessing"
+                    x-bind:class="isProcessing ? 'opacity-60 cursor-not-allowed' : 'hover:bg-indigo-700 active:scale-95'"
+                    class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold transition-all shadow-sm"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.362a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+                    <span x-text="isProcessing ? 'Memproses...' : 'Scan KTP'">Scan KTP</span>
+                </button>
+            </div>
         </div>
 
         {{-- Loading Bar saat Processing --}}
@@ -103,7 +229,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>AI sedang membaca KTP Anda, mohon tunggu...</span>
+            <span>AI sedang membaca & menganalisis KTP Anda, mohon tunggu...</span>
         </div>
 
         {{-- Loading Livewire saat Upload File --}}
@@ -112,7 +238,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>AI sedang membaca KTP Anda, mohon tunggu...</span>
+            <span>AI sedang membaca & menganalisis KTP Anda, mohon tunggu...</span>
         </div>
 
         {{-- Hidden File Input --}}
@@ -141,13 +267,13 @@
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="opacity-100 scale-100"
                 x-transition:leave-end="opacity-0 scale-95"
-                class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+                class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden"
             >
                 {{-- Modal Header --}}
                 <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800">
                     <div class="flex items-center gap-2">
                         <flux:icon name="viewfinder-circle" class="w-5 h-5 text-indigo-500" />
-                        <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Scan KTP Pasien</h3>
+                        <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Scan & Analisis KTP Pasien</h3>
                     </div>
                     <button type="button" @click="closeModal()" class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -155,36 +281,63 @@
                 </div>
 
                 {{-- Modal Body: Pilih Mode --}}
-                <div x-show="mode === null" class="p-6 grid grid-cols-2 gap-4">
-                    {{-- Opsi 1: Upload File --}}
-                    <button
-                        type="button"
-                        @click="closeModal(); $refs.fileInput.click();"
-                        class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-all group"
-                    >
-                        <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <flux:icon name="folder-open" class="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        <div class="text-center">
-                            <p class="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Dari Folder</p>
-                            <p class="text-xs text-neutral-400 mt-0.5">JPG, PNG, WEBP</p>
-                        </div>
-                    </button>
+                <div x-show="mode === null" class="p-6 flex flex-col gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {{-- Opsi 1: Upload File --}}
+                        <button
+                            type="button"
+                            @click="closeModal(); $refs.fileInput.click();"
+                            class="flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/20 transition-all group"
+                        >
+                            <div class="w-11 h-11 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <flux:icon name="folder-open" class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                            <div class="text-center">
+                                <p class="font-semibold text-xs text-neutral-800 dark:text-neutral-200">Dari Folder</p>
+                                <p class="text-[10px] text-neutral-400 mt-0.5">JPG, PNG, WEBP</p>
+                            </div>
+                        </button>
 
-                    {{-- Opsi 2: Webcam --}}
-                    <button
-                        type="button"
-                        @click="startWebcam()"
-                        class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-violet-400 hover:bg-violet-50/50 dark:hover:bg-violet-950/20 transition-all group"
-                    >
-                        <div class="w-12 h-12 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <flux:icon name="video-camera" class="w-6 h-6 text-violet-600 dark:text-violet-400" />
-                        </div>
-                        <div class="text-center">
-                            <p class="font-semibold text-sm text-neutral-800 dark:text-neutral-200">Kamera/Webcam</p>
-                            <p class="text-xs text-neutral-400 mt-0.5">Ambil foto langsung</p>
-                        </div>
-                    </button>
+                        {{-- Opsi 2: Webcam --}}
+                        <button
+                            type="button"
+                            @click="startWebcam()"
+                            class="flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-violet-400 hover:bg-violet-50/50 dark:hover:bg-violet-950/20 transition-all group"
+                        >
+                            <div class="w-11 h-11 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <flux:icon name="video-camera" class="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                            </div>
+                            <div class="text-center">
+                                <p class="font-semibold text-xs text-neutral-800 dark:text-neutral-200">Kamera/Webcam</p>
+                                <p class="text-[10px] text-neutral-400 mt-0.5">Ambil foto langsung</p>
+                            </div>
+                        </button>
+
+                        {{-- Opsi 3: Paste Clipboard (Ctrl + V) --}}
+                        <button
+                            type="button"
+                            @click="pasteFromClipboard()"
+                            class="flex flex-col items-center gap-2.5 p-4 rounded-xl border-2 border-dashed border-emerald-300 dark:border-emerald-700/60 bg-emerald-50/30 dark:bg-emerald-950/20 hover:border-emerald-500 hover:bg-emerald-50/70 transition-all group"
+                        >
+                            <div class="w-11 h-11 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <flux:icon name="clipboard-document" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div class="text-center">
+                                <p class="font-semibold text-xs text-emerald-800 dark:text-emerald-300">Paste (Ctrl + V)</p>
+                                <p class="text-[10px] text-neutral-400 mt-0.5">Dari clipboard</p>
+                            </div>
+                        </button>
+                    </div>
+
+                    {{-- Clipboard Helper Box --}}
+                    <div class="p-3 bg-neutral-50 dark:bg-neutral-800/60 rounded-xl border border-neutral-200/80 dark:border-neutral-700 text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-2.5">
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-[10px] font-bold font-mono bg-white dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded shadow-xs text-neutral-700 dark:text-neutral-200">
+                            Ctrl + V
+                        </span>
+                        <span class="text-[11px] leading-tight">
+                            Bisa langsung tekan <strong>Ctrl + V</strong> di mana saja pada halaman ini untuk langsung menganalisis gambar KTP dari clipboard.
+                        </span>
+                    </div>
                 </div>
 
                 {{-- Modal Body: Webcam View --}}
@@ -214,8 +367,30 @@
                 </div>
             </div>
         </div>
-    </div>
-
+        {{-- Banner Notifikasi Form Kosong Pasca Auto-Fill KTP --}}
+        <div
+            x-show="hasKtpHighlight"
+            x-cloak
+            x-transition
+            class="mx-6 mt-5 p-3.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-emerald-800 dark:text-emerald-200 shadow-xs"
+        >
+            <div class="flex items-center gap-2.5">
+                <span class="flex h-2.5 w-2.5 relative flex-shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span>
+                    <strong>Data KTP Berhasil Diterapkan!</strong> Form dengan tepian hijau (<strong x-text="emptyCount"></strong> kolom) menandakan data yang masih kosong. Tepian hijau akan otomatis kembali ke warna default begitu kolom diisi.
+                </span>
+            </div>
+            <button
+                type="button"
+                @click="dismissHighlight()"
+                class="self-end sm:self-auto flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded bg-white dark:bg-neutral-800 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100/60 transition-colors shadow-xs"
+            >
+                Tutup Sorotan
+            </button>
+        </div>
 
         <div class="p-6">
             <div class="space-y-8">

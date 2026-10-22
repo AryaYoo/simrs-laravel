@@ -18,9 +18,11 @@ class VisitePatient extends Component
     public string $no_rawat = '';
     public ?RegPeriksa $regPeriksa = null;
 
-    // Form Modal State
+    // Form Modal / Slide-in Panel State
     public bool $formModalOpen = false;
+    public bool $isPanelOpen = false;
     public bool $isEditMode = false;
+    public bool $autoTime = true;
     public ?int $selectedId = null;
 
     // Detail Modal State
@@ -153,6 +155,14 @@ class VisitePatient extends Component
         }
     }
 
+    public function selectPetugas(string $nip, string $nama): void
+    {
+        $this->nip = $nip;
+        $pegawai = Pegawai::find($nip);
+        $this->currentJabatan = $pegawai->jbtn ?? '-';
+        $this->pegawaiSearch = '';
+    }
+
     public function openCreateModal(): void
     {
         $this->resetValidation();
@@ -161,6 +171,7 @@ class VisitePatient extends Component
 
         $this->tgl_visite = date('Y-m-d');
         $this->jam_visite = date('H:i:s');
+        $this->autoTime = true;
         $this->keluhan = '';
         $this->pemeriksaan = '';
         $this->suhu_tubuh = '';
@@ -190,7 +201,14 @@ class VisitePatient extends Component
             }
         }
 
+        $this->isPanelOpen = true;
         $this->formModalOpen = true;
+        $this->dispatch('set-autotime', ['status' => true]);
+    }
+
+    public function openPanel(): void
+    {
+        $this->openCreateModal();
     }
 
     public function fillAutoData(): void
@@ -265,7 +283,9 @@ class VisitePatient extends Component
         $this->interaksi_obat = $visite->interaksi_obat ?? '';
 
         $this->detailModalOpen = false;
+        $this->isPanelOpen = true;
         $this->formModalOpen = true;
+        $this->dispatch('set-autotime', ['status' => false]);
     }
 
     public function save(): void
@@ -314,6 +334,7 @@ class VisitePatient extends Component
             $message = 'Data visite berhasil disimpan.';
         }
 
+        $this->isPanelOpen = false;
         $this->formModalOpen = false;
         $this->loadLastReference();
 

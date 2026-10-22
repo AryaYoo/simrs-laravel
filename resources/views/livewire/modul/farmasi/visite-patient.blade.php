@@ -175,34 +175,75 @@
         </flux:table>
     </div>
 
-    {{-- ===== MODAL FORM TAMBAH / EDIT VISITE (Flyout Popup di Sebelah Kanan seperti Pemeriksaan Rawat Inap) ===== --}}
-    <flux:modal wire:model="formModalOpen" class="w-full max-w-6xl" variant="flyout">
-        <div class="bg-white dark:bg-neutral-900 flex flex-col items-stretch max-h-[95vh]">
-            {{-- Header --}}
-            <div class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between flex-shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-[#4C5C2D]/10 text-[#4C5C2D] dark:bg-[#4C5C2D]/30 dark:text-[#8CC7C4]">
-                        <flux:icon name="document-plus" class="w-5 h-5" />
+    {{-- ===== RIGHT SLIDE-IN PANEL (Consistent with SBAR & ADIME) ===== --}}
+    <div x-data="{
+            open: @entangle('isPanelOpen'),
+            autoTime: @entangle('autoTime'),
+            interval: null,
+            init() {
+                this.interval = setInterval(() => {
+                    if(this.autoTime && this.open) {
+                        let now = new Date();
+                        $wire.tgl_visite = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+                        $wire.jam_visite = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+                    }
+                }, 1000);
+            }
+        }"
+        @set-autotime.window="autoTime = $event.detail[0].status"
+        x-show="open"
+        class="fixed inset-0 z-50 flex justify-end"
+        style="display: none;">
+
+        {{-- Backdrop --}}
+        <div x-show="open"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-neutral-900/50 backdrop-blur-sm"
+             @click="open = false"></div>
+
+        {{-- Right Panel --}}
+        <div x-show="open"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="translate-x-full opacity-0"
+             x-transition:enter-end="translate-x-0 opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="translate-x-0 opacity-100"
+             x-transition:leave-end="translate-x-full opacity-0"
+             class="relative z-10 w-full max-w-4xl bg-white dark:bg-neutral-800 h-full flex flex-col shadow-2xl border-l border-neutral-200 dark:border-neutral-700 overflow-hidden">
+
+            {{-- Panel Header --}}
+            <div class="px-8 py-5 border-b border-neutral-100 dark:border-neutral-700 flex items-center justify-between bg-neutral-50/70 dark:bg-neutral-900/60 flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-[#4C5C2D]/10 flex items-center justify-center">
+                        <flux:icon name="beaker" class="w-5 h-5 text-[#4C5C2D]" />
                     </div>
-                    <h2 class="text-lg font-bold text-neutral-800 dark:text-neutral-100" x-text="$wire.isEditMode ? 'Edit Visite Rawat Inap' : 'Tambah Pemeriksaan Rawat Inap (Visite)'"></h2>
+                    <div>
+                        <h3 class="text-lg font-bold text-neutral-800 dark:text-neutral-100">
+                            {{ $isEditMode ? 'Edit Visite Farmasi' : 'Input Visite Farmasi' }}
+                        </h3>
+                        <p class="text-xs text-neutral-500">Catatan visite klinis farmasi dan pemantauan terapi obat pasien.</p>
+                    </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div x-show="$wire.isEditMode" title="Fitur tidak tersedia ketika mengedit" x-cloak>
-                        <flux:button size="xs" variant="subtle" icon="bolt" disabled class="opacity-50 cursor-not-allowed">
-                            Isi Otomatis
-                        </flux:button>
-                    </div>
-                    <div x-show="!$wire.isEditMode" title="Isi otomatis data dari pemeriksaan terakhir & petugas yang login" x-cloak>
+                    <div x-show="!$wire.isEditMode" title="Isi otomatis data dari visite sebelumnya & petugas yang login" x-cloak>
                         <flux:button wire:click="fillAutoData" size="xs" variant="subtle" icon="bolt" class="text-[#4C5C2D] hover:bg-[#4C5C2D]/10">
                             Isi Otomatis
                         </flux:button>
                     </div>
+                    <button @click="open = false" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
+                        <flux:icon name="x-mark" class="w-6 h-6" />
+                    </button>
                 </div>
             </div>
 
             {{-- Reference Alert --}}
             @if($lastReference && !$isEditMode)
-                <div class="px-6 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/50 flex items-center gap-3 animate-in slide-in-from-top-1 duration-300">
+                <div class="px-8 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/50 flex items-center gap-3 flex-shrink-0 animate-in slide-in-from-top-1 duration-300">
                     <flux:icon name="information-circle" class="w-5 h-5 text-amber-500 flex-shrink-0" />
                     <p class="text-[11px] text-amber-800 dark:text-amber-300 leading-tight">
                         <span class="font-bold">Mode Patokan Aktif:</span> Menampilkan rujukan dari data terakhir tanggal <span class="font-bold">{{ $lastReference['tanggal'] }}</span> jam <span class="font-bold">{{ $lastReference['jam'] }}</span>.
@@ -211,216 +252,272 @@
                 </div>
             @endif
 
-            {{-- Form Content --}}
-            <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-                {{-- Header Row: Time & Date --}}
-                <div class="grid grid-cols-2 gap-4">
-                    <flux:field>
-                        <flux:input wire:model="tgl_visite" type="date" label="Tanggal Pemeriksaan" />
-                        @error('tgl_visite') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </flux:field>
-                    <flux:field>
-                        <flux:input wire:model="jam_visite" type="time" step="1" label="Jam Pemeriksaan" />
-                        @error('jam_visite') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </flux:field>
+            {{-- Panel Scrollable Body --}}
+            <div class="flex-1 overflow-y-auto p-8 space-y-6">
+
+                {{-- Patient Info Bar --}}
+                <div class="grid grid-cols-3 gap-4 bg-neutral-50 dark:bg-neutral-900 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                    <div>
+                        <div class="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-1">No. Rawat</div>
+                        <div class="font-mono text-sm font-semibold text-[#4C5C2D]">{{ $regPeriksa->no_rawat }}</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-1">No. RM — Nama</div>
+                        <div class="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                            {{ $regPeriksa->no_rkm_medis }} — {{ $regPeriksa->pasien->nm_pasien }}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-1">Tgl Lahir</div>
+                        <div class="text-sm font-medium text-neutral-800 dark:text-neutral-200">
+                            {{ $regPeriksa->pasien->tgl_lahir ? \Carbon\Carbon::parse($regPeriksa->pasien->tgl_lahir)->format('d-m-Y') : '-' }}
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                    {{-- LEFT COLUMN: Staff + S & O + Vitals --}}
-                    <div class="flex flex-col gap-6">
-                        {{-- Petugas Section --}}
-                        <div class="bg-blue-50/30 dark:bg-blue-900/10 p-5 rounded-xl border border-blue-100 dark:border-blue-800/50">
-                            <div class="grid grid-cols-1 gap-4">
-                                {{-- Dilakukan (Staff Selection) --}}
-                                <flux:field>
-                                    <flux:label class="text-blue-600 font-bold tracking-tight">Dilakukan :</flux:label>
-                                    <div class="relative">
-                                        <flux:input wire:model.live.debounce.300ms="pegawaiSearch" icon="magnifying-glass" placeholder="Cari Nama / NIK Petugas..." />
-                                        @if($nip)
-                                            @php $selectedPegawai = \App\Models\Pegawai::find($nip); @endphp
-                                            <div class="mt-2 flex items-center justify-between p-2.5 bg-white dark:bg-neutral-800 rounded-lg border border-emerald-500 shadow-sm animate-in fade-in duration-300">
-                                                <div class="flex items-center gap-2">
-                                                    <div class="p-1 px-2 rounded-md bg-emerald-500 text-white text-[10px] font-bold">{{ $selectedPegawai->nik ?? $nip }}</div>
-                                                    <span class="text-sm font-bold text-neutral-800 dark:text-white">{{ $selectedPegawai->nama ?? $nip }}</span>
-                                                </div>
-                                                <button type="button" wire:click="$set('nip', '')" class="p-1 text-neutral-400 hover:text-red-500 transition-colors">
-                                                    <flux:icon name="x-mark" class="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        @elseif(!empty($pegawaiList) && count($pegawaiList) > 0)
-                                            <div class="absolute w-full mt-1 max-h-48 overflow-y-auto rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 shadow-lg z-50">
-                                                @foreach($pegawaiList as $pg)
-                                                    <button type="button" wire:click="$set('nip', '{{ $pg->nik }}')" class="w-full flex flex-col text-left px-4 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors border-b border-neutral-50 dark:border-neutral-700/50 last:border-0">
-                                                        <span class="text-sm font-semibold text-neutral-700 dark:text-neutral-200">{{ $pg->nama }}</span>
-                                                        <span class="text-[10px] text-neutral-400">{{ $pg->jbtn }} | {{ $pg->nik }}</span>
-                                                    </button>
-                                                @endforeach
-                                            </div>
-                                        @endif
-                                        @error('nip') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                                    </div>
-                                </flux:field>
-
-                                {{-- Profesi / Jabatan / Departemen (Auto-filled) --}}
-                                <flux:field>
-                                    <flux:label class="text-neutral-500">Profesi / Jabatan / Departemen :</flux:label>
-                                    <flux:input wire:model="currentJabatan" readonly disabled class="bg-neutral-100/50 dark:bg-neutral-800/50 text-xs" />
-                                </flux:field>
+                {{-- Tanggal, Jam & Petugas Row --}}
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <div class="md:col-span-3">
+                        <flux:input wire:model="tgl_visite" type="date" label="Tanggal *" required />
+                        @error('tgl_visite') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="md:col-span-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <flux:label class="!mb-0">Jam *</flux:label>
+                            <div class="flex items-center gap-1.5 mt-2">
+                                <flux:checkbox wire:model="autoTime" id="autoTimeVisite" />
+                                <label for="autoTimeVisite" class="text-xs font-medium text-neutral-600 dark:text-neutral-400 cursor-pointer">Waktu Otomatis</label>
                             </div>
                         </div>
+                        <flux:input wire:model="jam_visite" type="time" step="1" required />
+                        @error('jam_visite') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="md:col-span-6 relative">
+                        <flux:input wire:model.live.debounce.300ms="pegawaiSearch"
+                                    label="Petugas Farmasi (NIP/Nama) *"
+                                    placeholder="Ketik minimal 3 karakter..."
+                                    icon="magnifying-glass" />
 
-                        {{-- SOAP: S & O --}}
-                        <div class="flex flex-col gap-4">
-                            <flux:textarea wire:model="keluhan" label="Subjek (Keluhan Utama) :" placeholder="Masukkan subjek/keluhan..." resize="none" rows="3" />
-                            <flux:textarea wire:model="pemeriksaan" label="Objek (Pemeriksaan Fisik) :" placeholder="Masukkan objek/pemeriksaan..." resize="none" rows="3" />
+                        @if(!empty($pegawaiList) && count($pegawaiList) > 0)
+                            <div class="absolute z-[60] left-0 right-0 mt-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                                @foreach($pegawaiList as $pg)
+                                    <button type="button"
+                                            wire:click="selectPetugas('{{ $pg->nik }}', '{{ $pg->nama }}')"
+                                            class="w-full text-left px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-700 border-b border-neutral-100 dark:border-neutral-700 last:border-0 transition-colors group">
+                                        <div class="font-bold text-sm text-neutral-700 dark:text-neutral-200 group-hover:text-[#4C5C2D]">{{ $pg->nama }}</div>
+                                        <div class="text-[10px] text-neutral-400 font-mono tracking-wider">{{ $pg->jbtn }} | {{ $pg->nik }}</div>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        @if($nip)
+                            @php $selectedPegawai = \App\Models\Pegawai::find($nip); @endphp
+                            <div class="mt-2 p-3 bg-[#4C5C2D]/5 border border-[#4C5C2D]/20 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <flux:icon name="user-circle" class="w-5 h-5 text-[#4C5C2D]" />
+                                    <div>
+                                        <div class="text-xs font-bold text-[#4C5C2D]">{{ $selectedPegawai->nama ?? $nip }}</div>
+                                        <div class="text-[10px] text-neutral-500 font-mono tracking-wider">{{ $selectedPegawai->jbtn ?? $currentJabatan ?: '-' }} &bull; {{ $selectedPegawai->nik ?? $nip }}</div>
+                                    </div>
+                                </div>
+                                <button type="button" wire:click="$set('nip', '')" class="text-neutral-400 hover:text-red-500 transition-colors">
+                                    <flux:icon name="trash" class="w-4 h-4" />
+                                </button>
+                            </div>
+                        @endif
+                        @error('nip') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                {{-- Khusus Farmasi Klinis --}}
+                <div class="bg-[#F1F5E9] dark:bg-[#4C5C2D]/15 p-5 rounded-xl border border-[#4C5C2D]/30 flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs font-bold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-wider flex items-center gap-1.5">
+                            <flux:icon name="beaker" class="w-4 h-4" /> Evaluasi Farmasi Klinis
+                        </p>
+                        <span class="text-[11px] text-neutral-500">Telaah terapi obat dan interaksi klinis</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <flux:label>Riwayat Pengobatan</flux:label>
+                            <textarea wire:model="riwayat_pengobatan"
+                                      rows="3"
+                                      placeholder="Masukkan riwayat penggunaan obat pasien..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <flux:label>Interaksi Obat</flux:label>
+                            <textarea wire:model="interaksi_obat"
+                                      rows="3"
+                                      placeholder="Catatan / potensi efek interaksi obat..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 2-Column SOAP & Vital Signs --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    {{-- LEFT COLUMN --}}
+                    <div class="space-y-5">
+                        <div>
+                            <flux:label>Subjek (Keluhan Utama)</flux:label>
+                            <textarea wire:model="keluhan"
+                                      rows="3"
+                                      placeholder="Masukkan subjek/keluhan utama pasien..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
+                        </div>
+
+                        <div>
+                            <flux:label>Objek (Pemeriksaan Fisik)</flux:label>
+                            <textarea wire:model="pemeriksaan"
+                                      rows="3"
+                                      placeholder="Masukkan objek/pemeriksaan fisik..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
                         </div>
 
                         {{-- Vital Signs Grid --}}
-                        <div class="bg-white dark:bg-neutral-800 p-5 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm mt-2">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 mb-5 flex items-center gap-1.5">
-                                <flux:icon name="heart" class="w-3.5 h-3.5" /> Tanda-Tanda Vital
+                        <div class="bg-neutral-50 dark:bg-neutral-900 p-5 rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm space-y-4">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                                <flux:icon name="heart" class="w-3.5 h-3.5 text-rose-500" /> Tanda-Tanda Vital
                             </p>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-5">
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">Suhu (C)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['suhu_tubuh'] }}</span>@endif
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">Suhu (&deg;C)</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['suhu_tubuh'] }}</span>@endif
                                     </div>
-                                    <flux:input wire:model="suhu_tubuh" size="sm" placeholder="36,1" class="{{ $lastReference && $suhu_tubuh == $lastReference['suhu_tubuh'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">Tensi (mmHg)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['tensi'] }}</span>@endif
+                                    <flux:input wire:model="suhu_tubuh" size="sm" placeholder="36.5" class="{{ $lastReference && $suhu_tubuh == $lastReference['suhu_tubuh'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">Tensi</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['tensi'] }}</span>@endif
                                     </div>
                                     <flux:input wire:model="tensi" size="sm" placeholder="120/80" class="{{ $lastReference && $tensi == $lastReference['tensi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">Berat (Kg)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['berat'] }}</span>@endif
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">Berat (Kg)</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['berat'] }}</span>@endif
                                     </div>
-                                    <flux:input wire:model="berat" size="sm" placeholder="65" class="{{ $lastReference && $berat == $lastReference['berat'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">TB (Cm)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['tinggi'] }}</span>@endif
+                                    <flux:input wire:model="berat" size="sm" placeholder="60" class="{{ $lastReference && $berat == $lastReference['berat'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">TB (Cm)</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['tinggi'] }}</span>@endif
                                     </div>
-                                    <flux:input wire:model="tinggi" size="sm" placeholder="170" class="{{ $lastReference && $tinggi == $lastReference['tinggi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">RR (/mnt)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['respirasi'] }}</span>@endif
+                                    <flux:input wire:model="tinggi" size="sm" placeholder="165" class="{{ $lastReference && $tinggi == $lastReference['tinggi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">RR (/mnt)</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['respirasi'] }}</span>@endif
                                     </div>
-                                    <flux:input wire:model="respirasi" size="sm" placeholder="18" class="{{ $lastReference && $respirasi == $lastReference['respirasi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">Nadi (/mnt)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['nadi'] }}</span>@endif
+                                    <flux:input wire:model="respirasi" size="sm" placeholder="20" class="{{ $lastReference && $respirasi == $lastReference['respirasi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">Nadi (/mnt)</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['nadi'] }}</span>@endif
                                     </div>
-                                    <flux:input wire:model="nadi" size="sm" placeholder="75" class="{{ $lastReference && $nadi == $lastReference['nadi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">SpO2 (%)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['spo2'] }}%</span>@endif
+                                    <flux:input wire:model="nadi" size="sm" placeholder="80" class="{{ $lastReference && $nadi == $lastReference['nadi'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">SpO2 (%)</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['spo2'] }}%</span>@endif
                                     </div>
                                     <flux:input wire:model="spo2" size="sm" placeholder="98" class="{{ $lastReference && $spo2 == $lastReference['spo2'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
-
-                                <flux:field>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <flux:label class="!mb-0">GCS (E,V,M)</flux:label>
-                                        @if($lastReference)<span class="text-[10px] text-amber-600 dark:text-amber-400 font-medium bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">Lalu: {{ $lastReference['gcs'] }}</span>@endif
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <flux:label class="!mb-0 text-xs">GCS</flux:label>
+                                        @if($lastReference)<span class="text-[9px] text-amber-600 dark:text-amber-400 font-medium">{{ $lastReference['gcs'] }}</span>@endif
                                     </div>
                                     <flux:input wire:model="gcs" size="sm" placeholder="15" class="{{ $lastReference && $gcs == $lastReference['gcs'] ? 'bg-amber-50/50 dark:bg-amber-900/10' : '' }}" />
-                                </flux:field>
+                                </div>
                             </div>
-
-                            <div class="mt-6 pt-5 border-t border-neutral-100 dark:border-neutral-700/50">
-                                <flux:field variant="horizontal">
-                                    <flux:label class="!mb-0 w-32">Kesadaran :</flux:label>
-                                    <div class="flex-1">
-                                        <flux:select wire:model="kesadaran" class="w-full">
-                                            <flux:select.option value="Compos Mentis">Compos Mentis</flux:select.option>
-                                            <flux:select.option value="Somnolence">Somnolence</flux:select.option>
-                                            <flux:select.option value="Sopor">Sopor</flux:select.option>
-                                            <flux:select.option value="Coma">Coma</flux:select.option>
-                                            <flux:select.option value="Apatis">Apatis</flux:select.option>
-                                            <flux:select.option value="Delirium">Delirium</flux:select.option>
-                                        </flux:select>
-                                    </div>
-                                </flux:field>
+                            <div class="pt-3 border-t border-neutral-200 dark:border-neutral-700/50 flex items-center gap-3">
+                                <flux:label class="!mb-0 text-xs w-24">Kesadaran :</flux:label>
+                                <flux:select wire:model="kesadaran" class="flex-1" size="sm">
+                                    <flux:select.option value="Compos Mentis">Compos Mentis</flux:select.option>
+                                    <flux:select.option value="Somnolence">Somnolence</flux:select.option>
+                                    <flux:select.option value="Sopor">Sopor</flux:select.option>
+                                    <flux:select.option value="Coma">Coma</flux:select.option>
+                                    <flux:select.option value="Apatis">Apatis</flux:select.option>
+                                    <flux:select.option value="Delirium">Delirium</flux:select.option>
+                                </flux:select>
                             </div>
                         </div>
                     </div>
 
-                    {{-- RIGHT COLUMN: Alergi + A, P, Inst/Impl, Eval + Farmasi --}}
-                    <div class="flex flex-col gap-6">
-                        {{-- Alergi --}}
-                        <flux:field>
-                            <flux:label class="font-bold text-red-500">Alergi :</flux:label>
-                            <flux:input wire:model="alergi" placeholder="Ada alergi makanan/obat?" class="border-red-200 focus:border-red-500" />
-                        </flux:field>
-
-                        {{-- SOAP: A & P --}}
-                        <div class="flex flex-col gap-5">
-                            <flux:field>
-                                <flux:textarea wire:model="penilaian" label="Asesmen (Penilaian Klinis)" placeholder="Masukkan penilaian..." resize="none" rows="4" />
-                                @error('penilaian') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                            </flux:field>
-                            <flux:field>
-                                <flux:textarea wire:model="rtl" label="Plan (Rencana Tindak Lanjut)" placeholder="Masukkan rencana..." resize="none" rows="4" />
-                                @error('rtl') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                            </flux:field>
+                    {{-- RIGHT COLUMN --}}
+                    <div class="space-y-5">
+                        <div>
+                            <flux:label>Asesmen (Penilaian Klinis)</flux:label>
+                            <textarea wire:model="penilaian"
+                                      rows="3"
+                                      placeholder="Masukkan penilaian klinis..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
+                            @error('penilaian') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- Inst/Impl & Evaluasi --}}
-                        <div class="flex flex-col gap-5">
-                            <flux:textarea wire:model="instruksi" label="Inst/Impl (Tindakan Dilakukan)" placeholder="Masukkan instruksi..." resize="none" rows="4" />
-                            <flux:textarea wire:model="evaluasi" label="Evaluasi (Respon Pasien)" placeholder="Masukkan evaluasi..." resize="none" rows="4" />
+                        <div>
+                            <flux:label>Plan (Rencana Tindak Lanjut)</flux:label>
+                            <textarea wire:model="rtl"
+                                      rows="3"
+                                      placeholder="Masukkan rencana tindak lanjut farmakoterapi..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
+                            @error('rtl') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        {{-- KHUSUS FARMASI KLINIS --}}
-                        <div class="bg-[#F1F5E9] dark:bg-[#4C5C2D]/15 p-5 rounded-xl border border-[#4C5C2D]/30 flex flex-col gap-4">
-                            <p class="text-xs font-bold text-[#4C5C2D] dark:text-[#8CC7C4] uppercase tracking-wider flex items-center gap-1.5">
-                                <flux:icon name="beaker" class="w-4 h-4" /> Evaluasi Farmasi Klinis
-                            </p>
-                            <flux:field>
-                                <flux:textarea wire:model="riwayat_pengobatan" label="Riwayat Pengobatan :" placeholder="Masukkan riwayat penggunaan obat pasien..." rows="3" />
-                            </flux:field>
-                            <flux:field>
-                                <flux:textarea wire:model="interaksi_obat" label="Interaksi Obat :" placeholder="Masukkan catatan / potensi interaksi obat..." rows="3" />
-                            </flux:field>
+                        <div>
+                            <flux:label>Instruksi / Implementasi</flux:label>
+                            <textarea wire:model="instruksi"
+                                      rows="3"
+                                      placeholder="Masukkan instruksi khusus atau tindakan..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
+                        </div>
+
+                        <div>
+                            <flux:label>Evaluasi (Respon Pasien)</flux:label>
+                            <textarea wire:model="evaluasi"
+                                      rows="3"
+                                      placeholder="Masukkan respon / evaluasi pengobatan pasien..."
+                                      class="mt-1 w-full rounded-xl border border-neutral-200 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4C5C2D]/40 focus:border-[#4C5C2D] transition resize-y"
+                            ></textarea>
+                        </div>
+
+                        <div>
+                            <flux:label class="font-bold text-red-600 dark:text-red-400">Riwayat Alergi</flux:label>
+                            <flux:input wire:model="alergi" placeholder="Ada alergi makanan/obat? (Isi '-' jika tidak ada)" class="border-red-200 focus:border-red-500" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Footer Actions --}}
-            <div class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 flex items-center justify-end gap-3 flex-shrink-0">
-                <flux:modal.close>
-                    <flux:button variant="ghost">Batal</flux:button>
-                </flux:modal.close>
-                <flux:button wire:click="save" variant="primary" class="px-8 bg-[#4C5C2D] hover:bg-[#3d4b24]" wire:loading.attr="disabled">
+            {{-- Panel Footer --}}
+            <div class="px-8 py-5 bg-neutral-50/70 dark:bg-neutral-900/60 border-t border-neutral-100 dark:border-neutral-700 flex justify-end gap-3 flex-shrink-0">
+                <flux:button @click="open = false" variant="ghost">Batal</flux:button>
+                <flux:button wire:click="save" variant="filled" class="!bg-[#4C5C2D] !text-white hover:!bg-[#3d4a24]" wire:loading.attr="disabled">
                     <div class="flex items-center justify-center gap-2">
                         <flux:icon name="check" class="w-4 h-4" wire:loading.remove wire:target="save" />
                         <flux:icon name="arrow-path" class="w-4 h-4 animate-spin" wire:loading wire:target="save" />
-                        <span x-text="$wire.isEditMode ? 'Update Perubahan' : 'Simpan Pemeriksaan'"></span>
+                        <span x-text="$wire.isEditMode ? 'Update Perubahan' : 'Simpan Visite'"></span>
                     </div>
                 </flux:button>
             </div>
         </div>
-    </flux:modal>
+    </div>
 
     {{-- ===== MODAL DETAIL VISITE (Alpine.js Pure Modal) ===== --}}
     <template x-teleport="body">
