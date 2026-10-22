@@ -184,7 +184,7 @@
                 }
             }
         }"
-        @paste.window="handlePaste($event)"
+        @paste.window="if (showModal) handlePaste($event)"
         class="ktp-scan-container p-6 border-b border-neutral-100 dark:border-neutral-800 bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/20 dark:to-violet-950/20"
     >
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -192,24 +192,12 @@
                 <h2 class="text-base font-semibold text-neutral-800 dark:text-neutral-200 flex items-center gap-2">
                     <flux:icon name="viewfinder-circle" class="w-5 h-5 text-indigo-500" />
                     Scan KTP (OCR)
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
-                        <kbd class="font-mono font-semibold">Ctrl + V</kbd> Aktif
-                    </span>
                 </h2>
                 <p class="text-sm text-neutral-500 mt-1">
-                    Scan, unggah foto KTP, atau langsung tekan <kbd class="px-1.5 py-0.5 text-xs font-mono font-semibold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded shadow-xs">Ctrl + V</kbd> untuk menganalisis gambar dari clipboard.
+                    Scan KTP menggunakan kamera, berkas foto, atau paste clipboard (Ctrl+V) untuk mengisi data pasien secara otomatis.
                 </p>
             </div>
-            <div class="flex items-center gap-2.5">
-                <button
-                    type="button"
-                    @click="pasteFromClipboard()"
-                    title="Paste gambar KTP dari clipboard"
-                    class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-sm font-semibold hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 transition-all shadow-xs"
-                >
-                    <flux:icon name="clipboard-document" class="w-4 h-4" />
-                    <span>Paste (Ctrl+V)</span>
-                </button>
+            <div>
                 <button
                     type="button"
                     @click="openModal()"
@@ -335,7 +323,7 @@
                             Ctrl + V
                         </span>
                         <span class="text-[11px] leading-tight">
-                            Bisa langsung tekan <strong>Ctrl + V</strong> di mana saja pada halaman ini untuk langsung menganalisis gambar KTP dari clipboard.
+                            Bisa langsung tekan <strong>Ctrl + V</strong> saat jendela ini terbuka untuk langsung menganalisis gambar KTP dari clipboard.
                         </span>
                     </div>
                 </div>
