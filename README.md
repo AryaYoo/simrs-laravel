@@ -32,7 +32,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Master Pasien**: Manajemen identitas dengan integrasi data wilayah & penjamin.
 - [x] **Master Data Medis**: Pengelolaan data Dokter, Poliklinik, Penjamin, & Perujuk.
 - [x] **Master Wilayah**: Manajemen data Provinsi, Kabupaten, Kecamatan, & Kelurahan.
-- [x] **AI OCR KTP (Gemini AI)**: Ekstraksi otomatis data identitas e-KTP berbasis Gemini Vision AI yang dilengkapi auto-matching wilayah (Kelurahan, Kecamatan, Kabupaten/Kota, Provinsi), perapian format alamat & RT/RW, auto-sinkronisasi data penanggung jawab, opsi cepat tempel clipboard (**Ctrl + V**) saat modal scan dibuka, serta *fallback* otomatis bahasa pasien ke Bahasa Indonesia.
+- [x] **AI OCR KTP (Gemini AI)**: Ekstraksi otomatis data identitas e-KTP berbasis Gemini Vision AI yang dilengkapi auto-matching wilayah (Kelurahan, Kecamatan, Kabupaten/Kota, Provinsi), perapian format alamat & RT/RW, auto-sinkronisasi data penanggung jawab, opsi cepat tempel clipboard (**Ctrl + V**) saat modal scan dibuka, fallback otomatis bahasa pasien ke Bahasa Indonesia, serta **Banner Checklist & Quick-Jump Reaktif** yang memandu kolom formulir mana saja yang belum tercantum di fisik KTP (Ibu Kandung, No. HP, PJ, Email) dan otomatis terupdate saat kolom diisi.
 - [x] **Dashboard Dinamis**: Monitoring real-time pasien inhouse, tren registrasi harian, distribusi penjamin, dan okupansi bed.
 
 ### 🛌 Modul Rawat Inap (Ranap)
