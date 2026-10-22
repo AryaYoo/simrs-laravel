@@ -21,67 +21,15 @@
         [data-ktp-empty="true"] {
             border-color: #10b981 !important;
             border-width: 2px !important;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25) !important;
-            background-color: rgba(16, 185, 129, 0.04) !important;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            outline: 2px solid #10b981 !important;
+            outline-offset: -1px !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3) !important;
+            background-color: rgba(16, 185, 129, 0.05) !important;
+            transition: border-color 0.2s ease, outline 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
     </style>
 
-    <form
-        wire:submit="save"
-        x-ref="patientForm"
-        x-data="{
-            hasKtpHighlight: false,
-            emptyCount: 0,
-            highlightEmptyFields() {
-                const form = this.$refs.patientForm;
-                if (!form) return;
-                const fields = form.querySelectorAll('input:not([type=hidden]):not([type=file]):not([type=checkbox]):not([type=radio]):not([disabled]):not([readonly]), select:not([disabled]), textarea:not([disabled]):not([readonly])');
-                let count = 0;
-                fields.forEach(field => {
-                    if (field.closest('.ktp-scan-container')) return;
-                    const val = (field.value || '').trim();
-                    if (val === '') {
-                        field.classList.add('ktp-highlight-empty');
-                        field.setAttribute('data-ktp-empty', 'true');
-                        count++;
-                        const clearHighlight = () => {
-                            if ((field.value || '').trim() !== '') {
-                                field.classList.remove('ktp-highlight-empty');
-                                field.removeAttribute('data-ktp-empty');
-                                field.removeEventListener('input', clearHighlight);
-                                field.removeEventListener('change', clearHighlight);
-                                this.updateCount();
-                            }
-                        };
-                        field.addEventListener('input', clearHighlight);
-                        field.addEventListener('change', clearHighlight);
-                    } else {
-                        field.classList.remove('ktp-highlight-empty');
-                        field.removeAttribute('data-ktp-empty');
-                    }
-                });
-                this.emptyCount = count;
-                this.hasKtpHighlight = count > 0;
-            },
-            updateCount() {
-                const remaining = this.$refs.patientForm ? this.$refs.patientForm.querySelectorAll('.ktp-highlight-empty').length : 0;
-                this.emptyCount = remaining;
-                if (remaining === 0) this.hasKtpHighlight = false;
-            },
-            dismissHighlight() {
-                if (!this.$refs.patientForm) return;
-                this.$refs.patientForm.querySelectorAll('.ktp-highlight-empty').forEach(el => {
-                    el.classList.remove('ktp-highlight-empty');
-                    el.removeAttribute('data-ktp-empty');
-                });
-                this.hasKtpHighlight = false;
-                this.emptyCount = 0;
-            }
-        }"
-        @ktp-autofilled.window="setTimeout(() => highlightEmptyFields(), 250)"
-        class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden"
-    >
+    <form wire:submit="save" id="patient-registration-form" class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
         
     {{-- =================== MODAL SCAN KTP =================== --}}
     <div
@@ -132,6 +80,10 @@
                 this.showModal = false;
                 await $wire.call('processKtpFromBase64', base64);
                 this.isProcessing = false;
+                if (typeof triggerKtpHighlight === 'function') {
+                    setTimeout(triggerKtpHighlight, 150);
+                    setTimeout(triggerKtpHighlight, 450);
+                }
             },
             async captureWebcam() {
                 const video = this.$refs.videoEl;
@@ -357,9 +309,8 @@
         </div>
         {{-- Banner Notifikasi Form Kosong Pasca Auto-Fill KTP --}}
         <div
-            x-show="hasKtpHighlight"
-            x-cloak
-            x-transition
+            id="ktp-highlight-banner"
+            style="display: none;"
             class="mx-6 mt-5 p-3.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-emerald-800 dark:text-emerald-200 shadow-xs"
         >
             <div class="flex items-center gap-2.5">
@@ -368,12 +319,12 @@
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                 </span>
                 <span>
-                    <strong>Data KTP Berhasil Diterapkan!</strong> Form dengan tepian hijau (<strong x-text="emptyCount"></strong> kolom) menandakan data yang masih kosong. Tepian hijau akan otomatis kembali ke warna default begitu kolom diisi.
+                    <strong>Data KTP Berhasil Diterapkan!</strong> Form dengan tepian hijau (<strong id="ktp-empty-count">0</strong> kolom) menandakan data yang masih kosong. Tepian hijau akan otomatis kembali normal begitu kolom diisi.
                 </span>
             </div>
             <button
                 type="button"
-                @click="dismissHighlight()"
+                onclick="dismissKtpHighlight()"
                 class="self-end sm:self-auto flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded bg-white dark:bg-neutral-800 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100/60 transition-colors shadow-xs"
             >
                 Tutup Sorotan
@@ -592,4 +543,120 @@
             <flux:button type="submit" variant="primary" icon="check">Simpan Pasien Baru</flux:button>
         </div>
     </form>
+
+    <script>
+        function triggerKtpHighlight() {
+            const form = document.getElementById('patient-registration-form') || document.querySelector('form');
+            if (!form) return;
+
+            const inputs = form.querySelectorAll(
+                'input:not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([disabled]):not([readonly]), ' +
+                'select:not([disabled]), ' +
+                'textarea:not([disabled]):not([readonly])'
+            );
+
+            let emptyCount = 0;
+
+            inputs.forEach(el => {
+                if (el.closest('.ktp-scan-container') || el.closest('[x-ref="videoEl"]')) return;
+
+                const val = (el.value || '').trim();
+                const isEmpty = (val === '' || val === '-');
+
+                if (isEmpty) {
+                    emptyCount++;
+                    el.classList.add('ktp-highlight-empty');
+                    el.setAttribute('data-ktp-empty', 'true');
+                    el.style.setProperty('border-color', '#10b981', 'important');
+                    el.style.setProperty('outline', '2px solid #10b981', 'important');
+                    el.style.setProperty('outline-offset', '-1px', 'important');
+                    el.style.setProperty('box-shadow', '0 0 0 3px rgba(16, 185, 129, 0.3)', 'important');
+                    el.style.setProperty('background-color', 'rgba(16, 185, 129, 0.05)', 'important');
+
+                    const removeHighlight = () => {
+                        const currentVal = (el.value || '').trim();
+                        if (currentVal !== '' && currentVal !== '-') {
+                            el.classList.remove('ktp-highlight-empty');
+                            el.removeAttribute('data-ktp-empty');
+                            el.style.removeProperty('border-color');
+                            el.style.removeProperty('outline');
+                            el.style.removeProperty('outline-offset');
+                            el.style.removeProperty('box-shadow');
+                            el.style.removeProperty('background-color');
+                            el.removeEventListener('input', removeHighlight);
+                            el.removeEventListener('change', removeHighlight);
+
+                            const remaining = form.querySelectorAll('.ktp-highlight-empty').length;
+                            const countEl = document.getElementById('ktp-empty-count');
+                            if (countEl) countEl.textContent = remaining;
+                            if (remaining === 0) {
+                                const banner = document.getElementById('ktp-highlight-banner');
+                                if (banner) banner.style.display = 'none';
+                            }
+                        }
+                    };
+
+                    el.addEventListener('input', removeHighlight);
+                    el.addEventListener('change', removeHighlight);
+                } else {
+                    el.classList.remove('ktp-highlight-empty');
+                    el.removeAttribute('data-ktp-empty');
+                    el.style.removeProperty('border-color');
+                    el.style.removeProperty('outline');
+                    el.style.removeProperty('outline-offset');
+                    el.style.removeProperty('box-shadow');
+                    el.style.removeProperty('background-color');
+                }
+            });
+
+            const banner = document.getElementById('ktp-highlight-banner');
+            const countEl = document.getElementById('ktp-empty-count');
+            if (banner) {
+                if (emptyCount > 0) {
+                    if (countEl) countEl.textContent = emptyCount;
+                    banner.style.display = 'flex';
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
+        }
+
+        function dismissKtpHighlight() {
+            const form = document.getElementById('patient-registration-form') || document.querySelector('form');
+            if (!form) return;
+            form.querySelectorAll('.ktp-highlight-empty').forEach(el => {
+                el.classList.remove('ktp-highlight-empty');
+                el.removeAttribute('data-ktp-empty');
+                el.style.removeProperty('border-color');
+                el.style.removeProperty('outline');
+                el.style.removeProperty('outline-offset');
+                el.style.removeProperty('box-shadow');
+                el.style.removeProperty('background-color');
+            });
+            const banner = document.getElementById('ktp-highlight-banner');
+            if (banner) banner.style.display = 'none';
+        }
+
+        window.addEventListener('ktp-autofilled', () => {
+            setTimeout(triggerKtpHighlight, 100);
+            setTimeout(triggerKtpHighlight, 400);
+            setTimeout(triggerKtpHighlight, 800);
+        });
+
+        if (window.Livewire) {
+            window.Livewire.on('ktp-autofilled', () => {
+                setTimeout(triggerKtpHighlight, 100);
+                setTimeout(triggerKtpHighlight, 400);
+                setTimeout(triggerKtpHighlight, 800);
+            });
+        } else {
+            document.addEventListener('livewire:init', () => {
+                window.Livewire.on('ktp-autofilled', () => {
+                    setTimeout(triggerKtpHighlight, 100);
+                    setTimeout(triggerKtpHighlight, 400);
+                    setTimeout(triggerKtpHighlight, 800);
+                });
+            });
+        }
+    </script>
 </div>
