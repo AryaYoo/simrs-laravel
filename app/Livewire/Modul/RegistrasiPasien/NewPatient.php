@@ -60,31 +60,6 @@ class NewPatient extends Component
     public $cacat_fisik = 1;
     public $perusahaan_pasien = '-';
     public $nip = '-';
-    public $is_ktp_scanned = false;
-
-    public function getKolomBelumTerisiProperty()
-    {
-        $list = [];
-        if (empty($this->nm_ibu) || $this->nm_ibu === '-') {
-            $list['nm_ibu'] = 'Nama Ibu Kandung';
-        }
-        if (empty($this->no_tlp) || $this->no_tlp === '-') {
-            $list['no_tlp'] = 'No. Telepon / HP';
-        }
-        if (empty($this->namakeluarga) || $this->namakeluarga === '-') {
-            $list['namakeluarga'] = 'Nama PJ';
-        }
-        if (empty($this->pekerjaanpj) || $this->pekerjaanpj === '-') {
-            $list['pekerjaanpj'] = 'Pekerjaan PJ';
-        }
-        if (empty($this->alamatpj) || $this->alamatpj === '-') {
-            $list['alamatpj'] = 'Alamat PJ';
-        }
-        if (empty($this->email)) {
-            $list['email'] = 'Email';
-        }
-        return $list;
-    }
 
     public function mount()
     {
@@ -361,9 +336,6 @@ class NewPatient extends Component
                 // Ignore umur parsing error
             }
         }
-
-        // Tandai bahwa data baru saja diisi dari KTP untuk menampilkan banner kolom yang belum lengkap
-        $this->is_ktp_scanned = true;
     }
 
     public function save()

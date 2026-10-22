@@ -291,51 +291,6 @@
             </div>
         </div>
         
-        {{-- Banner Kolom KTP yang Belum Lengkap --}}
-        @if($is_ktp_scanned && count($this->kolomBelumTerisi) > 0)
-            <div class="mx-6 mt-5 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 shadow-xs">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-start gap-3">
-                        <div class="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-lg text-amber-700 dark:text-amber-300 flex-shrink-0 mt-0.5">
-                            <flux:icon name="exclamation-circle" class="w-5 h-5" />
-                        </div>
-                        <div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h3 class="font-bold text-sm text-neutral-800 dark:text-neutral-100">Data e-KTP Berhasil Diterapkan</h3>
-                                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-200/80 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200">
-                                    {{ count($this->kolomBelumTerisi) }} kolom perlu dilengkapi
-                                </span>
-                            </div>
-                            <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                                Kolom berikut tidak tercantum di fisik KTP. Klik nama kolom untuk langsung mengisi:
-                            </p>
-                            <div class="flex flex-wrap gap-2 mt-3">
-                                @foreach($this->kolomBelumTerisi as $key => $item)
-                                    <button
-                                        type="button"
-                                        onclick="const el = document.querySelector('[wire\\:model*=\'{{ $key }}\']'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); }"
-                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-neutral-800 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100/70 dark:hover:bg-amber-900/40 hover:border-amber-400 transition-all shadow-xs cursor-pointer group"
-                                    >
-                                        <span class="w-2 h-2 rounded-full bg-amber-500 group-hover:scale-125 transition-transform"></span>
-                                        <span>{{ $item }}</span>
-                                        <flux:icon name="arrow-down" class="w-3 h-3 text-amber-500 opacity-60 group-hover:opacity-100" />
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    <button
-                        type="button"
-                        wire:click="$set('is_ktp_scanned', false)"
-                        title="Tutup pemberitahuan"
-                        class="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 hover:bg-amber-100/60 dark:hover:bg-amber-900/40 transition-colors flex-shrink-0"
-                    >
-                        <flux:icon name="x-mark" class="w-4 h-4" />
-                    </button>
-                </div>
-            </div>
-        @endif
-
         <div class="p-6">
             <div class="space-y-8">
                 
@@ -430,7 +385,7 @@
                             @endforeach
                         </flux:select>
 
-                        <flux:input wire:model.blur="nm_ibu" label="Nama Ibu Kandung" placeholder="Wajib diisi" required />
+                        <flux:input wire:model="nm_ibu" label="Nama Ibu Kandung" placeholder="Wajib diisi" required />
                     </div>
                 </section>
 
@@ -446,8 +401,8 @@
                         <div class="md:col-span-2">
                             <flux:textarea wire:model="alamat" label="Alamat Domisili" placeholder="Jl. Contoh No. 123..." rows="2" required />
                         </div>
-                        <flux:input wire:model.blur="no_tlp" label="No. Telepon / HP" placeholder="08xxxxxx" />
-                        <flux:input type="email" wire:model.blur="email" label="Alamat Email" placeholder="nama@email.com" />
+                        <flux:input wire:model="no_tlp" label="No. Telepon / HP" placeholder="08xxxxxx" />
+                        <flux:input type="email" wire:model="email" label="Alamat Email" placeholder="nama@email.com" />
 
                         <flux:select wire:model="kd_kel" label="Kelurahan" searchable>
                             @foreach($kelurahans as $kel)
@@ -484,7 +439,7 @@
                             <div class="w-1 h-5 bg-rose-500 rounded-full"></div>
                             <h2 class="text-sm font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider">Data Keluarga / Penanggung Jawab</h2>
                         </div>
-                        <flux:button size="xs" icon="document-duplicate" wire:click="copyAddressToPj" variant="ghost">Samakan Alamat degan Pasien</flux:button>
+                        <flux:button type="button" size="xs" icon="document-duplicate" wire:click="copyAddressToPj" variant="ghost">Samakan Alamat degan Pasien</flux:button>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         <flux:select wire:model="keluarga" label="Hubungan Keluarga" required>
@@ -493,13 +448,13 @@
                             @endforeach
                         </flux:select>
                         <div class="md:col-span-2">
-                            <flux:input wire:model.blur="namakeluarga" label="Nama Lengkap PJ" placeholder="Nama penanggung jawab" required />
+                            <flux:input wire:model="namakeluarga" label="Nama Lengkap PJ" placeholder="Nama penanggung jawab" required />
                         </div>
-                        <flux:input wire:model.blur="pekerjaanpj" label="Pekerjaan PJ" placeholder="Pekerjaan penanggung jawab" />
+                        <flux:input wire:model="pekerjaanpj" label="Pekerjaan PJ" placeholder="Pekerjaan penanggung jawab" />
 
                         <div class="md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div class="lg:col-span-2">
-                                <flux:input wire:model.blur="alamatpj" label="Alamat PJ" placeholder="Alamat penanggung jawab" required />
+                                <flux:input wire:model="alamatpj" label="Alamat PJ" placeholder="Alamat penanggung jawab" required />
                             </div>
                             <flux:input wire:model="kelurahanpj" label="Kelurahan PJ" />
                             <flux:input wire:model="kecamatanpj" label="Kecamatan PJ" />
