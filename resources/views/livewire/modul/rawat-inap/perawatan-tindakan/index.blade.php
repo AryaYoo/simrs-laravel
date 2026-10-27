@@ -151,9 +151,9 @@
                     ]},
                     { label: 'Diagnosa', url: '{{ route('modul.rawat-inap.sub-rawat-inap.diagnosa', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                     { label: 'RM Gizi', children: [
-                        { label: 'Skrining Nutrisi Pasien Dewasa', url: '#' },
-                        { label: 'Skrining Nutrisi Pasien Lansia', url: '#' },
-                        { label: 'Skrining Nutrisi Pasien Anak', url: '#' },
+                        { label: 'Skrining Nutrisi Pasien Dewasa', url: '{{ route('modul.rawat-inap.sub-rawat-inap.skrining-nutrisi-dewasa', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
+                        { label: 'Skrining Nutrisi Pasien Lansia', url: '{{ route('modul.rawat-inap.sub-rawat-inap.skrining-nutrisi-lansia', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
+                        { label: 'Skrining Nutrisi Pasien Anak', url: '{{ route('modul.rawat-inap.sub-rawat-inap.skrining-nutrisi-anak', str_replace('/', '-', $no_rawat)) }}', target: '_self' },
                         { label: 'Skrining Gizi Lanjut', url: '#' },
                         { label: 'Asuhan Gizi', url: '#' },
                         { label: 'Monitoring Gizi', url: '#' },

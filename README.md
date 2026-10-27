@@ -60,6 +60,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Integrasi Penunjang**: Laborat (PK, PA, MB) terintegrasi penuh dengan pola Repository, termasuk rekap riwayat Tab Hasil (Master-Detail).
 - [x] **Kelahiran Bayi**: Modul pencatatan data kelahiran bayi (Antropometri, Skor APGAR interaktif, Data Orang Tua, Proses Persalinan) dengan form vertikal 4 card, floating minimap, modal detail premium, serta halaman CRUD (Create, Edit, View Modal) berbasis Repository Pattern dan Flux UI.
 - [x] **Surat Keterangan Rawat Inap (SKRI / Opname)**: Modul pembuatan dan cetak Surat Keterangan Rawat Inap dengan nomor surat otomatis, pemilihan dokter DPJP penandatangan, integrasi diagnosa & penjamin, serta pemformatan jabatan spesialis otomatis di level aplikasi (contoh: spesialis `Obsgyn` ditampilkan resmi sebagai `Dokter Spesialis Obstetri dan Gynecology`).
+- [x] **Skrining Nutrisi (Dewasa, Lansia, Anak)**: Halaman modul RM Gizi untuk skrining nutrisi pasien (Dewasa: MST, Lansia: MNA, Anak: STRONG-kids) pada alur Rawat Inap & Rawat Jalan dengan navigasi persisten dan layout standar.
 
 ### 🏥 Modul Rawat Jalan (Ralan)
 - [x] **List Pasien Ralan**: Dashboard operasional poli dengan filter lanjutan (Dokter, Poliklinik, & Periode).
@@ -72,6 +73,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Catatan Keperawatan Ralan**: Modul pencatatan asuhan keperawatan rawat jalan terintegrasi dengan legacy database.
 - [x] **Observasi IGD**: Modul pencatatan tanda-tanda vital pasien IGD (GCS, TD, HR, RR, Suhu, SpO2) dengan CRUD penuh, validasi ketat, dan sinkronisasi legacy database (Refactored to Repository).
 - [x] **Resume Medis (Ralan)**: Modul resume medis pasien rawat jalan dengan CRUD lengkap, auto-fill diagnosa & prosedur (status Ralan), visual minimap/scrollspy interaktif, proteksi SweetAlert konfirmasi jika resume sudah ada, serta toggle filter kunjungan aktif vs semua riwayat kunjungan.
+- [x] **Skrining Nutrisi (Dewasa, Lansia, Anak)**: Halaman modul RM Gizi untuk skrining nutrisi pasien (Dewasa: MST, Lansia: MNA, Anak: STRONG-kids) pada alur Rawat Jalan dengan form slide-in panel, auto-fill tanda vital/antropometri dari pemeriksaan, default petugas login, dan navigasi terintegrasi.
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
 ### 💵 Modul Casemix

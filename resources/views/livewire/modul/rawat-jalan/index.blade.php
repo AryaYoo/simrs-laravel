@@ -43,6 +43,9 @@
             'resume': '{{ route("modul.rawat-jalan.sub-rawat-jalan.resume", ":noRawat") }}',
             'hasilUsgKandungan': '{{ route("modul.rawat-jalan.sub-rawat-jalan.hasil-usg-kandungan", ":noRawat") }}',
             'hasilUsgGynecologi': '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}',
+            'skrining-nutrisi-dewasa': '{{ route("modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-dewasa", ":noRawat") }}',
+            'skrining-nutrisi-lansia': '{{ route("modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-lansia", ":noRawat") }}',
+            'skrining-nutrisi-anak': '{{ route("modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-anak", ":noRawat") }}',
             'icare': '{{ route("modul.rawat-jalan.icare", ":noRawat") }}',
         },
         chunk(items, size) {
@@ -184,9 +187,9 @@
                     ]},
                     { label: 'Diagnosa', url: '#' },
                     { label: 'RM Gizi', children: [
-                        { label: 'Skrining Nutrisi Pasien Dewasa', url: '#' },
-                        { label: 'Skrining Nutrisi Pasien Lansia', url: '#' },
-                        { label: 'Skrining Nutrisi Pasien Anak', url: '#' },
+                        { label: 'Skrining Nutrisi Pasien Dewasa', url: 'skrining-nutrisi-dewasa' },
+                        { label: 'Skrining Nutrisi Pasien Lansia', url: 'skrining-nutrisi-lansia' },
+                        { label: 'Skrining Nutrisi Pasien Anak', url: 'skrining-nutrisi-anak' },
                         { label: 'Skrining Gizi Lanjut', url: '#' },
                         { label: 'Asuhan Gizi', url: '#' },
                         { label: 'Monitoring Gizi', url: '#' },
