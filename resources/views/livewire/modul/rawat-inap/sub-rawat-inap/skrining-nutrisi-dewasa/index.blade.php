@@ -63,16 +63,29 @@
                 </span>
             </h3>
 
-            {{-- Tombol Tambah Skrining --}}
-            <flux:button
-                type="button"
-                wire:click="openPanel"
-                icon="plus"
-                variant="filled"
-                size="sm"
-                class="!flex !flex-row !items-center !bg-[#4C5C2D] !text-white hover:!bg-[#3d4b24]">
-                Tambah Skrining
-            </flux:button>
+            {{-- Tombol Tambah Skrining (Disabled jika sudah ada 1 data) --}}
+            @if(count($skrinings) > 0)
+                <flux:button
+                    type="button"
+                    icon="plus"
+                    variant="subtle"
+                    size="sm"
+                    disabled
+                    class="!flex !flex-row !items-center !opacity-50 !cursor-not-allowed"
+                    title="Data skrining sudah ada (maksimal 1 data per pasien). Silakan gunakan tombol edit untuk mengubah data.">
+                    Tambah Skrining
+                </flux:button>
+            @else
+                <flux:button
+                    type="button"
+                    wire:click="openPanel"
+                    icon="plus"
+                    variant="filled"
+                    size="sm"
+                    class="!flex !flex-row !items-center !bg-[#4C5C2D] !text-white hover:!bg-[#3d4b24]">
+                    Tambah Skrining
+                </flux:button>
+            @endif
         </div>
 
         <div class="overflow-x-auto">
@@ -323,10 +336,14 @@
                         <div class="sm:col-span-3">
                             <div class="flex items-center justify-between mb-1">
                                 <flux:label class="!mb-0">Jam *</flux:label>
-                                <div class="flex items-center gap-1.5">
-                                    <flux:checkbox wire:model="autoTime" id="autoTimeSkrining" />
-                                    <label for="autoTimeSkrining" class="text-[11px] text-neutral-500 cursor-pointer">Auto</label>
-                                </div>
+                                <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        x-model="autoTime"
+                                        wire:model.live="autoTime"
+                                        class="rounded text-[#4C5C2D] focus:ring-[#4C5C2D] border-neutral-300 dark:border-neutral-600 dark:bg-neutral-800 cursor-pointer h-3.5 w-3.5" />
+                                    <span class="text-[11px] text-neutral-500 font-medium">Auto</span>
+                                </label>
                             </div>
                             <flux:input wire:model="tanggal_time" type="time" required />
                         </div>
