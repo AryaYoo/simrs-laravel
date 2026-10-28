@@ -334,6 +334,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
                         <div class="sm:col-span-4">
                             <flux:input wire:model="tanggal_date" type="date" label="Tanggal *" required />
+                            @error('tanggal_date') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div class="sm:col-span-3">
                             <div class="flex items-center justify-between mb-1">
@@ -348,6 +349,7 @@
                                 </label>
                             </div>
                             <flux:input wire:model="tanggal_time" type="time" required />
+                            @error('tanggal_time') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div class="sm:col-span-5 relative">
                             <flux:label>Petugas (NIP/Nama) *</flux:label>
@@ -476,7 +478,7 @@
                     {{-- Pertanyaan 1 --}}
                     <div class="bg-neutral-50 dark:bg-neutral-900/40 p-3.5 rounded-xl border border-neutral-200/70 dark:border-neutral-700 space-y-2">
                         <label class="block text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                            1. Apakah Ada Penurunan Berat Badan Yang Tidak Diinginkan Selama 6 Bulan Terakhir?
+                            1. Apakah Ada Penurunan Berat Badan Yang Tidak Diinginkan Selama 6 Bulan Terakhir? <span class="text-red-500">*</span>
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                             <div class="sm:col-span-9">
@@ -488,6 +490,7 @@
                                     <flux:select.option value="Ya, 11-15 Kg">Ya, ada penurunan 11 - 15 Kg (Skor: 3)</flux:select.option>
                                     <flux:select.option value="Ya, >15 Kg">Ya, ada penurunan > 15 Kg (Skor: 4)</flux:select.option>
                                 </flux:select>
+                                @error('sg1') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div class="sm:col-span-3 flex items-center justify-end sm:justify-center gap-2">
                                 <span class="text-xs text-neutral-500 font-medium">Nilai 1:</span>
@@ -501,7 +504,7 @@
                     {{-- Pertanyaan 2 --}}
                     <div class="bg-neutral-50 dark:bg-neutral-900/40 p-3.5 rounded-xl border border-neutral-200/70 dark:border-neutral-700 space-y-2">
                         <label class="block text-xs font-bold text-neutral-700 dark:text-neutral-200">
-                            2. Apakah Asupan Makan Berkurang Karena Tidak Nafsu Makan / Kesulitan Makan?
+                            2. Apakah Asupan Makan Berkurang Karena Tidak Nafsu Makan / Kesulitan Makan? <span class="text-red-500">*</span>
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
                             <div class="sm:col-span-9">
@@ -509,6 +512,7 @@
                                     <flux:select.option value="Tidak">Tidak (Skor: 0)</flux:select.option>
                                     <flux:select.option value="Ya">Ya (Skor: 1)</flux:select.option>
                                 </flux:select>
+                                @error('sg2') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div class="sm:col-span-3 flex items-center justify-end sm:justify-center gap-2">
                                 <span class="text-xs text-neutral-500 font-medium">Nilai 2:</span>

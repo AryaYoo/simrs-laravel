@@ -8,6 +8,7 @@ use App\Models\Pegawai;
 use App\Models\Petugas;
 use App\Livewire\Concerns\WithOptimisticLocking;
 use App\Repositories\RawatInap\SkriningNutrisiDewasaRepository;
+use Illuminate\Validation\Rule;
 
 class Index extends Component
 {
@@ -251,16 +252,20 @@ class Index extends Component
                 'suhu'         => 'nullable|string|max:5',
                 'spo2'         => 'nullable|string|max:5',
                 'alergi'       => 'nullable|string|max:100',
-                'sg1'          => 'required|in:Tidak,Tidak Yakin,Ya, 1-5 Kg,Ya, 6-10 Kg,Ya, 11-15 Kg,Ya, >15 Kg',
-                'nilai1'       => 'required|in:0,1,2,3,4',
-                'sg2'          => 'required|in:Ya,Tidak',
-                'nilai2'       => 'required|in:0,1',
+                'sg1'          => ['required', Rule::in(['Tidak', 'Tidak Yakin', 'Ya, 1-5 Kg', 'Ya, 6-10 Kg', 'Ya, 11-15 Kg', 'Ya, >15 Kg'])],
+                'nilai1'       => ['required', Rule::in(['0', '1', '2', '3', '4', 0, 1, 2, 3, 4])],
+                'sg2'          => ['required', Rule::in(['Ya', 'Tidak'])],
+                'nilai2'       => ['required', Rule::in(['0', '1', 0, 1])],
             ], [
                 'tanggal_date.required' => 'Tanggal wajib diisi.',
                 'tanggal_time.required' => 'Jam wajib diisi.',
                 'nip.required'          => 'Petugas pemeriksa wajib dipilih.',
                 'sg1.required'          => 'Pertanyaan 1 wajib dipilih.',
+                'sg1.in'                => 'Pilihan pertanyaan 1 tidak valid.',
+                'nilai1.required'       => 'Nilai 1 wajib terisi.',
                 'sg2.required'          => 'Pertanyaan 2 wajib dipilih.',
+                'sg2.in'                => 'Pilihan pertanyaan 2 tidak valid.',
+                'nilai2.required'       => 'Nilai 2 wajib terisi.',
             ]);
 
             $this->validateLock($this->regPeriksa->fresh());
@@ -280,9 +285,9 @@ class Index extends Component
                 'spo2'        => $this->spo2 ?: '',
                 'alergi'      => $this->alergi ?: '-',
                 'sg1'         => $this->sg1,
-                'nilai1'      => $this->nilai1,
+                'nilai1'      => (string) $this->nilai1,
                 'sg2'         => $this->sg2,
-                'nilai2'      => $this->nilai2,
+                'nilai2'      => (string) $this->nilai2,
                 'total_hasil' => $this->total_hasil,
                 'nip'         => $this->nip,
             ];
@@ -299,9 +304,10 @@ class Index extends Component
                 'icon'  => 'success',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
+            $firstError = collect($e->validator->errors()->all())->first();
             $this->dispatch('swal', [
                 'title' => 'Validasi Gagal!',
-                'text'  => 'Pastikan kolom wajib (*) sudah terisi dengan benar.',
+                'text'  => $firstError ?: 'Pastikan kolom wajib (*) sudah terisi dengan benar.',
                 'icon'  => 'warning',
             ]);
             throw $e;
