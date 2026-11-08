@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Repositories\RawatInap;
+
+use App\Models\SkriningNutrisiLansia;
+use Illuminate\Support\Facades\DB;
+
+class SkriningNutrisiLansiaRepository
+{
+    /**
+     * Get list of skrining nutrisi lansia by no_rawat
+     */
+    public function getByNoRawat(string $noRawat)
+    {
+        return SkriningNutrisiLansia::with(['petugas'])
+            ->where('no_rawat', $noRawat)
+            ->orderBy('tanggal', 'desc')
+            ->get();
+    }
+
+    /**
+     * Save (create or update) skrining nutrisi lansia
+     */
+    public function save(array $data)
+    {
+        return DB::transaction(function () use ($data) {
+            return SkriningNutrisiLansia::updateOrCreate(
+                ['no_rawat' => $data['no_rawat']],
+                $data
+            );
+        });
+    }
+
+    /**
+     * Delete skrining nutrisi lansia by no_rawat
+     */
+    public function delete(string $noRawat)
+    {
+        return DB::transaction(function () use ($noRawat) {
+            return SkriningNutrisiLansia::where('no_rawat', $noRawat)->delete();
+        });
+    }
+}

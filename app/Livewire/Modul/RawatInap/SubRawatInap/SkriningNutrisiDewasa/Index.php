@@ -76,31 +76,54 @@ class Index extends Component
 
         // 1. Cek langsung tabel Petugas berdasarkan username (NIP)
         if (!empty($user->username)) {
-            $petugas = Petugas::where('nip', $user->username)->where('status', '1')->first();
+            $petugas = Petugas::where('nip', $user->username)->first();
         }
 
-        // 2. Cek tabel Pegawai berdasarkan username (NIK), lalu cocokkan ke Petugas
+        // 2. Cek description user jika menyimpan NIP/kode dokter
+        if (!$petugas && !empty($user->description)) {
+            $petugas = Petugas::where('nip', $user->description)->first();
+        }
+
+        // 3. Cek tabel Pegawai berdasarkan username (NIK), lalu cocokkan ke Petugas
         if (!$petugas && !empty($user->username)) {
             $pegawai = Pegawai::find($user->username);
             if ($pegawai) {
-                $petugas = Petugas::where('nip', $pegawai->nik)->where('status', '1')->first()
-                    ?? Petugas::where('nama', 'like', '%' . $pegawai->nama . '%')->where('status', '1')->first();
+                $petugas = Petugas::where('nip', $pegawai->nik)->first()
+                    ?? Petugas::where('nama', 'like', '%' . $pegawai->nama . '%')->first();
             }
         }
 
-        // 3. Cek berdasarkan nama lengkap user di tabel Petugas
-        if (!$petugas && !empty($user->fullname)) {
-            $petugas = Petugas::where('nama', 'like', '%' . $user->fullname . '%')->where('status', '1')->first();
+        // 4. Cek jika username adalah kode dokter di tabel Dokter, lalu cocokkan ke Petugas
+        if (!$petugas && !empty($user->username)) {
+            $dokter = \App\Models\Dokter::where('kd_dokter', $user->username)->first();
+            if ($dokter) {
+                $petugas = Petugas::where('nip', $dokter->kd_dokter)->first()
+                    ?? Petugas::where('nama', 'like', '%' . $dokter->nm_dokter . '%')->first();
+            }
         }
 
-        // 4. Fallback jika login sebagai akun admin/pengembang
+        // 5. Cek berdasarkan nama lengkap user di tabel Petugas
+        if (!$petugas && !empty($user->fullname)) {
+            $petugas = Petugas::where('nama', 'like', '%' . $user->fullname . '%')->first();
+        }
+
+        // 6. Fallback jika masih belum cocok, ambil petugas aktif yang memiliki nama valid
         if (!$petugas) {
-            $petugas = Petugas::where('status', '1')->where('nip', '!=', '-')->orderBy('nama')->first();
+            $petugas = Petugas::where('status', '1')
+                ->where('nip', '!=', '-')
+                ->whereNotNull('nama')
+                ->where('nama', '!=', '')
+                ->orderBy('nama')
+                ->first();
         }
 
         if ($petugas) {
             $this->nip = $petugas->nip;
-            $this->nmPetugas = $petugas->nama;
+            $this->nmPetugas = $petugas->nama ?: ($user->fullname ?: $petugas->nip);
+            $this->petugasSearch = '';
+        } else {
+            $this->nip = $user->username;
+            $this->nmPetugas = $user->fullname ?: $user->username;
             $this->petugasSearch = '';
         }
     }

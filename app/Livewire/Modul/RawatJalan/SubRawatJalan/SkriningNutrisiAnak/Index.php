@@ -4,7 +4,11 @@ namespace App\Livewire\Modul\RawatJalan\SubRawatJalan\SkriningNutrisiAnak;
 
 use Livewire\Component;
 use App\Models\RegPeriksa;
+use App\Models\Pegawai;
+use App\Models\Petugas;
 use App\Livewire\Concerns\WithOptimisticLocking;
+use App\Repositories\RawatJalan\SkriningNutrisiAnakRepository;
+use Illuminate\Validation\Rule;
 
 class Index extends Component
 {
@@ -12,8 +16,46 @@ class Index extends Component
 
     public $noRawat;
     public $regPeriksa;
+    public $skrinings = [];
+    public $selectedSkrining = null;
 
-    public function mount($no_rawat)
+    // Form State
+    public $isPanelOpen = false;
+    public $isEditMode = false;
+    public $autoTime = true;
+    public $tanggal_date;
+    public $tanggal_time;
+
+    public $nip;
+    public $nmPetugas;
+    public $petugasSearch = '';
+
+    public $bb = '';
+    public $tbpb = '';
+    public $td = '';
+    public $hr = '';
+    public $rr = '';
+    public $suhu = '';
+    public $spo2 = '';
+    public $alergi = '-';
+
+    // STRONG-kids (Anak)
+    public $sg1 = 'Tidak';
+    public $nilai1 = '0';
+    public $sg2 = 'Tidak';
+    public $nilai2 = '0';
+    public $sg3 = 'Tidak';
+    public $nilai3 = '0';
+    public $sg4 = 'Tidak';
+    public $nilai4 = '0';
+
+    public $total_hasil = 0;
+    public $skor_nutrisi = 'Risiko Rendah';
+
+    public $diketahui_dietisien = 'Tidak';
+    public $keterangan_diketahui_dietisien = '';
+
+    public function mount($no_rawat, SkriningNutrisiAnakRepository $repository)
     {
         $this->noRawat = str_replace('-', '/', $no_rawat);
         $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik'])
@@ -21,11 +63,399 @@ class Index extends Component
             ->firstOrFail();
 
         $this->initializeLock($this->regPeriksa);
+        $this->loadData($repository);
+
+        $this->tanggal_date = now()->format('Y-m-d');
+        $this->tanggal_time = now()->format('H:i');
+        $this->initDefaultPetugas();
+    }
+
+    public function loadData(?SkriningNutrisiAnakRepository $repository = null)
+    {
+        $repository = $repository ?? new SkriningNutrisiAnakRepository();
+        $this->skrinings = $repository->getByNoRawat($this->noRawat);
+        if ($this->skrinings->isNotEmpty()) {
+            $this->selectedSkrining = $this->skrinings->first();
+        }
+    }
+
+    protected function initDefaultPetugas()
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return;
+        }
+
+        $petugas = null;
+
+        // 1. Cek langsung tabel Petugas berdasarkan username (NIP)
+        if (!empty($user->username)) {
+            $petugas = Petugas::where('nip', $user->username)->first();
+        }
+
+        // 2. Cek description user jika menyimpan NIP/kode dokter
+        if (!$petugas && !empty($user->description)) {
+            $petugas = Petugas::where('nip', $user->description)->first();
+        }
+
+        // 3. Cek tabel Pegawai berdasarkan username (NIK), lalu cocokkan ke Petugas
+        if (!$petugas && !empty($user->username)) {
+            $pegawai = Pegawai::find($user->username);
+            if ($pegawai) {
+                $petugas = Petugas::where('nip', $pegawai->nik)->first()
+                    ?? Petugas::where('nama', 'like', '%' . $pegawai->nama . '%')->first();
+            }
+        }
+
+        // 4. Cek jika username adalah kode dokter di tabel Dokter, lalu cocokkan ke Petugas
+        if (!$petugas && !empty($user->username)) {
+            $dokter = \App\Models\Dokter::where('kd_dokter', $user->username)->first();
+            if ($dokter) {
+                $petugas = Petugas::where('nip', $dokter->kd_dokter)->first()
+                    ?? Petugas::where('nama', 'like', '%' . $dokter->nm_dokter . '%')->first();
+            }
+        }
+
+        // 5. Cek berdasarkan nama lengkap user di tabel Petugas
+        if (!$petugas && !empty($user->fullname)) {
+            $petugas = Petugas::where('nama', 'like', '%' . $user->fullname . '%')->first();
+        }
+
+        // 6. Fallback jika masih belum cocok, ambil petugas aktif yang memiliki nama valid
+        if (!$petugas) {
+            $petugas = Petugas::where('status', '1')
+                ->where('nip', '!=', '-')
+                ->whereNotNull('nama')
+                ->where('nama', '!=', '')
+                ->orderBy('nama')
+                ->first();
+        }
+
+        if ($petugas) {
+            $this->nip = $petugas->nip;
+            $this->nmPetugas = $petugas->nama ?: ($user->fullname ?: $petugas->nip);
+            $this->petugasSearch = '';
+        } else {
+            $this->nip = $user->username;
+            $this->nmPetugas = $user->fullname ?: $user->username;
+            $this->petugasSearch = '';
+        }
+    }
+
+    public function openPanel()
+    {
+        $this->isEditMode = false;
+        $this->autoTime = true;
+        $this->tanggal_date = now()->format('Y-m-d');
+        $this->tanggal_time = now()->format('H:i');
+
+        $this->bb = '';
+        $this->tbpb = '';
+        $this->td = '';
+        $this->hr = '';
+        $this->rr = '';
+        $this->suhu = '';
+        $this->spo2 = '';
+        $this->alergi = '-';
+
+        $this->sg1 = 'Tidak';
+        $this->nilai1 = '0';
+        $this->sg2 = 'Tidak';
+        $this->nilai2 = '0';
+        $this->sg3 = 'Tidak';
+        $this->nilai3 = '0';
+        $this->sg4 = 'Tidak';
+        $this->nilai4 = '0';
+        $this->total_hasil = 0;
+        $this->skor_nutrisi = 'Risiko Rendah';
+
+        $this->diketahui_dietisien = 'Tidak';
+        $this->keterangan_diketahui_dietisien = '';
+
+        $this->initDefaultPetugas();
+        $this->isPanelOpen = true;
+        $this->dispatch('set-autotime', ['status' => true]);
+    }
+
+    public function edit()
+    {
+        $skrining = $this->skrinings->first();
+        if ($skrining) {
+            $this->isEditMode = true;
+            $this->autoTime = false;
+
+            if ($skrining->tanggal) {
+                $this->tanggal_date = $skrining->tanggal->format('Y-m-d');
+                $this->tanggal_time = $skrining->tanggal->format('H:i');
+            } else {
+                $this->tanggal_date = now()->format('Y-m-d');
+                $this->tanggal_time = now()->format('H:i');
+            }
+
+            $this->bb = $skrining->bb;
+            $this->tbpb = $skrining->tbpb;
+            $this->td = $skrining->td;
+            $this->hr = $skrining->hr;
+            $this->rr = $skrining->rr;
+            $this->suhu = $skrining->suhu;
+            $this->spo2 = $skrining->spo2;
+            $this->alergi = $skrining->alergi ?: '-';
+
+            $this->sg1 = $skrining->sg1 ?: 'Tidak';
+            $this->nilai1 = (string) ($skrining->nilai1 ?? '0');
+            $this->sg2 = $skrining->sg2 ?: 'Tidak';
+            $this->nilai2 = (string) ($skrining->nilai2 ?? '0');
+            $this->sg3 = $skrining->sg3 ?: 'Tidak';
+            $this->nilai3 = (string) ($skrining->nilai3 ?? '0');
+            $this->sg4 = $skrining->sg4 ?: 'Tidak';
+            $this->nilai4 = (string) ($skrining->nilai4 ?? '0');
+
+            $this->total_hasil = (int) ($skrining->total_hasil ?? 0);
+            $this->skor_nutrisi = $skrining->skor_nutrisi ?: 'Risiko Rendah';
+
+            $this->diketahui_dietisien = $skrining->diketahui_dietisien ?: 'Tidak';
+            $this->keterangan_diketahui_dietisien = $skrining->keterangan_diketahui_dietisien ?: '';
+
+            $this->nip = $skrining->nip;
+            $this->nmPetugas = $skrining->petugas?->nama ?: (Pegawai::find($skrining->nip)?->nama ?: $skrining->nip);
+
+            $this->isPanelOpen = true;
+            $this->dispatch('set-autotime', ['status' => false]);
+        }
+    }
+
+    public function showDetail()
+    {
+        $this->selectedSkrining = $this->skrinings->first();
+        return true;
+    }
+
+    public function selectPetugas($nip, $nama)
+    {
+        $this->nip = $nip;
+        $this->nmPetugas = $nama;
+        $this->petugasSearch = '';
+    }
+
+    public function clearPetugas()
+    {
+        $this->nip = null;
+        $this->nmPetugas = '';
+        $this->petugasSearch = '';
+    }
+
+    public function updatedSg1($value)
+    {
+        $this->nilai1 = ($value === 'Ya') ? '1' : '0';
+        $this->calculateTotal();
+    }
+
+    public function updatedSg2($value)
+    {
+        $this->nilai2 = ($value === 'Ya') ? '1' : '0';
+        $this->calculateTotal();
+    }
+
+    public function updatedSg3($value)
+    {
+        $this->nilai3 = ($value === 'Ya') ? '1' : '0';
+        $this->calculateTotal();
+    }
+
+    public function updatedSg4($value)
+    {
+        $this->nilai4 = ($value === 'Ya') ? '1' : '0';
+        $this->calculateTotal();
+    }
+
+    public function updatedDiketahuiDietisien($value)
+    {
+        if ($value === 'Ya' && empty($this->keterangan_diketahui_dietisien)) {
+            $this->keterangan_diketahui_dietisien = now()->format('H:i');
+        } elseif ($value === 'Tidak') {
+            $this->keterangan_diketahui_dietisien = '';
+        }
+    }
+
+    public function calculateTotal()
+    {
+        $this->total_hasil = (int) $this->nilai1 + (int) $this->nilai2 + (int) $this->nilai3 + (int) $this->nilai4;
+
+        if ($this->total_hasil >= 4) {
+            $this->skor_nutrisi = 'Risikio Berat';
+        } elseif ($this->total_hasil >= 1) {
+            $this->skor_nutrisi = 'Risiko Sedang';
+        } else {
+            $this->skor_nutrisi = 'Risiko Rendah';
+        }
+    }
+
+    public function save(SkriningNutrisiAnakRepository $repository)
+    {
+        try {
+            $this->validate([
+                'tanggal_date'                  => 'required|date',
+                'tanggal_time'                  => 'required',
+                'nip'                           => 'required',
+                'bb'                            => 'nullable|string|max:5',
+                'tbpb'                          => 'nullable|string|max:5',
+                'td'                            => 'nullable|string|max:8',
+                'hr'                            => 'nullable|string|max:5',
+                'rr'                            => 'nullable|string|max:5',
+                'suhu'                          => 'nullable|string|max:5',
+                'spo2'                          => 'nullable|string|max:5',
+                'alergi'                        => 'nullable|string|max:100',
+                'sg1'                           => ['required', Rule::in(['Tidak', 'Ya'])],
+                'nilai1'                        => ['required', Rule::in(['0', '1', 0, 1])],
+                'sg2'                           => ['required', Rule::in(['Tidak', 'Ya'])],
+                'nilai2'                        => ['required', Rule::in(['0', '1', 0, 1])],
+                'sg3'                           => ['required', Rule::in(['Tidak', 'Ya'])],
+                'nilai3'                        => ['required', Rule::in(['0', '1', 0, 1])],
+                'sg4'                           => ['required', Rule::in(['Tidak', 'Ya'])],
+                'nilai4'                        => ['required', Rule::in(['0', '1', 0, 1])],
+                'diketahui_dietisien'           => ['required', Rule::in(['Tidak', 'Ya'])],
+                'keterangan_diketahui_dietisien'=> 'nullable|string|max:10',
+            ], [
+                'tanggal_date.required' => 'Tanggal wajib diisi.',
+                'tanggal_time.required' => 'Jam wajib diisi.',
+                'nip.required'          => 'Petugas pemeriksa wajib dipilih.',
+                'sg1.required'          => 'Pertanyaan 1 wajib dipilih.',
+                'sg2.required'          => 'Pertanyaan 2 wajib dipilih.',
+                'sg3.required'          => 'Pertanyaan 3 wajib dipilih.',
+                'sg4.required'          => 'Pertanyaan 4 wajib dipilih.',
+            ]);
+
+            $this->validateLock($this->regPeriksa->fresh());
+
+            $tanggalFull = $this->tanggal_date . ' ' . $this->tanggal_time . ':00';
+            $this->calculateTotal();
+
+            $data = [
+                'no_rawat'                      => $this->noRawat,
+                'tanggal'                       => $tanggalFull,
+                'td'                            => $this->td ?: '',
+                'hr'                            => $this->hr ?: '',
+                'rr'                            => $this->rr ?: '',
+                'suhu'                          => $this->suhu ?: '',
+                'bb'                            => $this->bb ?: '',
+                'tbpb'                          => $this->tbpb ?: '',
+                'spo2'                          => $this->spo2 ?: '',
+                'alergi'                        => $this->alergi ?: '-',
+                'sg1'                           => $this->sg1,
+                'nilai1'                        => (string) $this->nilai1,
+                'sg2'                           => $this->sg2,
+                'nilai2'                        => (string) $this->nilai2,
+                'sg3'                           => $this->sg3,
+                'nilai3'                        => (string) $this->nilai3,
+                'sg4'                           => $this->sg4,
+                'nilai4'                        => (string) $this->nilai4,
+                'total_hasil'                   => $this->total_hasil,
+                'skor_nutrisi'                  => $this->skor_nutrisi,
+                'diketahui_dietisien'           => $this->diketahui_dietisien,
+                'keterangan_diketahui_dietisien'=> $this->keterangan_diketahui_dietisien ?: '',
+                'nip'                           => $this->nip,
+            ];
+
+            $repository->save($data);
+
+            $this->initializeLock($this->regPeriksa->fresh());
+            $this->isPanelOpen = false;
+            $this->loadData($repository);
+
+            $this->dispatch('swal', [
+                'title' => 'Berhasil!',
+                'text'  => $this->isEditMode ? 'Data skrining nutrisi anak berhasil diperbarui.' : 'Data skrining nutrisi anak berhasil disimpan.',
+                'icon'  => 'success',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $firstError = collect($e->validator->errors()->all())->first();
+            $this->dispatch('swal', [
+                'title' => 'Validasi Gagal!',
+                'text'  => $firstError ?: 'Pastikan kolom wajib (*) sudah terisi dengan benar.',
+                'icon'  => 'warning',
+            ]);
+            throw $e;
+        } catch (\Exception $e) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal Menyimpan!',
+                'text'  => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'icon'  => 'error',
+            ]);
+        }
+    }
+
+    public function delete(SkriningNutrisiAnakRepository $repository)
+    {
+        try {
+            $repository->delete($this->noRawat);
+            $this->loadData($repository);
+            $this->dispatch('swal', [
+                'title' => 'Berhasil!',
+                'text'  => 'Data skrining nutrisi anak berhasil dihapus.',
+                'icon'  => 'success',
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal!',
+                'text'  => 'Gagal menghapus data: ' . $e->getMessage(),
+                'icon'  => 'error',
+            ]);
+        }
+    }
+
+    public function fillLatestPemeriksaan()
+    {
+        $pemeriksaan = \App\Models\PemeriksaanRalan::where('no_rawat', $this->noRawat)
+            ->orderBy('tgl_perawatan', 'desc')
+            ->orderBy('jam_rawat', 'desc')
+            ->first();
+
+        if (!$pemeriksaan) {
+            $pemeriksaan = \App\Models\PemeriksaanRanap::where('no_rawat', $this->noRawat)
+                ->orderBy('tgl_perawatan', 'desc')
+                ->orderBy('jam_rawat', 'desc')
+                ->first();
+        }
+
+        if ($pemeriksaan) {
+            $this->bb = $pemeriksaan->berat ?: $this->bb;
+            $this->tbpb = $pemeriksaan->tinggi ?: $this->tbpb;
+            $this->td = $pemeriksaan->tensi ?: $this->td;
+            $this->hr = $pemeriksaan->nadi ?: $this->hr;
+            $this->rr = $pemeriksaan->respirasi ?: $this->rr;
+            $this->suhu = $pemeriksaan->suhu_tubuh ?: $this->suhu;
+            $this->spo2 = $pemeriksaan->spo2 ?: $this->spo2;
+            $this->alergi = $pemeriksaan->alergi ?: ($this->alergi ?: '-');
+
+            $this->dispatch('swal', [
+                'title' => 'Berhasil!',
+                'text'  => 'Data antropometri & tanda vital berhasil diisi otomatis dari pemeriksaan terakhir.',
+                'icon'  => 'success',
+            ]);
+        } else {
+            $this->dispatch('swal', [
+                'title' => 'Informasi',
+                'text'  => 'Belum ada data pemeriksaan (SOAP) untuk nomor rawat ini.',
+                'icon'  => 'info',
+            ]);
+        }
     }
 
     public function render()
     {
-        return view('livewire.modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-anak.index')
-            ->layout('layouts.app', ['title' => 'Skrining Nutrisi Pasien Anak - Rawat Jalan']);
+        $petugasList = [];
+        if (strlen($this->petugasSearch) >= 3) {
+            $petugasList = Petugas::where('status', '1')
+                ->where(function ($q) {
+                    $q->where('nama', 'like', '%' . $this->petugasSearch . '%')
+                      ->orWhere('nip', 'like', '%' . $this->petugasSearch . '%');
+                })
+                ->limit(10)
+                ->get();
+        }
+
+        return view('livewire.modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-anak.index', [
+            'petugasList' => $petugasList,
+        ])->layout('layouts.app', ['title' => 'Skrining Nutrisi Pasien Anak - Rawat Jalan']);
     }
 }

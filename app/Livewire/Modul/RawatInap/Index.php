@@ -13,22 +13,22 @@ class Index extends Component
 {
     use WithPagination;
 
-    #[Url(as: 'search', except: '')]
+    #[Url(as: 'search', except: '', history: true)]
     public string $search = '';
 
-    #[Url(as: 'dari', except: '')]
+    #[Url(as: 'dari', except: '', history: true)]
     public string $dari = '';
 
-    #[Url(as: 'sampai', except: '')]
+    #[Url(as: 'sampai', except: '', history: true)]
     public string $sampai = '';
 
-    #[Url(as: 'filter', except: '')]
+    #[Url(as: 'filter', except: '', history: true)]
     public string $filterType = '';
 
-    #[Url(as: 'status', except: 'belum_pulang')]
+    #[Url(as: 'status', except: 'belum_pulang', history: true)]
     public string $statusFilter = 'belum_pulang';
 
-    #[Url(as: 'per_page', except: 20)]
+    #[Url(as: 'per_page', except: 20, history: true)]
     public int $perPage = 20;
 
     public function mount()
