@@ -61,6 +61,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Kelahiran Bayi**: Modul pencatatan data kelahiran bayi (Antropometri, Skor APGAR interaktif, Data Orang Tua, Proses Persalinan) dengan form vertikal 4 card, floating minimap, modal detail premium, serta halaman CRUD (Create, Edit, View Modal) berbasis Repository Pattern dan Flux UI.
 - [x] **Surat Keterangan Rawat Inap (SKRI / Opname)**: Modul pembuatan dan cetak Surat Keterangan Rawat Inap dengan nomor surat otomatis, pemilihan dokter DPJP penandatangan, integrasi diagnosa & penjamin, serta pemformatan jabatan spesialis otomatis di level aplikasi (contoh: spesialis `Obsgyn` ditampilkan resmi sebagai `Dokter Spesialis Obstetri dan Gynecology`).
 - [x] **Skrining Nutrisi (Dewasa, Lansia, Anak)**: Halaman modul RM Gizi untuk skrining nutrisi pasien (Dewasa: MST, Lansia: MNA, Anak: STRONG-kids) pada alur Rawat Inap & Rawat Jalan dengan navigasi persisten dan layout standar.
+- [x] **Pelaksanaan Informasi & Edukasi (Ranap)**: Modul pencatatan pelaksanaan informasi dan edukasi terintegrasi kepada pasien/keluarga (tabel legacy `pelaksanaan_informasi_edukasi`) dengan form *Slide-In Right Panel*, *auto-populate* petugas login, integrasi selector template materi edukasi (`template_pelaksanaan_informasi_edukasi`), modal detail pop-up Alpine.js murni, dan pola Repository.
 
 ### 🏥 Modul Rawat Jalan (Ralan)
 - [x] **List Pasien Ralan**: Dashboard operasional poli dengan filter lanjutan (Dokter, Poliklinik, & Periode).
@@ -74,6 +75,7 @@ Berikut adalah status pengembangan fitur SIMRS Laralite:
 - [x] **Observasi IGD**: Modul pencatatan tanda-tanda vital pasien IGD (GCS, TD, HR, RR, Suhu, SpO2) dengan CRUD penuh, validasi ketat, dan sinkronisasi legacy database (Refactored to Repository).
 - [x] **Resume Medis (Ralan)**: Modul resume medis pasien rawat jalan dengan CRUD lengkap, auto-fill diagnosa & prosedur (status Ralan), visual minimap/scrollspy interaktif, proteksi SweetAlert konfirmasi jika resume sudah ada, serta toggle filter kunjungan aktif vs semua riwayat kunjungan.
 - [x] **Skrining Nutrisi (Dewasa, Lansia, Anak)**: Halaman modul RM Gizi untuk skrining nutrisi pasien (Dewasa: MST, Lansia: MNA, Anak: STRONG-kids) pada alur Rawat Jalan dengan form slide-in panel, auto-fill tanda vital/antropometri dari pemeriksaan, default petugas login, dan navigasi terintegrasi.
+- [x] **Pelaksanaan Informasi & Edukasi (Ralan)**: Modul pencatatan pelaksanaan edukasi rawat jalan terintegrasi dengan tabel legacy `pelaksanaan_informasi_edukasi`, fitur *auto-time*, selector template materi edukasi, modal detail pop-up Alpine.js murni, dan navigasi terintegrasi.
 - [ ] **Pemeriksaan Dokter**: SOAP & E-Resep khusus poli (In Progress).
 
 ### 💵 Modul Casemix
