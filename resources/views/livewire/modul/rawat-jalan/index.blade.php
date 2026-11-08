@@ -46,6 +46,7 @@
             'skrining-nutrisi-dewasa': '{{ route("modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-dewasa", ":noRawat") }}',
             'skrining-nutrisi-lansia': '{{ route("modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-lansia", ":noRawat") }}',
             'skrining-nutrisi-anak': '{{ route("modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-anak", ":noRawat") }}',
+            'pelaksanaan-informasi-edukasi': '{{ route("modul.rawat-jalan.sub-rawat-jalan.pelaksanaan-informasi-edukasi", ":noRawat") }}',
             'icare': '{{ route("modul.rawat-jalan.icare", ":noRawat") }}',
         },
         chunk(items, size) {
@@ -198,7 +199,7 @@
                     { label: 'Transfer Antar Ruang', url: '#' },
                     { label: 'Edukasi', children: [
                         { label: 'Asesment Edukasi Pasien & Keluarga', url: '#' },
-                        { label: 'Pelaksanaan Informasi dan Edukasi', url: '#' },
+                        { label: 'Pelaksanaan Informasi dan Edukasi', url: 'pelaksanaan-informasi-edukasi' },
                     ]},
                     { label: 'Resume', url: 'resume' },
                     { label: 'Riwayat Perawatan', url: 'riwayat-pasien' },

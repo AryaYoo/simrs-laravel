@@ -65,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-inap/{no_rawat}/surat-keterangan-rawat-inap', \App\Livewire\Modul\RawatInap\SubRawatInap\SuratKeteranganRawatInap\Index::class)->name('modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/surat-keterangan-rawat-inap/settings', \App\Livewire\Modul\RawatInap\SubRawatInap\SuratKeteranganRawatInap\Settings::class)->name('modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap.settings')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}/surat-keterangan-rawat-inap/{no_surat}/cetak', [\App\Http\Controllers\RawatInap\CetakSkriController::class, 'cetak'])->name('modul.rawat-inap.skri.cetak')->where(['no_rawat' => '.*', 'no_surat' => '.*']);
+    Route::get('modul/rawat-inap/{no_rawat}/pelaksanaan-informasi-edukasi', \App\Livewire\Modul\RawatInap\SubRawatInap\PelaksanaanInformasiEdukasi\Index::class)->name('modul.rawat-inap.sub-rawat-inap.pelaksanaan-informasi-edukasi')->where('no_rawat', '.*');
     Route::get('modul/rawat-inap/{no_rawat}', \App\Livewire\Modul\RawatInap\Show::class)->name('modul.rawat-inap.show')->where('no_rawat', '.*');
 
     Route::get('modul/rawat-jalan', \App\Livewire\Modul\RawatJalan\Index::class)->name('modul.rawat-jalan.index');
@@ -87,6 +88,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('modul/rawat-jalan/{no_rawat}/skrining-nutrisi-dewasa', \App\Livewire\Modul\RawatJalan\SubRawatJalan\SkriningNutrisiDewasa\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-dewasa')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/skrining-nutrisi-lansia', \App\Livewire\Modul\RawatJalan\SubRawatJalan\SkriningNutrisiLansia\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-lansia')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/skrining-nutrisi-anak', \App\Livewire\Modul\RawatJalan\SubRawatJalan\SkriningNutrisiAnak\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.skrining-nutrisi-anak')->where('no_rawat', '.*');
+    Route::get('modul/rawat-jalan/{no_rawat}/pelaksanaan-informasi-edukasi', \App\Livewire\Modul\RawatJalan\SubRawatJalan\PelaksanaanInformasiEdukasi\Index::class)->name('modul.rawat-jalan.sub-rawat-jalan.pelaksanaan-informasi-edukasi')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}/icare', \App\Livewire\Modul\RawatJalan\Icare\Index::class)->name('modul.rawat-jalan.icare')->where('no_rawat', '.*');
     Route::get('modul/rawat-jalan/{no_rawat}', \App\Livewire\Modul\RawatJalan\Show::class)->name('modul.rawat-jalan.show')->where('no_rawat', '.*');
 

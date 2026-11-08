@@ -52,7 +52,8 @@
             hasilUsgKandungan: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-kandungan", ":noRawat") }}',
             hasilUsgGynecologi: '{{ route("modul.rawat-inap.sub-rawat-inap.hasil-usg-gynecologi", ":noRawat") }}',
             jadwalOperasi: '{{ route("modul.rawat-inap.sub-rawat-inap.jadwal-operasi", ":noRawat") }}',
-            suratKeteranganRawatInap: '{{ route("modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap", ":noRawat") }}'
+            suratKeteranganRawatInap: '{{ route("modul.rawat-inap.sub-rawat-inap.surat-keterangan-rawat-inap", ":noRawat") }}',
+            pelaksanaanInformasiEdukasi: '{{ route("modul.rawat-inap.sub-rawat-inap.pelaksanaan-informasi-edukasi", ":noRawat") }}'
         },
         chunk(items, size) {
             const chunks = [];
@@ -190,7 +191,7 @@
                     ]},
                     { label: 'Transfer Antar Ruang', url: '#' },
                     { label: 'Perencanaan Pemulangan', url: '#' },
-                    { label: 'Edukasi (Pelaksanaan Informasi & Edukasi)', url: '#' },
+                    { label: 'Edukasi (Pelaksanaan Informasi & Edukasi)', url: 'pelaksanaanInformasiEdukasi' },
                     { label: 'Resume', url: 'resume', target: '_blank' },
                     { label: 'Riwayat Perawatan', url: 'riwayat', target: '_blank' },
                 ]
