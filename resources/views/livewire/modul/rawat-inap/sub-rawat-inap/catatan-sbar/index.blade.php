@@ -33,6 +33,16 @@
                     <span>{{ $regPeriksa->pasien->jk === 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
                     <span>•</span>
                     <span>{{ $regPeriksa->pasien->tgl_lahir ? \Carbon\Carbon::parse($regPeriksa->pasien->tgl_lahir)->age . ' Thn' : '-' }}</span>
+                    @php
+                        $topKamar = $regPeriksa->kamarInap->sortByDesc('tgl_masuk')->first() ?? $regPeriksa->kamarInap->last();
+                    @endphp
+                    @if($topKamar)
+                        <span>•</span>
+                        <span class="inline-flex items-center gap-1.5 bg-[#4C5C2D]/10 text-[#4C5C2D] dark:text-[#8CC7C4] text-xs font-semibold px-2 py-0.5 rounded-md">
+                            <flux:icon name="building-office-2" class="w-3.5 h-3.5" />
+                            {{ $topKamar->kamar->bangsal->nm_bangsal ?? '-' }} ({{ $topKamar->kd_kamar }})
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -118,9 +128,12 @@
                                 </div>
                             </flux:table.cell>
                             <flux:table.cell>
-                                <div class="flex justify-center gap-2">
-                                    <flux:button wire:click="showDetail('{{ $catatan['tanggal'] }}')" icon="eye" size="xs" variant="ghost" class="!text-blue-500 hover:!bg-blue-50 dark:hover:!bg-blue-500/10" />
-                                    <flux:button wire:click="edit('{{ $catatan['tanggal'] }}')" icon="pencil-square" size="xs" variant="ghost" />
+                                <div class="flex justify-center gap-1.5 items-center">
+                                    <a href="{{ route('modul.rawat-inap.catatan-sbar.cetak', [str_replace('/', '-', $catatan['no_rawat']), urlencode($catatan['tanggal'])]) }}" target="_blank" title="Cetak Lembar SBAR">
+                                        <flux:button icon="printer" size="xs" variant="ghost" class="!text-emerald-600 hover:!bg-emerald-50 dark:hover:!bg-emerald-500/10" />
+                                    </a>
+                                    <flux:button wire:click="showDetail('{{ $catatan['tanggal'] }}')" icon="eye" size="xs" variant="ghost" class="!text-blue-500 hover:!bg-blue-50 dark:hover:!bg-blue-500/10" title="Lihat Detail" />
+                                    <flux:button wire:click="edit('{{ $catatan['tanggal'] }}')" icon="pencil-square" size="xs" variant="ghost" title="Edit Catatan" />
                                     <flux:button
                                         @click="
                                             Swal.fire({
@@ -185,7 +198,7 @@
                         <p class="text-xs text-neutral-500">{{ \Carbon\Carbon::parse($detailSbar['tanggal'])->format('d/m/Y H:i') }}</p>
                     </div>
                 </div>
-                <button wire:click="$set('detailSbar', null)" class="text-neutral-400 hover:text-neutral-600 transition-colors">
+                <button type="button" wire:click="$set('detailSbar', null)" class="text-neutral-400 hover:text-neutral-600 transition-colors">
                     <flux:icon name="x-mark" class="w-5 h-5" />
                 </button>
             </div>
@@ -206,22 +219,104 @@
 
             {{-- SBAR Content --}}
             <div class="px-6 py-5 space-y-5 max-h-[55vh] overflow-y-auto">
-                @foreach([
-                    ['label' => 'Situation (S)',      'value' => $detailSbar['situation'],      'bg' => 'bg-amber-50 dark:bg-amber-500/10', 'text' => 'text-amber-700 dark:text-amber-400', 'border' => 'border-amber-200 dark:border-amber-500/20', 'icon' => 'information-circle'],
-                    ['label' => 'Background (B)',     'value' => $detailSbar['background'],     'bg' => 'bg-blue-50 dark:bg-blue-500/10', 'text' => 'text-blue-700 dark:text-blue-400', 'border' => 'border-blue-200 dark:border-blue-500/20', 'icon' => 'clock'],
-                    ['label' => 'Assessment (A)',     'value' => $detailSbar['assessment'],     'bg' => 'bg-purple-50 dark:bg-purple-500/10', 'text' => 'text-purple-700 dark:text-purple-400', 'border' => 'border-purple-200 dark:border-purple-500/20', 'icon' => 'clipboard-document-check'],
-                    ['label' => 'Recommendation (R)', 'value' => $detailSbar['recommendation'], 'bg' => 'bg-emerald-50 dark:bg-emerald-500/10', 'text' => 'text-emerald-700 dark:text-emerald-400', 'border' => 'border-emerald-200 dark:border-emerald-500/20', 'icon' => 'light-bulb'],
-                ] as $row)
+                {{-- Situation --}}
                 <div class="flex flex-col gap-1.5">
                     <div class="flex items-center gap-2">
-                        <flux:icon name="{{ $row['icon'] }}" class="w-4 h-4 {{ $row['text'] }}" />
-                        <span class="text-xs font-bold uppercase tracking-wider {{ $row['text'] }}">{{ $row['label'] }}</span>
+                        <flux:icon name="information-circle" class="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Situation (S)</span>
                     </div>
-                    <div class="{{ $row['bg'] }} rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border {{ $row['border'] }} leading-relaxed">
-                        {{ $row['value'] ?: '-' }}
+                    <div class="bg-amber-50 dark:bg-amber-500/10 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border border-amber-200 dark:border-amber-500/20 leading-relaxed">{{ trim($detailSbar['situation'] ?? '') ?: '-' }}</div>
+                </div>
+
+                {{-- Background --}}
+                @php
+                    $hasDetailBg = !empty($detailSbar['bg_riwayat_penyakit_dahulu']) ||
+                                   !empty($detailSbar['bg_riwayat_penyakit']) ||
+                                   !empty($detailSbar['bg_informasi_klinis']) ||
+                                   !empty($detailSbar['bg_penunjang']) ||
+                                   !empty($detailSbar['bg_alergi']) ||
+                                   !empty($detailSbar['bg_terapi']) ||
+                                   !empty($detailSbar['bg_tensi']);
+                @endphp
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center gap-2">
+                        <flux:icon name="clock" class="w-4 h-4 text-blue-700 dark:text-blue-400" />
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">Background (B)</span>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-500/10 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 border border-blue-200 dark:border-blue-500/20 leading-relaxed space-y-3">
+                        @if($hasDetailBg)
+                            @if(!empty($detailSbar['bg_riwayat_penyakit_dahulu']))
+                                <div>
+                                    <div class="text-[11px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider">MRS / Riwayat Penyakit Dahulu</div>
+                                    <div class="text-xs text-neutral-700 dark:text-neutral-300 mt-0.5 whitespace-pre-wrap">{{ trim($detailSbar['bg_riwayat_penyakit_dahulu']) }}</div>
+                                </div>
+                            @endif
+                            @if(!empty($detailSbar['bg_riwayat_penyakit']))
+                                <div>
+                                    <div class="text-[11px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider">Riwayat Penyakit</div>
+                                    <div class="text-xs text-neutral-700 dark:text-neutral-300 mt-0.5 whitespace-pre-wrap">{{ trim($detailSbar['bg_riwayat_penyakit']) }}</div>
+                                </div>
+                            @endif
+                            @if(!empty($detailSbar['bg_informasi_klinis']))
+                                <div>
+                                    <div class="text-[11px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider">Informasi Klinis</div>
+                                    <div class="text-xs text-neutral-700 dark:text-neutral-300 mt-0.5 whitespace-pre-wrap">{{ trim($detailSbar['bg_informasi_klinis']) }}</div>
+                                </div>
+                            @endif
+                            @if(!empty($detailSbar['bg_penunjang']))
+                                <div>
+                                    <div class="text-[11px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider">Lab / Pemeriksaan Penunjang Lain</div>
+                                    <div class="text-xs text-neutral-700 dark:text-neutral-300 mt-0.5 whitespace-pre-wrap">{{ trim($detailSbar['bg_penunjang']) }}</div>
+                                </div>
+                            @endif
+                            @if(!empty($detailSbar['bg_alergi']))
+                                <div>
+                                    <div class="text-[11px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider">Riwayat Alergi</div>
+                                    <div class="text-xs text-neutral-700 dark:text-neutral-300 mt-0.5">{{ trim($detailSbar['bg_alergi']) }}</div>
+                                </div>
+                            @endif
+                            @if(!empty($detailSbar['bg_kesadaran']) || !empty($detailSbar['bg_tensi']) || !empty($detailSbar['bg_nadi']) || !empty($detailSbar['bg_respirasi']) || !empty($detailSbar['bg_suhu']) || !empty($detailSbar['bg_spo2']))
+                                <div>
+                                    <div class="text-[11px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-1">Tanda Vital Saat Ini</div>
+                                    <div class="flex flex-wrap gap-2 text-xs">
+                                        @if(!empty($detailSbar['bg_kesadaran'])) <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded font-mono">Kes: {{ $detailSbar['bg_kesadaran'] }}</span> @endif
+                                        @if(!empty($detailSbar['bg_tensi'])) <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded font-mono">TD: {{ $detailSbar['bg_tensi'] }} mmHg</span> @endif
+                                        @if(!empty($detailSbar['bg_nadi'])) <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded font-mono">Nadi: {{ $detailSbar['bg_nadi'] }} x/m</span> @endif
+                                        @if(!empty($detailSbar['bg_respirasi'])) <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded font-mono">RR: {{ $detailSbar['bg_respirasi'] }} /m</span> @endif
+                                        @if(!empty($detailSbar['bg_suhu'])) <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded font-mono">S: {{ $detailSbar['bg_suhu'] }} °C</span> @endif
+                                        @if(!empty($detailSbar['bg_spo2'])) <span class="bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded font-mono">SpO2: {{ $detailSbar['bg_spo2'] }}%</span> @endif
+                                    </div>
+                                </div>
+                            @endif
+                            @if(!empty($detailSbar['bg_terapi']))
+                                <div>
+                                    <div class="text-[11px] font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider">Terapi Saat Ini</div>
+                                    <div class="text-xs text-neutral-700 dark:text-neutral-300 mt-0.5 whitespace-pre-wrap">{{ $detailSbar['bg_terapi'] }}</div>
+                                </div>
+                            @endif
+                        @else
+                            <div class="whitespace-pre-wrap">{{ trim($detailSbar['background'] ?? '') ?: '-' }}</div>
+                        @endif
                     </div>
                 </div>
-                @endforeach
+
+                {{-- Assessment --}}
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center gap-2">
+                        <flux:icon name="clipboard-document-check" class="w-4 h-4 text-purple-700 dark:text-purple-400" />
+                        <span class="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">Assessment (A)</span>
+                    </div>
+                    <div class="bg-purple-50 dark:bg-purple-500/10 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border border-purple-200 dark:border-purple-500/20 leading-relaxed">{{ trim($detailSbar['assessment'] ?? '') ?: '-' }}</div>
+                </div>
+
+                {{-- Recommendation --}}
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center gap-2">
+                        <flux:icon name="light-bulb" class="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Recommendation (R)</span>
+                    </div>
+                    <div class="bg-emerald-50 dark:bg-emerald-500/10 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border border-emerald-200 dark:border-emerald-500/20 leading-relaxed">{{ trim($detailSbar['recommendation'] ?? '') ?: '-' }}</div>
+                </div>
 
                 @if($detailSbar['advice'])
                 <div class="flex flex-col gap-1.5 pt-2">
@@ -229,9 +324,7 @@
                         <flux:icon name="chat-bubble-left-ellipsis" class="w-4 h-4 text-sky-600 dark:text-sky-400" />
                         <span class="text-xs font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">Advice Dokter</span>
                     </div>
-                    <div class="bg-sky-50 dark:bg-sky-900/20 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border border-sky-200 dark:border-sky-800 leading-relaxed shadow-sm">
-                        {{ $detailSbar['advice'] }}
-                    </div>
+                    <div class="bg-sky-50 dark:bg-sky-900/20 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap border border-sky-200 dark:border-sky-800 leading-relaxed shadow-sm">{{ trim($detailSbar['advice'] ?? '') }}</div>
                 </div>
                 @endif
             </div>
@@ -262,6 +355,13 @@
 
                 {{-- Action Buttons --}}
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    @if(!empty($detailSbar['tanggal']))
+                        <a href="{{ route('modul.rawat-inap.catatan-sbar.cetak', [str_replace('/', '-', $regPeriksa->no_rawat), urlencode($detailSbar['tanggal'])]) }}" target="_blank">
+                            <flux:button icon="printer" variant="filled" size="sm" class="!bg-[#4C5C2D] !text-white hover:!bg-[#3d4a24]">
+                                Cetak SBAR
+                            </flux:button>
+                        </a>
+                    @endif
                     <flux:button wire:click="$set('detailSbar', null)" variant="ghost" class="w-full sm:w-auto">Tutup</flux:button>
                     
                     {{-- Verifikasi DPJP button hidden per request --}}
@@ -325,7 +425,7 @@
                         <p class="text-xs text-neutral-500">Formulir komunikasi Situation, Background, Assessment, Recommendation.</p>
                     </div>
                 </div>
-                <button @click="open = false" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
+                <button type="button" @click="open = false" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
                     <flux:icon name="x-mark" class="w-6 h-6" />
                 </button>
             </div>
@@ -334,14 +434,20 @@
             <div class="flex-1 overflow-y-auto p-8 space-y-6">
 
                 {{-- Patient Info Bar --}}
-                <div class="grid grid-cols-3 gap-4 bg-neutral-50 dark:bg-neutral-900 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
+                @php
+                    $lastKamar = $regPeriksa->kamarInap->sortByDesc('tgl_masuk')->first() ?? $regPeriksa->kamarInap->last();
+                    $nmBangsal = $lastKamar->kamar->bangsal->nm_bangsal ?? null;
+                    $kdKamar   = $lastKamar->kd_kamar ?? null;
+                    $kelasKmr  = $lastKamar->kamar->kelas ?? null;
+                @endphp
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-neutral-50 dark:bg-neutral-900 p-4 rounded-xl border border-neutral-100 dark:border-neutral-800">
                     <div>
                         <div class="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-1">No. Rawat</div>
                         <div class="font-mono text-sm font-semibold text-[#4C5C2D]">{{ $regPeriksa->no_rawat }}</div>
                     </div>
                     <div>
                         <div class="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-1">No. RM — Nama</div>
-                        <div class="text-sm font-bold text-neutral-800 dark:text-neutral-200">
+                        <div class="text-sm font-bold text-neutral-800 dark:text-neutral-200 truncate" title="{{ $regPeriksa->pasien->nm_pasien ?? '-' }}">
                             {{ $regPeriksa->no_rkm_medis }} — {{ $regPeriksa->pasien->nm_pasien }}
                         </div>
                     </div>
@@ -350,6 +456,22 @@
                         <div class="text-sm font-medium text-neutral-800 dark:text-neutral-200">
                             {{ $regPeriksa->pasien->tgl_lahir ? \Carbon\Carbon::parse($regPeriksa->pasien->tgl_lahir)->format('d-m-Y') : '-' }}
                         </div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-neutral-400 font-bold uppercase tracking-wider mb-1">Kamar / Bangsal</div>
+                        <div class="text-sm font-bold text-neutral-800 dark:text-neutral-200 flex items-center gap-1.5 flex-wrap">
+                            @if($nmBangsal)
+                                <span>{{ $nmBangsal }}</span>
+                                <span class="font-mono text-xs bg-[#4C5C2D]/10 dark:bg-[#4C5C2D]/20 text-[#4C5C2D] dark:text-[#8CC7C4] px-1.5 py-0.5 rounded font-bold border border-[#4C5C2D]/20">
+                                    {{ $kdKamar }}
+                                </span>
+                            @else
+                                <span class="text-neutral-400 font-normal italic">-</span>
+                            @endif
+                        </div>
+                        @if($kelasKmr)
+                            <div class="text-[11px] text-neutral-500 font-medium mt-0.5">{{ $kelasKmr }}</div>
+                        @endif
                     </div>
                 </div>
 
@@ -397,7 +519,7 @@
                                         <div class="text-xs font-bold text-[#4C5C2D] truncate max-w-[100px]">{{ $nmPetugas }}</div>
                                     </div>
                                 </div>
-                                <button wire:click="$set('nip', null)" class="text-neutral-400 hover:text-red-500 transition-colors">
+                                <button type="button" wire:click="$set('nip', null)" class="text-neutral-400 hover:text-red-500 transition-colors">
                                     <flux:icon name="x-mark" size="xs" />
                                 </button>
                             </div>
@@ -432,7 +554,7 @@
                                         <div class="text-xs font-bold text-blue-700 dark:text-blue-300 truncate max-w-[100px]" title="{{ $nmDokter }}">{{ $nmDokter }}</div>
                                     </div>
                                 </div>
-                                <button wire:click="$set('kd_dokter', null)" class="text-blue-400 hover:text-red-500 transition-colors">
+                                <button type="button" wire:click="$set('kd_dokter', null)" class="text-blue-400 hover:text-red-500 transition-colors">
                                     <flux:icon name="x-mark" size="xs" />
                                 </button>
                             </div>
@@ -440,48 +562,188 @@
                     </div>
                 </div>
 
-                {{-- 2-Column SBAR Textareas --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {{-- LEFT COLUMN --}}
-                    <div class="space-y-6">
-                        <div class="bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10 rounded-xl p-4 transition-colors focus-within:bg-amber-50 dark:focus-within:bg-amber-500/10 focus-within:border-amber-200 dark:focus-within:border-amber-500/20">
-                            <flux:label class="flex items-center gap-2 !mb-3">
+                {{-- Vertical Ordered SBAR Form (Urut Atas ke Bawah) --}}
+                <div class="space-y-6">
+                    {{-- 1. SITUATION (S) --}}
+                    <div class="bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10 rounded-xl p-5 transition-colors focus-within:bg-amber-50 dark:focus-within:bg-amber-500/10 focus-within:border-amber-200 dark:focus-within:border-amber-500/20">
+                        <flux:label class="flex items-center justify-between !mb-2">
+                            <div class="flex items-center gap-2">
                                 <flux:icon name="information-circle" class="w-4 h-4 text-amber-600 dark:text-amber-400" />
                                 <span class="text-amber-800 dark:text-amber-300 font-bold uppercase tracking-wider text-xs">Situation (S) *</span>
-                            </flux:label>
-                            <textarea wire:model="situation" rows="4" placeholder="Tuliskan situasi pasien saat ini..." class="w-full rounded-lg border border-amber-200/60 dark:border-amber-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition resize-y shadow-sm"></textarea>
-                            @error('situation') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
-                        </div>
+                            </div>
+                            <flux:tooltip content="Apa yang terjadi pada saat ini ? Apa keluhannya, kapan terjadinya dan bagaimana  parahnya." position="left">
+                                <span class="text-[11px] text-amber-700/90 dark:text-amber-400 cursor-help flex items-center gap-1 font-medium bg-amber-100/70 dark:bg-amber-500/20 px-2.5 py-0.5 rounded-full" title="Apa yang terjadi pada saat ini ? Apa keluhannya, kapan terjadinya dan bagaimana  parahnya.">
+                                    <flux:icon name="question-mark-circle" class="w-3.5 h-3.5 text-amber-600" /> Keterangan
+                                </span>
+                            </flux:tooltip>
+                        </flux:label>
+                        <textarea wire:model="situation" rows="3"
+                                  placeholder="Apa yang terjadi pada saat ini ?&#10;Apa keluhannya, kapan terjadinya dan bagaimana  parahnya."
+                                  class="w-full rounded-lg border border-amber-200/60 dark:border-amber-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition resize-y shadow-sm"></textarea>
+                        @error('situation') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
+                    </div>
 
-                        <div class="bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 rounded-xl p-4 transition-colors focus-within:bg-blue-50 dark:focus-within:bg-blue-500/10 focus-within:border-blue-200 dark:focus-within:border-blue-500/20">
-                            <flux:label class="flex items-center gap-2 !mb-3">
+                    {{-- 2. BACKGROUND (B) --}}
+                    <div class="bg-blue-50/50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 rounded-xl p-5 transition-colors focus-within:bg-blue-50 dark:focus-within:bg-blue-500/10 focus-within:border-blue-200 dark:focus-within:border-blue-500/20 space-y-4">
+                        <div class="flex items-center justify-between border-b border-blue-200/50 dark:border-blue-500/20 pb-3">
+                            <div class="flex items-center gap-2">
                                 <flux:icon name="clock" class="w-4 h-4 text-blue-600 dark:text-blue-400" />
                                 <span class="text-blue-800 dark:text-blue-300 font-bold uppercase tracking-wider text-xs">Background (B) *</span>
+                            </div>
+                            <flux:tooltip content="Informasi yang berkaitan / mungkin berkaitan dengan problemnya   (Ringkas dan penting untuk menerangkan problem yang terjadi atau untuk menentukan tindakan selanjutnya) " position="left">
+                                <span class="text-[11px] text-blue-700/90 dark:text-blue-400 cursor-help flex items-center gap-1 font-medium bg-blue-100/70 dark:bg-blue-500/20 px-2.5 py-0.5 rounded-full" title="Informasi yang berkaitan / mungkin berkaitan dengan problemnya   (Ringkas dan penting untuk menerangkan problem yang terjadi atau untuk menentukan tindakan selanjutnya) ">
+                                    <flux:icon name="question-mark-circle" class="w-3.5 h-3.5 text-blue-600" /> Keterangan
+                                </span>
+                            </flux:tooltip>
+                        </div>
+                        <p class="text-xs text-blue-600/90 dark:text-blue-400/80 leading-relaxed italic">
+                            Informasi yang berkaitan / mungkin berkaitan dengan problemnya (Ringkas dan penting untuk menerangkan problem yang terjadi atau untuk menentukan tindakan selanjutnya)
+                        </p>
+
+                        {{-- a. Riwayat penyakit dahulu / MRS --}}
+                        <div>
+                            <flux:label class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 !mb-1.5">
+                                Riwayat Penyakit Dahulu (MRS/Dirawat Dengan)
                             </flux:label>
-                            <textarea wire:model="background" rows="4" placeholder="Tuliskan latar belakang medis yang relevan..." class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y shadow-sm"></textarea>
-                            @error('background') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
+                            <textarea wire:model="bg_riwayat_penyakit_dahulu" rows="2"
+                                      placeholder="Contoh: Pasca SC 1 bulan yang lalu, tidak ada bendungan ASI..."
+                                      class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y shadow-sm"></textarea>
+                        </div>
+
+                        {{-- b. Riwayat penyakit --}}
+                        <div>
+                            <flux:label class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 !mb-1.5">
+                                Riwayat Penyakit
+                            </flux:label>
+                            <textarea wire:model="bg_riwayat_penyakit" rows="2"
+                                      placeholder="Contoh: Tidak ada riwayat penyakit, HT (-), DM (-)..."
+                                      class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y shadow-sm"></textarea>
+                        </div>
+
+                        {{-- c. Informasi Klinis --}}
+                        <div>
+                            <flux:label class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 !mb-1.5">
+                                Informasi Klinis
+                            </flux:label>
+                            <textarea wire:model="bg_informasi_klinis" rows="2"
+                                      placeholder="Contoh: K/U cukup, kes CM, GCS 4-5-6, mual (+)..."
+                                      class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y shadow-sm"></textarea>
+                        </div>
+
+                        {{-- d. Lab / Pemeriksaan penunjang lain --}}
+                        <div>
+                            <flux:label class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 !mb-1.5">
+                                Lab / Pemeriksaan Penunjang Lain
+                            </flux:label>
+                            <textarea wire:model="bg_penunjang" rows="2"
+                                      placeholder="Contoh: DL, WIDAL, Hasil USG, Radiologi..."
+                                      class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y shadow-sm"></textarea>
+                        </div>
+
+                        {{-- e. Riwayat Alergi --}}
+                        <div>
+                            <flux:label class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 !mb-1.5">
+                                Riwayat Alergi
+                            </flux:label>
+                            <input wire:model="bg_alergi" type="text"
+                                   placeholder="Contoh: Tidak ada alergi / Alergi Amoxicillin..."
+                                   class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition shadow-sm" />
+                        </div>
+
+                        {{-- f. Tanda Vital Saat Ini --}}
+                        <div class="bg-white/80 dark:bg-neutral-900/60 border border-blue-200/80 dark:border-blue-500/30 rounded-xl p-4 shadow-sm">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-blue-900 dark:text-blue-200 uppercase tracking-wider mb-3">
+                                <flux:icon name="heart" class="w-4 h-4 text-rose-500" />
+                                Tanda Vital Saat Ini
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                                <div>
+                                    <flux:label class="!text-[11px] !mb-1 text-neutral-600 dark:text-neutral-400">Kesadaran</flux:label>
+                                    <select wire:model="bg_kesadaran"
+                                            class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-xs px-2.5 py-2 focus:ring-2 focus:ring-blue-500/40 focus:outline-none shadow-sm cursor-pointer">
+                                        <option value="Compos Mentis">Compos Mentis</option>
+                                        <option value="Somnolence">Somnolence</option>
+                                        <option value="Sopor">Sopor</option>
+                                        <option value="Coma">Coma</option>
+                                        <option value="Apatis">Apatis</option>
+                                        <option value="Delirium">Delirium</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <flux:label class="!text-[11px] !mb-1 text-neutral-600 dark:text-neutral-400">TD (mmHg)</flux:label>
+                                    <input wire:model="bg_tensi" type="text" placeholder="137/89"
+                                           class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-xs px-2.5 py-2 focus:ring-2 focus:ring-blue-500/40 focus:outline-none shadow-sm" />
+                                </div>
+                                <div>
+                                    <flux:label class="!text-[11px] !mb-1 text-neutral-600 dark:text-neutral-400">Nadi (x/mnt)</flux:label>
+                                    <input wire:model="bg_nadi" type="text" placeholder="119"
+                                           class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-xs px-2.5 py-2 focus:ring-2 focus:ring-blue-500/40 focus:outline-none shadow-sm" />
+                                </div>
+                                <div>
+                                    <flux:label class="!text-[11px] !mb-1 text-neutral-600 dark:text-neutral-400">Resp (/menit)</flux:label>
+                                    <input wire:model="bg_respirasi" type="text" placeholder="20"
+                                           class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-xs px-2.5 py-2 focus:ring-2 focus:ring-blue-500/40 focus:outline-none shadow-sm" />
+                                </div>
+                                <div>
+                                    <flux:label class="!text-[11px] !mb-1 text-neutral-600 dark:text-neutral-400">Temp (°C)</flux:label>
+                                    <input wire:model="bg_suhu" type="text" placeholder="38.5"
+                                           class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-xs px-2.5 py-2 focus:ring-2 focus:ring-blue-500/40 focus:outline-none shadow-sm" />
+                                </div>
+                                <div>
+                                    <flux:label class="!text-[11px] !mb-1 text-neutral-600 dark:text-neutral-400">SpO2 (%)</flux:label>
+                                    <input wire:model="bg_spo2" type="text" placeholder="98"
+                                           class="w-full rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-xs px-2.5 py-2 focus:ring-2 focus:ring-blue-500/40 focus:outline-none shadow-sm" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- g. Terapi saat ini --}}
+                        <div>
+                            <flux:label class="text-xs font-semibold text-neutral-700 dark:text-neutral-300 !mb-1.5">
+                                Terapi Saat Ini
+                            </flux:label>
+                            <textarea wire:model="bg_terapi" rows="2"
+                                      placeholder="Contoh: Terpasang Infus NaCl 0.9%..."
+                                      class="w-full rounded-lg border border-blue-200/60 dark:border-blue-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition resize-y shadow-sm"></textarea>
                         </div>
                     </div>
 
-                    {{-- RIGHT COLUMN --}}
-                    <div class="space-y-6">
-                        <div class="bg-purple-50/50 dark:bg-purple-500/5 border border-purple-100 dark:border-purple-500/10 rounded-xl p-4 transition-colors focus-within:bg-purple-50 dark:focus-within:bg-purple-500/10 focus-within:border-purple-200 dark:focus-within:border-purple-500/20">
-                            <flux:label class="flex items-center gap-2 !mb-3">
+                    {{-- 3. ASSESSMENT (A) --}}
+                    <div class="bg-purple-50/50 dark:bg-purple-500/5 border border-purple-100 dark:border-purple-500/10 rounded-xl p-5 transition-colors focus-within:bg-purple-50 dark:focus-within:bg-purple-500/10 focus-within:border-purple-200 dark:focus-within:border-purple-500/20">
+                        <flux:label class="flex items-center justify-between !mb-2">
+                            <div class="flex items-center gap-2">
                                 <flux:icon name="clipboard-document-check" class="w-4 h-4 text-purple-600 dark:text-purple-400" />
                                 <span class="text-purple-800 dark:text-purple-300 font-bold uppercase tracking-wider text-xs">Assessment (A) *</span>
-                            </flux:label>
-                            <textarea wire:model="assessment" rows="4" placeholder="Tuliskan hasil asesmen kesimpulan klinis..." class="w-full rounded-lg border border-purple-200/60 dark:border-purple-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 transition resize-y shadow-sm"></textarea>
-                            @error('assessment') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
-                        </div>
+                            </div>
+                            <flux:tooltip content="Kesimpulan diagnosa dari situasi dan background" position="left">
+                                <span class="text-[11px] text-purple-700/90 dark:text-purple-400 cursor-help flex items-center gap-1 font-medium bg-purple-100/70 dark:bg-purple-500/20 px-2.5 py-0.5 rounded-full" title="Kesimpulan diagnosa dari situasi dan background">
+                                    <flux:icon name="question-mark-circle" class="w-3.5 h-3.5 text-purple-600" /> Keterangan
+                                </span>
+                            </flux:tooltip>
+                        </flux:label>
+                        <textarea wire:model="assessment" rows="3"
+                                  placeholder="Kesimpulan diagnosa dari situasi dan background"
+                                  class="w-full rounded-lg border border-purple-200/60 dark:border-purple-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500 transition resize-y shadow-sm"></textarea>
+                        @error('assessment') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
+                    </div>
 
-                        <div class="bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 rounded-xl p-4 transition-colors focus-within:bg-emerald-50 dark:focus-within:bg-emerald-500/10 focus-within:border-emerald-200 dark:focus-within:border-emerald-500/20">
-                            <flux:label class="flex items-center gap-2 !mb-3">
+                    {{-- 4. RECOMMENDATION (R) --}}
+                    <div class="bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 rounded-xl p-5 transition-colors focus-within:bg-emerald-50 dark:focus-within:bg-emerald-500/10 focus-within:border-emerald-200 dark:focus-within:border-emerald-500/20">
+                        <flux:label class="flex items-center justify-between !mb-2">
+                            <div class="flex items-center gap-2">
                                 <flux:icon name="light-bulb" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                 <span class="text-emerald-800 dark:text-emerald-300 font-bold uppercase tracking-wider text-xs">Recommendation (R) *</span>
-                            </flux:label>
-                            <textarea wire:model="recommendation" rows="4" placeholder="Tuliskan rekomendasi asuhan atau intervensi..." class="w-full rounded-lg border border-emerald-200/60 dark:border-emerald-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition resize-y shadow-sm"></textarea>
-                            @error('recommendation') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
-                        </div>
+                            </div>
+                            <flux:tooltip content="usulan dan petunjuk untuk mengatasi problem" position="left">
+                                <span class="text-[11px] text-emerald-700/90 dark:text-emerald-400 cursor-help flex items-center gap-1 font-medium bg-emerald-100/70 dark:bg-emerald-500/20 px-2.5 py-0.5 rounded-full" title="usulan dan petunjuk untuk mengatasi problem">
+                                    <flux:icon name="question-mark-circle" class="w-3.5 h-3.5 text-emerald-600" /> Keterangan
+                                </span>
+                            </flux:tooltip>
+                        </flux:label>
+                        <textarea wire:model="recommendation" rows="3"
+                                  placeholder="usulan dan petunjuk untuk mengatasi problem"
+                                  class="w-full rounded-lg border border-emerald-200/60 dark:border-emerald-500/20 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 transition resize-y shadow-sm"></textarea>
+                        @error('recommendation') <div class="text-red-500 text-xs mt-1">{{ $message }}</div> @enderror
                     </div>
                 </div>
 

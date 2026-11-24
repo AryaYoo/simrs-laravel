@@ -56,7 +56,7 @@
                     ]},
                     { label: 'RM Operasi', children: [
                         { label: 'Pengkajian Pre Induksi', url: '#' },
-                        { label: 'Check List Pre Operasi', url: '#' },
+                        { label: 'Check List Pre Operasi', url: '{{ route('modul.rawat-inap.sub-rawat-inap.checklist-pre-operasi', str_replace('/', '-', $no_rawat)) }}' },
                         { label: 'Sign-In Sebelum Anestesi', url: '#' },
                         { label: 'Time-Out Sebelum Insisi', url: '#' },
                         { label: 'Sign-Out Sebelum Menutup Luka', url: '#' },

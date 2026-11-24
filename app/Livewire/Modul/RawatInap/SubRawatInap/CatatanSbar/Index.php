@@ -22,6 +22,21 @@ class Index extends Component
     public $nip, $nmPetugas;
     public $kd_dokter, $nmDokter;
     public $situation, $background, $assessment, $recommendation, $advice;
+
+    // Sub-form Background (B)
+    public $bg_riwayat_penyakit_dahulu;
+    public $bg_riwayat_penyakit;
+    public $bg_informasi_klinis;
+    public $bg_penunjang;
+    public $bg_alergi;
+    public $bg_kesadaran = 'Compos Mentis';
+    public $bg_tensi;
+    public $bg_nadi;
+    public $bg_respirasi;
+    public $bg_suhu;
+    public $bg_spo2;
+    public $bg_terapi;
+
     public $status_baca = 'Belum';
     public $status_konfirmasi = 'Belum';
     public $status_verifikasi = 'Belum';
@@ -37,7 +52,7 @@ class Index extends Component
     public function mount($no_rawat)
     {
         $this->noRawat = str_replace('-', '/', $no_rawat);
-        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik'])
+        $this->regPeriksa = RegPeriksa::with(['pasien', 'dokter', 'poliklinik', 'kamarInap.kamar.bangsal'])
             ->where('no_rawat', $this->noRawat)
             ->firstOrFail();
 
@@ -62,9 +77,14 @@ class Index extends Component
     {
         $this->reset([
             'nip', 'nmPetugas', 'petugasSearch',
-            'situation', 'background', 'assessment', 'recommendation', 'advice',
+            'situation', 'background',
+            'bg_riwayat_penyakit_dahulu', 'bg_riwayat_penyakit', 'bg_informasi_klinis', 'bg_penunjang', 'bg_alergi',
+            'bg_kesadaran', 'bg_tensi', 'bg_nadi', 'bg_respirasi', 'bg_suhu', 'bg_spo2', 'bg_terapi',
+            'assessment', 'recommendation', 'advice',
             'status_baca', 'status_konfirmasi', 'old_tanggal'
         ]);
+        $this->bg_kesadaran = 'Compos Mentis';
+
         // Kembalikan default DPJP
         $this->kd_dokter = $this->regPeriksa->kd_dokter;
         $this->nmDokter = $this->regPeriksa->dokter->nm_dokter ?? '';
@@ -109,6 +129,34 @@ class Index extends Component
             $this->nmDokter          = $catatan['dokter']['nama'] ?? '';
             $this->situation         = $catatan['situation'];
             $this->background        = $catatan['background'];
+
+            // Sub-form Background
+            $this->bg_riwayat_penyakit_dahulu = $catatan['bg_riwayat_penyakit_dahulu'] ?? '';
+            $this->bg_riwayat_penyakit        = $catatan['bg_riwayat_penyakit'] ?? '';
+            $this->bg_informasi_klinis        = $catatan['bg_informasi_klinis'] ?? '';
+            $this->bg_penunjang               = $catatan['bg_penunjang'] ?? '';
+            $this->bg_alergi                  = $catatan['bg_alergi'] ?? '';
+            $this->bg_kesadaran               = $catatan['bg_kesadaran'] ?? 'Compos Mentis';
+            $this->bg_tensi                   = $catatan['bg_tensi'] ?? '';
+            $this->bg_nadi                    = $catatan['bg_nadi'] ?? '';
+            $this->bg_respirasi               = $catatan['bg_respirasi'] ?? '';
+            $this->bg_suhu                    = $catatan['bg_suhu'] ?? '';
+            $this->bg_spo2                    = $catatan['bg_spo2'] ?? '';
+            $this->bg_terapi                  = $catatan['bg_terapi'] ?? '';
+
+            // Graceful fallback untuk data lama yang belum punya sub-kolom
+            $hasSubFields = !empty(trim($this->bg_riwayat_penyakit_dahulu ?? '')) ||
+                            !empty(trim($this->bg_riwayat_penyakit ?? '')) ||
+                            !empty(trim($this->bg_informasi_klinis ?? '')) ||
+                            !empty(trim($this->bg_penunjang ?? '')) ||
+                            !empty(trim($this->bg_alergi ?? '')) ||
+                            !empty(trim($this->bg_terapi ?? '')) ||
+                            !empty(trim($this->bg_tensi ?? ''));
+
+            if (!$hasSubFields && !empty(trim($catatan['background'] ?? ''))) {
+                $this->bg_informasi_klinis = $catatan['background'];
+            }
+
             $this->assessment        = $catatan['assessment'];
             $this->recommendation    = $catatan['recommendation'];
             $this->advice            = $catatan['advice'];
@@ -146,7 +194,6 @@ class Index extends Component
                 'nip'               => 'required',
                 'kd_dokter'         => 'required',
                 'situation'         => 'required|string',
-                'background'        => 'required|string',
                 'assessment'        => 'required|string',
                 'recommendation'    => 'required|string',
                 'advice'            => 'nullable|string',
@@ -158,28 +205,84 @@ class Index extends Component
                 'nip.required'            => 'Petugas wajib dipilih.',
                 'kd_dokter.required'      => 'DPJP wajib dipilih.',
                 'situation.required'      => 'Situation (S) wajib diisi.',
-                'background.required'     => 'Background (B) wajib diisi.',
                 'assessment.required'     => 'Assessment (A) wajib diisi.',
                 'recommendation.required' => 'Recommendation (R) wajib diisi.',
             ]);
+
+            // Auto-compile background summary dari sub-field
+            $bgParts = [];
+            if (!empty(trim($this->bg_riwayat_penyakit_dahulu ?? ''))) {
+                $bgParts[] = "MRS/Riwayat Penyakit Dahulu: " . trim($this->bg_riwayat_penyakit_dahulu);
+            }
+            if (!empty(trim($this->bg_riwayat_penyakit ?? ''))) {
+                $bgParts[] = "Riwayat Penyakit: " . trim($this->bg_riwayat_penyakit);
+            }
+            if (!empty(trim($this->bg_informasi_klinis ?? ''))) {
+                $bgParts[] = "Informasi Klinis: " . trim($this->bg_informasi_klinis);
+            }
+            if (!empty(trim($this->bg_penunjang ?? ''))) {
+                $bgParts[] = "Lab/Penunjang Lain: " . trim($this->bg_penunjang);
+            }
+            if (!empty(trim($this->bg_alergi ?? ''))) {
+                $bgParts[] = "Riwayat Alergi: " . trim($this->bg_alergi);
+            }
+
+            $vitalParts = [];
+            if (!empty(trim($this->bg_kesadaran ?? ''))) $vitalParts[] = "Kesadaran: " . trim($this->bg_kesadaran);
+            if (!empty(trim($this->bg_tensi ?? ''))) $vitalParts[] = "TD: " . trim($this->bg_tensi) . " mmHg";
+            if (!empty(trim($this->bg_nadi ?? ''))) $vitalParts[] = "Nadi: " . trim($this->bg_nadi) . " x/mnt";
+            if (!empty(trim($this->bg_respirasi ?? ''))) $vitalParts[] = "Resp: " . trim($this->bg_respirasi) . " /mnt";
+            if (!empty(trim($this->bg_suhu ?? ''))) $vitalParts[] = "Temp: " . trim($this->bg_suhu) . " °C";
+            if (!empty(trim($this->bg_spo2 ?? ''))) $vitalParts[] = "SpO2: " . trim($this->bg_spo2) . " %";
+            if (!empty($vitalParts)) {
+                $bgParts[] = "Tanda Vital: " . implode(', ', $vitalParts);
+            }
+
+            if (!empty(trim($this->bg_terapi ?? ''))) {
+                $bgParts[] = "Terapi Saat Ini: " . trim($this->bg_terapi);
+            }
+
+            // Validasi minimal ada 1 isian background
+            if (empty($bgParts)) {
+                $this->dispatch('swal', [
+                    'title' => 'Background Belum Terisi!',
+                    'text' => 'Mohon isi minimal salah satu informasi pada bagian Background (B).',
+                    'icon' => 'warning'
+                ]);
+                return;
+            }
+
+            $this->background = implode("\n", $bgParts);
 
             $this->validateLock($this->regPeriksa->fresh());
 
             $tanggalFull = $this->tanggal_date . ' ' . $this->tanggal_time . ':00';
 
             $data = [
-                'no_rawat'          => $this->noRawat,
-                'tanggal'           => $tanggalFull,
-                'nip'               => $this->nip,
-                'kd_dokter'         => $this->kd_dokter,
-                'situation'         => $this->situation,
-                'background'        => $this->background,
-                'assessment'        => $this->assessment,
-                'recommendation'    => $this->recommendation,
-                'advice'            => $this->advice ?? '',
-                'status_baca'       => $this->status_baca,
-                'status_konfirmasi' => $this->status_konfirmasi,
-                'status_verifikasi' => $this->status_verifikasi,
+                'no_rawat'                   => $this->noRawat,
+                'tanggal'                    => $tanggalFull,
+                'nip'                        => $this->nip,
+                'kd_dokter'                  => $this->kd_dokter,
+                'situation'                  => $this->situation,
+                'background'                 => $this->background,
+                'bg_riwayat_penyakit_dahulu' => $this->bg_riwayat_penyakit_dahulu,
+                'bg_riwayat_penyakit'        => $this->bg_riwayat_penyakit,
+                'bg_informasi_klinis'        => $this->bg_informasi_klinis,
+                'bg_penunjang'               => $this->bg_penunjang,
+                'bg_alergi'                  => $this->bg_alergi,
+                'bg_kesadaran'               => $this->bg_kesadaran,
+                'bg_tensi'                   => $this->bg_tensi,
+                'bg_nadi'                    => $this->bg_nadi,
+                'bg_respirasi'               => $this->bg_respirasi,
+                'bg_suhu'                    => $this->bg_suhu,
+                'bg_spo2'                    => $this->bg_spo2,
+                'bg_terapi'                  => $this->bg_terapi,
+                'assessment'                 => $this->assessment,
+                'recommendation'             => $this->recommendation,
+                'advice'                     => $this->advice ?? '',
+                'status_baca'                => $this->status_baca,
+                'status_konfirmasi'          => $this->status_konfirmasi,
+                'status_verifikasi'          => $this->status_verifikasi,
             ];
 
             if ($this->isEditMode) {
@@ -189,6 +292,8 @@ class Index extends Component
                 $repository->store($data);
                 $msg = 'Catatan SBAR berhasil disimpan.';
             }
+
+            $this->initializeLock($this->regPeriksa->fresh());
 
             $this->isPanelOpen = false;
             $this->loadCatatans();
