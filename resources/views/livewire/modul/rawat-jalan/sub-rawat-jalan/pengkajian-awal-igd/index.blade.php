@@ -81,8 +81,9 @@
                         </flux:table.cell>
                         <flux:table.cell>
                             <div class="flex justify-center gap-2">
-                                <flux:button wire:click="viewData('{{ $item['no_rawat'] }}')" icon="eye" size="xs" variant="ghost" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10" />
-                                <flux:button href="{{ route('modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd.form', str_replace('/', '-', $item['no_rawat'])) }}" wire:navigate icon="pencil-square" size="xs" variant="ghost" />
+                                <flux:button wire:click="viewData('{{ $item['no_rawat'] }}')" icon="eye" size="xs" variant="ghost" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10" title="Lihat Detail" />
+                                <flux:button href="{{ route('modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd.form', str_replace('/', '-', $item['no_rawat'])) }}" wire:navigate icon="pencil-square" size="xs" variant="ghost" title="Edit Pengkajian" />
+                                <flux:button href="{{ route('modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd.cetak', str_replace('/', '-', $item['no_rawat'])) }}" target="_blank" icon="printer" size="xs" variant="ghost" class="!text-[#4C5C2D] hover:!bg-emerald-50 dark:hover:!bg-emerald-500/10" title="Cetak Pengkajian IGD" />
                                 <flux:button
                                     @click="
                                         Swal.fire({
@@ -100,7 +101,7 @@
                                             }
                                         })
                                     "
-                                    icon="trash" size="xs" variant="ghost" class="!text-red-500 hover:!bg-red-50 dark:hover:!bg-red-500/10" />
+                                    icon="trash" size="xs" variant="ghost" class="!text-red-500 hover:!bg-red-50 dark:hover:!bg-red-500/10" title="Hapus Pengkajian" />
                             </div>
                         </flux:table.cell>
                     </flux:table.row>
@@ -157,9 +158,17 @@
                           <p class="text-xs text-neutral-500">Rekam medis pengkajian awal keperawatan IGD</p>
                       </div>
                   </div>
-                  <button @click="open = false" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors">
-                      <flux:icon name="x-mark" class="w-6 h-6" />
-                  </button>
+                  <div class="flex items-center gap-2">
+                      @if($detailData)
+                          <a href="{{ route('modul.rawat-jalan.sub-rawat-jalan.pengkajian-awal-keperawatan-igd.cetak', str_replace('/', '-', $detailData['no_rawat'])) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#4C5C2D] hover:bg-[#3D4A24] rounded-lg transition-colors shadow-sm" title="Cetak Pengkajian IGD">
+                              <flux:icon name="printer" class="w-4 h-4" />
+                              <span>Cetak</span>
+                          </a>
+                      @endif
+                      <button @click="open = false" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 transition-colors p-1" title="Tutup">
+                          <flux:icon name="x-mark" class="w-6 h-6" />
+                      </button>
+                  </div>
               </div>
 
               {{-- Body --}}
